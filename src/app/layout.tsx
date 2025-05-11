@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Sidebar } from "lucide-react";
-import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
 import Image from "next/image";
 
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -50,30 +50,60 @@ export default function RootLayout({
       <body
         className={`antialiased`}
       >
-        <SidebarProvider>
-          <Sidebar>
-            <SidebarContent>
-            <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-            </SidebarContent>
-          </Sidebar>
-        </SidebarProvider>
-        {children}
+        <div className="flex flex-col h-screen overflow-hidden">
+          <header className="w-full bg-blue-600 px-4 py-6">
+            Cabeçalho
+          </header>
+          <div className="flex flex-1">
+            <SidebarProvider>
+              <Sidebar
+                variant="inset" collapsible="icon" className="relative"
+              >
+                <SidebarHeader className="flex flex-col gap-4">
+                    <Image className="rounded-md" src="https://picsum.photos/100" alt="Logo" width={32} height={32} />
+                  </SidebarHeader>
+                  <SidebarContent>
+                    <SidebarGroup>
+                      <SidebarGroupLabel className="bg-zinc-200 rounded-md">
+                        <h3 className="font-semibold">MInha Conta</h3>
+                      </SidebarGroupLabel>
+                      <SidebarMenu>
+                        {items.map((item) => (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton asChild>
+                              <a href={item.url} className="flex items-center gap-2">
+                                <item.icon size={20} />
+                                <span>{item.title}</span>
+                              </a>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        ))}
+                      </SidebarMenu>
+                    </SidebarGroup>
+                    <SidebarGroup>
+                      <SidebarGroupLabel>
+                        <h3>Configurações</h3>
+                      </SidebarGroupLabel>
+                    </SidebarGroup>
+                  </SidebarContent>
+                  <SidebarFooter>
+                    <div className="flex items-center gap-4">
+                      <Image className="rounded-md" src="https://picsum.photos/100" alt="Logo" width={32} height={32} />
+                      <h1 className="text-lg font-semibold">
+                      </h1>
+                    </div>
+                  </SidebarFooter>
+            
+              </Sidebar>
+              <SidebarTrigger className="mt-10" />
+            </SidebarProvider>
+
+            <div>
+              {children}
+              
+            </div>
+          </div>
+        </div>
         
       </body>
     </html>
