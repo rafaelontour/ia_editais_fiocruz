@@ -37,14 +37,18 @@ export const firstChartData =[{
 export const secondChartData =[{
   tipo : "Tipo 1",
   valor : 200,
+  fill: "#4d4d4d"
 },{
   tipo : "Tipo 2",
   valor : 250,
+  fill: "#c2272c"
 },{
   tipo : "Tipo 3",
   valor : 162,
+  fill: "#898500"
 },{
   tipo : "Tipo 4",
   valor : 180,
+  fill: "#006938"
 },
 ]
