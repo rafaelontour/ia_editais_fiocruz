@@ -11,7 +11,7 @@ export default function Home() {
   return (
   <div className="bg-[url(/backgroundImg.png)]  px-12 pb-4 rounded w-full h-full flex justify-center items-center gap-12 flex-col">
     <h1 className="text-5xl font-bold mt-12 w-1/2 text-center leading-tight">Centralize, organize e otimize seus 
-    <strong className="bg-red-600 text-white px-2 rounded-xl">editais</strong> em um só lugar.</h1>
+    <span className="bg-red-600 text-white px-2 rounded-md font-semibold">editais</span> em um só lugar.</h1>
 
     <div className="flex gap-4 font-medium">
       <button className="text-red-700 border-red-700 border-solid border-2 px-6 py-2 rounded-md cursor-pointer">Módulo base de conhecimento</button>
