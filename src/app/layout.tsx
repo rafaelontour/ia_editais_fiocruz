@@ -59,17 +59,14 @@ export default function RootLayout({
               <Sidebar
                 variant="inset" collapsible="icon" className="relative"
               >
-                <SidebarHeader className="flex flex-col gap-4">
-                    <Image className="rounded-md" src="https://picsum.photos/100" alt="Logo" width={32} height={32} />
-                  </SidebarHeader>
                   <SidebarContent>
                     <SidebarGroup>
-                      <SidebarGroupLabel className="bg-zinc-200 rounded-md">
-                        <h3 className="font-semibold">MInha Conta</h3>
-                      </SidebarGroupLabel>
                       <SidebarMenu>
                         {items.map((item) => (
-                          <SidebarMenuItem key={item.title}>
+                          <SidebarMenuItem
+                            key={item.title}
+                            className="pl-2"
+                          >
                             <SidebarMenuButton asChild>
                               <a href={item.url} className="flex items-center gap-2">
                                 <item.icon size={20} />
@@ -96,21 +93,41 @@ export default function RootLayout({
             
               </Sidebar>
               <div
-                style={{
-                  borderTopLeftRadius: "20px",
-                  backgroundColor: "white"
-                }}
+                className="
+                  flex flex-1 relative
+                "
               >
-                <SidebarTrigger className="mt-5 ml-5" />
+                <div
+                  className="
+                    absolute left-3 top-3
+                    
+                  "
+                >
+                  <SidebarTrigger
+                    className="
+                      mt-5 ml-5
+                      hover:cursor-pointer
+                    "
+                  />
+                </div>
+                <div
+                  className="
+                    flex
+                    bg-yellow-400 flex-1 pt-20 pl-14
+                  "
+                    style={{
+                      boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
+                      marginLeft: "10px",
+                      borderRadius: "10px 10px 0 0"
+                    }}
+                >
+                  {children}
+                </div>
               </div>
             </SidebarProvider>
 
-            <div className="bg-white flex-1 pt-8 pl-7">
-              {children}
-            </div>
           </div>
         </div>
-        
       </body>
     </html>
   );
