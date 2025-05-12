@@ -1,0 +1,35 @@
+export const infoBarInfos = [{
+    titulo: "Editais recebidos",
+    valor: 200
+  },{
+    titulo: "Editais em análise",
+    valor: 176, 
+  },{
+    titulo: "Editais concluidos",
+    valor: 689,
+  },{
+  titulo: "Usuários",
+  valor: 30
+  }
+]
+
+export const firstChartData =[{
+  tipo : "Tipo 1",
+  valor : 200,
+},{
+  tipo : "Tipo 2",
+  valor : 250,
+},{
+  tipo : "Tipo 3",
+  valor : 162,
+},{
+  tipo : "Tipo 4",
+  valor : 180,
+},{
+  tipo : "Tipo 5",
+  valor : 345,
+},{
+  tipo : "Tipo 6",
+  valor : 80,
+},
+]
