@@ -58,7 +58,7 @@ export default function RootLayout({
                             <SidebarMenuButton
                               className="
                                 hover:bg-[#D03C30] rounded-sm
-                                hover:text-white
+                                hover:text-white bg-[#CCCCCC]
                               "
                               asChild
                             >
@@ -86,6 +86,7 @@ export default function RootLayout({
                   </SidebarFooter>
             
               </Sidebar>
+
               <div
                 className="
                   flex flex-1 relative
