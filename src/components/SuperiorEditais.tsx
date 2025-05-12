@@ -3,6 +3,12 @@ import CategoriaColor from "./CategoriaColor";
 import { Button } from "./ui/button";
 
 export default function SuperiorEditais () {
+
+    const status = [
+        { nome:"Retrabalhando", color:"green" },
+        { nome:"Retrabalhar", color:"red" }
+    ]
+
     return(
         <div className="flex felx-row justify-between items-center gap-5 px-2 h-12">
             <div className="flex flex-row gap-7 items-center">
@@ -10,9 +16,9 @@ export default function SuperiorEditais () {
                 <h2 className="text-2xl font-bold">Meus editais</h2>
             </div>
             <div className="flex flex-row gap-7 items-center">
-                <div className="text-slate-400 flex gap-5">
+                <div className="text-slate-400 flex gap-5 text-sm">
                     <p>Legendas:</p>
-                    <CategoriaColor/>
+                    <CategoriaColor categoria={status}/>
                 
                 </div>
                 <Button variant={"outline"}>Enviar novo edital</Button> {/* ADICIONAR ÍCONE */}

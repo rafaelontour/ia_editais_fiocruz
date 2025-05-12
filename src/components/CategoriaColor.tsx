@@ -1,17 +1,21 @@
 
 
-export default function CategoriaColor () {
-    // FUTURO SELECT -> STATUS
-    const status = [
-        { nome:"Retrabalhando", color:"green" },
-        { nome:"Retrabalhar", color:"red" }
-    ]
+export interface Categoria {
+  nome: string;
+  color: string;
+}
+
+interface CategoriaColorProps{
+    categoria: Categoria[];
+}
+
+export default function CategoriaColor ({categoria} : CategoriaColorProps) {
 
     return(
         <div>
             
             <div className="flex flex-row gap-5">
-                {status.map((item) => (
+                {categoria.map((item) => (
                     <div key={item.nome} className="flex items-center gap-3">
                         <div className="rounded-xs w-3 h-3" style={{ backgroundColor: item.color }}></div>
                         <p>{item.nome}</p>
