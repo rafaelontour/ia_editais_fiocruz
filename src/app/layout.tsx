@@ -48,10 +48,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`antialiased`}
+        className={`antialiased bg-[#F5F5F5]`}
       >
         <div className="flex flex-col h-screen overflow-hidden">
-          <header className="w-full bg-blue-600 px-4 py-6">
+          <header className="w-full bg-[#F5F5F5] px-4 py-6">
             Cabeçalho
           </header>
           <div className="flex flex-1">
@@ -95,12 +95,18 @@ export default function RootLayout({
                   </SidebarFooter>
             
               </Sidebar>
-              <SidebarTrigger className="mt-10" />
+              <div
+                style={{
+                  borderTopLeftRadius: "20px",
+                  backgroundColor: "white"
+                }}
+              >
+                <SidebarTrigger className="mt-5 ml-5" />
+              </div>
             </SidebarProvider>
 
-            <div>
+            <div className="bg-white flex-1 pt-8 pl-7">
               {children}
-              
             </div>
           </div>
         </div>
