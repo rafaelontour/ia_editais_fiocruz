@@ -3,8 +3,9 @@ import "./globals.css";
 
 import Image from "next/image";
 
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { GitGraph, Home, Sheet } from "lucide-react"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import Cabecalho from "@/components/Cabecalho";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,30 +20,20 @@ export default function RootLayout({
  
   const items = [
     {
-      title: "Home",
+      title: "Página Inicial",
       url: "#",
       icon: Home,
     },
     {
-      title: "Inbox",
+      title: "Meus editais",
       url: "#",
-      icon: Inbox,
+      icon: Sheet,
     },
     {
-      title: "Calendar",
+      title: "Estatísticas",
       url: "#",
-      icon: Calendar,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-    },
+      icon: GitGraph,
+    }
   ]
 
   return (
@@ -51,39 +42,39 @@ export default function RootLayout({
         className={`antialiased bg-[#F5F5F5]`}
       >
         <div className="flex flex-col h-screen overflow-hidden">
-          <header className="w-full bg-[#F5F5F5] px-4 py-6">
-            Cabeçalho
-          </header>
+          <Cabecalho />
           <div className="flex flex-1">
             <SidebarProvider>
               <Sidebar
                 variant="inset" collapsible="icon" className="relative"
               >
-                <SidebarHeader className="flex flex-col gap-4">
-                    <Image className="rounded-md" src="https://picsum.photos/100" alt="Logo" width={32} height={32} />
-                  </SidebarHeader>
                   <SidebarContent>
                     <SidebarGroup>
-                      <SidebarGroupLabel className="bg-zinc-200 rounded-md">
-                        <h3 className="font-semibold">MInha Conta</h3>
-                      </SidebarGroupLabel>
                       <SidebarMenu>
                         {items.map((item) => (
-                          <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton asChild>
-                              <a href={item.url} className="flex items-center gap-2">
-                                <item.icon size={20} />
+                          <SidebarMenuItem
+                            key={item.title}
+                          >
+                            <SidebarMenuButton
+                              className="
+                                hover:bg-[#D03C30] rounded-sm
+                                hover:text-white bg-[#CCCCCC]
+                              "
+                              asChild
+                            >
+                              <a
+                                href={item.url}
+                                className="
+                                  flex items-center gap-2
+                                "
+                              >
+                                <item.icon className="w-5 h-5" />
                                 <span>{item.title}</span>
                               </a>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                         ))}
                       </SidebarMenu>
-                    </SidebarGroup>
-                    <SidebarGroup>
-                      <SidebarGroupLabel>
-                        <h3>Configurações</h3>
-                      </SidebarGroupLabel>
                     </SidebarGroup>
                   </SidebarContent>
                   <SidebarFooter>
@@ -95,13 +86,37 @@ export default function RootLayout({
                   </SidebarFooter>
             
               </Sidebar>
+
               <div
-                style={{
-                  borderTopLeftRadius: "20px",
-                  backgroundColor: "white"
-                }}
+                className="
+                  flex flex-1 relative
+                "
               >
-                <SidebarTrigger className="mt-5 ml-5" />
+                <div
+                  className="
+                    absolute left-3 top-3
+                    
+                  "
+                >
+                  <SidebarTrigger
+                    className="
+                      mt-5 ml-5
+                      hover:cursor-pointer
+                    "
+                  />
+                </div>
+                <div
+                  className="
+                    flex
+                    bg-white flex-1 pt-20 pl-14
+                  "
+                    style={{
+                      boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
+                      borderRadius: "10px 10px 0 0"
+                    }}
+                >
+                  {children}
+                </div>
               </div>
             </SidebarProvider>
 
@@ -110,7 +125,6 @@ export default function RootLayout({
             </div>
           </div>
         </div>
-        
       </body>
     </html>
   );
