@@ -98,7 +98,7 @@ export default function RootLayout({
               <SidebarTrigger className="mt-10" />
             </SidebarProvider>
 
-            <div>
+            <div className="h-full w-full">
               {children}
               
             </div>
