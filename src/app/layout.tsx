@@ -45,7 +45,6 @@ export default function RootLayout({
       >
         <div className="flex flex-col h-screen overflow-hidden">
           <Cabecalho />
-          <Cabecalho />
           <div className="flex flex-1">
             <SidebarProvider>
               <Sidebar
