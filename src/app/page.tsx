@@ -9,7 +9,7 @@ export default function Home() {
   
 
   return (
-  <div className="bg-[url(/backgroundImg.png)]  px-12 pb-4 rounded w-full h-full flex justify-center items-center gap-12 flex-col">
+  <div className="bg-[url(/backgroundImg.png)] mr-12 px-12 pb-4 rounded-md w-full h-full flex justify-center items-center gap-12 flex-col">
     <h1 className="text-5xl font-bold mt-12 w-1/2 text-center leading-tight">Centralize, organize e otimize seus 
     <span className="bg-red-600 text-white px-2 rounded-md font-semibold">editais</span> em um só lugar.</h1>
 
