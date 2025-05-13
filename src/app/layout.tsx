@@ -59,6 +59,7 @@ export default function RootLayout({
                               className="
                                 hover:bg-[#D03C30] rounded-sm
                                 hover:text-white bg-[#CCCCCC]
+                                transition-all duration-150
                               "
                               asChild
                             >
