@@ -120,9 +120,6 @@ export default function RootLayout({
               </div>
             </SidebarProvider>
 
-            <div className="bg-white flex-1 pt-8 pl-7 pr-7">
-              {children}
-            </div>
           </div>
         </div>
       </body>
