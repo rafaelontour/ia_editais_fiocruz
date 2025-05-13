@@ -36,7 +36,7 @@ export default function SuperiorEditais () {
                         <div>
                             <div className="">
                                 <p>Nome do edital*</p>
-                                <Input></Input>
+                                <Input id="name" value={"Nome do edital"}></Input>
                             </div>
                             <div className=""></div>
                             <div className=""></div>
