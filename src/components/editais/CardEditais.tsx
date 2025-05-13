@@ -2,7 +2,7 @@ import { Button } from "../ui/button";
 
 export default function CardEditais () {
     return(
-        <div className="flex flex-col rounded-md overflow-hidden border-2 border-gray-300 cursor-pointer">
+        <div className="flex flex-col rounded-md overflow-hidden border-2 border-gray-300 cursor-move">
             <div className="bg-[#dedede]  h-16">
 
             </div>

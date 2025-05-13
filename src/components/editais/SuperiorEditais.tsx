@@ -3,6 +3,7 @@ import CategoriaColor from "./CategoriaColor";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Input } from "../ui/input";
+import { Label } from "@radix-ui/react-label";
 
 export default function SuperiorEditais () {
 
@@ -27,16 +28,22 @@ export default function SuperiorEditais () {
                     <SheetTrigger>
                         <Button variant={"outline"}>Enviar novo edital</Button> {/* ADICIONAR ÍCONE */}
                     </SheetTrigger>
-                    <SheetContent>
+                    <SheetContent side="right" className="w-1/2">
                         <SheetHeader>
                             <SheetTitle className="text-2xl">Adicionar</SheetTitle>
                             <SheetDescription>Edital</SheetDescription>
                         </SheetHeader>
                     
-                        <div>
-                            <div className="">
-                                <p>Nome do edital*</p>
-                                <Input id="name" value={"Nome do edital"}></Input>
+                        <div className="px-4 space-y-6">
+                            <div className="flex flex-row gap-3">
+                                <div>
+                                    <Label htmlFor="name">Nome do Edial</Label>
+                                    <Input id="name" placeholder="Insira o nome do edital"></Input>
+                                </div>
+                                <div>
+                                    <Label htmlFor="unit">Nome do Edial</Label>
+                                    <Input id="unit" placeholder="Escolha a unidade"></Input>
+                                </div>
                             </div>
                             <div className=""></div>
                             <div className=""></div>
