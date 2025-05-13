@@ -109,7 +109,7 @@ export default function RootLayout({
                 <div
                   className="
                     flex
-                    bg-white flex-1 pt-20 pl-14
+                    bg-white flex-1 pt-20 px-14
                   "
                     style={{
                       boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
