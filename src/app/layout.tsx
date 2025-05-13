@@ -34,6 +34,8 @@ export default function RootLayout({
       url: "#",
       icon: GitGraph,
     }
+
+  
   ]
 
   return (
@@ -42,6 +44,7 @@ export default function RootLayout({
         className={`antialiased bg-[#F5F5F5]`}
       >
         <div className="flex flex-col h-screen overflow-hidden">
+          <Cabecalho />
           <Cabecalho />
           <div className="flex flex-1">
             <SidebarProvider>
@@ -87,6 +90,7 @@ export default function RootLayout({
                   </SidebarFooter>
             
               </Sidebar>
+
 
               <div
                 className="
