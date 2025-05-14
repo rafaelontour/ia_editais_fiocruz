@@ -35,7 +35,7 @@ export default function CardEditais () {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction>Excluir edital</AlertDialogAction>
+                                <AlertDialogAction className="bg-orange-600"><Trash/><p>Excluir edital</p></AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
