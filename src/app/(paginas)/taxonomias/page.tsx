@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Calendar, ChevronLeft, PencilLine, Trash } from "lucide-react";
+import { Calendar, ChevronLeft, PencilLine, Plus, Trash } from "lucide-react";
 
 export default function Taxonomias() {
     const itens = [
@@ -56,11 +56,19 @@ export default function Taxonomias() {
 
     return (
         <div className="flex flex-col  w-full">
-            <div className="flex flex-row items-center gap-2">
-              <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 ml-4 hover:cursor-pointer">
-                <ChevronLeft className="h-4 w-4 " />
-              </button>
-              <h1 className=" font-semibold">Gestão de Taxonomia e Ramos</h1>
+            <div className="flex flex-row items-center gap-2 mb-4 justify-between">
+                <div className="flex flex-row items-center gap-2">
+                    <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 ml-4 hover:cursor-pointer">
+                    <ChevronLeft className="h-4 w-4 " />
+                    </button>
+                    <h1 className="ml-4 font-semibold text-2xl">Gestão de Taxonomia e Ramos</h1>
+                </div>
+                
+                <button className="mr-4 flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm">
+                    <Plus className="h-5 w-5 " strokeWidth={1.5} />
+                    <span>Adicionar </span>
+                </button>
+              
             </div>
 
             <div className="flex flex-row">
