@@ -1,5 +1,6 @@
 import { Calendar, PencilLine, Sparkle, Trash } from "lucide-react";
 import { Button } from "../ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 
 export default function CardEditais () {
     return(
@@ -21,7 +22,23 @@ export default function CardEditais () {
                 <div className="flex gap-0.5 justify-end">
                     <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><Sparkle/></Button>
                     <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><PencilLine/></Button>
-                    <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 bg-orange-600 text-white hover:text-black transition-all"><Trash className=""/></Button>
+                    <AlertDialog>
+                        <AlertDialogTrigger>
+                            <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 bg-orange-600 text-white hover:text-black transition-all"><Trash className=""/></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="rounded-2xl">
+                            <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital Edital Fiocruz 2025/1?</AlertDialogTitle>
+                                <AlertDialogDescription className="font-bold text-xs">
+                                    Após a exclusão, não será possível recuperar os dados desse edital e análise realizada
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction>Excluir edital</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </div>
             </div>
         </div>
