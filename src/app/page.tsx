@@ -1,129 +1,29 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Calendar, ChevronLeft, PencilLine, Trash } from "lucide-react";
+import Chart from "@/components/AppChart";
+import InfoBar from "@/components/InfoBar";
+import { firstChartData, infoBarInfos, secondChartData } from "@/constants/informacoes";
 
 
+//Lembrar de criar inteface exportavel para a infobar e chart para poder reutilizar
 export default function Home() {
 
-  const itens = [
-    {
-      nome: "Taxonomia 1",
-      descricao: "Determina que a remuneração em contratos de serviços de TI deve estar vinculada a resultados ou atendimento de níveis de serviço, salvo exceções justificadas.",
-      data: "25/02/2025",
-      ramos: [
-        {
-          nome: "Ramo 1 Taxonomia 2"
-        },
-        {
-          nome: "Ramo 2 Taxonomia 2"
-        },
-        {
-          nome: "Ramo 3Taxonomia 2"
-        },
-        {
-          nome: "Ramo 4 Taxonomia 2"
-        },
-        {
-          nome: "Ramo 5 Taxonomia 2"
-        },
-      ]
-    },
-    {
-      nome: "Taxonomia 2",
-      descricao: "Determina que a remuneração em contratos de serviços de TI deve estar vinculada a resultados ou atendimento de níveis de serviço, salvo exceções justificadas.",
-      data: "25/02/2025",
-    },
-    {
-      nome: "Taxonomia 3",
-      descricao: "Determina que a remuneração em contratos de serviços de TI deve estar vinculada a resultados ou atendimento de níveis de serviço, salvo exceções justificadas.",
-      data: "25/02/2025",
-    },
-    {
-      nome: "Taxonomia 4",
-      descricao: "Determina que a remuneração em contratos de serviços de TI deve estar vinculada a resultados ou atendimento de níveis de serviço, salvo exceções justificadas.",
-      data: "25/02/2025",
-    },
-    {
-      nome: "Taxonomia 5",
-      descricao: "Determina que a remuneração em contratos de serviços de TI deve estar vinculada a resultados ou atendimento de níveis de serviço, salvo exceções justificadas.",
-      data: "25/02/2025",
-    },
-  ]
+  
 
   return (
-  <div className="flex flex-col  w-full">
-    <div className="flex flex-row items-center gap-2">
-      <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 ml-4">
-          
-        <ChevronLeft className="h-4 w-4 hover:cursor-pointer " />
-      </button>
-      <h1 className=" font-semibold">Gestão de Taxonomia e Ramos</h1>
+  <div className="bg-[url(/backgroundImg.png)] px-12 pb-4 rounded-md w-full h-full flex justify-center items-center gap-12 flex-col">
+    <h1 className="text-5xl font-bold mt-12 w-1/2 text-center leading-tight">Centralize, organize e otimize seus 
+    <span className="bg-red-600 text-white px-2 rounded-md font-semibold">editais</span> em um só lugar.</h1>
 
+    <div className="flex gap-4 font-medium">
+      <button className="text-red-700 border-red-700 border-solid border-2 px-6 py-2 rounded-md cursor-pointer">Módulo base de conhecimento</button>
+      <button className="text-white bg-red-700 px-4 py-2 rounded-md cursor-pointer">Módulo análise de editais</button>
     </div>
-    <div className="flex flex-row">
-      <div className="basis-1/2 ">
-      {
-        itens.map((item, index) => (
-          <Card key={index} className=" hover:bg-gray-200 hover:cursor-pointer">
-            <CardHeader>
-              <CardTitle>{item.nome}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>{item.descricao}</p>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-3 w-3 text-gray-400" />
-                <span className="text-xs text-gray-400">{item.data}</span>
-              </div>
-              <div className="flex gap-2">
-                <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300">
-                  <PencilLine className="h-4 w-4 hover:cursor-pointer" strokeWidth={1.5} />
-                </button>
-                <button className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300">
-                  <Trash className="h-4 w-4 hover:cursor-pointer" strokeWidth={1.5} />
-                </button>
-              </div>
-            </CardFooter>
-          </Card>
-        ))
-      }
-        
-       
-      </div>
-      <div className="basis-1/2">
-  
-        <Card className="h-screen">
-          <CardHeader>
-            <CardTitle>Ramos</CardTitle>
-          </CardHeader>
-          <CardContent >
-            <div className="flex justify-between gap-8 mt-6 mb-4">
-              <p>Ramo 1 Taxonomia 1</p>
-
-              <div className="flex gap-2">
-              <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300">
-                <PencilLine className="h-4 w-4 hover:cursor-pointer" strokeWidth={1.5} />
-              </button>
-              <button className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300">
-                <Trash className="h-4 w-4 hover:cursor-pointer" strokeWidth={1.5} />
-              </button>
-              </div>
-            </div>
-          
-            <hr />
-
-          </CardContent>
-        </Card>
-      </div>
+    <div className="flex flex-col w-full gap-4 h-1/2">
+      <InfoBar data={infoBarInfos}/>
+      <div className="w-full h-full flex gap-8 ">
+        <Chart data={firstChartData}  titulo="Gráfico de quantidade de tipos de editais" className={"w-[60%]"}></Chart>
+        <Chart data={secondChartData}  titulo="Gráfico de status dos editais" className={"w-[40%]"}></Chart>
     </div>
-
+    </div>
   </div>
   );
 }
