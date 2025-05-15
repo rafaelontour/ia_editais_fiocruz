@@ -98,13 +98,13 @@ export default function RootLayout({
               >
                 <div
                   className="
-                    absolute left-3 top-3
+                    absolute left-2 top-2
                     
                   "
                 >
                   <SidebarTrigger
                     className="
-                      mt-5 ml-5
+                      mt-1 ml-1
                       hover:cursor-pointer
                     "
                   />
@@ -112,7 +112,7 @@ export default function RootLayout({
                 <div
                   className="
                     flex
-                    bg-white flex-1 pt-20 px-14
+                    bg-white flex-1 pt-12 px-10
                   "
                     style={{
                       boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
