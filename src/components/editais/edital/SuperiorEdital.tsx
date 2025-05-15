@@ -1,0 +1,17 @@
+import { Button } from "@/components/ui/button";
+import { Label } from "@radix-ui/react-label";
+import { ChevronLeft } from "lucide-react";
+
+export default function SuperiorEdital () {
+    return(
+        <div className="flex items-center justify-between">
+            <div className="flex flex-row gap-7">
+                <Button variant={"outline"} size={"icon"}><ChevronLeft/></Button>
+                <Label className="text-2xl font-bold">Edital Fiocruz 2025/1</Label>
+            </div>
+            <div>
+                <Button>Finalizar Elaboração</Button>
+            </div>
+        </div>
+    );
+}

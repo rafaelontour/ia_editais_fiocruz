@@ -2,6 +2,7 @@ import { Calendar, Sparkle, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 import EditarEdital from "./EditarEdital";
+import Link from "next/link";
 
 export default function CardEditais () {
     return(
@@ -21,7 +22,7 @@ export default function CardEditais () {
                     </div>
                 </div>
                 <div className="flex gap-0.5 justify-end">
-                    <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><Sparkle/></Button>
+                    <Link href={"/editais/edital"}><Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><Sparkle/></Button></Link>
                     <EditarEdital/>
                     <AlertDialog>
                         <AlertDialogTrigger>

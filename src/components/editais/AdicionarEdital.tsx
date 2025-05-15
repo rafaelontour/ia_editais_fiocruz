@@ -9,7 +9,7 @@ import { Textarea } from "../ui/textarea";
 
 export default function AdicionarEdital () {
     return(
-        <div>
+        <div className="w-full">
             <Sheet>
                 <SheetTrigger>
                     <Button variant={"outline"} className="bg-orange-600"> {/* AJEITAR ÍCONE */}
@@ -17,7 +17,7 @@ export default function AdicionarEdital () {
                         <p>Enviar novo edital</p>
                     </Button> 
                 </SheetTrigger>
-                <SheetContent side="right" className="w-1/2 max-w-[50%]">
+                <SheetContent side="right" className="w-full">
                     <SheetHeader>
                         <SheetTitle className="text-2xl">Adicionar</SheetTitle>
                         <SheetDescription>Edital</SheetDescription>

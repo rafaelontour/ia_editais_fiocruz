@@ -30,8 +30,8 @@ export default function SuperiorEditais () {
                     <CategoriaColor categoria={status}/>
                 
                 </div>
-                <div>
-                    <AdicionarEdital/>
+                <div className="w-full">
+                    <AdicionarEdital />
                 </div>
             </div>
         </div>
