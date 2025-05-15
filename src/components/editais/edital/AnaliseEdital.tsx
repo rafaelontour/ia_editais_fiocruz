@@ -1,6 +1,7 @@
 
 import Linha01 from "./analiselinhas/linha01";
 import Linha02 from "./analiselinhas/Linha02";
+import Linha03 from "./analiselinhas/Linha03";
 
 export default function AnaliseEdital () {
     return(
@@ -8,6 +9,8 @@ export default function AnaliseEdital () {
             <Linha01/>
 
             <Linha02/>
+
+            <Linha03/>
         </div>
     );
 }
