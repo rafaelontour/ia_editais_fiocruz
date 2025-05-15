@@ -1,11 +1,11 @@
-import { Calendar, PencilLine, Sparkle, Trash } from "lucide-react";
+import { Calendar, Sparkle, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 import EditarEdital from "./EditarEdital";
 
 export default function CardEditais () {
     return(
-        <div className="flex flex-col rounded-md overflow-hidden border-2 border-gray-300 cursor-move">
+        <div className="flex flex-col rounded-md overflow-hidden border-2 border-gray-300 cursor-grab active:cursor-grabbing">
             <div className="bg-[#dedede]  h-16">
 
             </div>
