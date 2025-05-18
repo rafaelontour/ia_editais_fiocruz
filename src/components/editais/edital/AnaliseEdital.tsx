@@ -1,5 +1,5 @@
 
-import Linha01 from "./analiselinhas/linha01";
+import Linha01 from "./analiselinhas/Linha01";
 import Linha02 from "./analiselinhas/Linha02";
 import Linha03 from "./analiselinhas/Linha03";
 import Linha04 from "./analiselinhas/Linha04";
