@@ -5,9 +5,6 @@ import { firstChartData, infoBarInfos, secondChartData } from "@/constants/infor
 
 //Lembrar de criar inteface exportavel para a infobar e chart para poder reutilizar
 export default function Home() {
-
-  
-
   return (
   <div className="bg-[url(/backgroundImg.png)] bg-repeat bg-contain px-12 pb-4 rounded-md w-full flex justify-center items-center gap-12 flex-col">
     <h1 className="text-5xl font-bold mt-12 w-1/2 text-center leading-tight">Centralize, organize e otimize seus 
