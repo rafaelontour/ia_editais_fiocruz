@@ -9,11 +9,7 @@ import { Textarea } from "../ui/textarea";
 
 export default function AdicionarEdital () {
     return(
-<<<<<<< HEAD
         <div className="w-full">
-=======
-        <div className="">
->>>>>>> 549136c (Ajeitando layout principal. Ainda com alguns problemas)
             <Sheet>
                 <SheetTrigger>
                     <Button variant={"outline"} className="bg-orange-600"> {/* AJEITAR ÍCONE */}
