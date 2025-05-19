@@ -3,8 +3,8 @@ import "./globals.css";
 
 import Image from "next/image";
 
-import { Calendar, GitGraph, Home, Inbox, Search, Settings, Sheet } from "lucide-react"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { GitGraph, Home, Sheet } from "lucide-react"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
 
 export const metadata: Metadata = {
@@ -45,7 +45,7 @@ export default function RootLayout({
       >
         <div className="flex flex-col h-screen overflow-hidden">
           <Cabecalho />
-          <div className="flex flex-1">
+          <div className="flex flex-1 overflow-y-scroll">
             <SidebarProvider>
               <Sidebar
                 variant="inset" collapsible="icon" className="relative"
@@ -94,12 +94,12 @@ export default function RootLayout({
               <div
                 className="
                   flex flex-1 relative
+                  overflow-y-scroll
                 "
               >
                 <div
                   className="
                     absolute left-2 top-2
-                    
                   "
                 >
                   <SidebarTrigger
@@ -111,7 +111,7 @@ export default function RootLayout({
                 </div>
                 <div
                   className="
-                    flex
+                    flex overflow-y-scroll w-full h-full
                     bg-white flex-1 pt-12 px-10
                   "
                     style={{
@@ -119,7 +119,9 @@ export default function RootLayout({
                       borderRadius: "10px 10px 0 0"
                     }}
                 >
-                  {children}
+                  <div className="w-full h-full">
+                    {children}
+                  </div>
                 </div>
               </div>
             </SidebarProvider>
