@@ -6,8 +6,8 @@ export default function Linha01 () {
     return(
         <div className="flex flex-row justify-between">
             <div className=" flex flex-col">
-                <h2 className="text-xl font-semibold">Análise do edital</h2>
-                <p className="text-sm text-gray-400">versão 1.0.1</p>
+                <h2 className="text-xl font-bold">Análise do edital</h2>
+                <p className="text-sm font-semibold text-gray-400">versão 1.0.1</p>
             </div>
             <div className="flex flex-row gap-2 items-center">
                 <Button variant={"outline"} className="items-center text-white bg-orange-600">
