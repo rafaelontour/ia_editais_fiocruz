@@ -11,9 +11,9 @@ export default function MeusEditais () {
 
     // Estado dos editais (exemplo com dados iniciais)
     const [editais, setEditais] = useState<Edital[]>([
-        { id: '1', titulo: 'Edital Fiocruz 2023/2', status: 'rascunho', data: '25/02/2025', categoria: 'compras' },
-        { id: '2', titulo: 'Edital Fiocruz 2023/2', status: 'rascunho', data: '25/02/2025', categoria: 'compras' },
-        { id: '3', titulo: 'Edital Fiocruz 2023/2', status: 'construcao', data: '25/02/2025', categoria: 'compras' },
+        { id: '1', titulo: 'Edital Fiocruz 2023/2', status: 'rascunho', data: '26/02/2025', categoria: 'compras' },
+        { id: '2', titulo: 'Edital Fiocruz 2024/1', status: 'rascunho', data: '25/02/2025', categoria: 'compras' },
+        { id: '3', titulo: 'Edital Fiocruz 2025/1', status: 'construcao', data: '25/02/2025', categoria: 'compras' },
     ]);
 
     const [activeId, setActiveId] = useState<string | null>(null);
