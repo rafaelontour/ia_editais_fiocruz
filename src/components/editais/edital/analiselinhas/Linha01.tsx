@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
+import Link from "next/link";
 
 export default function Linha01 () {
     return(
@@ -15,7 +16,7 @@ export default function Linha01 () {
                 </Button>
                 <div className="bg-gray-200 flex gap-0.5 p-1 rounded-md"> 
                     <Button variant={"outline"} className="text-xs py-0.5 px-2" size="sm">Resultado do edital</Button>
-                    <Button variant={"outline"} className="text-xs py-0.5 px-2" size="sm">Comentários</Button>
+                    <Link href={"/editais/edital/comentarios"}><Button variant={"outline"} className="text-xs py-0.5 px-2" size="sm">Comentários</Button></Link>
                     <Button variant={"outline"} className="text-xs py-0.5 px-2" size="sm">Configurações</Button>
                 </div>
             </div>
