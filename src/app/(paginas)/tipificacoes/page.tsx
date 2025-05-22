@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
-import { CoresSite } from "@/core/constants";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Calendar, ChevronRightIcon, Edit, Plus, Trash } from "lucide-react";
 import { useState } from "react";
@@ -112,18 +111,18 @@ export default function  Tipificacoes() {
 
                     <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
                         <DialogTrigger>
-                            <Button
+                            <div
                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
                                 className={`
                                     flex rounded-md gap-2 items-center px-4 py-2
                                     transition duration-100
-                                    bg-[${CoresSite.VERDE}] hover:bg-[${CoresSite.VERDE}] text-white
+                                    bg-verde hover:bg-verde text-white
                                     hover:cursor-pointer hover:scale-110 active:scale-100
                                 `}
                             >
                                 <Plus className=""/>
                                 <p className="text-white">Adicionar</p>
-                            </Button> 
+                            </div> 
                         </DialogTrigger>
 
                         <DialogContent>
@@ -154,7 +153,7 @@ export default function  Tipificacoes() {
                                     <DialogClose
                                         className={`
                                             transition ease-in-out text-white
-                                            rounded-md px-3 bg-[${CoresSite.VERMELHO}]
+                                            rounded-md px-3 bg-vermelho
                                             hover:cursor-pointer
                                             hover:scale-110 active:scale-100
                                         `}
@@ -165,7 +164,7 @@ export default function  Tipificacoes() {
                                     
                                     <Button
                                         className={`
-                                            flex bg-[${CoresSite.VERDE}] hover:bg-[${CoresSite.VERDE}]
+                                            flex bg-verde hover:bg-verde
                                             text-white hover:cursor-pointer
                                             hover:scale-110 active:scale-100
                                         `}
@@ -198,10 +197,10 @@ export default function  Tipificacoes() {
                         >
                             <div className="flex flex-col gap-2">
                                 <h2 className="text-xl font-semibold">{tipificacao.nome}</h2>
-                                <p className={`bg-[${CoresSite.VERDE}] py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
+                                <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
                                 Lei: {tipificacao.lei}
                                 </p>
-                                <p className={`bg-[${CoresSite.VERDE}] py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
+                                <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
                                 Lei Complementar: {tipificacao.lei_complementar}
                                 </p>
                             </div>
@@ -214,7 +213,7 @@ export default function  Tipificacoes() {
                                     <Button
                                         className={`
                                             h-8 w-8 hover:cursor-pointer hover:scale-110 active:scale-100
-                                            bg-[${CoresSite.BRANCO}] hover:bg-[${CoresSite.BRANCO}]
+                                            bg-branco hover:bg-branco
                                         `}
                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
                                         size={"icon"}
@@ -225,7 +224,7 @@ export default function  Tipificacoes() {
 
                                     <Button
                                         className={`
-                                            h-8 w-8 bg-[${CoresSite.VERMELHO}] hover:bg-[${CoresSite.VERMELHO}]
+                                            h-8 w-8 bg-vermelho hover:bg-vermelho
                                             hover:cursor-pointer hover:scale-110 active:scale-100
                                         `}
                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
