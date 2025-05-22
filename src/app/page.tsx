@@ -1,6 +1,6 @@
 import Chart from "@/components/AppChart";
 import InfoBar from "@/components/InfoBar";
-import { firstChartData, infoBarInfos, secondChartData } from "@/constants/informacoes";
+import { firstChartData, infoBarInfos, secondChartData } from "@/core/constants/informacoes";
 
 
 //Lembrar de criar inteface exportavel para a infobar e chart para poder reutilizar

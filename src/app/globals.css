@@ -4,6 +4,15 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Cores da plataforma, coloque aqui */
+  
+  --color-verde: #088077;
+  --color-vermelho: #C1363D;
+  --color-cinza: #4E4E4E;
+  --color-branco: #FFFFFF;
+
+  /* Acima */
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
