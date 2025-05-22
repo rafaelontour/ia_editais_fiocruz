@@ -3,7 +3,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -69,10 +68,16 @@ export default function Taxonomias() {
   ];
 
   const [taxonomiaSelecionada, setTaxonomiaSelecionada] = useState<Taxonomia | null>(null);
+
   const ramoNovo: Ramo = {
     nome: '',
     descricao: '',
+  }
 
+  const taxonomiaNova: Taxonomia = {
+    nome: '',
+    descricao: '',
+    data: '',
   }
 
   const [itens, setItens] = useState<Taxonomia[]>(itenss);
@@ -92,12 +97,18 @@ export default function Taxonomias() {
 
       setTaxonomiaSelecionada(novaTaxonomia);
 
-      setOpen(false);
+      setOpenRamo(false);
     }
   };
 
+  const handleAddTaxonomia = () => {
+    setItens((prevItens) => [...prevItens, taxonomiaNova]);
+    setOpenTaxonomia(false);
+  }
 
-  const [open, setOpen] = useState(false);
+
+  const [openTaxonomia, setOpenTaxonomia] = useState(false);
+  const [openRamo, setOpenRamo] = useState(false);
 
   return (
     <div className="flex flex-col w-full">
@@ -109,12 +120,81 @@ export default function Taxonomias() {
           <h1 className="ml-4 font-semibold text-2xl">Gestão de Taxonomia e Ramos</h1>
         </div>
 
-        <button 
-          className="mr-4 flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
-        >
-          <Plus className="h-5 w-5 " strokeWidth={1.5} />
-          <span>Adicionar </span>
-        </button>
+        <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
+          <DialogTrigger asChild >
+            <button 
+                className=" flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
+              
+            >
+              <Plus className="h-5 w-5 " strokeWidth={1.5} />
+              Adicionar 
+            </button>
+          
+          </DialogTrigger>
+          <DialogContent >
+            <DialogHeader>
+              <DialogTitle>Adicionar taxonomia</DialogTitle>
+              <DialogDescription>
+                Preencha os campos abaixo para adicionar uma nova taxonomia.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="bg-gray-300 rounded-sm items-center flex justify-center">
+                <span>Tipificação COMUM A TODAS AS CONTRATAÇÕES </span>
+              </div>
+              <div>
+                <label htmlFor="nomeRamo" className="block text-sm font-medium text-gray-700">
+                  Título*
+                </label>
+                <input
+                  onChange={(e) => taxonomiaNova.nome = e.target.value}
+                  type="text"
+                  id="nomeTaxonomia"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"   
+                />
+              </div>
+              <div>
+                  <label htmlFor="descricaoRamo" className="block text-sm font-medium text-gray-700">
+                    Descrição da Taxonomia*
+                  </label>
+                  <textarea
+                    onChange={(e) => taxonomiaNova.descricao = e.target.value}
+                    id="descricaoTaxonomia"
+                    placeholder="Digite uma descrição para a taxonomia"
+                    rows={4}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                  />
+              </div>
+              <div>
+                <label htmlFor="fontes" className="block text-sm font-medium text-gray-700">
+                  Fontes* 
+                </label>
+                <select name="" id="" className="w-full">
+                  <option value="">IN SGD n° 94/2022</option>
+                  <option value="">Lei n° 14.133/2021</option>
+                  <option value="">Constituição Federal</option>
+                  <option value="">INSTRUÇÃO NORMATIVA 05/2017 SLTI</option>
+                </select>
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                  Cancelar
+              </DialogClose>
+              
+              <button 
+                className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
+                type="submit"
+                onClick={handleAddTaxonomia}
+              >
+                Adicionar
+              </button>
+
+              
+            </DialogFooter>
+
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex flex-row">
@@ -154,7 +234,7 @@ export default function Taxonomias() {
             <CardHeader>
               <CardTitle className="flex flex-row justify-between items-center">
                 <h1 className="text-2xl">Ramos</h1>
-                <Dialog open={open} onOpenChange={setOpen}>
+                <Dialog open={openRamo} onOpenChange={setOpenRamo}>
                   <DialogTrigger asChild >
                     <button 
                         className=" flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
@@ -167,12 +247,18 @@ export default function Taxonomias() {
                   </DialogTrigger>
                   <DialogContent >
                     <DialogHeader>
-                      <DialogTitle>Adicionar ramo</DialogTitle>
+                      <DialogTitle>Adicionar Ramo</DialogTitle>
                       <DialogDescription>
                         Preencha os campos abaixo para adicionar um novo ramo.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
+                      <div className="bg-gray-300 rounded-sm items-center flex justify-center">
+                        <span>Tipificação COMUM A TODAS AS CONTRATAÇÕES </span>
+                      </div>
+                      <div className="bg-gray-300 rounded-sm items-center flex justify-center">
+                        <span>Taxonomia Planejada </span>
+                      </div>
                       <div>
                         <label htmlFor="nomeRamo" className="block text-sm font-medium text-gray-700">
                           Nome do Ramo*
