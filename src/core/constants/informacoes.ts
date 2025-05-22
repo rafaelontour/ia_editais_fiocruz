@@ -1,4 +1,4 @@
-export const infoBarInfos = [{
+const infoBarInfos = [{
     titulo: "Editais recebidos",
     valor: 200
   },{
@@ -13,7 +13,7 @@ export const infoBarInfos = [{
   }
 ]
 
-export const firstChartData =[{
+const firstChartData =[{
   tipo : "Tipo 1",
   valor : 200,
 },{
@@ -34,7 +34,7 @@ export const firstChartData =[{
 },
 ]
 
-export const secondChartData =[{
+const secondChartData =[{
   tipo : "Tipo 1",
   valor : 200,
   fill: "#4d4d4d"
@@ -52,3 +52,9 @@ export const secondChartData =[{
   fill: "#006938"
 },
 ]
+
+export {
+  infoBarInfos,
+  firstChartData,
+  secondChartData
+}
