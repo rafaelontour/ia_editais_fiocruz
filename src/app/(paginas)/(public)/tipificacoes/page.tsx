@@ -127,10 +127,14 @@ export default function  Tipificacoes() {
 
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle className="text-3xl font-bold">Criar tipificação</DialogTitle>
+                                <DialogTitle className="text-3xl font-bold">
+                                    Criar tipificação
+                                </DialogTitle>
+                                
                                 <DialogDescription className="text-md pb-4">
                                     Adicione todos os dados da tipificação.
                                 </DialogDescription>
+                            </DialogHeader>
 
                                 <form className="flex text-lg flex-col gap-4">
                                     <p className="flex flex-col gap-2">
@@ -174,7 +178,6 @@ export default function  Tipificacoes() {
                                         Salvar
                                     </Button>
                                 </div>
-                            </DialogHeader>
                         </DialogContent>
 
                     </Dialog>
