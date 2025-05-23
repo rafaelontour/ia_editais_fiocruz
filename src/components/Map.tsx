@@ -1,7 +1,8 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
-import mapboxgl from "mapbox-gl"
+import mapboxgl, { GeoJSONFeature } from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
+import { features } from "process"
 
 type LngLatBoundsLike =
   | [[number, number], [number, number]]
@@ -34,7 +35,7 @@ export default function MapaRender() {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/verttb/cmav7e36p00vx01sd6w6h9690",
-      center: [-41.5, -12.9], // Centro da Bahia
+      center: [-41.5, -12.9], 
       zoom: 5,
       maxBounds: brazilBounds
     })
@@ -84,7 +85,6 @@ export default function MapaRender() {
         filter: ["has", "point_count"],
         layout: {
           "text-field": ["get", "point_count_abbreviated"],
-          "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
           "text-size": 12
         }
       })
@@ -101,10 +101,48 @@ export default function MapaRender() {
           "circle-stroke-color": "#fff"
         }
       })
+      map.on('click', 'clusters', (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers:['clusters']
+        });
+
+        if(features[0].properties){
+           const cluster_id = features[0].properties.cluster_id;
+           const source = map.getSource('instituicoes') as mapboxgl.GeoJSONSource;
+           if (features[0].geometry.type !== 'Point') return;
+           const coordinates = features[0].geometry.coordinates
+
+           source.getClusterExpansionZoom(cluster_id, 
+            (err, zoom) => {
+              if(err) return;
+              map.easeTo({
+                center: coordinates as [number,number],
+                zoom: zoom as number
+              });
+            });}
+
+      });
+
+      
+
+      map.on('click', 'unclustered-point', (e) => {
+        if(e.features && e.features[0]){
+          const features  = e.features[0];
+
+          if(features.geometry.type !== 'Point') return;
+          const coordinates = features.geometry.coordinates.slice();
+          if(features.properties)
+            alert(`Cidade: ${features.properties.cidade}
+          \nEstado: ${features.properties.estado}`)
+          
+        }
+      
+           
+      })
     })
 
     return () => map.remove()
   }, [geojsonData])
 
-  return <div ref={mapContainerRef} className="w-full h-full" />
+  return <div ref={mapContainerRef} className="w-full h-4/5" />
 }
