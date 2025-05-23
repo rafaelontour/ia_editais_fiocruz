@@ -20,9 +20,9 @@ export default function Chart({data, className, titulo}: {data : IChartData[], c
 
 
     return(
-        <div className={`min-h-[280px] bg-white p-4 rounded-md flex flex-col px-12 border-zinc-400 border-1 ${className}`}>
+        <div className={`min-h-[280px] bg-branco p-4 rounded-md flex flex-col px-12 border-zinc-400 border-1 ${className}`}>
             <h2 className="text-2xl">{titulo}</h2>
-            <ResponsiveContainer width="100%" height="100%" className="bg-white rounded-sm py-4">
+            <ResponsiveContainer width="100%" height="100%" className="bg-branco rounded-sm py-4">
             <BarChart accessibilityLayer data={data}   >
                 <XAxis 
                 dataKey="tipo"
