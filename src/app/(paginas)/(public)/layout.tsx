@@ -1,0 +1,124 @@
+import Image from "next/image";
+
+import { GitGraph, Home, Sheet } from "lucide-react"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import Cabecalho from "@/components/Cabecalho";
+
+
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+ 
+  const items = [
+    {
+      title: "Página Inicial",
+      url: "#",
+      icon: Home,
+    },
+    {
+      title: "Meus editais",
+      url: "#",
+      icon: Sheet,
+    },
+    {
+      title: "Estatísticas",
+      url: "#",
+      icon: GitGraph,
+    }
+
+  
+  ]
+
+  return (
+  
+        <div className="flex flex-col h-screen overflow-hidden">
+          <Cabecalho />
+          <div className="flex flex-1 overflow-y-auto">
+            <SidebarProvider>
+              <Sidebar
+                variant="inset" collapsible="icon" className="relative"
+              >
+                  <SidebarContent>
+                    <SidebarGroup>
+                      <SidebarMenu>
+                        {items.map((item) => (
+                          <SidebarMenuItem
+                            key={item.title}
+                          >
+                            <SidebarMenuButton
+                              className="
+                                hover:bg-[#D03C30] rounded-sm
+                                hover:text-white bg-[#CCCCCC]
+                                transition-all duration-150
+                              "
+                              asChild
+                            >
+                              <a
+                                href={item.url}
+                                className="
+                                  flex items-center gap-2
+                                "
+                              >
+                                <item.icon className="w-5 h-5" />
+                                <span>{item.title}</span>
+                              </a>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        ))}
+                      </SidebarMenu>
+                    </SidebarGroup>
+                  </SidebarContent>
+                  <SidebarFooter>
+                    <div className="flex items-center gap-4">
+                      <Image className="rounded-md" src="https://picsum.photos/100" alt="Logo" width={32} height={32} />
+                      <h1 className="text-lg font-semibold">
+                      </h1>
+                    </div>
+                  </SidebarFooter>
+            
+              </Sidebar>
+
+
+              <div
+                className="
+                  flex flex-1 relative
+                 
+                "
+              >
+                <div
+                  className="
+                    absolute left-2 top-2
+                  "
+                >
+                  <SidebarTrigger
+                    className="
+                      mt-1 ml-1
+                      hover:cursor-pointer
+                    "
+                  />
+                </div>
+                <div
+                  className="
+                    flex overflow-y-scroll w-full h-full
+                    bg-white flex-1 pt-12 px-10
+                  "
+                    style={{
+                      boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
+                      borderRadius: "10px 10px 0 0"
+                    }}
+                >
+                  <div className="w-full h-full">
+                    {children}
+                  </div>
+                </div>
+              </div>
+            </SidebarProvider>
+
+          </div>
+        </div>
+    
+  );
+}
