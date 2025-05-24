@@ -17,56 +17,13 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { Ramo } from "@/core/ramo";
+import { Taxonomia } from "@/core/taxonomia";
 import { Calendar, ChevronLeft, PencilLine, Plus, Trash } from "lucide-react";
-import { useState } from "react";
-
-interface Ramo {
-  nome: string;
-  descricao: string;
-}
-
-interface Taxonomia {
-  nome: string;
-  descricao: string;
-  data: string;
-  ramos?: Ramo[]; 
-}
+import { useEffect, useState } from "react";
 
 
 export default function Taxonomias() {
-  const itenss: Taxonomia[] = [
-    {
-      nome: "Taxonomia 1",
-      descricao:
-        "Determina que a remuneração em contratos de serviços de TI deve estar vinculada a resultados ou atendimento de níveis de serviço, salvo exceções justificadas.",
-      data: "25/02/2025",
-      ramos: [
-        { nome: "Ramo 1 Taxonomia 1", descricao: "Ramo 1 Taxonomia 1" },
-        { nome: "Ramo 2 Taxonomia 1", descricao: "Ramo 2 Taxonomia 1" },
-        { nome: "Ramo 3 Taxonomia 1", descricao: "Ramo 3 Taxonomia 1" },
-        { nome: "Ramo 4 Taxonomia 1", descricao: "Ramo 4 Taxonomia 1" },
-        { nome: "Ramo 5 Taxonomia 1", descricao: "Ramo 5 Taxonomia 1" },
-      ],
-    },
-    {
-      nome: "Taxonomia 2",
-      descricao:
-        "Determina que a remuneração em contratos de serviços de TI deve estar vinculada a resultados ou atendimento de níveis de serviço, salvo exceções justificadas.",
-      data: "25/02/2025",
-      ramos: [
-        { nome: "Ramo 1 Taxonomia 2", descricao: "Ramo 1 Taxonomia 2" },
-        { nome: "Ramo 2 Taxonomia 2", descricao: "Ramo 2 Taxonomia 2" },
-  
-      ],
-    },
-    {
-      nome: "Taxonomia 3",
-      descricao:
-        "Determina que a remuneração em contratos de serviços de TI deve estar vinculada a resultados ou atendimento de níveis de serviço, salvo exceções justificadas.",
-      data: "25/02/2025",
-    },
-  ];
-
   const [taxonomiaSelecionada, setTaxonomiaSelecionada] = useState<Taxonomia | null>(null);
 
   const ramoNovo: Ramo = {
@@ -75,12 +32,32 @@ export default function Taxonomias() {
   }
 
   const taxonomiaNova: Taxonomia = {
+    id: 0,  
     nome: '',
     descricao: '',
     data: '',
   }
 
-  const [itens, setItens] = useState<Taxonomia[]>(itenss);
+  const [itens, setItens] = useState<Taxonomia[]>([]);
+
+  useEffect(() => {
+    try {
+      const getTaxonomias = async () => {
+        const dados = await fetch('http://localhost:3000/api/taxonomias')
+
+        if (!dados.ok) {
+            throw new Error('Erro ao buscar taxonomias')
+        }
+
+        const taxonomias = await dados.json()
+        setItens(taxonomias)
+      }
+
+      getTaxonomias()
+    } catch (error) {
+        console.error("Erro ao buscar taxonomias:", error);
+    }
+  }, []);
 
   const handleAddRamo = () => {
     if (taxonomiaSelecionada) {
