@@ -207,7 +207,7 @@ export default function Taxonomias() {
         </div>
 
         <div className="basis-1/2">
-          <Card className="h-screen m-4">
+          <Card className="min-h-[50rem] h-auto m-4">
             <CardHeader>
               <CardTitle className="flex flex-row justify-between items-center">
                 <h1 className="text-2xl">Ramos</h1>
@@ -282,7 +282,8 @@ export default function Taxonomias() {
 
             </CardHeader>
             <CardContent>
-              {taxonomiaSelecionada && taxonomiaSelecionada.ramos ? (
+              {taxonomiaSelecionada ? (
+                taxonomiaSelecionada.ramos && taxonomiaSelecionada.ramos.length > 0 ? (
                   <ul>
                   {taxonomiaSelecionada.ramos.map((ramo, index) => (
                       <div className="flex flex-col gap-2">
@@ -308,8 +309,12 @@ export default function Taxonomias() {
                     ))}
                 </ul>
               ) : (
-                  <p>Nenhum ramo disponível para esta taxonomia.</p>
-                )}
+                  <p>Nenhum ramo disponível adicione um novo ramo.</p>
+                )
+              ) : (
+                  <p>Nenhum ramo disponível selecione uma taxonomia.</p>
+                )
+              }
             </CardContent>
           </Card>
         </div>
