@@ -2,94 +2,102 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import { Tipificacao } from "@/core";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, ChevronRightIcon, Edit, Plus, Trash } from "lucide-react";
+import { Calendar, ChevronRightIcon, Edit, PencilLine, Plus, Trash } from "lucide-react";
 import { useState } from "react";
 
 export default function  Tipificacoes() {
     
     const [dialogTipificacao, setDialogTipificacao] = useState(false);
-    type Tipificacao = {
-        nome: string,
-        lei: string,
-        lei_complementar: string,
-        data: string
-    }
 
     const tipificacoes: Tipificacao[] = [
         {
+            id: 1,
             nome: "Tipificacao 1",
             lei: "Lei 1",
             lei_complementar: "Lei Complementar 1",
             data: "12/12/2022"
         },
         {
+            id: 2,
             nome: "Tipificacao 2",
             lei: "Lei 2",
             lei_complementar: "Lei Complementar 2",
             data: "8/12/2022"
         },
         {
+            id: 3,
             nome: "Tipificacao 3",
             lei: "Lei 3",
             lei_complementar: "Lei Complementar 3",
             data: "10/12/2020"
         },
         {
+            id: 4,
             nome: "Tipificacao 4",
             lei: "Lei 4",
             lei_complementar: "Lei Complementar 4",
             data: "20/12/2010"
         },
         {
+            id: 5,
             nome: "Tipificacao 5",
             lei: "Lei 5",
             lei_complementar: "Lei Complementar 5",
             data: "30/12/2000"
         },
         {
+            id: 6,
             nome: "Tipificacao 6",
             lei: "Lei 6",
             lei_complementar: "Lei Complementar 6",
             data: "20/12/1990"
         },
         {
+            id: 7,
             nome: "Tipificacao 7",
             lei: "Lei 7",
             lei_complementar: "Lei Complementar 7",
             data: "20/12/1980"
         },
         {
+            id: 8,
             nome: "Tipificacao 8",
             lei: "Lei 8",
             lei_complementar: "Lei Complementar 8",
             data: "20/12/1970"
         },
         {
+            id: 9,
             nome: "Tipificacao 9",
             lei: "Lei 9",
             lei_complementar: "Lei Complementar 9",
             data: "20/12/1960"
         },
         {
+            id: 10,
             nome: "Tipificacao 10",
             lei: "Lei 10",
             lei_complementar: "Lei Complementar 10",
             data: "20/12/1950"
         },
         {
+            id: 11,
             nome: "Tipificacao 11",
             lei: "Lei 11",
             lei_complementar: "Lei Complementar 11",
             data: "20/12/1940"
         },
         {
+            id: 12,
             nome: "Tipificacao 12",
             lei: "Lei 12",
             lei_complementar: "Lei Complementar 12",
             data: "20/12/1930"
         },
         {
+            id: 13,
             nome: "Tipificacao 13",
             lei: "Lei 13",
             lei_complementar: "Lei Complementar 13",
@@ -222,7 +230,7 @@ export default function  Tipificacoes() {
                                         size={"icon"}
                                         
                                     >
-                                        <Edit color="black" />
+                                        <PencilLine color="black" />
                                     </Button>
 
                                     <Button
