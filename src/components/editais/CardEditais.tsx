@@ -49,8 +49,11 @@ export default function CardEditais ({ edital }: CardEditaisProps) {
                 </div>
                 <div className="flex gap-0.5 justify-end">
                     {/* COLOCAR PARA PASSAR O ID NO LOCAL DO EDITAL */}
-                    <Link href={"/editais/edital"}><Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><Sparkle/></Button></Link>
-                    <EditarEdital/>
+                    { (edital.status !== "rascunho" && edital.status !== "concluido") ? (
+                        <Link href={"/editais/edital"}><Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><Sparkle/></Button></Link>
+                    ) : null
+                    }
+                   <EditarEdital/>
                     <AlertDialog>
                         <AlertDialogTrigger>
                             <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 bg-orange-600 text-white hover:text-black transition-all"><Trash className=""/></Button>
