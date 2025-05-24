@@ -4,6 +4,7 @@ import CardEditais from "@/components/editais/CardEditais";
 import CardList from "@/components/editais/CardList";
 import SuperiorEditais from "@/components/editais/SuperiorEditais";
 import { Edital, StatusEdital } from "@/components/editais/types";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { closestCenter, DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
 import { useState } from "react";
 
@@ -20,6 +21,7 @@ export default function MeusEditais () {
     ]);
 
     const [activeId, setActiveId] = useState<string | null>(null);
+    const [pendingChange, setPendingChange] = useState<{editalId: string, newStatus: StatusEdital} | null>(null);
 
 
     // Status disponíveis
@@ -34,12 +36,36 @@ export default function MeusEditais () {
             return; 
         } // nada muda — o card original já não saiu da lista
 
-        const editalId = active.id;
-        const newStatus = over.id as StatusEdital;
+        const editalId = String(active.id);
+        const newStatus = String(over.id) as StatusEdital;
+        const currentStatus = editais.find(e => e.id === editalId)?.status;
 
-        setEditais(editais.map(edital =>
-        edital.id === editalId ? { ...edital, status: newStatus } : edital
-        ));
+        if(newStatus !== currentStatus){
+            setPendingChange({ editalId, newStatus });
+        }else{
+            setEditais(editais.map(edital =>
+            edital.id === editalId ? { ...edital, status: newStatus } : edital
+            ));
+            setActiveId(null);
+        }
+
+    };
+
+    // Confirmação de mudança de status
+    const confirmStatusChange = () => {
+        if (pendingChange) {
+            const { editalId, newStatus } = pendingChange;
+            setEditais(editais.map(edital =>
+                edital.id === editalId ? { ...edital, status: newStatus } : edital
+            ));
+        }
+        setPendingChange(null);
+        setActiveId(null);
+    };
+
+    // Cancela a mudança de status
+    const cancelStatusChange = () => {
+        setPendingChange(null);
         setActiveId(null);
     };
     
@@ -53,6 +79,7 @@ export default function MeusEditais () {
         }
     };
 
+    // Formatação de cor
     const getStatusColor = (status: StatusEdital): string => {
         switch (status) {
             case 'rascunho': return 'gray';
@@ -97,7 +124,32 @@ export default function MeusEditais () {
                 </DragOverlay>
             </DndContext>
            
-                
+            { pendingChange && (
+            <AlertDialog open={!!pendingChange}>
+                <AlertDialogContent className="rounded-2xl">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl font-bold">
+                            Tem certeza que deseja mover o edital para <span className="">{formatStatus(pendingChange?.newStatus)}</span>?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="font-bold text-xs">
+                            Após mudar de status, ele estará sujeito a alteração
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={cancelStatusChange}>
+                            Cancelar
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            className="bg-orange-600"
+                            onClick={confirmStatusChange}
+                        >
+                            Mudar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            )}
+
         </div>
     );
 } 
