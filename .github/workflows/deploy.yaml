@@ -1,0 +1,45 @@
+name: Deploy do protótipo IA Editais
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Build da imagem Docker
+        run: docker build -t ia_editais .
+
+      - name: Salvar imagem como .tar
+        run: docker save ia_editais:latest -o ia_editais.tar
+
+      - name: Ajustar permissões do arquivo .tar
+        run: chmod 644 ia_editais.tar
+
+      - name: Enviar imagem para a EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_CHAVE_SSH }}
+          source: "ia_editais.tar"
+          target: "/home/ubuntu/prototipo_ia_editais/"
+          debug: true
+
+      - name: Rodar container na EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_CHAVE_SSH }}
+          script: |
+            sudo docker stop ia_editais || true
+            sudo docker rm ia_editais || true
+            sudo docker load -i /home/ubuntu/prototipo_ia_editais/ia_editais.tar
+            sudo docker run -d --name ia_editais -p 3000:80 ia_editais:latest
