@@ -20,6 +20,13 @@ export default function ConversaIa () {
                 </Button>
             </div>
 
+            <div>
+                <h3 className="text-lg font-semibold">Resumo IA</h3>
+                <p className="text-sm text-gray-400">
+                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Impedit cumque, numquam aspernatur inventore eligendi, perferendis, similique error expedita vel itaque laboriosam quisquam. Voluptates autem nulla tempora modi. Perferendis, totam suscipit.
+                </p>
+            </div>
+
 
         </div>
     );

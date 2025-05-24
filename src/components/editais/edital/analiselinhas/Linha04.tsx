@@ -1,3 +1,5 @@
+import { Link } from "lucide-react";
+
 export default function Linha04 () {
 
 
@@ -55,10 +57,12 @@ export default function Linha04 () {
                         <div className="flex items-center gap-3">
                             <div className="rounded-xs w-3 h-3" style={{ backgroundColor: "green" }}></div>
                             <p className="text-gray-400">1,2,3 (0k)</p>
+                            <Link size={16}/>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="rounded-xs w-3 h-3" style={{ backgroundColor: "orange" }}></div>
                             <p className="text-gray-400">4 (Não Identificado)</p>
+                            <Link size={16}/>
                         </div>
                     </div>
             </div>
