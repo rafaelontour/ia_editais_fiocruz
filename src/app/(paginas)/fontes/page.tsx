@@ -4,7 +4,7 @@ import Masonry from 'react-masonry-css'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Calendar, Edit, Plus, Trash } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
 
@@ -16,88 +16,34 @@ export default function Fontes() {
         700: 1
     }
 
-    const itens = [
-        {
-            nome: "Tipificacao 1",
-            lei: "Lei 1",
-            lei_complementar: "Lei Complementar 1",
-            data: "12/12/2022"
-        },
-        {
-            nome: "Tipificacao 2",
-            lei: "Lei 2",
-            lei_complementar: "Lei Complemenmplementar 9Lei Complementar 9Lei Complementar 9",
-            data: "8/12/2022"
-        },
-        {
-            nome: "Tipificacao 3",
-            lei: "Lei 3",
-            lei_complementar: "Lei 3 Lei CoComplementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9",
-            data: "10/12/2020"
-        },
-        {
-            nome: "Tipificacao 4",
-            lei: "Lei 4",
-            lei_complementar: "Lei Complementar 4",
-            data: "20/12/2010"
-        },
-        {
-            nome: "Tipificacao 5",
-            lei: "Lei 5",
-            lei_complementar: "Lei Complementar 5",
-            data: "30/12/2000"
-        },
-        {
-            nome: "Tipificacao 6",
-            lei: "Lei 6",
-            lei_complementar: "Lei Complementar 6 Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9",
-            data: "20/12/1990"
-        },
-        {
-            nome: "Tipificacao 7",
-            lei: "Lei 7",
-            lei_complementar: "Lei Complementar  Lei Complementar 9Le9Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9",
-            data: "20/12/1980"
-        },
-        {
-            nome: "Tipificacao 8",
-            lei: "Lei 8",
-            lei_complementar: "Lei Complementar 8",
-            data: "20/12/1970"
-        },
-        {
-            nome: "Tipificacao 9",
-            lei: "Lei 9",
-            lei_complementar: "Lei Complementar 9 Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementalementar 9Lei Complementar 9",
-            data: "20/12/1960"
-        },
-        {
-            nome: "Tipificacao 10",
-            lei: "Lei 10",
-            lei_complementar: "Lei Complementar 10 Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Complementar 9Lei Comple",
-            data: "20/12/1950"
-        },
-        {
-            nome: "Tipificacao 11",
-            lei: "Lei 11",
-            lei_complementar: "Lei Complementar 11",
-            data: "20/12/1940"
-        },
-        {
-            nome: "Tipificacao 12",
-            lei: "Lei 12",
-            lei_complementar: "Lei Complementar 12",
-            data: "20/12/1930"
-        },
-        {
-            nome: "Tipificacao 13",
-            lei: "Lei 13",
-            lei_complementar: "Lei Complementar 13",
-            data: "20/12/1920"
-        }
-    ]
-
     const [openDialogFontes, setOpenDialogFontes] = useState(false);
+
+    type Fonte = {
+        nome: string,
+        descricao: string,
+        data: string
+    }
+
+    const [fontes, setFontes] = useState<Fonte[]>([])
+
+    useEffect(() => {
+        try {
+            const getFontes = async () => {
+                const dados = await fetch('http://localhost:3000/api/fontes')
+
+                if (!dados.ok) {
+                    throw new Error('Erro ao buscar fontes')
+                }
+                
+                const fontes = await dados.json()
+                setFontes(fontes)
+            } 
+                 
+            getFontes()
+        } catch (error) {
+            console.error("Erro ao buscar fontes", error)
+        }
+    }, [])
 
     return (
         <div className="flex flex-col gap-5">
@@ -187,7 +133,7 @@ export default function Fontes() {
                 columnClassName="pl-4"
                 className={'flex -ml-4 w-auto'}
             >
-                {itens.map((tipificacao, index) => (
+                {fontes.map((fonte, index) => (
                     <div
                         style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)"}} 
                         key={index}
@@ -198,18 +144,18 @@ export default function Fontes() {
                         "
                     >
                         <div className="flex flex-col gap-2">
-                            <h2 className="text-xl font-semibold">{tipificacao.nome}</h2>
+                            <h2 className="text-xl font-semibold">{fonte.nome}</h2>
                             <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
-                            Lei: {tipificacao.lei}
+                            {fonte.nome}
                             </p>
                             <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 break-words text-sm`}>
-                            Lei Complementar: {tipificacao.lei_complementar}
+                            {fonte.descricao}
                             </p>
                         </div>
                         <div className="flex justify-between items-center mt-3">
                             <p className="flex items-center gap-2 text-sm text-gray-400">
                                 <Calendar size={16} />
-                                <span>{tipificacao.data}</span>
+                                <span>{fonte.data}</span>
                             </p>
                             <div className="flex gap-3">
                                 <Button
