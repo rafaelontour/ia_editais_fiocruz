@@ -4,8 +4,6 @@ import { GitGraph, Home, Sheet } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
 
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,8 +26,6 @@ export default function RootLayout({
       url: "#",
       icon: GitGraph,
     }
-
-  
   ]
 
   return (
