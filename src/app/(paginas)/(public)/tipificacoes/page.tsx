@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { Tipificacao } from "@/core";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, ChevronRightIcon, Edit, PencilLine, Plus, Trash } from "lucide-react";
+import { Calendar, ChevronRightIcon, PencilLine, Plus, Trash } from "lucide-react";
 import { useState } from "react";
 
 export default function  Tipificacoes() {

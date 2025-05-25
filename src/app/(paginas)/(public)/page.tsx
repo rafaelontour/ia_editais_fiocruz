@@ -1,7 +1,6 @@
 'use client'
 import Chart from "@/components/AppChart";
 import InfoBar from "@/components/InfoBar";
-import MapaRender from "@/components/Map";
 import { firstChartData, infoBarInfos, secondChartData } from "@/core/constants/informacoes";
 import dynamic from "next/dynamic";
 

@@ -285,8 +285,8 @@ export default function Taxonomias() {
               {taxonomiaSelecionada && taxonomiaSelecionada.ramos ? (
                   <ul>
                   {taxonomiaSelecionada.ramos.map((ramo, index) => (
-                      <div className="flex flex-col gap-2">
-                          <li key={index} className="flex  justify-between items-center mb-2">
+                      <div key={index} className="flex flex-col gap-2">
+                          <li className="flex  justify-between items-center mb-2">
                           <span>{ramo.nome}</span>
                      
                             <div className="flex flex-row gap-2">
