@@ -1,5 +1,11 @@
+"use client"
+
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import CardEditais from "./CardEditais";
-import CategoriaColor from "./CategoriaColor";
+import { Edital, StatusEdital } from "./types";
+import { useDroppable } from "@dnd-kit/core";
+//import { useState } from "react";
+//import CategoriaColor from "./CategoriaColor";
 
 export interface Categoria {
   nome: string;
@@ -7,21 +13,40 @@ export interface Categoria {
 }
 
 interface CategoriaColorProps{
+    status: StatusEdital;
     categoria: Categoria[];
+    editais: Edital[];
 }
 
-export default function CardList ({categoria} : CategoriaColorProps) {
+export default function CardList ({status, categoria , editais} : CategoriaColorProps) {
+
+    /*const statusMapping: Record<string, StatusEdital> = {
+        'rascunho': 'rascunho',
+        'emconstrucao': 'construcao',
+        'emanálise': 'analise',
+        'concluído': 'concluido'
+    };*/
+
+    const { setNodeRef } = useDroppable({ id: status, data: { status } });
+
     return(
-        <div className="flex flex-col  w-56 gap-5">
+        <div ref={setNodeRef} className="flex flex-col  w-56 gap-5">
             <div className="flex flex-row justify-between">
                 {categoria.map((item) => (
-                    <CategoriaColor key={item.nome} categoria={[{nome:item.nome, color:item.color}]}/>
+                    <div key={item.nome} className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-xs" style={{ backgroundColor: item.color }} />
+                        <span className="text-slate-400">{item.nome}</span>
+                    </div>
                 ))}
-                <p>7</p>
+                <p>{editais.length}</p>
             </div>
-            <div className="">
-                <CardEditais/>
-            </div>
+            <SortableContext items={editais.map(e => e.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-3">
+                    {editais.map((edital) => (
+                        <CardEditais key={edital.id} edital={edital} />
+                    ))}
+                </div>
+            </SortableContext>
             
         </div>
     );

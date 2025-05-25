@@ -1,29 +1,59 @@
+"use client"
+
 import { Calendar, Sparkle, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 import EditarEdital from "./EditarEdital";
 import Link from "next/link";
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Edital } from "./types";
 
-export default function CardEditais () {
+export interface CardEditaisProps {
+    edital: Edital;
+}
+
+export default function CardEditais ({ edital }: CardEditaisProps) {
+    const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: edital.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition: transition || 'transform 200ms ease',
+    opacity: isDragging ? 0.5 : 1,
+  };
+
     return(
-        <div className="flex flex-col rounded-md overflow-hidden border-2 border-gray-300 cursor-grab active:cursor-grabbing">
-            <div className="bg-[#dedede]  h-16">
+        <div 
+        ref={setNodeRef}
+        style={style}
+        className="flex flex-col rounded-md overflow-hidden border-2 border-gray-300 cursor-grab active:cursor-grabbing">
+            <div {...attributes} {...listeners} className="bg-[#dedede]  h-16"></div>
 
-            </div>
             <div className="flex flex-col bg-gray-50 py-2.5 px-3 gap-4">
-                <div>
-                    <div>Edital Fiocruz 2023/2</div>
+                <div > {/* O QUE FAZ MOVIENTAR - DRAG HANDLE*/}
+                    <div>{edital.titulo}</div>
                     <div className="flex flex-row justify-between items-center">
-                        <p className="text-sm">compras</p>
+                        <p className="text-sm">{edital.categoria}</p>
                         <div className="flex flex-row text-gray-500">
-                            <p className="text-[8px]">25/02/2025 </p>
+                            <p className="text-[8px]">{edital.data}</p>
                             <Calendar className="h-3"/>
                         </div>
                     </div>
                 </div>
                 <div className="flex gap-0.5 justify-end">
-                    <Link href={"/editais/edital"}><Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><Sparkle/></Button></Link>
-                    <EditarEdital/>
+                    {/* COLOCAR O STATUS */}
+                    { (edital.status !== "rascunho" && edital.status !== "concluido") ? (
+                        <Link href={"/editais/edital"}><Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><Sparkle/></Button></Link>
+                    ) : null
+                    }
+                   <EditarEdital/>
                     <AlertDialog>
                         <AlertDialogTrigger>
                             <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 bg-orange-600 text-white hover:text-black transition-all"><Trash className=""/></Button>
