@@ -4,107 +4,57 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { Tipificacao } from "@/core";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { get } from "http";
 import { Calendar, ChevronRightIcon, PencilLine, Plus, Trash } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function  Tipificacoes() {
+
+    const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     
     const [dialogTipificacao, setDialogTipificacao] = useState(false);
+    const [idDialogExcluir, setIdDialogExcluir] = useState<number | null>(null);
 
-    const tipificacoes: Tipificacao[] = [
-        {
-            id: 1,
-            nome: "Tipificacao 1",
-            lei: "Lei 1",
-            lei_complementar: "Lei Complementar 1",
-            data: "12/12/2022"
-        },
-        {
-            id: 2,
-            nome: "Tipificacao 2",
-            lei: "Lei 2",
-            lei_complementar: "Lei Complementar 2",
-            data: "8/12/2022"
-        },
-        {
-            id: 3,
-            nome: "Tipificacao 3",
-            lei: "Lei 3",
-            lei_complementar: "Lei Complementar 3",
-            data: "10/12/2020"
-        },
-        {
-            id: 4,
-            nome: "Tipificacao 4",
-            lei: "Lei 4",
-            lei_complementar: "Lei Complementar 4",
-            data: "20/12/2010"
-        },
-        {
-            id: 5,
-            nome: "Tipificacao 5",
-            lei: "Lei 5",
-            lei_complementar: "Lei Complementar 5",
-            data: "30/12/2000"
-        },
-        {
-            id: 6,
-            nome: "Tipificacao 6",
-            lei: "Lei 6",
-            lei_complementar: "Lei Complementar 6",
-            data: "20/12/1990"
-        },
-        {
-            id: 7,
-            nome: "Tipificacao 7",
-            lei: "Lei 7",
-            lei_complementar: "Lei Complementar 7",
-            data: "20/12/1980"
-        },
-        {
-            id: 8,
-            nome: "Tipificacao 8",
-            lei: "Lei 8",
-            lei_complementar: "Lei Complementar 8",
-            data: "20/12/1970"
-        },
-        {
-            id: 9,
-            nome: "Tipificacao 9",
-            lei: "Lei 9",
-            lei_complementar: "Lei Complementar 9",
-            data: "20/12/1960"
-        },
-        {
-            id: 10,
-            nome: "Tipificacao 10",
-            lei: "Lei 10",
-            lei_complementar: "Lei Complementar 10",
-            data: "20/12/1950"
-        },
-        {
-            id: 11,
-            nome: "Tipificacao 11",
-            lei: "Lei 11",
-            lei_complementar: "Lei Complementar 11",
-            data: "20/12/1940"
-        },
-        {
-            id: 12,
-            nome: "Tipificacao 12",
-            lei: "Lei 12",
-            lei_complementar: "Lei Complementar 12",
-            data: "20/12/1930"
-        },
-        {
-            id: 13,
-            nome: "Tipificacao 13",
-            lei: "Lei 13",
-            lei_complementar: "Lei Complementar 13",
-            data: "20/12/1920"
+    
+    const getTipificacoes = async () => {
+        const dados = await fetch('http://localhost:3000/api/tipificacoes')
+
+        if (!dados.ok) {
+            throw new Error('Erro ao buscar tipificacoes')
         }
-    ]
 
+        const tipificacoes = await dados.json()
+        setTipificacoes(tipificacoes)
+    } 
+    useEffect(() => {
+        try {
+            getTipificacoes();
+        } catch(erro) {
+            console.error("Erro ao buscar tipificacoes", erro)
+        }
+    }, []);
+
+    const excluirTipificacao = (id: number) => {
+        alert("Tipificação excluida com sucesso!");
+        setIdDialogExcluir(id);
+
+        const fetchData = async () => {
+            try {
+                const resposta = await fetch(`http://localhost:3000/api/tipificacoes?id=${id}`, { method: 'DELETE' });
+                console.log(resposta);
+                if (!resposta.ok) {
+                    throw new Error('Erro ao excluir tipificacao')
+                }
+                const r = await resposta.json();
+                alert(r);
+                await getTipificacoes();
+            } catch(erro) {
+                console.error(erro)
+            }
+        }
+
+        fetchData();
+    }
 
     return(
         <div>
@@ -197,7 +147,7 @@ export default function  Tipificacoes() {
                         lg:[grid-template-columns:1fr_1fr_1fr] md:[grid-template-columns:1fr_1fr] gap-7
                     "
                 >
-                    {tipificacoes.map((tipificacao, index) => (
+                    {tipificacoes && tipificacoes.map((tipificacao, index) => (
                         <div
                             style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)"}} 
                             key={index}
@@ -233,16 +183,55 @@ export default function  Tipificacoes() {
                                         <PencilLine color="black" />
                                     </Button>
 
-                                    <Button
-                                        className={`
-                                            h-8 w-8 bg-vermelho hover:bg-vermelho
-                                            hover:cursor-pointer hover:scale-110 active:scale-100
-                                        `}
-                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
-                                        size={"icon"}
-                                    >
-                                        <Trash />
-                                    </Button>
+                                    <Dialog open={idDialogExcluir === tipificacao.id} onOpenChange={(open) => setIdDialogExcluir(open ? tipificacao.id : null)}>
+                                        <DialogTrigger>
+                                            <Button
+                                                className={`
+                                                    h-8 w-8 bg-vermelho hover:bg-vermelho
+                                                    hover:cursor-pointer hover:scale-110 active:scale-100
+                                                `}
+                                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
+                                                size={"icon"}
+                                            >
+                                                <Trash />
+                                            </Button>
+                                            
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>Excluir Tipificação</DialogTitle>
+                                                <DialogDescription>
+                                                    Tem certeza que deseja excluir essa tipificação?
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="flex justify-end gap-4 mt-4">
+                                                <DialogClose
+                                                    className={`
+                                                        transition ease-in-out text-white
+                                                        rounded-md px-3 bg-vermelho
+                                                        hover:cursor-pointer
+                                                        hover:scale-110 active:scale-100
+                                                    `}
+                                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
+                                                >
+                                                    Cancelar
+                                                </DialogClose>
+                                                
+                                                <Button
+                                                    className={`
+                                                        flex bg-verde hover:bg-verde
+                                                        text-white hover:cursor-pointer
+                                                        hover:scale-110 active:scale-100
+                                                    `}
+                                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
+                                                    onClick={() => excluirTipificacao(tipificacao.id)}
+                                                >
+                                                    Excluir
+                                                </Button>
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+
                                 </div>
                             </div>
                         </div>

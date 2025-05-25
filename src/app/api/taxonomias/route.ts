@@ -1,7 +1,7 @@
 import { Taxonomia } from "@/core/taxonomia";
 import { NextResponse, NextRequest } from "next/server";
 
-const itens: Taxonomia[] = [
+let itens: Taxonomia[] = [
     {
       id: 1,  
       nome: "Taxonomia 1",
