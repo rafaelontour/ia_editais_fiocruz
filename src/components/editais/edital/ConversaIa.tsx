@@ -13,7 +13,7 @@ export default function ConversaIa () {
                 <Button
                     variant="outline"
                     size="sm"
-                    className="absolute bottom-2 right-2 flex items-center gap-1 "
+                    className="absolute bottom-2 right-2 flex items-center gap-1 bg-vermelho text-white hover:text-black"
                 >
                     <Play size={16} />
                     <span className="text-sm">Analisar edital</span>

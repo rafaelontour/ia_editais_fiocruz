@@ -10,7 +10,7 @@ export default function Linha01 () {
                 <p className="text-sm font-semibold text-gray-400">versão 1.0.1</p>
             </div>
             <div className="flex flex-row gap-2 items-center">
-                <Button variant={"outline"} className="items-center text-white bg-orange-600">
+                <Button variant={"outline"} className="items-center text-white bg-vermelho hover:text-black">
                     <Upload className=""/>
                     <p>Editar edtial</p>
                 </Button>

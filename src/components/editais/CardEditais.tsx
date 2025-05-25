@@ -56,7 +56,7 @@ export default function CardEditais ({ edital }: CardEditaisProps) {
                    <EditarEdital/>
                     <AlertDialog>
                         <AlertDialogTrigger>
-                            <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 bg-orange-600 text-white hover:text-black transition-all"><Trash className=""/></Button>
+                            <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 bg-vermelho text-white hover:text-black transition-all"><Trash className=""/></Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="rounded-2xl">
                             <AlertDialogHeader>
@@ -67,7 +67,7 @@ export default function CardEditais ({ edital }: CardEditaisProps) {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction className="bg-orange-600"><Trash/><p>Excluir edital</p></AlertDialogAction>
+                                <AlertDialogAction className="bg-vermelho"><Trash/><p>Excluir edital</p></AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>

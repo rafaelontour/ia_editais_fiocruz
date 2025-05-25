@@ -10,7 +10,7 @@ export default function SuperiorEdital () {
                 <Label className="text-2xl font-bold">Edital Fiocruz 2025/1</Label>
             </div>
             <div>
-                <Button>Finalizar Elaboração</Button>
+                <Button variant={"outline"} className="bg-vermelho text-white hover:text-black">Finalizar Elaboração</Button>
             </div>
         </div>
     );

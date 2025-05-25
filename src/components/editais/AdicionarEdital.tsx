@@ -12,7 +12,7 @@ export default function AdicionarEdital () {
         <div className="">
             <Sheet>
                 <SheetTrigger>
-                    <Button variant={"outline"} className="bg-orange-600"> {/* AJEITAR ÍCONE */}
+                    <Button variant={"outline"} className="bg-vermelho text-white hover:text-black"> {/* AJEITAR ÍCONE */}
                         <Upload className=""/>
                         <p>Enviar novo edital</p>
                     </Button> 
