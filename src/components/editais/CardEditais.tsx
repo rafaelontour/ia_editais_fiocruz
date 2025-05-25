@@ -48,7 +48,7 @@ export default function CardEditais ({ edital }: CardEditaisProps) {
                     </div>
                 </div>
                 <div className="flex gap-0.5 justify-end">
-                    {/* COLOCAR PARA PASSAR O ID NO LOCAL DO EDITAL */}
+                    {/* COLOCAR O STATUS */}
                     { (edital.status !== "rascunho" && edital.status !== "concluido") ? (
                         <Link href={"/editais/edital"}><Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300"><Sparkle/></Button></Link>
                     ) : null
