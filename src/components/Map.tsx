@@ -1,8 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
-import mapboxgl, { GeoJSONFeature } from "mapbox-gl"
+import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
-import { features } from "process"
 
 type LngLatBoundsLike =
   | [[number, number], [number, number]]
@@ -123,8 +122,6 @@ export default function MapaRender() {
 
       });
 
-      
-
       map.on('click', 'unclustered-point', (e) => {
         if(e.features && e.features[0]){
           const features  = e.features[0];
@@ -136,8 +133,6 @@ export default function MapaRender() {
           \nEstado: ${features.properties.estado}`)
           
         }
-      
-           
       })
     })
 
