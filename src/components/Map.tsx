@@ -1,21 +1,23 @@
 "use client"
+
 import { useEffect, useRef, useState } from "react"
 import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
+import { FeatureCollection } from "geojson"
 
 type LngLatBoundsLike =
   | [[number, number], [number, number]]
   | [number, number, number, number]
 
+const brazilBounds: LngLatBoundsLike = [
+  [-74.0, -34.0],
+  [-34.0, 5.5]
+]
+
 export default function MapaRender() {
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
-  const [geojsonData, setGeojsonData] = useState<any>(null)
-
-  const brazilBounds: LngLatBoundsLike = [
-    [-74.0, -34.0],
-    [-34.0, 5.5]
-  ]
+  const [geojsonData, setGeojsonData] = useState<FeatureCollection | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,11 +32,10 @@ export default function MapaRender() {
     if (!geojsonData || !mapContainerRef.current || !process.env.NEXT_PUBLIC_MAPBOX_KEY) return
 
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_KEY
-
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/verttb/cmav7e36p00vx01sd6w6h9690",
-      center: [-41.5, -12.9], 
+      center: [-41.5, -12.9],
       zoom: 5,
       maxBounds: brazilBounds
     })
@@ -100,44 +101,41 @@ export default function MapaRender() {
           "circle-stroke-color": "#fff"
         }
       })
-      map.on('click', 'clusters', (e) => {
+
+      map.on("click", "clusters", (e) => {
         const features = map.queryRenderedFeatures(e.point, {
-          layers:['clusters']
-        });
+          layers: ["clusters"]
+        })
 
-        if(features[0].properties){
-           const cluster_id = features[0].properties.cluster_id;
-           const source = map.getSource('instituicoes') as mapboxgl.GeoJSONSource;
-           if (features[0].geometry.type !== 'Point') return;
-           const coordinates = features[0].geometry.coordinates
+        if (features[0]?.properties) {
+          const cluster_id = features[0].properties.cluster_id
+          const source = map.getSource("instituicoes") as mapboxgl.GeoJSONSource
 
-           source.getClusterExpansionZoom(cluster_id, 
-            (err, zoom) => {
-              if(err) return;
-              map.easeTo({
-                center: coordinates as [number,number],
-                zoom: zoom as number
-              });
-            });}
+          if (features[0].geometry.type !== "Point") return
 
-      });
+          const coordinates = features[0].geometry.coordinates as [number, number]
 
-      map.on('click', 'unclustered-point', (e) => {
-        if(e.features && e.features[0]){
-          const features  = e.features[0];
-
-          if(features.geometry.type !== 'Point') return;
-          const coordinates = features.geometry.coordinates.slice();
-          if(features.properties)
-            alert(`Cidade: ${features.properties.cidade}
-          \nEstado: ${features.properties.estado}`)
-          
+          source.getClusterExpansionZoom(cluster_id, (err, zoom) => {
+            if (err) return
+            map.easeTo({
+              center: coordinates,
+              zoom
+            })
+          })
         }
+      })
+
+      map.on("click", "unclustered-point", (e) => {
+        const feature = e.features?.[0]
+        if (!feature || feature.geometry.type !== "Point") return
+
+        const { cidade, estado } = feature.properties || {}
+        alert(`Cidade: ${cidade}\nEstado: ${estado}`)
       })
     })
 
     return () => map.remove()
-  }, [geojsonData])
+  }, [geojsonData]) // ✅ brazilBounds está fora do hook, não precisa aqui
 
   return <div ref={mapContainerRef} className="w-full h-4/5" />
 }

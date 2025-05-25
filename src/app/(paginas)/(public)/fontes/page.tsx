@@ -3,7 +3,7 @@
 import Masonry from 'react-masonry-css'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, Edit, Pencil, PencilLine, Plus, Trash } from "lucide-react";
+import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
