@@ -27,6 +27,7 @@ export default function Taxonomias() {
   const [taxonomiaSelecionada, setTaxonomiaSelecionada] = useState<Taxonomia | null>(null);
 
   const ramoNovo: Ramo = {
+    id: 0,
     nome: '',
     descricao: '',
   }
@@ -40,19 +41,19 @@ export default function Taxonomias() {
 
   const [itens, setItens] = useState<Taxonomia[]>([]);
 
+  const getTaxonomias = async () => {
+    const dados = await fetch('http://localhost:3000/api/taxonomias')
+
+    if (!dados.ok) {
+        throw new Error('Erro ao buscar taxonomias')
+    }
+
+    const taxonomias = await dados.json()
+    setItens(taxonomias)
+  }
+
   useEffect(() => {
     try {
-      const getTaxonomias = async () => {
-        const dados = await fetch('http://localhost:3000/api/taxonomias')
-
-        if (!dados.ok) {
-            throw new Error('Erro ao buscar taxonomias')
-        }
-
-        const taxonomias = await dados.json()
-        setItens(taxonomias)
-      }
-
       getTaxonomias()
     } catch (error) {
         console.error("Erro ao buscar taxonomias:", error);
@@ -77,6 +78,44 @@ export default function Taxonomias() {
       setOpenRamo(false);
     }
   };
+
+const handleDeleteTaxonomia = async (taxonomiaId: number) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/taxonomias?id=${taxonomiaId}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Erro ao excluir taxonomia:', errorData.error);
+            return;
+        }
+
+        getTaxonomias()
+    } catch (error) {
+        console.error('Erro ao excluir taxonomia:', error);
+    }
+};
+
+
+const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/taxonomias?id=${taxonomiaId}&ramo=${idRamo}`, {
+          method: 'DELETE',
+      });
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Erro ao excluir ramo:', errorData.error);
+          return;
+      }
+
+      getTaxonomias()
+    } catch (error) {
+        console.error('Erro ao excluir ramo:', error);
+    }
+};
+
 
   const handleAddTaxonomia = () => {
     setItens((prevItens) => [...prevItens, taxonomiaNova]);
@@ -197,7 +236,9 @@ export default function Taxonomias() {
                   <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 hover:cursor-pointer">
                     <PencilLine className="h-4 w-4" strokeWidth={1.5} />
                   </button>
-                  <button className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer">
+                  <button 
+                    onClick={() => handleDeleteTaxonomia(item.id)}
+                    className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer">
                     <Trash className="h-4 w-4" strokeWidth={1.5} />
                   </button>
                 </div>
@@ -286,15 +327,17 @@ export default function Taxonomias() {
                 taxonomiaSelecionada.ramos && taxonomiaSelecionada.ramos.length > 0 ? (
                   <ul>
                   {taxonomiaSelecionada.ramos.map((ramo, index) => (
-                      <div className="flex flex-col gap-2">
-                          <li key={index} className="flex  justify-between items-center mb-2">
+                      <div key={index} className="flex flex-col gap-2">
+                          <li className="flex  justify-between items-center mb-2">
                           <span>{ramo.nome}</span>
                      
                             <div className="flex flex-row gap-2">
                                 <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 hover:cursor-pointer">
                                   <PencilLine className="h-4 w-4" strokeWidth={1.5} />
                                 </button>
-                                <button className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer">
+                                <button 
+                                  onClick={() => handleDeleteRamo(taxonomiaSelecionada.id, ramo.id)}
+                                  className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer">
                                   <Trash className="h-4 w-4" strokeWidth={1.5} />
                                 </button>
                            
