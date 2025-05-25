@@ -119,7 +119,7 @@ export default function MapaRender() {
             if (err) return
             map.easeTo({
               center: coordinates,
-              zoom
+              zoom: zoom
             })
           })
         }
