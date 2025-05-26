@@ -3,8 +3,9 @@
 import CardEditais from "@/components/editais/CardEditais";
 import CardList from "@/components/editais/CardList";
 import SuperiorEditais from "@/components/editais/SuperiorEditais";
-import { Edital, StatusEdital } from "@/components/editais/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Edital } from "@/core";
+import { StatusEdital } from "@/core/edital/Edital";
 import { closestCenter, DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
 import { useState } from "react";
 

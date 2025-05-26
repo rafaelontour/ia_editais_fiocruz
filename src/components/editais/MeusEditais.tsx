@@ -5,7 +5,8 @@ import CardList from "./CardList";
 //import CategoriaColor from "./CategoriaColor";
 import SuperiorEditais from "./SuperiorEditais";
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
-import { Edital, StatusEdital } from "./types";
+import { Edital } from "@/core";
+import { StatusEdital } from "@/core/edital/Edital";
 
 export default function MeusEditais () {
 

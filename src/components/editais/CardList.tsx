@@ -2,8 +2,9 @@
 
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import CardEditais from "./CardEditais";
-import { Edital, StatusEdital } from "./types";
 import { useDroppable } from "@dnd-kit/core";
+import { Edital } from "@/core";
+import { StatusEdital } from "@/core/edital/Edital";
 //import { useState } from "react";
 //import CategoriaColor from "./CategoriaColor";
 

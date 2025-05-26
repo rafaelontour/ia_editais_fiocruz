@@ -1,6 +1,6 @@
 export type StatusEdital = "rascunho" | "construcao" | "analise" | "concluido";
 
-export interface Edital {
+export default interface Edital {
   id: string;
   titulo: string;
   status: StatusEdital;

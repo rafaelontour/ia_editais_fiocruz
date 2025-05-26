@@ -7,7 +7,7 @@ import EditarEdital from "./EditarEdital";
 import Link from "next/link";
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Edital } from "./types";
+import { Edital } from "@/core";
 
 export interface CardEditaisProps {
     edital: Edital;
