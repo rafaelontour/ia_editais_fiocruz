@@ -39,7 +39,7 @@ export default function Taxonomias() {
     data: '',
   }
 
-  const [itens, setItens] = useState<Taxonomia[]>([]);
+  const [tax, setTax] = useState<Taxonomia[]>([]);
 
   const getTaxonomias = async () => {
     const dados = await fetch('http://localhost:3000/api/taxonomias')
@@ -49,7 +49,7 @@ export default function Taxonomias() {
     }
 
     const taxonomias = await dados.json()
-    setItens(taxonomias)
+    setTax(taxonomias)
   }
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function Taxonomias() {
         ramos: [...taxonomiaSelecionada.ramos || [], ramoNovo],
       };
 
-      setItens((prevItens) =>
+      setTax((prevItens) =>
         prevItens.map((item) =>
           item.nome === taxonomiaSelecionada.nome ? novaTaxonomia : item
         )
@@ -75,56 +75,80 @@ export default function Taxonomias() {
 
       setTaxonomiaSelecionada(novaTaxonomia);
 
-      setOpenRamo(false);
+      setOpenDialogRamo(false);
     }
   };
 
 const handleDeleteTaxonomia = async (taxonomiaId: number) => {
-    try {
-        const response = await fetch(`http://localhost:3000/api/taxonomias?id=${taxonomiaId}`, {
-            method: 'DELETE',
-        });
+  try {
+    const response = await fetch(`http://localhost:3000/api/taxonomias?id=${taxonomiaId}`, {
+        method: 'DELETE',
+    });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Erro ao excluir taxonomia:', errorData.error);
-            return;
-        }
-
-        getTaxonomias()
-    } catch (error) {
-        console.error('Erro ao excluir taxonomia:', error);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Erro ao excluir taxonomia:', errorData.error);
+      return;
     }
+
+    getTaxonomias()
+    setTaxonomiaSelecionada(null)
+
+  } catch (error) {
+    console.error('Erro ao excluir taxonomia:', error);
+  }
 };
 
 
 const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/taxonomias?id=${taxonomiaId}&ramo=${idRamo}`, {
-          method: 'DELETE',
-      });
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/taxonomias?id=${taxonomiaId}&ramo=${idRamo}`,
+      { method: 'DELETE' }
+    );
 
-      if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Erro ao excluir ramo:', errorData.error);
-          return;
-      }
-
-      getTaxonomias()
-    } catch (error) {
-        console.error('Erro ao excluir ramo:', error);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Erro ao excluir ramo:', errorData.error);
+      return;
     }
+
+    // Atualizar o estado local após exclusão bem-sucedida
+    setTax((prevTax) =>
+      prevTax.map((taxonomia) => {
+        if (taxonomia.id === taxonomiaId) {
+          return {
+            ...taxonomia,
+            ramos: taxonomia.ramos?.filter((ramo) => ramo.id !== idRamo) || [],
+          };
+        }
+        return taxonomia;
+      })
+    );
+
+    // Atualizar a taxonomia selecionada, se necessário
+    if (taxonomiaSelecionada?.id === taxonomiaId) {
+      setTaxonomiaSelecionada((prevTaxonomia) => {
+        if (!prevTaxonomia) return null;
+        return {
+          ...prevTaxonomia,
+          ramos: prevTaxonomia.ramos?.filter((ramo) => ramo.id !== idRamo) || [],
+        };
+      });
+    }
+  } catch (error) {
+    console.error('Erro ao excluir ramo:', error);
+  }
 };
 
-
+    
   const handleAddTaxonomia = () => {
-    setItens((prevItens) => [...prevItens, taxonomiaNova]);
+    setTax((prevItens) => [...prevItens, taxonomiaNova]);
     setOpenTaxonomia(false);
   }
 
-
   const [openTaxonomia, setOpenTaxonomia] = useState(false);
-  const [openRamo, setOpenRamo] = useState(false);
+  const [openDialogRamo, setOpenDialogRamo] = useState(false);
 
   return (
     <div className="flex flex-col w-full">
@@ -215,7 +239,7 @@ const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
 
       <div className="flex flex-row">
         <div className="basis-1/2">
-          {itens.map((item, index) => (
+          {tax.map((item, index) => (
             <Card
               key={index}
               className="hover:bg-gray-200 hover:cursor-pointer m-4"
@@ -252,7 +276,7 @@ const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
             <CardHeader>
               <CardTitle className="flex flex-row justify-between items-center">
                 <h1 className="text-2xl">Ramos</h1>
-                <Dialog open={openRamo} onOpenChange={setOpenRamo}>
+                <Dialog open={openDialogRamo} onOpenChange={setOpenDialogRamo}>
                   <DialogTrigger asChild >
                     <button 
                         className=" flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
@@ -326,8 +350,8 @@ const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
               {taxonomiaSelecionada ? (
                 taxonomiaSelecionada.ramos && taxonomiaSelecionada.ramos.length > 0 ? (
                   <ul>
-                  {taxonomiaSelecionada.ramos.map((ramo, index) => (
-                      <div key={index} className="flex flex-col gap-2">
+                  {taxonomiaSelecionada.ramos.map((ramo) => (
+                      <div key={ramo.id} className="flex flex-col gap-2">
                           <li className="flex  justify-between items-center mb-2">
                           <span>{ramo.nome}</span>
                      

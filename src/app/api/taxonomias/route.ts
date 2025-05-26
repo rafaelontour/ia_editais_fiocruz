@@ -1,6 +1,5 @@
 import { Taxonomia } from "@/core/taxonomia";
 import { NextResponse, NextRequest } from "next/server";
-import { parse } from "path";
 
 const itens: Taxonomia[] = [
     {
@@ -91,13 +90,17 @@ export async function DELETE(req: NextRequest) {
   console.log("idramo: " + idRamo)
 
   if (!(isNaN(idRamo))) {
-    console.log("ENTROU")
-    const taxonomia = itens.filter((item) => id === item.id)
-    console.log("TAXONOMIA ANTES DE APAGAR RAMO: " + taxonomia)
-    taxonomia.splice(idRamo, 1)
-    console.log("TAXONOMIA DEPOIS DE APAGAR RAMO: " + taxonomia)
+    const taxonomiaIndex = itens.findIndex((t) => t.id === id);
+    if (taxonomiaIndex === -1) {
+      return NextResponse.json({ error: "Taxonomia não encontrada" }, { status: 404 });
+    }
+    const taxonomia = itens[taxonomiaIndex];
+    console.log("TAXONOMIA ANTES DE APAGAR RAMO: " + JSON.stringify(taxonomia));
 
-    return NextResponse.json({ message: `Ramo ${idRamo} removid` }, { status: 200 });
+    taxonomia.ramos?.splice(idRamo, 1);
+    console.log("TAXONOMIA DEPOIS DE APAGAR RAMO: " + JSON.stringify(taxonomia));
+
+    return NextResponse.json({ message: `Ramo ${idRamo} removido` }, { status: 200 });
   } 
 
   console.log("ID:" + id);
