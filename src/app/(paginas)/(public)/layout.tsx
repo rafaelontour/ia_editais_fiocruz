@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { GitGraph, Home, Sheet } from "lucide-react"
+import { FilePen, Home, Sheet, Type, University } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
 
@@ -13,18 +13,28 @@ export default function RootLayout({
   const items = [
     {
       title: "Página Inicial",
-      url: "#",
+      url: "/",
       icon: Home,
     },
     {
       title: "Meus editais",
-      url: "#",
+      url: "/editais",
       icon: Sheet,
     },
     {
-      title: "Estatísticas",
-      url: "#",
-      icon: GitGraph,
+      title: "Tipificações",
+      url: "/tipificacoes",
+      icon: Type,
+    },
+    {
+      title: "Fontes",
+      url: "/fontes",
+      icon: FilePen,
+    },
+    {
+      title: "Unidade",
+      url: "/unidades",
+      icon: University,
     }
   ]
 
