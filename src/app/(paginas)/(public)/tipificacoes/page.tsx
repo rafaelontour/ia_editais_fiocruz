@@ -35,7 +35,7 @@ export default function  Tipificacoes() {
     }, []);
 
     const excluirTipificacao = (id: number) => {
-        alert("Tipificação excluida com sucesso!");
+
         setIdDialogExcluir(id);
 
         const fetchData = async () => {
@@ -46,7 +46,7 @@ export default function  Tipificacoes() {
                     throw new Error('Erro ao excluir tipificacao')
                 }
                 const r = await resposta.json();
-                alert(r);
+
                 await getTipificacoes();
             } catch(erro) {
                 console.error(erro)
@@ -207,8 +207,8 @@ export default function  Tipificacoes() {
                                             <div className="flex justify-end gap-4 mt-4">
                                                 <DialogClose
                                                     className={`
-                                                        transition ease-in-out text-white
-                                                        rounded-md px-3 bg-vermelho
+                                                        transition ease-in-out
+                                                        rounded-md px-3
                                                         hover:cursor-pointer
                                                         hover:scale-110 active:scale-100
                                                     `}
@@ -219,7 +219,7 @@ export default function  Tipificacoes() {
                                                 
                                                 <Button
                                                     className={`
-                                                        flex bg-verde hover:bg-verde
+                                                        flex bg-vermelho hover:bg-vermelho
                                                         text-white hover:cursor-pointer
                                                         hover:scale-110 active:scale-100
                                                     `}
