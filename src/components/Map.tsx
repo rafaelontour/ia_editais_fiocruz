@@ -116,7 +116,7 @@ export default function MapaRender() {
           const coordinates = features[0].geometry.coordinates as [number, number]
 
           source.getClusterExpansionZoom(cluster_id, (err, zoom) => {
-            if (err) return
+            if (err || !zoom) return
             map.easeTo({
               center: coordinates,
               zoom: zoom
