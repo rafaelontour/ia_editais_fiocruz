@@ -1,6 +1,6 @@
 import { ChevronLeft } from "lucide-react";
 
-export default function PdfFontes() {
+export default function AnalisePdf() {
   return (
     <div className="flex flex-col w-full min-h-screen p-6">
       <header className="flex items-center gap-4 mb-6">
