@@ -74,7 +74,10 @@ let itens: Taxonomia[] = [
 ]
 
 export async function GET(req: NextRequest) {
-  return NextResponse.json(itens)
+  return NextResponse.json(itens.map(t => ({
+    ...t,
+    ramos: t.ramos ? [...t.ramos] : []
+  })));
 }
 
 export async function POST(req: NextRequest) {

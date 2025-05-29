@@ -19,15 +19,19 @@ import {
 } from "@/components/ui/dialog";
 import { Ramo } from "@/core/ramo";
 import { Taxonomia } from "@/core/taxonomia";
+import { excluirRamo } from "@/service/ramo";
+import { excluirTaxonomia, getTaxonomias } from "@/service/taxonomia";
 import { Calendar, ChevronLeft, PencilLine, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 
 
 export default function Taxonomias() {
+  const [idSelecionado, setIdSelecionado] = useState<number | null>(null);
   const [taxonomiaSelecionada, setTaxonomiaSelecionada] = useState<Taxonomia | null>(null);
+  const [tax, setTax] = useState<Taxonomia[]>([]);
 
   const ramoNovo: Ramo = {
-    id: 0,
+    id: Math.floor(Math.random() * 1000),
     nome: '',
     descricao: '',
   }
@@ -39,25 +43,16 @@ export default function Taxonomias() {
     data: '',
   }
 
-  const [tax, setTax] = useState<Taxonomia[]>([]);
-
-  const getTaxonomias = async () => {
-    const dados = await fetch('http://localhost:3000/api/taxonomias')
-
-    if (!dados.ok) {
-        throw new Error('Erro ao buscar taxonomias')
-    }
-
-    const taxonomias = await dados.json()
-    setTax(taxonomias)
-  }
-
   useEffect(() => {
-    try {
-      getTaxonomias()
-    } catch (error) {
-        console.error("Erro ao buscar taxonomias:", error);
+    const fetchData = async () => {
+      try {
+        setTax(await getTaxonomias())
+      } catch (error) {
+          console.error("Erro ao buscar taxonomias:", error); // Chamar um toast no lugar
+      }
     }
+
+    fetchData();
   }, []);
 
   const handleAddRamo = () => {
@@ -79,70 +74,34 @@ export default function Taxonomias() {
     }
   };
 
-const handleDeleteTaxonomia = async (taxonomiaId: number) => {
+const handleExcluirTaxonomia = async (taxonomiaId: number) => {
+  console.log("ID: " + taxonomiaId)
   try {
-    const response = await fetch(`http://localhost:3000/api/taxonomias?id=${taxonomiaId}`, {
-        method: 'DELETE',
-    });
+    const resposta = await excluirTaxonomia(taxonomiaId);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Erro ao excluir taxonomia:', errorData.error);
-      return;
-    }
+    if (!resposta) return;
 
-    getTaxonomias()
+    setTax(await getTaxonomias()) // Avisar que foi apagada
     setTaxonomiaSelecionada(null)
 
   } catch (error) {
-    console.error('Erro ao excluir taxonomia:', error);
+    console.error('Erro ao excluir taxonomia:', error); // Chamar um toast no lugar
   }
 };
 
 
-const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
+const handleExcluirRamo = async (taxonomiaId: number, idRamo: number) => {
   try {
-    const response = await fetch(
-      `http://localhost:3000/api/taxonomias?id=${taxonomiaId}&ramo=${idRamo}`,
-      { method: 'DELETE' }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Erro ao excluir ramo:', errorData.error);
-      return;
-    }
-
-    // Atualizar o estado local após exclusão bem-sucedida
-    setTax((prevTax) =>
-      prevTax.map((taxonomia) => {
-        if (taxonomia.id === taxonomiaId) {
-          return {
-            ...taxonomia,
-            ramos: taxonomia.ramos?.filter((ramo) => ramo.id !== idRamo) || [],
-          };
-        }
-        return taxonomia;
-      })
-    );
-
-    // Atualizar a taxonomia selecionada, se necessário
-    if (taxonomiaSelecionada?.id === taxonomiaId) {
-      setTaxonomiaSelecionada((prevTaxonomia) => {
-        if (!prevTaxonomia) return null;
-        return {
-          ...prevTaxonomia,
-          ramos: prevTaxonomia.ramos?.filter((ramo) => ramo.id !== idRamo) || [],
-        };
-      });
-    }
+    await excluirRamo(taxonomiaId, idRamo);
+    console.log("ATUALIZANDO, RAMO EXCLUIDO")
+    setTax(await getTaxonomias())
   } catch (error) {
     console.error('Erro ao excluir ramo:', error);
   }
 };
 
     
-  const handleAddTaxonomia = () => {
+  const handleAdicionarTaxonomia = () => {
     setTax((prevItens) => [...prevItens, taxonomiaNova]);
     setOpenTaxonomia(false);
   }
@@ -163,7 +122,7 @@ const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
         <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
           <DialogTrigger asChild >
             <button 
-                className=" flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
+                className=" flex items-center gap-2 bg-vermelho hover:bg-vermelho cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm hover:scale-105 active:scale-100 duration-100 transition-all"
               
             >
               <Plus className="h-5 w-5 " strokeWidth={1.5} />
@@ -225,7 +184,7 @@ const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
               <button 
                 className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
                 type="submit"
-                onClick={handleAddTaxonomia}
+                onClick={handleAdicionarTaxonomia}
               >
                 Adicionar
               </button>
@@ -242,8 +201,15 @@ const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
           {tax.map((item, index) => (
             <Card
               key={index}
-              className="hover:bg-gray-200 hover:cursor-pointer m-4"
-              onClick={() => setTaxonomiaSelecionada(item)}
+              className={`
+                hover:bg-gray-200 hover:cursor-pointer
+                m-4 hover:scale-[1.03] active:scale-100 duration-100
+                ${idSelecionado === item.id ? "border-orange-300 border-[1px]" : ""}
+              `}
+              onClick={() => {
+                setTaxonomiaSelecionada(item)
+                setIdSelecionado(item.id)
+              }}
             >
               <CardHeader>
                 <CardTitle>{item.nome}</CardTitle>
@@ -257,12 +223,12 @@ const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
                   <span className="text-xs text-gray-400">{item.data}</span>
                 </div>
                 <div className="flex gap-2">
-                  <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 hover:cursor-pointer">
+                  <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 hover:cursor-pointer hover:scale-110 active:scale-100 duration-100 transition-all">
                     <PencilLine className="h-4 w-4" strokeWidth={1.5} />
                   </button>
                   <button 
-                    onClick={() => handleDeleteTaxonomia(item.id)}
-                    className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer">
+                    onClick={() => handleExcluirTaxonomia(item.id)}
+                    className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer hover:scale-110 active:scale-100 duration-100 transition-all">
                     <Trash className="h-4 w-4" strokeWidth={1.5} />
                   </button>
                 </div>
@@ -356,12 +322,12 @@ const handleDeleteRamo = async (taxonomiaId: number, idRamo: number) => {
                           <span>{ramo.nome}</span>
                      
                             <div className="flex flex-row gap-2">
-                                <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 hover:cursor-pointer">
+                                <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 hover:cursor-pointer hover:scale-110 active:scale-100 duration-100 transition-all">
                                   <PencilLine className="h-4 w-4" strokeWidth={1.5} />
                                 </button>
                                 <button 
-                                  onClick={() => handleDeleteRamo(taxonomiaSelecionada.id, ramo.id)}
-                                  className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer">
+                                  onClick={() => handleExcluirRamo(taxonomiaSelecionada.id, ramo.id)}
+                                  className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer hover:scale-110 active:scale-100 duration-100 transition-all">
                                   <Trash className="h-4 w-4" strokeWidth={1.5} />
                                 </button>
                            

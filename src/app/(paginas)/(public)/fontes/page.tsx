@@ -7,8 +7,10 @@ import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
+import { getFontes } from '@/service/fonte';
+import { Fontes } from '@/core/fonte';
 
-export default function Fontes() {
+export default function Fontess() {
     const breakpointColumnsObj = {
         default: 4,
         1500: 3,
@@ -17,32 +19,18 @@ export default function Fontes() {
     }
 
     const [openDialogFontes, setOpenDialogFontes] = useState(false);
-
-    type Fonte = {
-        nome: string,
-        descricao: string,
-        data: string
-    }
-
-    const [fontes, setFontes] = useState<Fonte[]>([])
+    const [fontes, setFontes] = useState<Fontes[]>([])
 
     useEffect(() => {
-        try {
-            const getFontes = async () => {
-                const dados = await fetch('http://localhost:3000/api/fontes')
-
-                if (!dados.ok) {
-                    throw new Error('Erro ao buscar fontes')
-                }
-                
-                const fontes = await dados.json()
-                setFontes(fontes)
-            } 
-                 
-            getFontes()
-        } catch (error) {
-            console.error("Erro ao buscar fontes", error)
+        const fetchData = async () => {
+            try {
+                setFontes(await getFontes())
+            } catch (error) {
+                console.error("Erro ao buscar fontes", error)
+            }
         }
+    
+        fetchData();
     }, [])
 
     return (
@@ -59,8 +47,8 @@ export default function Fontes() {
                             className={`
                                 flex rounded-md gap-2 items-center px-4 py-2
                                 transition duration-100
-                                bg-verde hover:bg-verde text-white
-                                hover:cursor-pointer hover:scale-110 active:scale-100
+                                bg-vermelho hover:bg-vermelho text-white
+                                hover:cursor-pointer hover:scale-105 active:scale-100
                             `}
                         >
                             <Plus className=""/>
@@ -152,6 +140,7 @@ export default function Fontes() {
                             {fonte.descricao}
                             </p>
                         </div>
+                        
                         <div className="flex justify-between items-center mt-3">
                             <p className="flex items-center gap-2 text-sm text-gray-400">
                                 <Calendar size={16} />

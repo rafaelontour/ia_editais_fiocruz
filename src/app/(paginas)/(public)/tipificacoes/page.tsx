@@ -74,8 +74,8 @@ export default function  Tipificacoes() {
                                 className={`
                                     flex rounded-md gap-2 items-center px-4 py-2
                                     transition duration-100
-                                    bg-verde hover:bg-verde text-white
-                                    hover:cursor-pointer hover:scale-110 active:scale-100
+                                    bg-vermelho hover:bg-vermelho text-white
+                                    hover:cursor-pointer hover:scale-105 active:scale-100
                                 `}
                             >
                                 <Plus className=""/>
