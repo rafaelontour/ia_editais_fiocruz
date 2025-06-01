@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <Cabecalho />
-      <div className="flex flex-1 overflow-y-auto">
+      <div className="flex flex-1 overflow-y-hidden">
         <SidebarProvider>
           <Sidebar
             variant="inset" collapsible="icon" className="relative"
@@ -110,7 +110,7 @@ export default function RootLayout({
             </div>
             <div
               className="
-                flex overflow-y-scroll w-full h-full
+                flex overflow-y-scroll w-full
                 bg-white flex-1 pt-12 px-10
               "
                 style={{
