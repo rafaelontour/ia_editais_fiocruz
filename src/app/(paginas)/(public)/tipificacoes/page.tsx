@@ -68,8 +68,8 @@ export default function  Tipificacoes() {
                     </div>
 
                     <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
-                        <DialogTrigger>
-                            <div
+                        <DialogTrigger asChild>
+                            <Button
                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
                                 className={`
                                     flex rounded-md gap-2 items-center px-4 py-2
@@ -80,7 +80,7 @@ export default function  Tipificacoes() {
                             >
                                 <Plus className=""/>
                                 <p className="text-white">Adicionar</p>
-                            </div> 
+                            </Button> 
                         </DialogTrigger>
 
                         <DialogContent>
@@ -184,7 +184,7 @@ export default function  Tipificacoes() {
                                     </Button>
 
                                     <Dialog open={idDialogExcluir === tipificacao.id} onOpenChange={(open) => setIdDialogExcluir(open ? tipificacao.id : null)}>
-                                        <DialogTrigger>
+                                        <DialogTrigger asChild>
                                             <Button
                                                 className={`
                                                     h-8 w-8 bg-vermelho hover:bg-vermelho
