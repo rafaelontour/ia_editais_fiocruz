@@ -24,16 +24,21 @@ export default function Home() {
     <div className="flex flex-col w-full gap-4 h-1/2">
       <InfoBar data={infoBarInfos}/>
       <div className="w-full flex gap-8 ">
-        <Chart data={firstChartData}  titulo="Gráfico de quantidade de tipos de editais" className={"w-[60%]"}></Chart>
-        <Chart data={secondChartData}  titulo="Gráfico de status dos editais" className={"w-[40%]"}></Chart>
+        <Chart data={firstChartData}  titulo="Gráfico de quantidade de tipos de editais" className="w-[60%]"></Chart>
+        <Chart data={secondChartData}  titulo="Gráfico de status dos editais" className="w-[40%]"></Chart>
     </div>
     </div>
    
   </div>
    <div className='flex gap-6 h-screen  w-full items-center text-center justify-between p-4'>
-          <h2 className='w-3/4  text-3xl 2xl:text-5xl leading-tight'><strong className=' px-2 py-2 bg-red-600 rounded-xl text-white'>Pesquise</strong> por editais por unidades da FioCruz</h2>
-            <Map/>
-        </div>
-    </div>
+      <h2 className='w-3/4 text-3xl 2xl:text-5xl leading-tight'>
+        <strong className=' px-2 py-2 bg-red-600 rounded-xl text-white'>Pesquise</strong>
+        por editais por unidades da FioCruz
+      </h2>
+
+      <Map/>
+
+      </div>
+  </div>
   );
 }

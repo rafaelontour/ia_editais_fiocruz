@@ -11,6 +11,20 @@ async function getTaxonomias() : Promise<Taxonomia[]> {
     return taxonomias
 }
 
+async function adicionarTaxonomia(taxonomia: Taxonomia) : Promise<void> {
+    try {
+        await fetch('http://localhost:3000/api/taxonomias', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(taxonomia)
+        });
+    } catch (error) {
+        console.error('Erro ao adicionar taxonomia:', error);
+    }
+}
+
 async function excluirTaxonomia(idTaxomonia: number) {
     try {
         const resposta = await fetch(`http://localhost:3000/api/taxonomias?id=${idTaxomonia}`, { method: 'DELETE' });
@@ -30,5 +44,6 @@ async function excluirTaxonomia(idTaxomonia: number) {
 
 export {
     getTaxonomias,
+    adicionarTaxonomia,
     excluirTaxonomia
 }

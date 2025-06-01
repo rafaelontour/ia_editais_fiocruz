@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     const data = await req.json()
     itens.push(data)
-    return NextResponse.json({ message: 'Usuário adicionado' }, { status: 201 })
+    return NextResponse.json({ message: 'Taxonomia adicionada' }, { status: 201 })
 }
 
 export async function DELETE(req: NextRequest) {

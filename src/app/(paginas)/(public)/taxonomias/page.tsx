@@ -20,14 +20,14 @@ import {
 import { Ramo } from "@/core/ramo";
 import { Taxonomia } from "@/core/taxonomia";
 import { excluirRamo } from "@/service/ramo";
-import { excluirTaxonomia, getTaxonomias } from "@/service/taxonomia";
+import { adicionarTaxonomia, excluirTaxonomia, getTaxonomias } from "@/service/taxonomia";
 import { Calendar, ChevronLeft, PencilLine, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 
 
 export default function Taxonomias() {
   const [idSelecionado, setIdSelecionado] = useState<number | null>(null);
-  const [taxonomiaSelecionada, setTaxonomiaSelecionada] = useState<Taxonomia | null>(null);
+  const [taxonomiaSelecionada, setTaxonomiaSelecionada] = useState<Taxonomia | null | undefined>(null);
   const [tax, setTax] = useState<Taxonomia[]>([]);
 
   const ramoNovo: Ramo = {
@@ -69,40 +69,48 @@ export default function Taxonomias() {
       );
 
       setTaxonomiaSelecionada(novaTaxonomia);
-
       setOpenDialogRamo(false);
+    }
+  }
+
+  const handleExcluirTaxonomia = async (taxonomiaId: number) => {
+    console.log("ID: " + taxonomiaId)
+    try {
+      const resposta = await excluirTaxonomia(taxonomiaId);
+
+      if (!resposta) return;
+
+      setTax(await getTaxonomias()) // Avisar que foi apagada
+      setTaxonomiaSelecionada(null)
+
+    } catch (error) {
+      console.error('Erro ao excluir taxonomia:', error); // Chamar um toast no lugar
     }
   };
 
-const handleExcluirTaxonomia = async (taxonomiaId: number) => {
-  console.log("ID: " + taxonomiaId)
-  try {
-    const resposta = await excluirTaxonomia(taxonomiaId);
+  const handleExcluirRamo = async (taxonomiaId: number, idRamo: number) => {
+    try {
+      await excluirRamo(taxonomiaId, idRamo);
+      console.log("ATUALIZANDO, RAMO EXCLUIDO");
 
-    if (!resposta) return;
+      setTax(await getTaxonomias());
+      const atualizada = await getTaxonomias();
+      const novaSelecionada = atualizada.find(t => t.id === taxonomiaId);
+      setTaxonomiaSelecionada(novaSelecionada);
 
-    setTax(await getTaxonomias()) // Avisar que foi apagada
-    setTaxonomiaSelecionada(null)
-
-  } catch (error) {
-    console.error('Erro ao excluir taxonomia:', error); // Chamar um toast no lugar
-  }
-};
-
-
-const handleExcluirRamo = async (taxonomiaId: number, idRamo: number) => {
-  try {
-    await excluirRamo(taxonomiaId, idRamo);
-    console.log("ATUALIZANDO, RAMO EXCLUIDO")
-    setTax(await getTaxonomias())
-  } catch (error) {
-    console.error('Erro ao excluir ramo:', error);
-  }
-};
-
+    } catch (error) {
+      console.error('Erro ao excluir ramo:', error);
+    }
+  };
     
-  const handleAdicionarTaxonomia = () => {
-    setTax((prevItens) => [...prevItens, taxonomiaNova]);
+  const handleAdicionarTaxonomia = async () => {
+    try {
+      await adicionarTaxonomia(taxonomiaNova);
+      getTaxonomias();
+      console.log("Taxonomias: " + JSON.stringify(tax));
+    } catch (error) {
+      console.error('Erro ao adicionar taxonomia:', error);
+    }
     setOpenTaxonomia(false);
   }
 

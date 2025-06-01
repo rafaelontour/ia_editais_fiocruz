@@ -7,8 +7,8 @@ import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
-import { getFontes } from '@/service/fonte';
-import { Fontes } from '@/core/fonte';
+import { adicionarFonte, excluirFonte, getFontes } from '@/service/fonte';
+import { Fonte } from '@/core/fonte';
 
 export default function Fontess() {
     const breakpointColumnsObj = {
@@ -19,12 +19,22 @@ export default function Fontess() {
     }
 
     const [openDialogFontes, setOpenDialogFontes] = useState(false);
-    const [fontes, setFontes] = useState<Fontes[]>([])
+    const [fontes, setFontes] = useState<Fonte[]>([])
+    const [fontePraAdicionar, setFontePraAdicionar] = useState<Fonte>({} as Fonte);
+
+    const fonteVazia = {
+        nome: "",
+        descricao: ""
+    }
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setFontes(await getFontes())
+                const fnts = await getFontes()
+                if (!fnts) {
+                    throw new Error("Erro ao buscar fontes")
+                }
+                setFontes(fnts)
             } catch (error) {
                 console.error("Erro ao buscar fontes", error)
             }
@@ -32,6 +42,39 @@ export default function Fontess() {
     
         fetchData();
     }, [])
+
+    const handleAddFonte = async (fonte: any) => {
+        try {
+            const resposta = await adicionarFonte(fonte);
+            
+            if (!resposta) {
+                throw new Error("Erro ao adicionar fonte")
+            }
+
+            setFontes([...fontes, fonte]);
+            setOpenDialogFontes(false);
+            getFontes();
+        } catch (error) {
+            console.error("Erro ao adicionar fonte", error)
+        }
+    }
+
+    const handleExcluirFonte = async (id: number) => {
+        try {
+            const excluiu: boolean = await excluirFonte(id);
+
+            if (!excluiu) {
+                alert("Erro ao excluir fonte")
+                return
+            }
+
+            setFontes(fontes.filter((f) => f.id !== id));
+            getFontes();
+
+        } catch (error) {
+            console.error("Erro ao excluir fonte", error)
+        }
+    }
 
     return (
         <div className="flex flex-col gap-5">
@@ -72,12 +115,28 @@ export default function Fontess() {
                         <form className="flex text-lg flex-col gap-4">
                             <p className="flex flex-col gap-2">
                                 <label htmlFor="nomeFonte" className="">Nome da fonte</label>
-                                <input type="text" id="nomeFonte" className="border-2 border-gray-300 rounded-md p-2 w-full" />
+                                <input
+                                    type="text"
+                                    id="nomeFonte"
+                                    className="
+                                        border-2 border-gray-300
+                                        rounded-md p-2 w-full
+                                    "
+                                    onChange={(e) => { fonteVazia.nome = e.target.value }}
+                                />
                             </p>
 
                             <p className="flex flex-col gap-2">
                                 <label htmlFor="descricaoFonte" className="">Descrição da fonte</label>
-                                <input type="text" id="descricaoFonte" className="border-2 border-gray-300 rounded-md p-2 w-full" />
+                                <input
+                                    type="text"
+                                    id="descricaoFonte"
+                                    className="
+                                        border-2 border-gray-300
+                                        rounded-md p-2 w-full
+                                    "
+                                    onChange={(e) => { fonteVazia.descricao = e.target.value }}    
+                                />
                             </p>
 
                             <p>
@@ -107,7 +166,10 @@ export default function Fontess() {
                                     hover:scale-110 active:scale-100
                                 `}
                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
-                                onClick={() => setOpenDialogFontes(false)}
+                                onClick={() => {
+                                    setOpenDialogFontes(false)
+                                    handleAddFonte(fonteVazia)
+                                }}
                             >
                                 Salvar
                             </Button>
@@ -151,7 +213,7 @@ export default function Fontess() {
                                     className={`
                                         h-8 w-8 hover:cursor-pointer hover:scale-110 active:scale-100
                                         bg-branco hover:bg-branco
-                                    `}
+                                        `}
                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
                                     size={"icon"}
                                     
@@ -159,16 +221,57 @@ export default function Fontess() {
                                     <PencilLine color="black" />
                                 </Button>
 
-                                <Button
-                                    className={`
-                                        h-8 w-8 bg-vermelho hover:bg-vermelho
-                                        hover:cursor-pointer hover:scale-110 active:scale-100
-                                    `}
-                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
-                                    size={"icon"}
-                                >
-                                    <Trash />
-                                </Button>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            className={`
+                                                h-8 w-8 bg-vermelho hover:bg-vermelho
+                                                hover:cursor-pointer hover:scale-110 active:scale-100
+                                            `}
+                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
+                                            size={"icon"}
+                                        >
+                                            <Trash />
+                                        </Button>
+                                    </DialogTrigger>
+
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>
+                                                    Excluir fonte
+                                                </DialogTitle>
+                                            <DialogDescription>
+                                                <p>Tem certeza que quer excluir a fonte <strong>{fonte.nome}</strong>?</p>
+                                            </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="flex justify-end gap-4 mt-4">
+                                                <DialogClose
+                                                    className={`
+                                                        transition ease-in-out text-black
+                                                        rounded-md px-3
+                                                        hover:cursor-pointer
+                                                        hover:scale-110 active:scale-100
+                                                    `}
+                                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
+                                                >
+                                                    Cancelar
+                                                </DialogClose>
+                                                
+                                                <Button
+                                                    className={`
+                                                        flex bg-vermelho hover:bg-vermelho
+                                                        text-white hover:cursor-pointer
+                                                        hover:scale-110 active:scale-100
+                                                    `}
+                                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
+                                                    onClick={() => handleExcluirFonte(fonte.id)}
+                                                >
+                                                    Excluir
+                                                </Button>
+                                            </div>
+                                        </DialogContent>
+                                </Dialog>
+
                             </div>
                         </div>
                     </div>
