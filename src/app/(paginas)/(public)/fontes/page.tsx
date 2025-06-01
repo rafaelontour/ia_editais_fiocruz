@@ -21,6 +21,7 @@ export default function Fontess() {
     const [openDialogFontes, setOpenDialogFontes] = useState(false);
     const [fontes, setFontes] = useState<Fonte[]>([])
     const [fontePraAdicionar, setFontePraAdicionar] = useState<Fonte>({} as Fonte);
+    const [openDialogIdExcluir, setOpenDialogIdExcluir] = useState<number | null>(null);
 
     const fonteVazia = {
         nome: "",
@@ -68,6 +69,7 @@ export default function Fontess() {
                 return
             }
 
+            setOpenDialogIdExcluir(null)
             setFontes(fontes.filter((f) => f.id !== id));
             getFontes();
 
@@ -221,7 +223,7 @@ export default function Fontess() {
                                     <PencilLine color="black" />
                                 </Button>
 
-                                <Dialog>
+                                <Dialog open={openDialogIdExcluir === fonte.id} onOpenChange={(open) => setOpenDialogIdExcluir(open ? fonte.id : null)}>
                                     <DialogTrigger asChild>
                                         <Button
                                             className={`
@@ -264,7 +266,9 @@ export default function Fontess() {
                                                         hover:scale-110 active:scale-100
                                                     `}
                                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
-                                                    onClick={() => handleExcluirFonte(fonte.id)}
+                                                    onClick={() => { 
+                                                        handleExcluirFonte(fonte.id)
+                                                    }}
                                                 >
                                                     Excluir
                                                 </Button>
