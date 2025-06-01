@@ -53,8 +53,6 @@ export async function DELETE(req: NextRequest) {
     const id = req.nextUrl.searchParams.get("id")
 
     const pos = itens.findIndex((i) => i.id === Number(id))
-    console.log("ITENS ANTES DE APAGAR: " + JSON.stringify(itens))
     itens.splice(pos, 1)
-    console.log("ITENS DEPOIS DE APAGAR: " + JSON.stringify(itens))
     return NextResponse.json({ message: "Fonte removida" }, { status: 200 });
 }
