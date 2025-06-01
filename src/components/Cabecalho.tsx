@@ -7,21 +7,19 @@ export default function Cabecalho() {
                 w-full bg-[#F5F5F5] px-3
             "
         >
-            <Image
+            <img
                 src={"/logo_ia_editais.png"}
                 alt="Logo"
-                width={200}
-                height={200}
+                style={{ width: "auto", maxHeight: "32px" }}
                 className="
                     inline-block ml-2
                 "
             />
 
-            <Image 
+            <img 
                 src={"/logo_fiocruz.png"}
                 alt="Logo"
-                width={150}
-                height={150}
+                style={{ width: "auto", maxHeight: "60px" }}
                 className="
                     ml-2 inline-block mb-[3px]
                 "
