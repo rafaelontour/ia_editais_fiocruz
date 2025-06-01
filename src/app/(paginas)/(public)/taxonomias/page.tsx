@@ -118,8 +118,8 @@ export default function Taxonomias() {
   const [openDialogRamo, setOpenDialogRamo] = useState(false);
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="flex flex-row items-center gap-2 mb-4 justify-between">
+    <div className="flex flex-col">
+      <div className="flex items-center gap-2 mb-4 justify-between">
         <div className="flex flex-row items-center gap-2">
           <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 ml-4 hover:cursor-pointer">
             <ChevronLeft className="h-4 w-4 " />
@@ -204,8 +204,8 @@ export default function Taxonomias() {
         </Dialog>
       </div>
 
-      <div className="flex flex-row">
-        <div className="basis-1/2">
+      <div className="flex max-h-[80dvh]">
+        <div className="flex flex-col basis-1/2 overflow-y-scroll">
           {tax.map((item, index) => (
             <Card
               key={index}
@@ -305,7 +305,7 @@ export default function Taxonomias() {
                       </DialogClose>
                       
                       <button 
-                        className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
+                        className="px-4 py-2 text-sm hover:cursor-pointer font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
                         type="submit"
                         onClick={handleAddRamo}
                       >
@@ -324,7 +324,7 @@ export default function Taxonomias() {
               {taxonomiaSelecionada ? (
                 taxonomiaSelecionada.ramos && taxonomiaSelecionada.ramos.length > 0 ? (
                   <ul>
-                  {taxonomiaSelecionada.ramos.map((ramo) => (
+                  {taxonomiaSelecionada.ramos.map((ramo, index) => (
                       <div key={ramo.id} className="flex flex-col gap-2">
                           <li className="flex  justify-between items-center mb-2">
                           <span>{ramo.nome}</span>
@@ -340,11 +340,15 @@ export default function Taxonomias() {
                                 </button>
                            
                           </div>
+
+                            
                          </li>
-                        <div className="w-full flex flex-col mb-6">
-                    
-                            <hr />
-                        </div>
+                        
+                          { 
+                            index !== taxonomiaSelecionada.ramos!.length - 1 && 
+                            <hr className="border-gray-300 mb-4" />
+                          }
+                        
                       </div>
                       
                     ))}

@@ -98,10 +98,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Taxonomia não encontrada" }, { status: 404 });
     }
     const taxonomia = itens[taxonomiaIndex];
-    console.log("TAXONOMIA ANTES DE APAGAR RAMO: " + JSON.stringify(taxonomia));
 
     taxonomia.ramos?.splice(idRamo, 1);
-    console.log("TAXONOMIA DEPOIS DE APAGAR RAMO: " + JSON.stringify(taxonomia));
 
     return NextResponse.json({ message: `Ramo ${idRamo} removido` }, { status: 200 });
   } 
