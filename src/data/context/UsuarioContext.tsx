@@ -1,14 +1,14 @@
 import { Usuario } from "@/core";
 import { getUsuario } from "@/service/usuario";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 export interface ContextoProps {
     usuario: Usuario | undefined
 }
 
-const UsuarioContexto = createContext<ContextoProps | undefined>(undefined)
+export const UsuarioContexto = createContext<ContextoProps | undefined>(undefined)
 
-const UsuarioContextoProvider = ({ children }: { children: React.ReactNode }) => {
+export const UsuarioContextoProvider = ({ children }: { children: React.ReactNode }) => {
     const [usuario, setUsuario] = useState<Usuario>();
 
     async function logarUsuario(): Promise<void> {
@@ -25,6 +25,10 @@ const UsuarioContextoProvider = ({ children }: { children: React.ReactNode }) =>
         const resposta = await getUsuario();
 
     }
+
+    useEffect(() => {
+        console.log("Contexto funcionando ao carregar a página.")
+    }, [])
 
     return (
         <UsuarioContexto.Provider
