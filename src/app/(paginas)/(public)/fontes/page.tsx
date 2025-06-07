@@ -197,10 +197,8 @@ export default function Fontess() {
                     >
                         <div className="flex flex-col gap-2">
                             <h2 className="text-xl font-semibold">{fonte.nome}</h2>
-                            <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
-                            {fonte.nome}
-                            </p>
-                            <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 break-words text-sm`}>
+                            
+                            <p className={`py-1 w-fit break-words text-sm`}>
                             {fonte.descricao}
                             </p>
                         </div>
