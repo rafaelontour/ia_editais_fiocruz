@@ -1,9 +1,13 @@
+import { Fonte } from "../fonte";
 import Ramo from "../ramo/Ramo";
 
 export default interface Taxonomia {
-    id: number;
-    nome: string;
-    descricao: string;
-    data: string;
-    ramos?: Ramo[];
+    typification_id: string;
+    id?: string;
+    title: string;
+    description: string;
+    source: Fonte[] | string[];
+    branches?: Ramo[];
+    created_at?: string;
+    updated_at?: string;
 }

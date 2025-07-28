@@ -1,7 +1,9 @@
+import { Fonte } from "../fonte";
+
 export default interface Tipificacao {
-    id: number;
-    nome: string;
-    lei: string;
-    lei_complementar: string;
-    data: string;
+    id: string;
+    name: string;
+    sources: Fonte[];
+    created_at: string;
+    updated_at: string;
 }
