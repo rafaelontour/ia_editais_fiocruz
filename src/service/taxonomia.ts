@@ -1,49 +1,63 @@
 import { Taxonomia } from "@/core"
 
-async function getTaxonomias() : Promise<Taxonomia[]> {
-    const dados = await fetch('http://localhost:3000/api/taxonomias')
+const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
+
+async function getTaxonomiasService() : Promise<Taxonomia[] | undefined> {
+    const dados = await fetch(`${urlBase}/taxonomy`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
 
     if (!dados.ok) {
         throw new Error('Erro ao buscar taxonomias')
     }
     
     const taxonomias = await dados.json()
+
+    for (let taxonomia of taxonomias) {
+        taxonomia.created_at = new Date(taxonomia.created_at).toLocaleString()
+    }
+    
     return taxonomias
 }
 
-async function adicionarTaxonomia(taxonomia: Taxonomia) : Promise<void> {
+async function adicionarTaxonomia(taxonomia: Taxonomia) : Promise<number | undefined> {
+    
     try {
-        await fetch('http://localhost:3000/api/taxonomias', {
+        const ressposta = await fetch(`${urlBase}/taxonomy`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(taxonomia)
         });
+
+        return ressposta.status
     } catch (error) {
         console.error('Erro ao adicionar taxonomia:', error);
     }
 }
 
-async function excluirTaxonomia(idTaxomonia: number) {
+async function excluirTaxonomia(idTaxomonia: string) : Promise<number | undefined> {
     try {
-        const resposta = await fetch(`http://localhost:3000/api/taxonomias?id=${idTaxomonia}`, { method: 'DELETE' });
-    
-        const dado = await resposta.json();
+        const resposta = await fetch(`${urlBase}/taxonomy/${idTaxomonia}/`, { method: 'DELETE' });
+
+        console.log(resposta);
     
         if (!resposta.ok) {
-            console.error('Erro ao excluir taxonomia:', dado.error);
-            throw new Error(dado.error);
+            throw new Error("Erro ao excluir taxonomia");
         }
         
-        return dado
+        return resposta.status
     } catch (error) {
         console.error('Erro ao excluir taxonomia:', error);
     }
 }
 
 export {
-    getTaxonomias,
+    getTaxonomiasService,
     adicionarTaxonomia,
     excluirTaxonomia
 }

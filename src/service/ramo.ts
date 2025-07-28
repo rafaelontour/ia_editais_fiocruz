@@ -1,6 +1,8 @@
-async function excluirRamo(idTaxomonia: number, idRamo: number) {
+const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
+
+async function excluirRamo(idRamo: number) {
     try {
-        const resposta = await fetch(`http://localhost:3000/api/taxonomias?id=${idTaxomonia}&ramo=${idRamo}`, { method: 'DELETE' });
+        const resposta = await fetch(`${urlBase}/taxonomias/${idRamo}`, { method: 'DELETE' });
     
         const dado = await resposta.json();
     
@@ -15,4 +17,6 @@ async function excluirRamo(idTaxomonia: number, idRamo: number) {
     }
 }
 
-export { excluirRamo }
+export { 
+    excluirRamo
+}

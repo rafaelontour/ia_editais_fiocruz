@@ -1,8 +1,10 @@
 import { Fonte } from "@/core/fonte"
 
-async function getFontes(): Promise<Fonte[] | null> {
+const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
+
+async function getFontesService(): Promise<Fonte[] | undefined> {
     try {
-        const dados = await fetch('http://localhost:3000/api/fontes', { method: 'GET' })
+        const dados = await fetch(`${urlBase}/source/`, { method: 'GET' })
         
         if (!dados.ok) {
             throw new Error('Erro ao buscar fontes')
@@ -11,51 +13,48 @@ async function getFontes(): Promise<Fonte[] | null> {
         return fontes
     } catch (error) {
         console.error('Erro ao buscar fontes', error)
-        return null
     }
 }
 
-async function adicionarFonte(fonte: Fonte) : Promise<boolean> {
+async function adicionarFonteService(nome: string, descricao: string) : Promise<number | undefined> {
     try {
-        fonte.id = Math.floor(Math.random() * 1000)
-        const resposta = await fetch('http://localhost:3000/api/fontes', {
+        const url = `${urlBase}/source/`
+        const resposta = await fetch(`${url}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(fonte)
+            body: JSON.stringify({
+                name: nome,
+                description: descricao
+            })
         });
 
-        return resposta.ok
+        return resposta.status
     } catch (error) {
         console.error('Erro ao adicionar fonte:', error);
     }
-
-    return false
 }
 
-async function excluirFonte(id: number): Promise<boolean> {
+async function excluirFonteService(id: string): Promise<number | undefined> {
+    const url = `${urlBase}/source/${id}`
     try {
-        const resposta = await fetch(`http://localhost:3000/api/fontes?id=${id}`, { method: 'DELETE' });
-    
-        const dado = await resposta.json();
-    
-        if (!resposta.ok) {
-            console.error('Erro ao excluir fonte:', dado.error);
-            throw new Error(dado.error);
-        }
-        
-        return resposta.ok
+        const resposta = await fetch(`${url}`, { 
+            method: "DELETE",
+            headers: {
+                "content-type": "application/json"
+            }
+        });
+
+        console.log("Status: ", resposta.status);
+        return resposta.status
     } catch (error) {
         console.error('Erro ao excluir fonte:', error);
     }
-
-    return false
 }
 
 export { 
-    getFontes,
-    adicionarFonte,
-    excluirFonte
-
+    getFontesService,
+    adicionarFonteService,
+    excluirFonteService
 }
