@@ -7,10 +7,10 @@ import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
-import { adicionarFonte, excluirFonte, getFontes } from '@/service/fonte';
+import { adicionarFonteService, excluirFonteService, getFontesService } from '@/service/fonte';
 import { Fonte } from '@/core/fonte';
 
-export default function Fontess() {
+export default function Fontes() {
     const breakpointColumnsObj = {
         default: 4,
         1500: 3,
@@ -20,59 +20,52 @@ export default function Fontess() {
 
     const [openDialogFontes, setOpenDialogFontes] = useState(false);
     const [fontes, setFontes] = useState<Fonte[]>([])
-    const [fontePraAdicionar, setFontePraAdicionar] = useState<Fonte>({} as Fonte);
-    const [openDialogIdExcluir, setOpenDialogIdExcluir] = useState<number | null>(null);
+    const [openDialogIdExcluir, setOpenDialogIdExcluir] = useState<string | null>(null);
+    const [nomeFonte, setNomeFonte] = useState<string>("");
+    const [descricaoFonte, setDescricaoFonte] = useState<string>("");
 
-    const fonteVazia = {
-        nome: "",
-        descricao: ""
+    const fetchData = async () => {
+        try {
+            const fnts = await getFontesService()
+            
+            if (!fnts) {
+                throw new Error("Erro ao buscar fontes")
+            }
+            setFontes([...fnts])
+        } catch (error) {
+            console.error("Erro ao buscar fontes", error)
+        }
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const fnts = await getFontes()
-                if (!fnts) {
-                    throw new Error("Erro ao buscar fontes")
-                }
-                setFontes(fnts)
-            } catch (error) {
-                console.error("Erro ao buscar fontes", error)
-            }
-        }
-    
         fetchData();
     }, [])
 
-    const handleAddFonte = async (fonte: any) => {
+    const handleAddFonte = async () => {
         try {
-            const resposta = await adicionarFonte(fonte);
+            const resposta = await adicionarFonteService(nomeFonte, descricaoFonte);
             
-            if (!resposta) {
+            if (resposta !== 201) {
                 throw new Error("Erro ao adicionar fonte")
             }
 
-            setFontes([...fontes, fonte]);
             setOpenDialogFontes(false);
-            getFontes();
+            fetchData();
         } catch (error) {
             console.error("Erro ao adicionar fonte", error)
         }
     }
 
-    const handleExcluirFonte = async (id: number) => {
+    const handleExcluirFonte = async (id: string) => {
         try {
-            const excluiu: boolean = await excluirFonte(id);
+            const resposta = await excluirFonteService(id);
 
-            if (!excluiu) {
-                alert("Erro ao excluir fonte")
-                return
+            if (resposta !== 204) {
+                throw new Error("Erro ao excluir fonte")
             }
 
             setOpenDialogIdExcluir(null)
-            setFontes(fontes.filter((f) => f.id !== id));
-            getFontes();
-
+            fetchData();
         } catch (error) {
             console.error("Erro ao excluir fonte", error)
         }
@@ -124,7 +117,7 @@ export default function Fontess() {
                                         border-2 border-gray-300
                                         rounded-md p-2 w-full
                                     "
-                                    onChange={(e) => { fonteVazia.nome = e.target.value }}
+                                    onChange={(e) => setNomeFonte(e.target.value)}
                                 />
                             </p>
 
@@ -137,7 +130,7 @@ export default function Fontess() {
                                         border-2 border-gray-300
                                         rounded-md p-2 w-full
                                     "
-                                    onChange={(e) => { fonteVazia.descricao = e.target.value }}    
+                                    onChange={(e) => setDescricaoFonte(e.target.value)}    
                                 />
                             </p>
 
@@ -170,7 +163,7 @@ export default function Fontess() {
                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
                                 onClick={() => {
                                     setOpenDialogFontes(false)
-                                    handleAddFonte(fonteVazia)
+                                    handleAddFonte()
                                 }}
                             >
                                 Salvar
@@ -196,17 +189,17 @@ export default function Fontess() {
                         "
                     >
                         <div className="flex flex-col gap-2">
-                            <h2 className="text-xl font-semibold">{fonte.nome}</h2>
+                            <h2 className="text-xl font-semibold">{fonte.name}</h2>
                             
                             <p className={`py-1 w-fit break-words text-sm`}>
-                            {fonte.descricao}
+                            {fonte.description}
                             </p>
                         </div>
                         
                         <div className="flex justify-between items-center mt-3">
                             <p className="flex items-center gap-2 text-sm text-gray-400">
                                 <Calendar size={16} />
-                                <span>{fonte.data}</span>
+                                <span>{fonte.created_at}</span>
                             </p>
                             <div className="flex gap-3">
                                 <Button
@@ -241,7 +234,7 @@ export default function Fontess() {
                                                     Excluir fonte
                                                 </DialogTitle>
                                             <DialogDescription>
-                                                <p>Tem certeza que quer excluir a fonte <strong>{fonte.nome}</strong>?</p>
+                                                <p>Tem certeza que quer excluir a fonte <strong>{fonte.name}</strong>?</p>
                                             </DialogDescription>
                                             </DialogHeader>
                                             <div className="flex justify-end gap-4 mt-4">

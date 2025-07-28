@@ -1,59 +1,86 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
-import { Tipificacao } from "@/core";
+import { Label } from "@/components/ui/label";
+import { Fonte, Tipificacao } from "@/core";
+import { getFontesService } from "@/service/fonte";
+import { getTipificacoesService, adicionarTipificacaoService, excluirTipificacaoService } from "@/service/tipificacao";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { get } from "http";
 import { Calendar, ChevronRightIcon, PencilLine, Plus, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
-export default function  Tipificacoes() {
+export default function Tipificacoes() {
 
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
+    const [fontes, setFontes] = useState<Fonte[]>([]);
+
+    const [nomeTipificacao, setNomeTipificacao] = useState<string>("");
     
     const [dialogTipificacao, setDialogTipificacao] = useState(false);
-    const [idDialogExcluir, setIdDialogExcluir] = useState<number | null>(null);
+    const [idDialogExcluir, setIdDialogExcluir] = useState<string | null>("");
+
+    const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
 
     
     const getTipificacoes = async () => {
-        const dados = await fetch('http://localhost:3000/api/tipificacoes')
+        const dados = await getTipificacoesService();
 
-        if (!dados.ok) {
+        if (dados == null) {
             throw new Error('Erro ao buscar tipificacoes')
         }
 
-        const tipificacoes = await dados.json()
-        setTipificacoes(tipificacoes)
-    } 
+        setTipificacoes(dados)
+    }
+
+    const getFontess = async () => {
+        const dados = await getFontesService();
+
+        if (dados == null) {
+            throw new Error('Erro ao buscar fontes')
+        }
+        
+        setFontes(dados)
+    }
+
     useEffect(() => {
         try {
+            getFontess();
             getTipificacoes();
         } catch(erro) {
-            console.error("Erro ao buscar tipificacoes", erro)
+            console.error("Erro ao buscar tipificacoes ou fontes", erro)
         }
     }, []);
 
-    const excluirTipificacao = (id: number) => {
+    const handleAdicionarTipificacao = async () => {
+        const dados = await adicionarTipificacaoService(nomeTipificacao, fontesSelecionadas);
+        if (dados == null) {
+            throw new Error('Erro ao adicionar tipificacao')
+        }
+        getTipificacoes();
+        limparCampos();
+    }
 
+    const excluirTipificacao = async (id: string) => {
         setIdDialogExcluir(id);
 
-        const fetchData = async () => {
-            try {
-                const resposta = await fetch(`http://localhost:3000/api/tipificacoes?id=${id}`, { method: 'DELETE' });
-                console.log(resposta);
-                if (!resposta.ok) {
-                    throw new Error('Erro ao excluir tipificacao')
-                }
-                const r = await resposta.json();
+        try {
+            const resposta = await excluirTipificacaoService(id);
 
-                await getTipificacoes();
-            } catch(erro) {
-                console.error(erro)
+            if (resposta !== 204) {
+                throw new Error('Erro ao excluir tipificacao')
             }
-        }
 
-        fetchData();
+            getTipificacoes();
+        } catch(erro) {
+            console.error(erro)
+        }
+    }
+
+    function limparCampos() {
+        setNomeTipificacao("");
+        setFontesSelecionadas([]);
     }
 
     return(
@@ -83,7 +110,7 @@ export default function  Tipificacoes() {
                             </Button> 
                         </DialogTrigger>
 
-                        <DialogContent>
+                        <DialogContent onCloseAutoFocus={limparCampos}>
                             <DialogHeader>
                                 <DialogTitle className="text-3xl font-bold">
                                     Criar tipificação
@@ -97,18 +124,57 @@ export default function  Tipificacoes() {
                                 <form className="flex text-lg flex-col gap-4">
                                     <p className="flex flex-col gap-2">
                                         <label className="">Nome da tipificação</label>
-                                        <input type="text" className="border-2 border-gray-300 rounded-md p-2 w-full" />
+                                        <input 
+                                            type="text"
+                                            className="border-2 border-gray-300 rounded-md p-2 w-full" 
+                                            onChange={(e) => setNomeTipificacao(e.target.value)}
+                                        />
                                     </p>
                                     <p className="flex flex-col gap-2">
                                         <label>Fontes</label>
-                                        <select className="border-2 border-gray-300 rounded-md p-2">
-                                            <option>Fonte 1</option>
-                                            <option>Fonte 2</option>
-                                            <option>Fonte 3</option>
-                                            <option>Fonte 4</option>
-                                            <option>Fonte 5</option>
+                                        <select 
+                                            defaultValue={"Selecione uma fonte"}
+                                            className="border-2 border-gray-300 rounded-md p-2"
+                                            onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                                setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
+                                            }}
+                                        >
+                                            <option disabled>Selecione uma fonte</option>
+                                            {fontes && fontes.map((fonte, index) => (
+                                                <option
+                                                    key={index}
+                                                    value={fonte.id}
+                                                >
+                                                    {fonte.name}
+                                                </option>
+                                            ))}
                                         </select>
                                     </p>
+
+                                    { 
+                                        fontesSelecionadas.length > 0 && (
+                                            <div className="flex flex-col gap-2">
+                                                <p>Fontes selecionadas: </p>
+                                                <div className="grid grid-cols-3 gap-2 border-2 border-gray-300 rounded-md p-2">
+                                                    { fontesSelecionadas.map((fonte, index) => (
+                                                        <span key={index} className="flex gap-2 items-center w-fit">
+                                                            <Checkbox
+                                                                className="cursor-pointer"
+                                                                checked
+                                                                onClick={() => {
+                                                                    setFontesSelecionadas((fonteAnterior) => fonteAnterior.filter(fonte => fonte.id !== fonteAnterior[index].id))
+                                                                    console.log("fontes selecionadas", fontesSelecionadas)
+                                                                }}
+                                                                id="fonte"
+                                                                key={index} 
+                                                            />
+                                                            <Label className="cursor-pointer" htmlFor={"fonte"} key={fonte.id}>{fonte.name}</Label>
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) 
+                                    }
                                 </form>
 
                                 <div className="flex justify-end gap-4 mt-4">
@@ -131,7 +197,10 @@ export default function  Tipificacoes() {
                                             hover:scale-110 active:scale-100
                                         `}
                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)"}}
-                                        onClick={() => setDialogTipificacao(false)}
+                                        onClick={() => {
+                                            setDialogTipificacao(false)
+                                            handleAdicionarTipificacao();
+                                        }}
                                     >
                                         Salvar
                                     </Button>
@@ -143,8 +212,8 @@ export default function  Tipificacoes() {
                 
                 <div
                     className="
-                        grid [grid-template-columns:1fr] xl:[grid-template-columns:1fr_1fr_1fr_1fr]
-                        lg:[grid-template-columns:1fr_1fr_1fr] md:[grid-template-columns:1fr_1fr] gap-7
+                        grid [grid-template-columns:1fr] xl:[grid-template-columns:1fr_1fr_1fr]
+                        lg:[grid-template-columns:1fr_1fr] md:[grid-template-columns:1fr] gap-5
                     "
                 >
                     {tipificacoes && tipificacoes.map((tipificacao, index) => (
@@ -157,18 +226,21 @@ export default function  Tipificacoes() {
                             "
                         >
                             <div className="flex flex-col gap-2">
-                                <h2 className="text-xl font-semibold">{tipificacao.nome}</h2>
+                                <h2 className="text-xl font-semibold">{tipificacao.name}</h2>
                                 <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
-                                Lei: {tipificacao.lei}
+                                Lei: {tipificacao.name}
                                 </p>
                                 <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
-                                Lei Complementar: {tipificacao.lei_complementar}
+                                Lei Complementar: {tipificacao.name}
                                 </p>
                             </div>
                             <div className="flex justify-between items-center mt-3">
                                 <p className="flex items-center gap-2 text-sm text-gray-400">
-                                    <Calendar size={16} />
-                                    <span>{tipificacao.data}</span>
+                                    <Calendar size={27} />
+                                    <span className="flex justify-center flex-col">
+                                        <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
+                                        <span>{tipificacao.created_at}</span>
+                                    </span>
                                 </p>
                                 <div className="flex gap-3">
                                     <Button
