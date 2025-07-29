@@ -23,7 +23,7 @@ import { Fonte, Tipificacao } from "@/core";
 import { Ramo } from "@/core/ramo";
 import { Taxonomia } from "@/core/taxonomia";
 import { getFontesService } from "@/service/fonte";
-import { excluirRamo } from "@/service/ramo";
+import { adicionarRamoService, excluirRamo } from "@/service/ramo";
 import { adicionarTaxonomia, excluirTaxonomia, getTaxonomiasService } from "@/service/taxonomia";
 import { getTipificacoesService } from "@/service/tipificacao";
 import { Calendar, ChevronLeft, PencilLine, Plus, Trash } from "lucide-react";
@@ -37,17 +37,18 @@ export default function Taxonomias() {
   const [descricaoTaxonomia, setDescricaoTaxonomia] = useState<string>("");
   const [descricaoRamo, setDescricaoRamo] = useState<string>("");
   const [tituloRamo, setTituloRamo] = useState<string>("");
-  const [tax, setTax] = useState<Taxonomia[]>([]);
-  
+  let [tax, setTax] = useState<Taxonomia[]>([]);
+
   const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
   const [fontes, setFontes] = useState<Fonte[]>([]);
   const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
   const [idTipificacao, setIdTipificacao] = useState<string>("");
-  
+
   const [openTaxonomia, setOpenTaxonomia] = useState<boolean>(false);
   const [openDialogRamo, setOpenDialogRamo] = useState<boolean>(false);
-  
-  const divTax = useRef<HTMLDivElement>(null);
+
+  const divRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const botaoRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,34 +68,45 @@ export default function Taxonomias() {
     }
 
     fetchData();
-
-    // Função para verificar clique fora de uma taxonomia para atualizar os ramos e melhorar usabilidade
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-
-      if (divTax.current && !divTax.current.contains(target)) {
-        setTaxonomiaSelecionada(null);
-        setIdSelecionado("");
-      }
-    };
-
-    document.addEventListener("click", handleClick);
-
-    // Limpar o listener ao desmontar
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
-
   }, []);
 
-  const handleAddRamo = (idTaxonomia: number | undefined, titulo: string, descricao: string) => {
+  // Função para verificar clique fora de uma taxonomia para atualizar os ramos e melhorar usabilidade
+  useEffect(() => {
+  const handleClick = (e: MouseEvent) => {
+    const target = e.target as Node;
 
-    setTaxonomiaSelecionada(novaTaxonomia);
+    const clicouDentroDeAlguma = Object.values(divRefs.current).some((ref) =>
+      ref?.contains(target)
+    );
+
+    if (!clicouDentroDeAlguma && !openDialogRamo) {
+      setTaxonomiaSelecionada(null);
+      setIdSelecionado("");
+    }
+  };
+
+  document.addEventListener("mousedown", handleClick);
+  return () => document.removeEventListener("mousedown", handleClick);
+}, [openDialogRamo]);
+
+
+  const handleAddRamo = async (idTaxonomia: string | undefined, titulo: string, descricao: string) => {
+    const ramo: Ramo = {
+      taxonomy_id: idTaxonomia,
+      title: titulo,
+      description: descricao,
+    };
+
+    const resposta = await adicionarRamoService(ramo);
+
+    if (resposta !== 201) {
+      throw new Error("Erro ao adicionar ramo");
+    }
+
     setOpenDialogRamo(false);
   }
 
-
-  const handleExcluirTaxonomia = async (taxonomiaId: string) => {
+  const handleExcluirTaxonomia = async (taxonomiaId: string | undefined) => {
     try {
       const resposta = await excluirTaxonomia(taxonomiaId);
       setIdSelecionado("");
@@ -112,7 +124,7 @@ export default function Taxonomias() {
     }
   };
 
-  const handleExcluirRamo = async (taxonomiaId: number, idRamo: number) => {
+  const handleExcluirRamo = async (taxonomiaId: string | undefined, idRamo: number) => {
     try {
       await excluirRamo(idRamo);
 
@@ -139,7 +151,8 @@ export default function Taxonomias() {
         throw new Error("Erro ao adicionar taxonomia");
       }
 
-      getTaxonomiasService();
+      const taxs = await getTaxonomiasService();
+      setTax(taxs || []);
     } catch (error) {
       console.error('Erro ao adicionar taxonomia:', error);
     }
@@ -295,17 +308,17 @@ export default function Taxonomias() {
         <div className="flex flex-col basis-1/2 overflow-y-scroll">
           {tax.map((item, index) => (
             <Card
-              ref={divTax}
+              ref={(e) => { divRefs.current[index] = e }}
               key={index}
               className={`
                 hover:bg-gray-200 hover:cursor-pointer
                 m-4 hover:scale-[1.03] active:scale-100 duration-100
                 div-taxonomia
-                ${idSelecionado ? "border-orange-300 border-[1px]" : ""}
+                ${idSelecionado && idSelecionado === index.toString() ? "border-orange-300 border-[1px]" : ""}
               `}
               onClick={() => {
                 setTaxonomiaSelecionada(item)
-                setIdSelecionado(item.id)
+                setIdSelecionado(index.toString())
               }}
             >
               <CardHeader>
@@ -335,6 +348,8 @@ export default function Taxonomias() {
                 </div>
               </CardFooter>
             </Card>
+
+            
           ))}
         </div>
 
@@ -344,14 +359,15 @@ export default function Taxonomias() {
               <CardTitle className="flex flex-row justify-between items-center">
                 <h1 className="text-2xl">Ramos</h1>
                 <Dialog open={openDialogRamo} onOpenChange={setOpenDialogRamo}>
-                  <DialogTrigger asChild >
-                    <button
-                      className=" flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
-
-                    >
-                      <Plus className="h-5 w-5 " strokeWidth={1.5} />
-                      Adicionar ramo
-                    </button>
+                  <DialogTrigger asChild>
+                    <div ref={(e) => { divRefs.current["botao"] = e }}>
+                      <button
+                        className="flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
+                      >
+                        <Plus className="h-5 w-5 " strokeWidth={1.5} />
+                        Adicionar ramo
+                      </button>
+                    </div>
 
                   </DialogTrigger>
                   <DialogContent >
@@ -362,11 +378,23 @@ export default function Taxonomias() {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
-                      <div className="bg-gray-300 rounded-sm items-center flex justify-center">
-                        <span>Tipificação COMUM A TODAS AS CONTRATAÇÕES </span>
-                      </div>
-                      <div className="bg-gray-300 rounded-sm items-center flex justify-center">
-                        <span>Taxonomia Planejada </span>
+                      <div className="flex p-3 gap-2 bg-gray-300 rounded-sm items-center">
+                        <label className="block text-md text-gray-700">
+                          Tipificação:
+                        </label>
+
+                        <select
+                          className="bg-white p-2 w-full rounded-md"
+                          defaultValue={"Selecione uma tipificação"}
+                          onChange={(e) => setIdTipificacao(e.target.value)}
+                        >
+                          <option disabled>Selecione uma tipificação</option>
+                          {
+                            tipificacoes && tipificacoes.map((item, index) => (
+                              <option key={index} value={item.id}>{item.name}</option>
+                            ))
+                          }
+                        </select>
                       </div>
                       <div>
                         <label htmlFor="titleRamo" className="block text-sm font-medium text-gray-700">
@@ -400,7 +428,7 @@ export default function Taxonomias() {
                       <button
                         className="px-4 py-2 text-sm hover:cursor-pointer font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
                         type="submit"
-                        onClick={() => handleAddRamo(taxonomiaSelecionada?.id, tituloRamo, descricaoRamo)}
+                        onClick={() => {console.log("ids: ", idSelecionado, " EEE ", taxonomiaSelecionada?.id); handleAddRamo(taxonomiaSelecionada?.id, tituloRamo, descricaoRamo)}}
                       >
                         Adicionar
                       </button>
@@ -413,6 +441,7 @@ export default function Taxonomias() {
               </CardTitle>
 
             </CardHeader>
+
             <CardContent>
               {taxonomiaSelecionada ? (
                 taxonomiaSelecionada.branches && taxonomiaSelecionada.branches.length > 0 ? (
