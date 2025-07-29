@@ -1,4 +1,22 @@
+import { Ramo } from "@/core";
+
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
+
+async function adicionarRamoService(ramo: Ramo): Promise<number | undefined> {
+    try {
+        const resposta = await fetch(`${urlBase}/taxonomy/branch/`, { 
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(ramo)
+        });
+        
+        return resposta.status
+    } catch (error) {
+        console.error('Erro ao adicionar ramo:', error);
+    }
+}
 
 async function excluirRamo(idRamo: number) {
     try {
@@ -17,6 +35,7 @@ async function excluirRamo(idRamo: number) {
     }
 }
 
-export { 
+export {
+    adicionarRamoService,
     excluirRamo
 }

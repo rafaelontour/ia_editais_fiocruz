@@ -40,7 +40,7 @@ async function adicionarTaxonomia(taxonomia: Taxonomia) : Promise<number | undef
     }
 }
 
-async function excluirTaxonomia(idTaxomonia: string) : Promise<number | undefined> {
+async function excluirTaxonomia(idTaxomonia: string | undefined) : Promise<number | undefined> {
     try {
         const resposta = await fetch(`${urlBase}/taxonomy/${idTaxomonia}/`, { method: 'DELETE' });
 
