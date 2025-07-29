@@ -1,8 +1,8 @@
 export default interface Ramo {
-    taxonomy_id: number;
-    id: number;
+    taxonomy_id: string | undefined;
+    id?: number;
     title: string;
     description: string;
-    created_at: string;
-    updated_at: string;
+    created_at?: string;
+    updated_at?: string;
 }
