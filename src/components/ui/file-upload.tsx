@@ -53,12 +53,15 @@ export const FileUpload = ({
   });
 
   return (
-    <div className="w-full flex bg-slate-100 rounded-md" {...getRootProps()}>
+    <div
+      style={{ boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)" }}
+      className="w-full flex items-center bg-slate-100 h-[165px] rounded-md"
+      {...getRootProps()}
+    >
       <motion.div
         onClick={handleClick}
         whileHover="animate"
         className=" group/file block pb-12 rounded-lg cursor-pointer w-full relative overflow-hidden"
-        style={{ boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)" }}
       >
         <input
           ref={fileInputRef}
@@ -70,9 +73,10 @@ export const FileUpload = ({
         <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
           <GridPattern />
         </div>
+
         <div className="flex flex-col p-2 items-center justify-center">
           
-          <div className="relative w-full mt-10 max-w-xl mx-auto">
+          <div className="relative w-full mt-10 max-w-xl">
             {files.length > 0 &&
               files.map((file, idx) => (
                 <motion.div
