@@ -93,25 +93,24 @@ export default function RootLayout({
           <div
             className="
               flex flex-1 relative
-    
             "
           >
             <div
               className="
-                absolute left-2 top-2
+                absolute left-2 top-2 block
               "
             >
               <SidebarTrigger
                 className="
-                  mt-1 ml-1
-                  hover:cursor-pointer
+                mt-1 ml-1
+                hover:cursor-pointer
                 "
               />
             </div>
             <div
               className="
-                flex overflow-y-scroll w-full
-                bg-white flex-1 pt-12 px-10
+                flex w-full
+                bg-white flex-1 pt-10 px-12 overflow-hidden
               "
                 style={{
                   boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
