@@ -23,10 +23,10 @@ async function getTaxonomiasService() : Promise<Taxonomia[] | undefined> {
     return taxonomias
 }
 
-async function adicionarTaxonomia(taxonomia: Taxonomia) : Promise<number | undefined> {
+async function adicionarTaxonomiaService(taxonomia: Taxonomia) : Promise<number | undefined> {
     
     try {
-        const ressposta = await fetch(`${urlBase}/taxonomy`, {
+        const resposta = await fetch(`${urlBase}/taxonomy`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -34,21 +34,33 @@ async function adicionarTaxonomia(taxonomia: Taxonomia) : Promise<number | undef
             body: JSON.stringify(taxonomia)
         });
 
-        return ressposta.status
+        return resposta.status
     } catch (error) {
         console.error('Erro ao adicionar taxonomia:', error);
     }
 }
 
-async function excluirTaxonomia(idTaxomonia: string | undefined) : Promise<number | undefined> {
+async function atualizarTaxonomiaService(taxonomia: Taxonomia): Promise<number | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/taxonomy/${idTaxomonia}/`, { method: 'DELETE' });
+        const resposta = await fetch(`${urlBase}/taxonomy`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(taxonomia)
+        })
 
-        console.log(resposta);
+        return resposta.status
+    } catch (error) {
+        console.error('Erro ao atualizar taxonomia:', error);
+    }
+}
+
+async function excluirTaxonomiaService(idTaxomonia: string | undefined) : Promise<number | undefined> {
+    try {
+        const resposta = await fetch(`${urlBase}/taxonomy/${idTaxomonia}/`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
     
-        if (!resposta.ok) {
-            throw new Error("Erro ao excluir taxonomia");
-        }
+        console.log("Status: ", resposta.status);
         
         return resposta.status
     } catch (error) {
@@ -58,6 +70,7 @@ async function excluirTaxonomia(idTaxomonia: string | undefined) : Promise<numbe
 
 export {
     getTaxonomiasService,
-    adicionarTaxonomia,
-    excluirTaxonomia
+    adicionarTaxonomiaService,
+    atualizarTaxonomiaService,
+    excluirTaxonomiaService
 }

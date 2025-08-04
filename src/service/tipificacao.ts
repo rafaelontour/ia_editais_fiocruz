@@ -73,8 +73,29 @@ async function excluirTipificacaoService(id: string): Promise<number | undefined
     }
 }
 
+async function atualizarTipificacaoService(tipificacao: Tipificacao): Promise<number | undefined> {
+    const url = `${urlBase}/typification/`
+    
+    try {
+        const dados = await fetch(url, {
+            method: "PUT",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(tipificacao)
+        })
+        
+        console.log(dados)
+
+        return dados.status
+    } catch(error) {
+        throw new Error("Erro ao atualizar tipificacao no arquivo ts: " + error)
+    }
+}
+
 export {
     getTipificacoesService,
     adicionarTipificacaoService,
+    atualizarTipificacaoService,
     excluirTipificacaoService
 }
