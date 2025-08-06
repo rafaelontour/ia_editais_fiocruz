@@ -61,7 +61,7 @@ export const FileUpload = ({
       <motion.div
         onClick={handleClick}
         whileHover="animate"
-        className=" group/file block pb-12 rounded-lg cursor-pointer w-full relative overflow-hidden"
+        className=" group/file block pb-12 rounded-lg cursor-pointer w-full h-[165px] relative overflow-hidden"
       >
         <input
           ref={fileInputRef}
@@ -136,8 +136,9 @@ export const FileUpload = ({
                   stiffness: 300,
                   damping: 20,
                 }}
-                className={cn(
-                  "relative group-hover/file:shadow-2xl z-40 bg-white dark:bg-neutral-900 flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-md",
+                /* Altura do quadrado com o ícone de upload*/
+                className={cn( 
+                  "relative group-hover/file:shadow-2xl z-40 bg-white dark:bg-neutral-900 flex items-center justify-center h-28 mt-4 w-full max-w-[8rem] mx-auto rounded-md",
                   "shadow-[0px_10px_50px_rgba(0,0,0,0.1)]"
                 )}
               >
