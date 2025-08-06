@@ -1,3 +1,5 @@
+'use client'
+
 import Image from "next/image";
 
 import { FilePen, Home, Sheet, Type, TypeOutline, University } from "lucide-react"
@@ -97,27 +99,47 @@ export default function RootLayout({
           >
             <div
               className="
-                absolute left-2 top-2 block
+                absolute left-0 top-0 
+                overflow-hidden flex w-full
               "
+              style={{
+                borderTopLeftRadius: "10px",
+                borderTopRightRadius: "10px",
+              }}
             >
               <SidebarTrigger
                 className="
-                mt-1 ml-1
+                mt-4 ml-4
                 hover:cursor-pointer
+                bg-white
                 "
               />
+
+              <div 
+                className="
+                  flex items-center pl-4 py-3
+                  h-16 w-[calc(100%-50px)] bg-white sticky]
+                  top-0 left-0 pointer-events-none z-10
+                "
+                style={{ 
+                  background: "linear-gradient(to bottom, rgb(202, 202, 202) 0%, white 7%)",
+                }}
+              >
+                <p></p>
+              </div>
             </div>
+            
             <div
               className="
-                flex w-full
-                bg-white flex-1 pt-10 px-12 overflow-hidden
+                flex w-full flex-col h-[98%]
+                bg-white flex-1 pt-20 px-12 overflow-y-auto scrollbar-hide
               "
-                style={{
-                  boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
-                  borderRadius: "10px 10px 0 0"
-                }}
+              style={{
+                boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
+                borderRadius: "10px",
+              }}
             >
-              <div className="w-full h-full">
+              <div className="w-full">
                 {children}
               </div>
             </div>

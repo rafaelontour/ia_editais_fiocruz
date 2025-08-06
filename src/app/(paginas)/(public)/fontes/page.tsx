@@ -313,9 +313,11 @@ export default function Fontes() {
                                                 {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
                                             </p>
 
-                                            <p>
-                                                Upload do documento (opcional)</p>
-                                            <FileUpload />
+                                            <p className="flex flex-col gap-2">
+                                                Upload do documento (opcional)
+                                                <FileUpload />
+                                                
+                                            </p>
 
                                             <div className="flex justify-end gap-4 mt-4">
                                                 <DialogClose

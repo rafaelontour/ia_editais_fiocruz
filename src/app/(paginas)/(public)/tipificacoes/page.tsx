@@ -135,7 +135,7 @@ export default function Tipificacoes() {
     function limparCampos() {
         reset();
         setNomeTipificacao("");
-        
+        setValue("fontesSelecionadas", []);
         setFontesSelecionadas([]);
     }
 
@@ -143,12 +143,7 @@ export default function Tipificacoes() {
         <div>
             <div className="flex flex-col gap-7">
                 <div className="flex justify-between w-full items-center bg-white pb-5">
-                    <div className="flex gap-6">
-                        <Button variant={"outline"} size={"icon"}>
-                            <ChevronRightIcon />
-                        </Button>
-                        <h2 className="text-2xl font-bold">Gestão de tipificações</h2>
-                    </div>
+                    <p className="text-2xl font-bold">Gestão de tipificações</p>
 
                     <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
                         <DialogTrigger asChild>
@@ -192,7 +187,7 @@ export default function Tipificacoes() {
                                 <p className="flex flex-col gap-2">
                                     <label>Fontes</label>
                                     <select
-                                        defaultValue={"Selecione uma fonte"}
+                                        defaultValue=""
                                         className="border-2 border-gray-300 rounded-md p-2"
                                         onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                             setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
@@ -206,7 +201,7 @@ export default function Tipificacoes() {
                                             }
                                         }}
                                     >
-                                        <option disabled>Selecione uma ou mais fontes</option>
+                                        <option value="" disabled>Selecione uma ou mais fontes</option>
                                         {fontes && fontes.map((fonte, index) => (
                                             <option
                                                 key={index}
@@ -264,10 +259,10 @@ export default function Tipificacoes() {
                                     <Button
                                         type="submit"
                                         className={`
-                                                flex bg-verde hover:bg-verde
-                                                text-white hover:cursor-pointer
-                                                active:scale-100
-                                            `}
+                                            flex bg-verde hover:bg-verde
+                                            text-white hover:cursor-pointer
+                                            active:scale-100
+                                        `}
                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                     >
                                         Salvar

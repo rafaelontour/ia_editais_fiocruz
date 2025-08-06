@@ -256,8 +256,6 @@ export default function Taxonomias() {
         description: descricaoRamo
       }
 
-      console.log(dado)
-
       const resposta = await atualizarRamoService(dado);
 
       if (resposta !== 200) {
@@ -283,6 +281,7 @@ export default function Taxonomias() {
   function limparCamposRamo() {
     setTituloRamo("");
     setDescricaoRamo("");
+    setRamoSelecionado(null);
     resetRamo()
   }
 
@@ -293,12 +292,7 @@ export default function Taxonomias() {
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-2 mb-4 justify-between">
-        <div className="flex flex-row items-center gap-2">
-          <button className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 ml-4 hover:cursor-pointer">
-            <ChevronLeft className="h-4 w-4 " />
-          </button>
-          <h1 className="ml-4 font-semibold text-2xl">Gestão de Taxonomia e ramos</h1>
-        </div>
+        <p className="font-semibold text-2xl">Gestão de Taxonomia e ramos</p>
 
         <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
           <DialogTrigger asChild >
@@ -431,7 +425,7 @@ export default function Taxonomias() {
               }
 
               <DialogFooter>
-                <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
                   Cancelar
                 </DialogClose>
 
@@ -449,16 +443,16 @@ export default function Taxonomias() {
       </div>
 
       <div className="flex h-[75dvh]">
-        <div className="flex flex-col basis-1/2 overflow-y-scroll">
+        <div className="flex  flex-col basis-1/2 overflow-y-scroll">
           {tax.map((item, index) => (
             <Card
               key={index}
               className={`
-                hover:cursor-pointer m-4 
+                hover:cursor-pointer m-4 ml-0
                 ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}
               `}
               onMouseDown={() => {
-                setTaxonomiaSelecionada
+                // setTaxonomiaSelecionada(item)
                 setIdSelecionado(index.toString())
               }}
               onClick={() => {
@@ -469,7 +463,7 @@ export default function Taxonomias() {
                 setIdSelecionado(index.toString())
                 buscarRamos(item.id)
               }}
-              onMouseUp={() => setTaxonomiaSelecionada(item)}
+              // onMouseUp={() => setTaxonomiaSelecionada(item)}
             >
               <CardHeader>
                 <CardTitle>{item.title}</CardTitle>
@@ -633,12 +627,12 @@ export default function Taxonomias() {
                         }
 
                         <DialogFooter>
-                          <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                          <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
                             Cancelar
                           </DialogClose>
 
                           <button
-                            className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
+                            className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md"
                             type="submit"
                           >
                             Salvar alterações
@@ -765,7 +759,7 @@ export default function Taxonomias() {
                       </div>
 
                       <DialogFooter>
-                        <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                        <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
                           Cancelar
                         </DialogClose>
 
@@ -808,7 +802,7 @@ export default function Taxonomias() {
                               </DialogTrigger>
 
                               <DialogContent
-                                ref={(e) => { divRefs.current["ramo_" + index] = e }}
+                                ref={(e) => { divRefs.current["ramo_editar_" + index] = e }}
                                 onCloseAutoFocus={limparCamposRamo}
                               >
                                 <DialogHeader>
@@ -853,12 +847,12 @@ export default function Taxonomias() {
                                   </div>
 
                                   <DialogFooter>
-                                    <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                                    <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
                                       Cancelar
                                     </DialogClose>
 
                                     <button
-                                      className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
+                                      className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md"
                                       type="submit"
                                     >
                                       Salvar alterações
@@ -883,7 +877,7 @@ export default function Taxonomias() {
 
                                 <DialogHeader>
                                   <DialogTitle>
-                                    Excluir fonte
+                                    Excluir ramo
                                   </DialogTitle>
 
                                   <DialogDescription>
