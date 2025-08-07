@@ -118,7 +118,7 @@ export default function RootLayout({
               <div 
                 className="
                   flex items-center pl-4 py-3
-                  h-16 w-[calc(100%-50px)] bg-white sticky]
+                  h-16 w-[95%] bg-white sticky
                   top-0 left-0 pointer-events-none z-10
                 "
                 style={{ 

@@ -820,7 +820,7 @@ export default function Taxonomias() {
 
                                     <input
                                       {...registerRamo("tituloRamo")}
-                                      defaultValue={ramo.title}
+                                      defaultValue={ramoSelecionado?.title}
                                       onChange={(e) => setTituloRamo(e.target.value)}
                                       type="text"
                                       id="titleTaxonomia"
@@ -836,7 +836,7 @@ export default function Taxonomias() {
 
                                     <textarea
                                       {...registerRamo("descricaoRamo")}
-                                      defaultValue={ramo.description}
+                                      defaultValue={ramoSelecionado?.description}
                                       onChange={(e) => setDescricaoRamo(e.target.value)}
                                       id="descriptionTaxonomia"
                                       placeholder="Digite uma descrição para a taxonomia"

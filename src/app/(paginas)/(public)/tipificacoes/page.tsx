@@ -142,7 +142,7 @@ export default function Tipificacoes() {
     return (
         <div>
             <div className="flex flex-col gap-7">
-                <div className="flex justify-between w-full items-center bg-white pb-5">
+                <div className="flex justify-between w-full top-0 items-center bg-white">
                     <p className="text-2xl font-bold">Gestão de tipificações</p>
 
                     <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
