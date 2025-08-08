@@ -4,6 +4,8 @@ import { createContext, useEffect, useState } from "react";
 
 export interface ContextoProps {
     usuario: Usuario | undefined
+    logarUsuario: () => void
+    deslogar: () => void
 }
 
 export const UsuarioContexto = createContext<ContextoProps | undefined>(undefined)
@@ -26,6 +28,10 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
 
     }
 
+    function deslogar() {
+        setUsuario(undefined)
+    }
+
     useEffect(() => {
         console.log("Contexto funcionando ao carregar a página.")
     }, [])
@@ -33,7 +39,9 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     return (
         <UsuarioContexto.Provider
             value={{
-                usuario: usuario
+                usuario: usuario,
+                logarUsuario: logarUsuario,
+                deslogar: deslogar
             }}
         >
             {children}
