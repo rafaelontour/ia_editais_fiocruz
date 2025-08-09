@@ -11,12 +11,13 @@ export default function AdicionarEdital () {
     return(
         <div className="">
             <Sheet>
-                <SheetTrigger>
+                <SheetTrigger asChild>
                     <Button variant={"outline"} className="bg-vermelho hover:bg-vermelho hover:cursor-pointer hover:scale-105 active:scale-100 duration-100 text-white"> {/* AJEITAR ÍCONE */}
                         <Upload color="white" className=""/>
                         <p className="text-white">Enviar novo edital</p>
                     </Button> 
                 </SheetTrigger>
+                
                 <SheetContent side="right" className="w-full px-10">
                     <SheetHeader>
                         <SheetTitle className="text-2xl">Adicionar</SheetTitle>

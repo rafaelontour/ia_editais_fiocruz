@@ -13,8 +13,8 @@ export default function EditarEdital () {
     return(
         <div>
             <Sheet>
-                <SheetTrigger>
-                    <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300">
+                <SheetTrigger asChild>
+                    <Button variant={"outline"} size={"icon"} className="h-6 w-6 p-[14px] border-gray-300 rounded-sm hover:cursor-pointer">
                         <PencilLine/>
                     </Button> 
                 </SheetTrigger>
@@ -27,7 +27,7 @@ export default function EditarEdital () {
                     <div className="space-y-6">
                         <div className="flex flex-row gap-3">
                             <div className="flex flex-col gap-3 w-[60%]">
-                                <Label htmlFor="name">Nome do Edial*</Label>
+                                <Label htmlFor="name">Nome do Edital*</Label>
                                 <Input id="name" placeholder="Insira o nome do edital"></Input>
                             </div>
                             <div className="flex flex-col gap-3 w-[40%]">

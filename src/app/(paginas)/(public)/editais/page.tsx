@@ -142,7 +142,7 @@ export default function MeusEditais () {
                         </AlertDialogCancel>
                         <AlertDialogAction
                             className="bg-orange-600"
-                            onClick={confirmStatusChange}
+                            onMouseUp={confirmStatusChange}
                         >
                             Mudar
                         </AlertDialogAction>

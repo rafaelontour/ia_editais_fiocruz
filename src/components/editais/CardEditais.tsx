@@ -55,7 +55,7 @@ export default function CardEditais ({ edital }: CardEditaisProps) {
                     }
                    <EditarEdital/>
                     <AlertDialog>
-                        <AlertDialogTrigger>
+                        <AlertDialogTrigger asChild>
                             <Button variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 bg-vermelho text-white hover:text-black transition-all"><Trash className=""/></Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="rounded-2xl">
