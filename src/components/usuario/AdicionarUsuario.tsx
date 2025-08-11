@@ -1,6 +1,7 @@
-import { DialogContent, DialogTitle } from "@radix-ui/react-dialog";
-import { Dialog, DialogHeader } from "../ui/dialog";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { User } from "lucide-react";
+
 
 interface AdicionarUsuarioProps {
     open: boolean;

@@ -1,10 +1,17 @@
+'use client'
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AdicionarUsuario from "@/components/usuario/AdicionarUsuario";
 import { ChevronLeft, Plus, Search } from "lucide-react";
+import { useState } from "react";
 
 export default function AtribuirCargo () {
+
+    const [isDialogAdicionarUsuarioOpen, setIsDialogAdicionarUsuarioOpen] = useState(false);
+
     return(
         <div className="flex flex-col gap-8">
             {/* MENU SUPERIOR - ATRIBUIR CARGO */}
@@ -14,7 +21,10 @@ export default function AtribuirCargo () {
                     <h2 className="text-2xl font-semibold">Gerenciar Usuários</h2>
                 </div>
                 <div>
-                    <Button variant={"outline"}
+                    <Button variant={"outline"} onClick={(e) => {
+                        e.preventDefault();
+                        setIsDialogAdicionarUsuarioOpen(true);
+                    }}
                         className="bg-vermelho text-white items-center cursor-pointer hover:scale-105 hover:bg-vermelho hover:text-white transition-all"
                         >
                         <Plus />
@@ -34,8 +44,8 @@ export default function AtribuirCargo () {
                         <SelectContent >
                             <SelectGroup>
                                 <SelectLabel>Unidade</SelectLabel>
-                                {Array.from({length:5}).map(() => (
-                                    <SelectItem value="unit">Unidade01</SelectItem>
+                                {Array.from({length:5}).map((_, i) => (
+                                    <SelectItem key={i} value="unit">Unidade01</SelectItem>
                                 ))}
                             </SelectGroup>
                         </SelectContent>
@@ -51,6 +61,8 @@ export default function AtribuirCargo () {
                 </div>
             </div>
 
+
+            <AdicionarUsuario open={isDialogAdicionarUsuarioOpen} onOpenChange={setIsDialogAdicionarUsuarioOpen}/>
         </div>
     );
 }
