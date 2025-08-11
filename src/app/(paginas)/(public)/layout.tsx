@@ -44,8 +44,8 @@ export default function RootLayout({
       icon: University,
     },
     {
-      title: "Atribuir Cargo",
-      url:"/atribuirCargo",
+      title: "Atribuição de cargo",
+      url:"/cargos",
       icon: IdCard,
     },
   ]
