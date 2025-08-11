@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronLeft, Plus } from "lucide-react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronLeft, Plus, Search } from "lucide-react";
 
 export default function AtribuirCargo () {
     return(
-        <div>
+        <div className="flex flex-col gap-8">
             {/* MENU SUPERIOR - ATRIBUIR CARGO */}
             <div className="flex flex-row justify-between w-full">
                 <div className="flex flex-row gap-2 items-center">
@@ -20,6 +22,35 @@ export default function AtribuirCargo () {
                     </Button>
                 </div>
             </div>
+
+            {/* FILTRO + BUSCA */}
+            <div className="flex flex-row gap-5">
+                <div className="flex flex-row gap-2 items-center">
+                    <p className="font-semibold">Unidade: </p>
+                    <Select>
+                        <SelectTrigger className="">
+                            <SelectValue placeholder="Selecione a unidade" />
+                        </SelectTrigger>
+                        <SelectContent >
+                            <SelectGroup>
+                                <SelectLabel>Unidade</SelectLabel>
+                                {Array.from({length:5}).map(() => (
+                                    <SelectItem value="unit">Unidade01</SelectItem>
+                                ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="relative flex-grow w-full items-center">
+                    <Input type={"search"} placeholder="Buscar Usuário" 
+                        className="pl-4 pr-10 py-2 w-full rounded-lg"/>
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 items-center">
+                        <Search size={20}/>
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 }
