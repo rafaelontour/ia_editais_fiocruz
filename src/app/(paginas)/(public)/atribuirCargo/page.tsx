@@ -44,8 +44,8 @@ export default function AtribuirCargo () {
                         <SelectContent >
                             <SelectGroup>
                                 <SelectLabel>Unidade</SelectLabel>
-                                {Array.from({length:5}).map((_, i) => (
-                                    <SelectItem key={i} value="unit">Unidade01</SelectItem>
+                                {unidades.map(u => (
+                                    <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
                                 ))}
                             </SelectGroup>
                         </SelectContent>
