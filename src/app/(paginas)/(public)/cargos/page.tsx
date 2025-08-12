@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import AdicionarUsuario from "@/components/usuario/AdicionarUsuario";
+import AdicionarUsuario from "@/components/usuarios/AdicionarUsuario";
 import { ChevronLeft, UserPlus, Search } from "lucide-react";
 import { useState } from "react";
 
@@ -52,13 +52,13 @@ export default function AtribuirCargo () {
                     </Select>
                 </div>
 
-                <div className="relative flex-grow w-full items-center">
+                { /*<div className="relative flex-grow w-full items-center">
                     <Input type={"search"} placeholder="Buscar Usuário" 
                         className="pl-4 pr-10 py-2 w-full rounded-lg"/>
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 items-center">
                         <Search size={20}/>
                     </div>
-                </div>
+                </div> */ }
             </div>
 
 
