@@ -4,10 +4,11 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getToken } from "@/service/auth"
+
 const loginSchema = z.object({
   username: z
     .string()
-    .min(1, "O username é obrigatório"),
+    .min(1, "O nome de usuário é obrigatório"),
   senha: z
     .string()
     .min(3, "A senha deve ter no mínimo 3 caracteres"),
@@ -25,17 +26,16 @@ export default function Login() {
   })
 
   async function onSubmit(data: LoginFormData) {
-    try{
+    try {
         const formData = new FormData();
         formData.append("username", data.username)
         formData.append("password", data.senha)
         const token = await getToken(formData)
         console.log(token)
         localStorage.setItem("token", token.access_token)
-    }catch(e){
+    } catch(e) {
         console.log(e)
     }  
-
   }
 
   return (
@@ -83,12 +83,12 @@ export default function Login() {
           </label>
 
           <button
-            
             type="submit"
             className="bg-vermelho text-branco rounded-md px-6 py-3 cursor-pointer"
           >
             Fazer Login
           </button>
+          
           <div className="flex justify-between">
             <p>Esqueci a senha</p>
           </div>

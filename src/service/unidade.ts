@@ -1,9 +1,7 @@
-
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-
-export async function getTodasUnidades(){
-    try{
+async function getTodasUnidades() {
+    try {
         const res = await fetch(`${urlBase}/unit`);
 
         if (!res.ok) throw new Error("Erro ao buscar Unidades");
@@ -12,14 +10,14 @@ export async function getTodasUnidades(){
 
         return data;
         
-    }catch(e){
+    } catch(e) {
         throw new Error("Erro ao buscar tipificacoes: " + e)
 
     }
 }
 
-export async function getUnidadePorId(unidadeId: string){
-    try{
+async function getUnidadePorId(unidadeId: string){
+    try {
         const res = await fetch(`${urlBase}/unit/${unidadeId}`);
 
         if (!res.ok) throw new Error("Erro ao buscar unidade ");
@@ -28,14 +26,14 @@ export async function getUnidadePorId(unidadeId: string){
 
         return data;
         
-    }catch(e){
+    } catch(e) {
         throw new Error("Erro ao buscar unidade: " + e)
 
     }
 }
 
-export async function postUnidade(name: string, location : string){
-    try{
+async function adicionarUsuarioService(name: string, location : string){
+    try {
         const res = await fetch(`${urlBase}/unit`,{
             method: "POST",
             headers: {
@@ -49,14 +47,14 @@ export async function postUnidade(name: string, location : string){
         const data = await res.json();
         return data;
         
-    }catch(e){
+    } catch(e) {
         throw new Error("Erro ao criar unidade: " + e)
 
     }
 }
 
-export async function deleteUnidade(unidadeId: string){
-    try{
+async function excluirUsuarioService(unidadeId: string){
+    try {
         const res = await fetch(`${urlBase}/unit/${unidadeId}`);
 
         if (!res.ok) throw new Error("Erro ao deletar unidade ");
@@ -64,8 +62,15 @@ export async function deleteUnidade(unidadeId: string){
         const data = await res.json();
         return data;
         
-    }catch(e){
+    } catch(e) {
         throw new Error("Erro ao deletar unidade: " + e)
 
     }
+}
+
+export {
+    getTodasUnidades,
+    getUnidadePorId,
+    adicionarUsuarioService,
+    excluirUsuarioService
 }

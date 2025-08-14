@@ -8,15 +8,12 @@ import { Button } from "@/components/ui/button";
 import { UsuarioUnidade } from "@/core/usuario";
 import { Unidade } from "@/core/unidade";
 import { NivelAcesso } from "@/core/enum/nivelAcessoEnum";
-import { deleteUsuario, updateUser } from "@/service/usuario";
+import { atualizarUsuarioService, excluirUsuarioService } from "@/service/usuario";
 
 const schemaUsuario = z.object({
   unidade: z.string().min(1, "A unidade é obrigatória"),
   nivelAcesso: z.string().min(1, "O nível de acesso é obrigatório")
 });
-
-
-
 
 interface UsuarioCardProps {
   usuario: UsuarioUnidade;
@@ -45,12 +42,12 @@ export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
 
   const onSubmit = (data: FormData) => {
     console.log("Dados para atualizar:", data);
-    updateUser(usuario.id, usuario.email, usuario.username, data.nivelAcesso)
+    atualizarUsuarioService(usuario.id, usuario.email, usuario.username, data.nivelAcesso)
     setOpenDialogEditar(false);
   };
 
   const excluirUsuario = (id: string) => {
-    deleteUsuario(id)
+    excluirUsuarioService(id)
     setOpenDialogExcluir(false);
   };
 
