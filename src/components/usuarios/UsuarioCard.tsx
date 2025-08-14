@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { UsuarioUnidade } from "@/core/usuario";
 import { Unidade } from "@/core/unidade";
 import { NivelAcesso } from "@/core/enum/nivelAcessoEnum";
-import { deleteUsuario } from "@/service/usuario";
+import { deleteUsuario, updateUser } from "@/service/usuario";
 
 const schemaUsuario = z.object({
   unidade: z.string().min(1, "A unidade é obrigatória"),
@@ -45,6 +45,7 @@ export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
 
   const onSubmit = (data: FormData) => {
     console.log("Dados para atualizar:", data);
+    updateUser(usuario.id, usuario.email, usuario.username, data.nivelAcesso)
     setOpenDialogEditar(false);
   };
 
