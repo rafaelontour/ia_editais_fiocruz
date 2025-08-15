@@ -11,16 +11,16 @@ async function getUsuario(): Promise<Usuario | null> {
 async function getUsuariosPorUnidade(unidadeId: string, unidadeNome: string) {
     try {
         const res = await fetch(`${urlBase}/user_units/unit/${unidadeId}`)
-
-
+        
+        
         const data =  await res.json();
         if(!data || data.lenght === 0) return []
-
+        
         return data.map((usuario: any) => ({
             ...usuario,
             unidade: unidadeNome
         }));
-      
+        
     } catch(e) {
         console.error("Erro na busca de usuario: ", e)
     }
@@ -46,6 +46,7 @@ async function adicionarUsuarioService(name : string, password: string, email: s
     } catch(e) {
         console.error("Erro ao tentar criar usuário: ", e);
     }
+
 }
 
 async function atualizarUsuarioService(usuarioId: string, email:string, username: string, access_level : string) {

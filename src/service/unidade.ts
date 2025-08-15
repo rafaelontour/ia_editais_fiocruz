@@ -28,7 +28,6 @@ async function getUnidadePorId(unidadeId: string){
         
     } catch(e) {
         throw new Error("Erro ao buscar unidade: " + e)
-
     }
 }
 
@@ -49,7 +48,6 @@ async function adicionarUsuarioService(name: string, location : string){
         
     } catch(e) {
         throw new Error("Erro ao criar unidade: " + e)
-
     }
 }
 
@@ -64,7 +62,6 @@ async function excluirUsuarioService(unidadeId: string){
         
     } catch(e) {
         throw new Error("Erro ao deletar unidade: " + e)
-
     }
 }
 

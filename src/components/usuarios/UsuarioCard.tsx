@@ -68,13 +68,14 @@ export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
       </div>
 
       <div className="flex justify-between items-center mt-3">
-         <p className="flex items-center gap-2 text-sm text-gray-400">
-            <Calendar size={16} />
-              <span className="flex justify-center flex-col">
-                  <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criado em</span>
-                  <span>{new Date(usuario.created_at).toLocaleString()}</span>
-              </span>
-          </p>
+        <p className="flex items-center gap-2 text-sm text-gray-400">
+          <Calendar size={16} />
+            <span className="flex justify-center flex-col">
+                <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criado em</span>
+                <span>{new Date(usuario.created_at).toLocaleString()}</span>
+            </span>
+        </p>
+
         <div className="flex gap-3">
           <Dialog open={openDialogEditar} onOpenChange={setOpenDialogEditar}>
             <DialogTrigger asChild>

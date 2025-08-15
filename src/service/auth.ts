@@ -1,16 +1,68 @@
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
-export async function getToken(formData:any) {
-    try {
-        const url = `${urlBase}/token `;
+async function adicionarUsuarioService(name : string, password: string, email: string) {
+    try{
+        const url = `${urlBase}/users `;
 
         const res = await fetch(url, {
             method: "POST",
-            body: formData
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name,password, email
+            })
+
         });
-      const data = await res.json()
-      return data;
+
+        return res.status
+
     } catch(e) {
         console.error("Erro ao tentar criar usuário: ", e);
     }
 }
+
+async function getToken(email: string, password: string) {
+     try {
+        const url = `${urlBase}/token `;
+
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                password, email
+            })
+        });
+      const data = await res.json()
+     return data;
+    } catch (e) {
+        console.error("Erro ao tentar criar usuário: ", e);
+    }
+}
+
+export {
+    adicionarUsuarioService,
+    getToken
+}
+
+// async function atualizarUsuario(email: string, password: string) {
+//      try{
+//         const url = `${urlBase}/token `;
+
+//         const res = await fetch(url, {
+//             method: "GET",
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+//                 password, email
+//             })
+//         });
+//       const data = await res.json()
+//      return data;
+//     }catch(e){
+//         console.error("Erro ao tentar criar usuário: ", e);
+//     }
+// }
