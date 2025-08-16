@@ -30,7 +30,7 @@ export default function Login() {
         const formData = new FormData();
         formData.append("username", data.username)
         formData.append("password", data.senha)
-        const token = await getToken(formData)
+        const token = await getToken(data.username, data.senha)
         console.log(token)
         localStorage.setItem("token", token.access_token)
     } catch(e) {

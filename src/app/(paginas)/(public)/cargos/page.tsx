@@ -27,7 +27,7 @@ export default function AtribuirCargo () {
                     setUnidades(unidadesData);
     
                     if (unidadesData.length > 0) {
-                        const usuariosData = await getUsuariosPorUnidade(unidadesData[0].id, unidadesData[0].name);
+                        const usuariosData = await getUsuariosPorUnidade(unidadesData[0].id);
                         console.log(usuariosData)
                         setUsuarios(Array.isArray(usuariosData) ? usuariosData : [usuariosData]);
                     }
@@ -51,7 +51,7 @@ export default function AtribuirCargo () {
                 <div className="flex flex-row justify-between w-full">
                     <div className="flex flex-row gap-2 items-center">
                         <Button variant={"outline"} size={"icon"} className="cursor-pointer"><ChevronLeft /></Button>
-                        <h2 className="text-2xl font-semibold">Gerenciar Usuários</h2>
+                        <h2 className="text-2xl font-semibold">Gerenciar usuários</h2>
                     </div>
                     <div>
                         <Button variant={"outline"} onClick={(e) => {
@@ -61,7 +61,7 @@ export default function AtribuirCargo () {
                             className="bg-vermelho text-white items-center cursor-pointer hover:scale-105 hover:bg-vermelho hover:text-white transition-all"
                             >
                             <UserPlus />
-                            <Label>Adicionar Usuário</Label>
+                            <Label>Adicionar usuário</Label>
                         </Button>
                     </div>
                 </div>
@@ -85,26 +85,26 @@ export default function AtribuirCargo () {
                         </Select>
                     </div>
     
-                    <div className="relative flex-grow w-full items-center">
+                    {/* <div className="relative flex-grow w-full items-center">
                         <Input type={"search"} placeholder="Buscar Usuário" 
                             className="pl-4 pr-10 py-2 w-full rounded-lg"/>
                         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 items-center">
                             <Search size={20}/>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
     
                 <div className="p-4 flex flex-wrap gap-4">
                     {usuarios.map((usuario) => (
                         <UsuarioCard
-                        key={usuario.id}
-                        usuario={usuario}
-                        unidades={unidades}
+                            key={usuario.id}
+                            usuario={usuario}
+                            unidades={unidades}
                         />
                     ))}
                 </div>
     
-                <AdicionarUsuario open={isDialogAdicionarUsuarioOpen} onOpenChange={setIsDialogAdicionarUsuarioOpen}/>
+                <AdicionarUsuario unidades={unidades} open={isDialogAdicionarUsuarioOpen} onOpenChange={setIsDialogAdicionarUsuarioOpen}/>
             </div>
         );
 }

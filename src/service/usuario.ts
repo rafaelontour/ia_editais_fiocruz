@@ -8,17 +8,16 @@ async function getUsuario(): Promise<Usuario | null> {
     return null;
 }
 
-async function getUsuariosPorUnidade(unidadeId: string, unidadeNome: string) {
+async function getUsuariosPorUnidade(unidadeId: string) {
     try {
-        const res = await fetch(`${urlBase}/user_units/unit/${unidadeId}`)
+        const res = await fetch(`${urlBase}/users/?unit_id=${unidadeId}`)
         
         
         const data =  await res.json();
         if(!data || data.lenght === 0) return []
         
         return data.map((usuario: any) => ({
-            ...usuario,
-            unidade: unidadeNome
+            ...usuario
         }));
         
     } catch(e) {
@@ -28,7 +27,7 @@ async function getUsuariosPorUnidade(unidadeId: string, unidadeNome: string) {
 
 async function adicionarUsuarioService(name : string, password: string, email: string) {
     try {
-        const url = `${urlBase}/users `;
+        const url = `${urlBase}/user/`;
         
         const res = await fetch(url, {
             method: "POST",
@@ -49,9 +48,9 @@ async function adicionarUsuarioService(name : string, password: string, email: s
 
 }
 
-async function atualizarUsuarioService(usuarioId: string, email:string, username: string, access_level : string) {
+async function atualizarUsuarioService(usuarioId: string, email:string, username: string, access_level : string, phone_number: string, unit_id: string) {
      try {
-        const url = `${urlBase}/user/${usuarioId} `;
+        const url = `${urlBase}/user/`;
 
         const res = await fetch(url, {
             method: "PUT",
@@ -60,7 +59,12 @@ async function atualizarUsuarioService(usuarioId: string, email:string, username
                 'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({
-                id: usuarioId, email, username, access_level
+                username: username,
+                email: email,
+                unit_id: unit_id,
+                phone_number: phone_number,
+                access_level: access_level,
+                id: usuarioId,
             })
         });
 
