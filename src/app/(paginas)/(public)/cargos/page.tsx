@@ -10,13 +10,13 @@ import { Unidade } from "@/core/unidade";
 import { UsuarioUnidade } from "@/core/usuario";
 import { getTodasUnidades } from "@/service/unidade";
 import { getUsuariosPorUnidade } from "@/service/usuario";
-import { ChevronLeft, UserPlus, Search } from "lucide-react";
+import { ChevronLeft, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function AtribuirCargo () {
 
     const [isDialogAdicionarUsuarioOpen, setIsDialogAdicionarUsuarioOpen] = useState<boolean>(false);
-    const [usuarios, setUsuarios] = useState<UsuarioUnidade[]>([]);
+    const [usuarios, setUsuarios] = useState<UsuarioUnidade[] | undefined>([]);
     const [unidades, setUnidades] = useState<Unidade[]>([]);
     const [loading, setLoading] = useState(true);
     
@@ -29,7 +29,7 @@ export default function AtribuirCargo () {
                     if (unidadesData.length > 0) {
                         const usuariosData = await getUsuariosPorUnidade(unidadesData[0].id);
                         console.log(usuariosData)
-                        setUsuarios(Array.isArray(usuariosData) ? usuariosData : [usuariosData]);
+                        setUsuarios(usuariosData);
                     }
                 } catch (error) {
                     console.error("Erro ao carregar dados:", error);
@@ -50,16 +50,17 @@ export default function AtribuirCargo () {
                 {/* MENU SUPERIOR - ATRIBUIR CARGO */}
                 <div className="flex flex-row justify-between w-full">
                     <div className="flex flex-row gap-2 items-center">
-                        <Button variant={"outline"} size={"icon"} className="cursor-pointer"><ChevronLeft /></Button>
+                        {/* <Button variant={"outline"} size={"icon"} className="cursor-pointer"><ChevronLeft /></Button> */}
                         <h2 className="text-2xl font-semibold">Gerenciar usuários</h2>
                     </div>
-                    <div>
-                        <Button variant={"outline"} onClick={(e) => {
+                    
+                    <div className="cursor-pointer">
+                        <Button  onClick={(e) => {
                             e.preventDefault();
                             setIsDialogAdicionarUsuarioOpen(true);
                         }}
-                            className="bg-vermelho text-white items-center cursor-pointer hover:scale-105 hover:bg-vermelho hover:text-white transition-all"
-                            >
+                            className="bg-vermelho text-white items-center hover:bg-vermelho"
+                        >
                             <UserPlus />
                             <Label>Adicionar usuário</Label>
                         </Button>
@@ -74,7 +75,8 @@ export default function AtribuirCargo () {
                             <SelectTrigger className="">
                                 <SelectValue placeholder="Selecione a unidade" />
                             </SelectTrigger>
-                            <SelectContent >
+
+                            <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Unidade</SelectLabel>
                                     {unidades.map(u => (
@@ -95,13 +97,13 @@ export default function AtribuirCargo () {
                 </div>
     
                 <div className="p-4 flex flex-wrap gap-4">
-                    {usuarios.map((usuario) => (
+                    {usuarios ? usuarios.map((usuario) => (
                         <UsuarioCard
                             key={usuario.id}
                             usuario={usuario}
                             unidades={unidades}
                         />
-                    ))}
+                    )) : null}
                 </div>
     
                 <AdicionarUsuario unidades={unidades} open={isDialogAdicionarUsuarioOpen} onOpenChange={setIsDialogAdicionarUsuarioOpen}/>

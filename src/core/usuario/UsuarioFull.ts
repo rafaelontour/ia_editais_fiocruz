@@ -1,4 +1,4 @@
-export interface UsuarioUnidade{
+export interface UsuarioUnidade {
     id: string,
     username: string,
     email: string,

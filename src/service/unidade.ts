@@ -1,12 +1,15 @@
+import { Unidade } from "@/core/unidade";
+
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-async function getTodasUnidades() {
+async function getTodasUnidades(): Promise<Unidade[]> {
     try {
-        const res = await fetch(`${urlBase}/unit`);
+        const res = await fetch(`${urlBase}/unit/`);
 
         if (!res.ok) throw new Error("Erro ao buscar Unidades");
 
         const data = await res.json();
+        console.log("Unidades: ", data)
 
         return data;
         
@@ -16,9 +19,9 @@ async function getTodasUnidades() {
     }
 }
 
-async function getUnidadePorId(unidadeId: string){
+async function getUnidadePorId(unidadeId: string) {
     try {
-        const res = await fetch(`${urlBase}/unit/${unidadeId}`);
+        const res = await fetch(`${urlBase}/unit/${unidadeId}/`);
 
         if (!res.ok) throw new Error("Erro ao buscar unidade ");
 

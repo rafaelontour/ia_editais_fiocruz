@@ -8,13 +8,15 @@ async function getUsuario(): Promise<Usuario | null> {
     return null;
 }
 
-async function getUsuariosPorUnidade(unidadeId: string) {
+async function getUsuariosPorUnidade(unidadeId: string): Promise<UsuarioUnidade[] | undefined> {
     try {
-        const res = await fetch(`${urlBase}/users/?unit_id=${unidadeId}`)
-        
+        const res = await fetch(`${urlBase}/user/?unit_id=${unidadeId}`)
         
         const data =  await res.json();
+
         if(!data || data.lenght === 0) return []
+
+        console.log("data: ", data)
         
         return data.map((usuario: any) => ({
             ...usuario
