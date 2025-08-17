@@ -12,15 +12,17 @@ import { atualizarUsuarioService, excluirUsuarioService } from "@/service/usuari
 
 const schemaUsuario = z.object({
   unidade: z.string().min(1, "A unidade é obrigatória"),
-  nivelAcesso: z.string().min(1, "O nível de acesso é obrigatório")
+  nivelAcesso: z.string().min(1, "O nível de acesso é obrigatório"),
+  phone_number: z.string().min(7, "O telefone é obrigatório"),
 });
 
 interface UsuarioCardProps {
   usuario: UsuarioUnidade;
   unidades: Unidade[];
+  buscarUsuarios: (unidadeId: string) => Promise<void>;
 }
 
-export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
+export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardProps) => {
   type FormData = z.infer<typeof schemaUsuario>;
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
@@ -32,17 +34,13 @@ export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
 
   useEffect(() => {
     if (openDialogEditar) {
-      const unidadeUsuario = unidades.find(u => u.name === usuario.unidade)
-      reset({
-        unidade: unidadeUsuario?.id ?? "",
-        nivelAcesso: usuario.access_level ?? ""
-      });
+      reset();
     }
   }, [openDialogEditar, reset, usuario]);
 
-  const onSubmit = (data: FormData) => {
-    console.log("Dados para atualizar:", data);
-    atualizarUsuarioService(usuario.id, usuario.email, usuario.username, data.nivelAcesso)
+  const atualizarUsuario = (data: FormData) => {
+    atualizarUsuarioService(usuario.id, usuario.email, usuario.username, data.nivelAcesso, data.phone_number, usuario.unit_id)
+    buscarUsuarios(usuario.unit_id);
     setOpenDialogEditar(false);
   };
 
@@ -57,7 +55,7 @@ export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
       className="
         flex flex-col gap-2 rounded-md p-4 mb-4
         transition ease-in-out duration-100
-        min-w-[320px]
+        min-w-[290px]
       "
     >
       <div className="flex flex-col gap-2">
@@ -72,7 +70,7 @@ export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
           <Calendar size={16} />
             <span className="flex justify-center flex-col">
                 <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criado em</span>
-                <span>{new Date(usuario.created_at).toLocaleString()}</span>
+                <span>{usuario.created_at}</span>
             </span>
         </p>
 
@@ -97,7 +95,21 @@ export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
                 </DialogDescription>
               </DialogHeader>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="flex text-lg flex-col gap-4">
+              <form onSubmit={handleSubmit(atualizarUsuario)} className="flex text-lg flex-col gap-4">
+
+                <div>
+                  <label htmlFor="phone_number">WhatsApp</label>
+                  <input
+                    defaultValue={usuario.phone_number}
+                    {...register("phone_number")}
+                    id="phone_number"
+                    className="border-2 border-gray-300 rounded-md p-2 w-full"
+                  />
+                  {errors.phone_number && (
+                    <span className="text-red-500 text-sm italic">{errors.phone_number.message}</span>
+                  )}
+                </div>
+
                 <div className="flex flex-col gap-2">
                   <label htmlFor="unidade">Unidade</label>
                   <select
@@ -122,8 +134,12 @@ export const UsuarioCard = ({ usuario, unidades }: UsuarioCardProps) => {
                     {...register("nivelAcesso")}
                     id="nivelAcesso"
                     className="border-2 border-gray-300 rounded-md p-2 w-full"
-                    
+                    defaultValue={usuario.access_level}
                   >
+                    <option disabled>
+                      Selecione um perfil
+                    </option>
+
                     {Object.values(NivelAcesso).map((nivel) => (
                       <option key={nivel} value={nivel}>
                         {nivel}
