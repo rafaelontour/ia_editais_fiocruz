@@ -8,7 +8,7 @@ import { getToken } from "@/service/auth"
 const loginSchema = z.object({
   username: z
     .string()
-    .min(1, "O nome de usuário é obrigatório"),
+    .min(1, "O email é obrigatório"),
   senha: z
     .string()
     .min(3, "A senha deve ter no mínimo 3 caracteres"),
@@ -25,12 +25,12 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   })
 
-  async function onSubmit(data: LoginFormData) {
+  async function logar(data: LoginFormData) {
     try {
         const formData = new FormData();
         formData.append("username", data.username)
         formData.append("password", data.senha)
-        const token = await getToken(data.username, data.senha)
+        const token = await getToken(formData)
         console.log(token)
         localStorage.setItem("token", token.access_token)
     } catch(e) {
@@ -51,11 +51,11 @@ export default function Login() {
         </div>
 
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(logar)}
           className="flex flex-col gap-4 font-medium text-lg 2xl:text-xl"
         >
           <label htmlFor="username" className="flex flex-col gap-2">
-            Username
+            Email
             <input
               {...register("username")}
               type="text"
