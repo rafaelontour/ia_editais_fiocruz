@@ -1,5 +1,4 @@
 import { Usuario } from "@/core";
-import { NivelAcesso } from "@/core/enum/nivelAcessoEnum";
 import { UsuarioUnidade } from "@/core/usuario";
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
@@ -8,15 +7,13 @@ async function getUsuario(): Promise<Usuario | null> {
     return null;
 }
 
-async function getUsuariosPorUnidade(unidadeId: string): Promise<UsuarioUnidade[] | undefined> {
+async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<UsuarioUnidade[] | undefined> {
     try {
         const res = await fetch(`${urlBase}/user/?unit_id=${unidadeId}`)
         
         const data =  await res.json();
 
         if(!data || data.lenght === 0) return []
-
-        console.log("data: ", data)
         
         return data.map((usuario: any) => ({
             ...usuario
@@ -71,6 +68,7 @@ async function atualizarUsuarioService(usuarioId: string, email:string, username
         });
 
         const data = await res.json()
+        
         return data;
     } catch(e) {
         console.error("Erro ao tentar criar usuário: ", e);

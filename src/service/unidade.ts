@@ -9,7 +9,6 @@ async function getTodasUnidades(): Promise<Unidade[]> {
         if (!res.ok) throw new Error("Erro ao buscar Unidades");
 
         const data = await res.json();
-        console.log("Unidades: ", data)
 
         return data;
         
