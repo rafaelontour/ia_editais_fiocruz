@@ -4,7 +4,13 @@ const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getTodasUnidades(): Promise<Unidade[]> {
     try {
-        const res = await fetch(`${urlBase}/unit/`);
+        const res = await fetch(`${urlBase}/unit/`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "content-type": "application/json"
+            }
+        });
 
         if (!res.ok) throw new Error("Erro ao buscar Unidades");
 
@@ -20,7 +26,13 @@ async function getTodasUnidades(): Promise<Unidade[]> {
 
 async function getUnidadePorId(unidadeId: string) {
     try {
-        const res = await fetch(`${urlBase}/unit/${unidadeId}/`);
+        const res = await fetch(`${urlBase}/unit/${unidadeId}/`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        });
 
         if (!res.ok) throw new Error("Erro ao buscar unidade ");
 
@@ -37,6 +49,7 @@ async function adicionarUsuarioService(name: string, location : string){
     try {
         const res = await fetch(`${urlBase}/unit`,{
             method: "POST",
+            credentials: "include",
             headers: {
                 "content-type": "application/json"
             },
@@ -55,7 +68,13 @@ async function adicionarUsuarioService(name: string, location : string){
 
 async function excluirUsuarioService(unidadeId: string){
     try {
-        const res = await fetch(`${urlBase}/unit/${unidadeId}`);
+        const res = await fetch(`${urlBase}/unit/${unidadeId}`, {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        });
 
         if (!res.ok) throw new Error("Erro ao deletar unidade ");
 

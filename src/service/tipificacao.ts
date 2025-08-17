@@ -8,6 +8,7 @@ async function getTipificacoesService(): Promise<Tipificacao[]> {
     try {
         const dados = await fetch(url, {
             "method": "GET",
+            "credentials": "include",
             "headers": {
                 "content-type": "application/json"
             }
@@ -36,6 +37,7 @@ async function adicionarTipificacaoService(nome: string, fontesSelecionadas: Fon
         let listaIds = fontesSelecionadas.map(fonte => fonte.id)
         const dados = await fetch(url, {
             "method": "POST",
+            "credentials": "include",
             "headers": {
                 "content-type": "application/json"
             },
@@ -62,6 +64,7 @@ async function excluirTipificacaoService(id: string): Promise<number | undefined
     try {
         const dados = await fetch(url, {
             method: "DELETE",
+            credentials: "include",
             headers: {
                 "content-type": "application/json"
             }
@@ -79,13 +82,12 @@ async function atualizarTipificacaoService(tipificacao: Tipificacao): Promise<nu
     try {
         const dados = await fetch(url, {
             method: "PUT",
+            credentials: "include",
             headers: {
                 "content-type": "application/json"
             },
             body: JSON.stringify(tipificacao)
         })
-        
-        console.log(dados)
 
         return dados.status
     } catch(error) {

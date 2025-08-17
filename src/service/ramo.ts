@@ -4,7 +4,10 @@ const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getRamosService(id: string | undefined): Promise<Ramo[] | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/taxonomy/branch/${id}/`, { method: 'GET' });
+        const resposta = await fetch(`${urlBase}/taxonomy/branch/${id}/`, { 
+            method: "GET",
+            credentials: "include", 
+        });
     
         const dado = await resposta.json();
         
@@ -23,6 +26,7 @@ async function adicionarRamoService(ramo: Ramo): Promise<number | undefined> {
     try {
         const resposta = await fetch(`${urlBase}/taxonomy/branch/`, { 
             method: 'POST',
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -37,7 +41,10 @@ async function adicionarRamoService(ramo: Ramo): Promise<number | undefined> {
 
 async function buscarRamosDaTaxonomiaService(idTaxonomia: string | undefined): Promise<Ramo[] | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/taxonomy/branch/${idTaxonomia}/`, { method: 'GET' });
+        const resposta = await fetch(`${urlBase}/taxonomy/branch/${idTaxonomia}/`, { 
+            method: "GET",
+            credentials: "include", 
+        });
     
         const dado = await resposta.json();
         
@@ -56,6 +63,7 @@ async function atualizarRamoService(dadosRamos: Ramo): Promise<number | undefine
     try {
         const resposta = await fetch(`${urlBase}/taxonomy/branch/`, {
             method: 'PUT',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -70,7 +78,7 @@ async function atualizarRamoService(dadosRamos: Ramo): Promise<number | undefine
 
 async function excluirRamoService(idRamo: string | undefined): Promise<number | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/taxonomy/branch/${idRamo}/`, { method: 'DELETE' });
+        const resposta = await fetch(`${urlBase}/taxonomy/branch/${idRamo}/`, { method: "DELETE", credentials: "include" });
         console.log("Status: ", resposta.status);
         return resposta.status
     } catch (error) {

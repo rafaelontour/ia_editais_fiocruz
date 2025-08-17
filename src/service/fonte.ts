@@ -4,7 +4,10 @@ const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getFontesService(): Promise<Fonte[] | undefined> {
     try {
-        const dados = await fetch(`${urlBase}/source/`, { method: 'GET' })
+        const dados = await fetch(`${urlBase}/source/`, { 
+            method: 'GET',
+            credentials: "include"
+        })
         
         if (!dados.ok) {
             throw new Error('Erro ao buscar fontes')
@@ -29,6 +32,7 @@ async function adicionarFonteService(nome: string, descricao: string) : Promise<
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: "include",
             body: JSON.stringify({
                 name: nome,
                 description: descricao
@@ -49,6 +53,7 @@ async function atualizarFonteService(id: string, nome: string, descricao: string
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: "include",
             body: JSON.stringify({
                 id: id,
                 name: nome,
@@ -67,6 +72,7 @@ async function excluirFonteService(id: string): Promise<number | undefined> {
     try {
         const resposta = await fetch(`${url}`, { 
             method: "DELETE",
+            credentials: "include",
             headers: {
                 "content-type": "application/json"
             }

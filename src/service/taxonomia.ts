@@ -5,6 +5,7 @@ const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 async function getTaxonomiasService() : Promise<Taxonomia[] | undefined> {
     const dados = await fetch(`${urlBase}/taxonomy`, {
         method: 'GET',
+        credentials: "include",
         headers: {
             'Content-Type': 'application/json'
         }
@@ -26,8 +27,9 @@ async function getTaxonomiasService() : Promise<Taxonomia[] | undefined> {
 async function adicionarTaxonomiaService(taxonomia: Taxonomia) : Promise<number | undefined> {
     
     try {
-        const resposta = await fetch(`${urlBase}/taxonomy`, {
+        const resposta = await fetch(`${urlBase}/taxonomy/`, {
             method: 'POST',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -44,6 +46,7 @@ async function atualizarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
     try {
         const resposta = await fetch(`${urlBase}/taxonomy`, {
             method: "PUT",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -58,7 +61,13 @@ async function atualizarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
 
 async function excluirTaxonomiaService(idTaxomonia: string | undefined) : Promise<number | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/taxonomy/${idTaxomonia}/`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+        const resposta = await fetch(`${urlBase}/taxonomy/${idTaxomonia}/`, { 
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
     
         console.log("Status: ", resposta.status);
         

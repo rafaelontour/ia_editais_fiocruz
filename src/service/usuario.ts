@@ -9,7 +9,13 @@ async function getUsuario(): Promise<Usuario | null> {
 
 async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<UsuarioUnidade[] | undefined> {
     try {
-        const res = await fetch(`${urlBase}/user/?unit_id=${unidadeId}`)
+        const res = await fetch(`${urlBase}/user/?unit_id=${unidadeId}`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "content-type": "application/json"
+            }
+        })
         
         const data =  await res.json();
 
@@ -30,6 +36,7 @@ async function adicionarUsuarioService(name : string, password: string, email: s
         
         const res = await fetch(url, {
             method: "POST",
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -53,6 +60,7 @@ async function atualizarUsuarioService(usuarioId: string, email:string, username
 
         const res = await fetch(url, {
             method: "PUT",
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem("token")}`
@@ -81,8 +89,8 @@ async function excluirUsuarioService(usuarioId: string) {
 
         const res = await fetch(`${urlBase}/user/${usuarioId}`, {
             method: "DELETE",
-            
-             headers: {
+            credentials: "include",
+            headers: {
                 "Authorization": `Bearer ${token}`
             },
         });
