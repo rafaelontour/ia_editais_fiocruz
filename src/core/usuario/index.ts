@@ -1,4 +1,4 @@
 import Usuario from "./Usuario";
-import { UsuarioUnidade } from "./UsuarioFull";
+import { UsuarioUnidade } from "./UsuarioUnidade";
 
 export type { Usuario, UsuarioUnidade }

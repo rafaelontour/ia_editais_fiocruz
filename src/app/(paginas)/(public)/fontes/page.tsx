@@ -131,13 +131,12 @@ export default function Fontes() {
                             style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                             className={`
                                 flex rounded-md gap-2 items-center px-4 py-2
-                                transition duration-100
                                 bg-vermelho hover:bg-vermelho text-white
-                                hover:cursor-pointer hover:scale-105 active:scale-100
+                                hover:cursor-pointer
                             `}
                         >
-                            <Plus className="" />
-                            <p className="text-white">Adicionar</p>
+                            <Plus size={18}/>
+                            <p className="text-white text-sm">Adicionar fonte</p>
                         </div>
                     </DialogTrigger>
 
@@ -145,7 +144,7 @@ export default function Fontes() {
 
                         <DialogHeader>
                             <DialogTitle className="text-3xl font-bold">
-                                Adicionar Fonte à base de dados
+                                Adicionar fonte à base de dados
                             </DialogTitle>
 
                             <DialogDescription className="text-md pb-2">

@@ -1,7 +1,6 @@
 
 export enum NivelAcesso {
-  DEFAULT = "DEFAULT",
-  ADMIN = "ADMIN",
-  ANALYST = "ANALYST",
-  AUDITOR = "AUDITOR"
+  DEFAULT = "Usuário",
+  ANALYST = "Analista",
+  AUDITOR = "Auditor"
 }

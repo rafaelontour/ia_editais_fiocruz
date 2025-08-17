@@ -148,7 +148,7 @@ export default function Tipificacoes() {
                     <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
                         <DialogTrigger asChild>
                             <Button
-                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
                                 className={`
                                     flex rounded-md gap-2 items-center px-4 py-2
                                     transition duration-100
@@ -156,8 +156,8 @@ export default function Tipificacoes() {
                                     hover:cursor-pointer
                                 `}
                             >
-                                <Plus className="" />
-                                <p className="text-white">Adicionar</p>
+                                <Plus size={18} />
+                                <p className="text-white text-sm">Adicionar tipificação</p>
                             </Button>
                         </DialogTrigger>
 
@@ -374,7 +374,6 @@ export default function Tipificacoes() {
                                                                     value={fonte.id}
                                                                 >
                                                                     {fonte.name}
-                                                                    
                                                                 </option>
                                                             ))}
                                                         </select>

@@ -292,16 +292,16 @@ export default function Taxonomias() {
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-2 mb-4 justify-between">
-        <p className="font-semibold text-2xl">Gestão de Taxonomia e ramos</p>
+        <p className="font-semibold text-2xl">Gestão de taxonomia e ramos</p>
 
         <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
           <DialogTrigger asChild >
             <button
-              className=" flex items-center gap-2 bg-vermelho hover:bg-vermelho cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm hover:scale-105 active:scale-100 duration-100 transition-all"
-
+              className=" flex items-center gap-2 bg-vermelho hover:bg-vermelho cursor-pointer hover:shadow-md text-white py-2 px-4 rounded-sm"
+              style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
             >
-              <Plus className="h-5 w-5 " strokeWidth={1.5} />
-              Adicionar
+              <Plus size={18} />
+              <p className="text-sm">Adicionar taxonomia</p>
             </button>
           </DialogTrigger>
 
