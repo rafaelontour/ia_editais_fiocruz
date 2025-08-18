@@ -109,18 +109,29 @@ export default function AtribuirCargo () {
                 </div> */}
             </div>
 
-            <div className={`${idUnidadeSelecionada !== "" ? "grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-0.5" : "flex w-full"}`}>
-                {idUnidadeSelecionada !== "" ? 
-                    usuariosDaUnidade?.map((usuario) => (
-                    <UsuarioCard
-                        key={usuario.id}
-                        usuario={usuario}
-                        unidades={unidades}
-                        buscarUsuarios={buscarUsuariosDaUnidade}
-                    />
-                )) : (
-                    <p className="w-full text-gray-500 animate-pulse transition-all text-center">Selecione uma unidade para exibir os usuários</p>
-                )}
+            <div className={`${idUnidadeSelecionada !== "" && (usuariosDaUnidade && usuariosDaUnidade.length > 0) ? "grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-0.5" : "flex w-full justify-center"}`}>
+                {
+                    idUnidadeSelecionada !== "" ? (
+                        usuariosDaUnidade && usuariosDaUnidade.length > 0 ? (
+                            usuariosDaUnidade?.map((usuario) => (
+                                <UsuarioCard
+                                key={usuario.id}
+                                usuario={usuario}
+                                unidades={unidades}
+                                buscarUsuarios={buscarUsuariosDaUnidade}
+                                />
+                            ))
+                        ) : (
+                            <p className="w-full text-gray-500 animate-pulse transition-all text-center">
+                                Nenhum usuário cadastrado nessa unidade
+                            </p>
+                        )
+                    ) : (
+                        <p className="w-full text-gray-500 animate-pulse transition-all text-center">
+                            Selecione uma unidade para exibir os usuários
+                        </p>
+                    )
+                }
             </div>
 
             <AdicionarUsuario unidades={unidades} open={isDialogAdicionarUsuarioOpen} onOpenChange={setIsDialogAdicionarUsuarioOpen}/>
