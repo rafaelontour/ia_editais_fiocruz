@@ -24,7 +24,7 @@ async function adicionarUsuarioService(name : string, password: string, email: s
 
 async function getToken(dados: any) {
      try {
-        const url = `${urlBase}/token/`;
+        const url = `${urlBase}/auth/login`;
 
         const dadosLogin = new URLSearchParams(dados).toString();
 
@@ -39,7 +39,6 @@ async function getToken(dados: any) {
 
         const data = await res.json()
 
-        console.log("token: ", data)
         return data;
     } catch (e) {
         console.error("Erro ao tentar criar usuário: ", e);

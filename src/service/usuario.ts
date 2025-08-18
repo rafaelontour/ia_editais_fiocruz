@@ -30,7 +30,7 @@ async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<Usu
     }
 }
 
-async function adicionarUsuarioService(name : string, password: string, email: string) {
+async function adicionarUsuarioService(dados: any) {
     try {
         const url = `${urlBase}/user/`;
         
@@ -41,7 +41,7 @@ async function adicionarUsuarioService(name : string, password: string, email: s
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                name,password, email
+                dados
             })
 
         });

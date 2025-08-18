@@ -10,6 +10,7 @@ import z, { email } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Unidade } from "@/core/unidade";
+import { adicionarUsuarioService } from "@/service/usuario";
 
 const usuarioSchema = z.object({
     nome: z.string().min(4, "O nome do usuário é obrigatório"),
@@ -42,19 +43,19 @@ export default function AdicionarUsuario({ open, onOpenChange, unidades }: Adici
         }
     })
 
-    const [nomeUsuario, setNomeUsuario] = useState<string>("");
-    const [emailUsuario, setEmailUsuario] = useState<string>("");
-    const [telWhatsApp, setTelWhatsApp] = useState<string>("");
-    const [unidade, setUnidade] = useState<string>("");
-    const [perfil, setPerfil] = useState<string>("");
+    async function adicionarUsuario(data: UsuarioFormData) {
+
+        const formData = new FormData();
+        formData.append("username", data.nome);
+        formData.append("email", data.email);
+        formData.append("phone_number", data.whatsapp);
+        formData.append("unit_id", data.unidade);
+        formData.append("access_level", data.perfil);
+        adicionarUsuarioService(formData);
+    }
 
     function limparCampos() {
         reset();
-        setNomeUsuario("");
-        setEmailUsuario("");
-        setTelWhatsApp("");
-        setUnidade("");
-        setPerfil("");
     }
 
     return (
@@ -67,7 +68,7 @@ export default function AdicionarUsuario({ open, onOpenChange, unidades }: Adici
                     <DialogDescription>Adicione um usuário</DialogDescription>
                 </DialogHeader>
 
-                <form className="flex flex-col gap-5" onSubmit={handleSubmit((data) => console.log(data))}>
+                <form className="flex flex-col gap-5" onSubmit={handleSubmit(adicionarUsuario)}>
                     <div className="flex flex-col gap-3">
                         <div className="flex w-full gap-3">
                             <div className="flex w-1/2 flex-col gap-1">

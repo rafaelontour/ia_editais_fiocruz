@@ -1,38 +1,61 @@
 "use client"
 
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { set, z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getToken } from "@/service/auth"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 const loginSchema = z.object({
-  username: z
+  email: z
     .string()
-    .min(1, "O email é obrigatório"),
+    .min(1, "Campo obrigatório!"),
   senha: z
     .string()
-    .min(3, "A senha deve ter no mínimo 3 caracteres"),
+    .min(3, "Campo obrigatório!"),
 })
 
 type LoginFormData = z.infer<typeof loginSchema>
 
 export default function Login() {
+
+  const router = useRouter()
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }, setError
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
 
   async function logar(data: LoginFormData) {
     try {
+        if (!data.email || !data.senha) {
+          setError("email", {
+            type: "manual",
+            message: "O email é obrigatório"
+          })
+
+          setError("senha", {
+            type: "manual",
+            message: "/a senha é obrigatória"
+          })
+
+          return
+        }
+
         const formData = new FormData();
-        formData.append("username", data.username)
+        formData.append("username", data.email)
         formData.append("password", data.senha)
         const token = await getToken(formData)
-        console.log(token)
-        localStorage.setItem("token", token.access_token)
+
+        if (!token) {
+          return
+        }
+
+        router.push("/adm")
     } catch(e) {
         console.log(e)
     }  
@@ -57,13 +80,13 @@ export default function Login() {
           <label htmlFor="username" className="flex flex-col gap-2">
             Email
             <input
-              {...register("username")}
+              {...register("email")}
               type="text"
               className="bg-branco rounded-md border-gray-300 border py-2 px-2"
             />
-            {errors.username && (
+            {errors.email && (
               <span className="text-red-500 text-sm">
-                {errors.username.message}
+                {errors.email.message}
               </span>
             )}
           </label>

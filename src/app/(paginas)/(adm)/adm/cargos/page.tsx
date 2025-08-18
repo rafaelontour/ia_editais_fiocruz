@@ -7,7 +7,7 @@ import { Unidade } from "@/core/unidade";
 import { UsuarioUnidade } from "@/core/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { getTodasUnidades } from "@/service/unidade";
-import { getUnidadePorId } from "@/service/unity";
+import { getUnidadePorId } from "@/service/unidade";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import { ChevronLeft, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
