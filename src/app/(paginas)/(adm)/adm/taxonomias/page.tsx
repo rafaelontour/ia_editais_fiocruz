@@ -706,14 +706,17 @@ export default function Taxonomias() {
                 <h1 className="text-2xl">Ramos</h1>
                 <Dialog open={openDialogRamo} onOpenChange={setOpenDialogRamo}>
                   <DialogTrigger asChild>
-                    <div ref={(e) => { divRefs.current["botao"] = e }}>
-                      <button
-                        className="flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
-                      >
-                        <Plus className="h-5 w-5 " strokeWidth={1.5} />
-                        Adicionar ramo
-                      </button>
-                    </div>
+                    {
+                      taxonomiaSelecionada && 
+                      <div ref={(e) => { divRefs.current["botao"] = e }}>
+                        <button
+                          className="flex items-center gap-2 bg-red-500 hover:bg-red-600 cursor-pointer hover:shadow-md text-white font-semibold py-2 px-4 rounded-sm"
+                        >
+                          <Plus className="h-5 w-5 " strokeWidth={1.5} />
+                          Adicionar ramo
+                        </button>
+                      </div>
+                    }
 
                   </DialogTrigger>
 
