@@ -21,9 +21,7 @@ async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<Usu
 
         if(!data || data.lenght === 0) return []
         
-        return data.map((usuario: any) => ({
-            ...usuario
-        }));
+        return data
         
     } catch(e) {
         console.error("Erro na busca de usuario: ", e)
