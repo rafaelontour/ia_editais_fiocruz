@@ -1,10 +1,22 @@
-'use client'
-
 import Image from "next/image";
 
 import { FilePen, Home, IdCard, Sheet, Type, TypeOutline, University } from "lucide-react"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger
+} from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
+
+export const metadata = {
+  title: "IAEditais - Início"
+}
 
 export default function RootLayout({
   children,
