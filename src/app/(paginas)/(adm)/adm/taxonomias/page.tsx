@@ -290,7 +290,7 @@ export default function Taxonomias() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col flex-1 h-full relalive">
       <div className="flex items-center gap-2 mb-4 justify-between">
         <p className="font-semibold text-2xl">Gestão de taxonomia e ramos</p>
 
@@ -442,8 +442,8 @@ export default function Taxonomias() {
         </Dialog>
       </div>
 
-      <div className="flex h-[75dvh]">
-        <div className="flex  flex-col basis-1/2 overflow-y-scroll">
+      <div className="flex h-[69vh] gap-3 relative">
+        <div className="flex h-[calc(100%-20px)] flex-col w-1/2 overflow-y-scroll">
           {tax.map((item, index) => (
             <Card
               key={index}
@@ -699,8 +699,8 @@ export default function Taxonomias() {
           ))}
         </div>
 
-        <div className="basis-1/2">
-          <Card className="h-[73dvh] m-4 overflow-y-auto">
+        <div className="w-1/2 h-full relative">
+          <Card className="m-4 overflow-y-auto">
             <CardHeader>
               <CardTitle className="flex flex-row justify-between items-center">
                 <h1 className="text-2xl">Ramos</h1>
