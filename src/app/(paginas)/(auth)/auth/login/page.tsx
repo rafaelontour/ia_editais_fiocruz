@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import useUsuario from "@/data/hooks/useUsuario"
 import { getUsuarioLogado } from "@/service/usuario"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const loginSchema = z.object({
   email: z
@@ -66,6 +69,7 @@ export default function Login() {
         const usuarioLogado = await getUsuarioLogado()
 
         console.log("usuario logado: ", usuarioLogado)
+        setUsuario(usuarioLogado)
 
         router.push("/adm")
     } catch(e) {
@@ -77,11 +81,11 @@ export default function Login() {
     <div className="flex items-center bg-gray-100 h-full justify-center">
       <div className="w-3/4 2xl:w-1/2 flex flex-col gap-4 2xl:gap-6">
         <div>
-          <h2 className="text-cinza text-4xl self-baseline font-bold mb-2">
+          <h2 className="text-cinza text-center text-4xl self-baseline font-bold mb-5">
             Fazer Login
           </h2>
-          <p className="text-xl">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+          <p className="text-lg text-center">
+            Para acessar a plataforma e gerenciar os editais, faça o login abaixo!
           </p>
         </div>
 
@@ -89,9 +93,10 @@ export default function Login() {
           onSubmit={handleSubmit(logar)}
           className="flex flex-col gap-4 font-medium text-lg 2xl:text-xl"
         >
-          <label htmlFor="username" className="flex flex-col gap-2">
-            Email
-            <input
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
               {...register("email")}
               type="text"
               className="bg-branco rounded-md border-gray-300 border py-2 px-2"
@@ -101,11 +106,12 @@ export default function Login() {
                 {errors.email.message}
               </span>
             )}
-          </label>
+          </div>
 
-          <label htmlFor="senha" className="flex flex-col gap-2">
-            Senha
-            <input
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="senha">Senha</Label>
+            <Input
+              id="senha"
               {...register("senha")}
               type="password"
               className="bg-branco rounded-md border-gray-300 border py-2 px-2"
@@ -115,17 +121,21 @@ export default function Login() {
                 {errors.senha.message}
               </span>
             )}
-          </label>
+          </div>
 
-          <button
+          <Button
             type="submit"
             className="bg-vermelho text-branco rounded-md px-6 py-3 cursor-pointer"
           >
             Fazer Login
-          </button>
+          </Button>
           
           <div className="flex justify-between">
-            <p>Esqueci a senha</p>
+            <a
+              href="#"
+              className="hover:cursor-pointer hover:underline text-sm"
+            >
+              Esqueci a senha</a>
           </div>
         </form>
       </div>
