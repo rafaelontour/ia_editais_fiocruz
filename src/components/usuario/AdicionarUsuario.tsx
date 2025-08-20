@@ -14,18 +14,8 @@ interface AdicionarUsuarioProps {
 
 export default function AdicionarUsuario ({open, onOpenChange}:AdicionarUsuarioProps) {
 
-    const [nomeUsuario, setNomeUsuario] = useState<string>("");
-    const [emailUsuario, setEmailUsuario] = useState<string>("");
-    const [telWhatsApp, setTelWhatsApp] = useState<string>("");
-    const [unidade, setUnidade] = useState<string>("");
-    const [perfil, setPerfil] = useState<string>("");
-
     function limparCampos() {
-        setNomeUsuario("");
-        setEmailUsuario("");
-        setTelWhatsApp("");
-        setUnidade("");
-        setPerfil("");
+        return null
     }
 
     return(

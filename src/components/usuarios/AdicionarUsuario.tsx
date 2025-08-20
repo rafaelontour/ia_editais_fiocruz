@@ -24,15 +24,18 @@ interface AdicionarUsuarioProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     unidades: Unidade[]
+    atualizarUsuariosUnidade: (unidadeId: string | undefined) => Promise<void>
+    unidade: string | undefined
 }
 
-export default function AdicionarUsuario({ open, onOpenChange, unidades }: AdicionarUsuarioProps) {
+export default function AdicionarUsuario({ open, onOpenChange, unidade, unidades, atualizarUsuariosUnidade }: AdicionarUsuarioProps) {
     type UsuarioFormData = z.infer<typeof usuarioSchema>;
 
     const {
         register,
         handleSubmit,
         formState: { errors },
+        setError,
         control,
         reset
     } = useForm<UsuarioFormData>({
@@ -43,24 +46,28 @@ export default function AdicionarUsuario({ open, onOpenChange, unidades }: Adici
         }
     })
 
+    const [erroGeral, setErroGeral] = useState<string>("");
+
     async function adicionarUsuario(data: UsuarioFormData) {
+        const resposta = await adicionarUsuarioService(data);
 
-        const formData = new FormData();
-        formData.append("username", data.nome);
-        formData.append("email", data.email);
-        formData.append("phone_number", data.whatsapp);
-        formData.append("unit_id", data.unidade);
-        formData.append("access_level", data.perfil);
-        adicionarUsuarioService(formData);
+        if (resposta !== 201) {
+            setErroGeral("Já existe um usuário cadastrado com algum dos dados informados!");
+            return
+        }
+
+        onOpenChange(false);
+        atualizarUsuariosUnidade(unidade)
+        limparCampos();
     }
-
     function limparCampos() {
+        if (erroGeral) setErroGeral("");
         reset();
     }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent onCloseAutoFocus={limparCampos}>
+            <DialogContent className="" onCloseAutoFocus={limparCampos}>
                 <DialogHeader className="mb-3">
                     <div className="flex flex-row gap-2 items-center">
                         <DialogTitle>Adicionar usuário</DialogTitle>
@@ -80,9 +87,10 @@ export default function AdicionarUsuario({ open, onOpenChange, unidades }: Adici
                                 {errors.nome && <span className="text-xs text-red-500 italic">{errors.nome.message}</span>}
                             </div>
                             <div className="flex w-1/2 flex-col gap-1">
-                                <Label>Email</Label>
+                                <Label htmlFor="e">Email</Label>
                                 <Input
                                     {...register("email")}
+                                    id="e"
                                     className="w-full"
                                     placeholder="Insira o email"
                                 />
@@ -90,9 +98,10 @@ export default function AdicionarUsuario({ open, onOpenChange, unidades }: Adici
                             </div>
                         </div>
                         <div className="flex w-full flex-col gap-1 relative">
-                            <Label>WhatsApp</Label>
+                            <Label htmlFor="wpp">WhatsApp</Label>
                             <Input
                                 {...register("whatsapp")}
+                                id="wpp"
                                 placeholder="Insira o telefone do WhatsApp"
                             />
                             {errors.whatsapp && <span className="text-xs text-red-500 italic">{errors.whatsapp.message}</span>}
@@ -109,7 +118,7 @@ export default function AdicionarUsuario({ open, onOpenChange, unidades }: Adici
 
                         <div className="flex gap-3 items-center">
                             <div className="flex w-1/2 flex-col gap-1">
-                                <Label>Unidade</Label>
+                                <Label htmlFor="u">Unidade</Label>
                                 <Controller
                                     name="unidade"
                                     control={control}
@@ -188,6 +197,7 @@ export default function AdicionarUsuario({ open, onOpenChange, unidades }: Adici
                             </Button>
                         </DialogFooter>
                     </div>
+                    {erroGeral && <span className="text-xs text-red-500 italic">{erroGeral}</span>}
                 </form>
 
             </DialogContent>

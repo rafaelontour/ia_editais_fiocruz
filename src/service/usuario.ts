@@ -3,8 +3,24 @@ import { UsuarioUnidade } from "@/core/usuario";
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-async function getUsuario(): Promise<Usuario | null> {
-    return null;
+async function getUsuarioLogado(): Promise<UsuarioUnidade | undefined> {
+    try {
+        const res = await fetch(`${urlBase}/user/my-self/`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "content-type": "application/json"
+            }
+        })
+
+        const data =  await res.json();
+
+        console.log("usuario: ", data)
+
+        return data
+    } catch(e) {
+        console.error("Erro na busca de usuario: ", e)
+    }
 }
 
 async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<UsuarioUnidade[] | undefined> {
@@ -31,6 +47,8 @@ async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<Usu
 async function adicionarUsuarioService(dados: any) {
     try {
         const url = `${urlBase}/user/`;
+
+        console.log(dados)
         
         const res = await fetch(url, {
             method: "POST",
@@ -39,7 +57,11 @@ async function adicionarUsuarioService(dados: any) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                dados
+                username: dados.nome,
+                email: dados.email,
+                unit_id: dados.unidade,
+                phone_number: dados.whatsapp,
+                access_level: dados.perfil
             })
 
         });
@@ -61,7 +83,6 @@ async function atualizarUsuarioService(usuarioId: string, email:string, username
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({
                 username: username,
@@ -81,22 +102,14 @@ async function atualizarUsuarioService(usuarioId: string, email:string, username
     }
 }
 
-async function excluirUsuarioService(usuarioId: string) {
+async function excluirUsuarioService(usuarioId: string): Promise<number | undefined> {
     try {
-        const token = localStorage.getItem("token")
-
-        const res = await fetch(`${urlBase}/user/${usuarioId}`, {
+        const res = await fetch(`${urlBase}/user/${usuarioId}/`, {
             method: "DELETE",
             credentials: "include",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            },
         });
 
-        if (!res.ok) throw new Error("Erro ao deletar Usuario ");
-
-        const data = await res.json();
-        return data;
+        return res.status;
         
     } catch(e) {
         throw new Error("Erro ao deletar Usuario: " + e)
@@ -105,7 +118,7 @@ async function excluirUsuarioService(usuarioId: string) {
 }
 
 export {
-    getUsuario,
+    getUsuarioLogado,
     getUsuariosPorUnidade,
     adicionarUsuarioService,
     atualizarUsuarioService,

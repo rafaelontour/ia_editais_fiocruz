@@ -1,4 +1,5 @@
 'use client'
+
 import Chart from "@/components/AppChart";
 import InfoBar from "@/components/InfoBar";
 import { firstChartData, infoBarInfos, secondChartData } from "@/core/constants/informacoes";

@@ -27,7 +27,7 @@ export default function AtribuirCargo () {
         setUnidades(unidades);
     }
 
-    async function buscarUsuariosDaUnidade(unidadeId: string) {
+    async function buscarUsuariosDaUnidade(unidadeId: string | undefined) {
         const usuarios = await getUsuariosPorUnidade(idUnidadeSelecionada);
         setUsuariosDaUnidade(usuarios);
     }
@@ -115,10 +115,10 @@ export default function AtribuirCargo () {
                         usuariosDaUnidade && usuariosDaUnidade.length > 0 ? (
                             usuariosDaUnidade?.map((usuario) => (
                                 <UsuarioCard
-                                key={usuario.id}
-                                usuario={usuario}
-                                unidades={unidades}
-                                buscarUsuarios={buscarUsuariosDaUnidade}
+                                    key={usuario.id}
+                                    usuario={usuario}
+                                    unidades={unidades}
+                                    buscarUsuarios={buscarUsuariosDaUnidade}
                                 />
                             ))
                         ) : (
@@ -134,7 +134,7 @@ export default function AtribuirCargo () {
                 }
             </div>
 
-            <AdicionarUsuario unidades={unidades} open={isDialogAdicionarUsuarioOpen} onOpenChange={setIsDialogAdicionarUsuarioOpen}/>
+            <AdicionarUsuario unidade={idUnidadeSelecionada} atualizarUsuariosUnidade={buscarUsuariosDaUnidade} unidades={unidades} open={isDialogAdicionarUsuarioOpen} onOpenChange={setIsDialogAdicionarUsuarioOpen}/>
         </div>
     );
 }

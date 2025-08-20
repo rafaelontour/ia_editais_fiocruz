@@ -5,12 +5,33 @@ import Image from "next/image";
 import { FilePen, Home, IdCard, Sheet, Type, TypeOutline, University } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+import Head from "next/head";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+
+  const titulosMap: Record<string, string> = {
+    "/adm": "Início",
+    "/adm/editais": "Meus Editais",
+    "/adm/tipificacoes": "Tipificações",
+    "/adm/taxonomias": "Taxonomias",
+    "/adm/fontes": "Fontes",
+    "/adm/unidades": "Unidades",
+    "/adm/cargos": "Cargos",
+  };
+
+  const title = titulosMap[pathname] || "Administrativo";
+
+  // Atualiza o título dinamicamente no client (quando navega via Link)
+  useEffect(() => {
+    document.title = `Administrativo - ${title}`;
+  }, [title]);
  
   const items = [
     {
@@ -52,6 +73,11 @@ export default function RootLayout({
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
+      <Head>
+        <title>Administrativo - {title}</title>
+        <link rel="icon" sizes="32x32" type="image/x-icon" href="/favicon.ico" />
+      </Head>
+      
       <Cabecalho />
       <div className="flex flex-1 overflow-y-hidden">
         <SidebarProvider>

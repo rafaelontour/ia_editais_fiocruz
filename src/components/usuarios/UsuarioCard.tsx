@@ -2,13 +2,16 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Di
 import { Calendar, PencilLine, Trash, UserPen } from "lucide-react";
 import { useState, useEffect } from "react";
 import z from "zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { UsuarioUnidade } from "@/core/usuario";
 import { Unidade } from "@/core/unidade";
 import { NivelAcesso } from "@/core/enum/nivelAcessoEnum";
 import { atualizarUsuarioService, excluirUsuarioService } from "@/service/usuario";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 const schemaUsuario = z.object({
   unidade: z.string().min(1, "A unidade é obrigatória"),
@@ -25,7 +28,13 @@ interface UsuarioCardProps {
 export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardProps) => {
   type FormData = z.infer<typeof schemaUsuario>;
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    control
+  } = useForm<FormData>({
     resolver: zodResolver(schemaUsuario)
   });
 
@@ -44,8 +53,14 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
     setOpenDialogEditar(false);
   };
 
-  const excluirUsuario = (id: string) => {
-    excluirUsuarioService(id)
+  const excluirUsuario = async (id: string) => {
+    console.log("id: " + id);
+    const resposta = await excluirUsuarioService(id)
+
+    if (resposta !== 204) {
+      throw new Error('Erro ao excluir usuario')
+    }
+    
     setOpenDialogExcluir(false);
   };
 
@@ -97,9 +112,9 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
 
               <form onSubmit={handleSubmit(atualizarUsuario)} className="flex text-lg flex-col gap-4">
 
-                <div>
-                  <label htmlFor="phone_number">WhatsApp</label>
-                  <input
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="phone_number">WhatsApp</Label>
+                  <Input
                     defaultValue={usuario.phone_number}
                     {...register("phone_number")}
                     id="phone_number"
@@ -111,41 +126,64 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="unidade">Unidade</label>
-                  <select
-                    {...register("unidade")}
-                    id="unidade"
-                    className="border-2 border-gray-300 rounded-md p-2 w-full"
-                  >
-                    {unidades.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.name}
-                      </option>
-                    ))}
-                  </select>
+                  <Label htmlFor="unidade">Unidade</Label>
+                  <Controller
+                    name="unidade"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        defaultValue={usuario.unit_id}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Selecione a unidade" />
+                          </SelectTrigger>
+
+                          <SelectContent>
+                              <SelectGroup>
+                                  <SelectLabel>Unidade</SelectLabel>
+                                  {unidades.map((unidade) => (
+                                    <SelectItem key={unidade.id} value={unidade.id}>
+                                      {unidade.name}
+                                    </SelectItem>
+                                  ))}
+                              </SelectGroup>
+                          </SelectContent>
+                      </Select>
+                    )}
+                />
                   {errors.unidade && (
                     <span className="text-red-500 text-sm italic">{errors.unidade.message}</span>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="nivelAcesso">Nível de Acesso</label>
-                  <select
-                    {...register("nivelAcesso")}
-                    id="nivelAcesso"
-                    className="border-2 border-gray-300 rounded-md p-2 w-full"
-                    defaultValue={usuario.access_level}
-                  >
-                    <option disabled>
-                      Selecione um perfil
-                    </option>
+                  <Label htmlFor="nivelAcesso">Nível de Acesso</ Label>
+                  <Controller
+                    name="nivelAcesso"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                          defaultValue={usuario.access_level}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Selecione o perfil" />
+                            </SelectTrigger>
 
-                    {Object.values(NivelAcesso).map((nivel) => (
-                      <option key={nivel} value={nivel}>
-                        {nivel}
-                      </option>
-                    ))}
-                  </select>
+                            <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Perfil</SelectLabel>
+                                  <SelectItem value="DEFAULT">Usuário</SelectItem>
+                                  <SelectItem value="ANALYST">Analista</SelectItem>
+                                  <SelectItem value="AUDITOR">Auditor</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    )}
+                />
                   {errors.nivelAcesso && (
                     <span className="text-red-500 text-sm italic">{errors.nivelAcesso.message}</span>
                   )}
@@ -186,6 +224,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                   Tem certeza que deseja excluir o usuário <strong>{usuario.username}</strong>?
                 </DialogDescription>
               </DialogHeader>
+
               <div className="flex justify-end gap-4 mt-4">
                 <DialogClose className="transition ease-in-out text-black rounded-md px-3 hover:cursor-pointer hover:scale-110 active:scale-100">
                   Cancelar

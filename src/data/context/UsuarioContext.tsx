@@ -1,5 +1,5 @@
-import { Usuario, UsuarioUnidade } from "@/core/usuario";
-import { getUsuario } from "@/service/usuario";
+import { UsuarioUnidade } from "@/core/usuario";
+import { getUsuarioLogado } from "@/service/usuario";
 import { createContext, useEffect, useState } from "react";
 
 export interface ContextoProps {
@@ -13,20 +13,25 @@ export const UsuarioContexto = createContext<ContextoProps | undefined>({} as Co
 export const UsuarioContextoProvider = ({ children }: { children: React.ReactNode }) => {
     const [usuario, setUsuario] = useState<UsuarioUnidade | undefined>();
     
-    async function logarUsuario(): Promise<void> {
+    async function logarUsuario() {
         try {
-            
+            const res = await getUsuarioLogado();
+            console.log("res: ", res)
+            setUsuario(res)
         } catch(error) {
             console.error("Erro ao logar: ", error)
         }
-        
-        const resposta = await getUsuario();
     }
+    
     
     function deslogar() {
         setUsuario(undefined)
     }
 
+    useEffect(() => {
+        logarUsuario()
+    }, [])
+    
     return (
         <UsuarioContexto.Provider
             value={{

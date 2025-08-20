@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getToken } from "@/service/auth"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import useUsuario from "@/data/hooks/useUsuario"
+import { getUsuarioLogado } from "@/service/usuario"
 
 const loginSchema = z.object({
   email: z
@@ -20,6 +22,8 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function Login() {
 
+  const { setUsuario } = useUsuario()
+
   const router = useRouter()
 
   const {
@@ -32,15 +36,19 @@ export default function Login() {
 
   async function logar(data: LoginFormData) {
     try {
-        if (!data.email || !data.senha) {
+        if (!data.email) {
           setError("email", {
             type: "manual",
             message: "O email é obrigatório"
           })
 
+          return
+        }
+
+        if (!data.senha) {
           setError("senha", {
             type: "manual",
-            message: "/a senha é obrigatória"
+            message: "A senha é obrigatória"
           })
 
           return
@@ -54,6 +62,10 @@ export default function Login() {
         if (!token) {
           return
         }
+
+        const usuarioLogado = await getUsuarioLogado()
+
+        console.log("usuario logado: ", usuarioLogado)
 
         router.push("/adm")
     } catch(e) {
