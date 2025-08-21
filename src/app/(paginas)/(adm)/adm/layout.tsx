@@ -8,8 +8,7 @@ import Cabecalho from "@/components/Cabecalho";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
-
-import { Toaster } from "sonner";
+import { itemsAdm } from "@/core/constants";
 
 export default function RootLayout({
   children,
@@ -79,7 +78,6 @@ export default function RootLayout({
         <title>Administrativo - {title}</title>
         <link rel="icon" sizes="32x32" type="image/x-icon" href="/favicon.ico" />
       </Head>
-      <Toaster richColors position="top-right" duration={3000} />
       
       <Cabecalho />
       <div className="flex flex-1 overflow-y-hidden">
@@ -90,7 +88,7 @@ export default function RootLayout({
               <SidebarContent>
                 <SidebarGroup>
                   <SidebarMenu>
-                    {items.map((item) => (
+                    {itemsAdm.map((item) => (
                       <SidebarMenuItem
                         key={item.title}
                       >

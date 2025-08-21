@@ -20,13 +20,6 @@ export const metadata = {
   title: "IAEditais - Início",
 }
 
-
-interface MenuItem {
-  title: string;
-  url: string;
-  icon: any;
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,8 +28,8 @@ export default function RootLayout({
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
-      <Head>IAEditais - Início</Head>
       <Cabecalho />
+
       <div className="flex flex-1 overflow-y-hidden">
         <SidebarProvider>
           <Sidebar
