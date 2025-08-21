@@ -28,7 +28,7 @@ export default function CardListaTeste({ status, categoria, editais }: Props) {
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col w-56 gap-4 p-2 border border-gray-200 rounded bg-gray-50 min-h-[160px]"
+      className="flex flex-col w-full max-w-80 min-w-56 gap-4 p-2 border border-gray-200 rounded bg-gray-50 min-h-[160px]"
     >
       <div
         className="flex justify-between items-center mb-2"

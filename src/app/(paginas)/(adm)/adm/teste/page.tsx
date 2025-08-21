@@ -122,7 +122,7 @@ export default function Teste() {
   const getStatusColor = (status: StatusEdital): string => {
     switch (status) {
       case "rascunho":
-        return "gray";
+        return "#99A1AF";
       case "construcao":
         return "red";
       case "analise":
@@ -144,10 +144,10 @@ export default function Teste() {
         onDragEnd={handleDragEnd}
       >
         <div
-          className="flex justify-between"
+          className="flex justify-between relative gap-4"
         >
           {statuses.map((status) => (
-            <div key={status}>
+            <div className="w-full max-w-80 min-w-56" key={status}>
               <SortableContext items={columns[status].map((c) => c.id)} strategy={verticalListSortingStrategy}>
                 <CardListaTeste
                   status={status}
@@ -163,7 +163,7 @@ export default function Teste() {
         <DragOverlay>
           {activeId ? (
             // renderiza uma cópia visual leve do item arrastado
-            <div className="bg-white p-3 rounded shadow-lg w-56">
+            <div className="bg-white p-3 w-full min-w-56 max-w-80 rounded shadow-lg">
               {(() => {
                 const item = findItem(activeId);
                 if (!item) return null;

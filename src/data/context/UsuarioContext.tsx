@@ -1,9 +1,10 @@
 import { UsuarioUnidade } from "@/core/usuario";
 import { getUsuarioLogado } from "@/service/usuario";
-import { createContext, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export interface ContextoProps {
     usuario: UsuarioUnidade | undefined
+    setUsuario: Dispatch<SetStateAction<UsuarioUnidade | undefined>>
     logarUsuario: () => void
     deslogar: () => void
 }
@@ -36,6 +37,7 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
         <UsuarioContexto.Provider
             value={{
                 usuario: usuario,
+                setUsuario: setUsuario,
                 logarUsuario: logarUsuario,
                 deslogar: deslogar
             }}
