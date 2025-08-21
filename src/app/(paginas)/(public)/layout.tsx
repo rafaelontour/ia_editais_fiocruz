@@ -1,3 +1,5 @@
+'use client'
+
 import Image from "next/image";
 
 import {
@@ -12,19 +14,18 @@ import {
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
-import { useEffect, useState } from "react";
-import { itemsUsuarioComum } from "@/core/constants";
-import Head from "next/head";
-
-export const metadata = {
-  title: "IAEditais - Início",
-}
+import { itemsAdm, itemsUsuarioComum } from "@/core/constants";
+import useUsuario from "@/data/hooks/useUsuario";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const { usuario } = useUsuario()
+
+  const items = usuario ? itemsAdm : itemsUsuarioComum
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -38,7 +39,7 @@ export default function RootLayout({
               <SidebarContent>
                 <SidebarGroup>
                   <SidebarMenu>
-                    {itemsUsuarioComum.map((item) => (
+                    {items.map((item) => (
                       <SidebarMenuItem
                         key={item.title}
                       >
