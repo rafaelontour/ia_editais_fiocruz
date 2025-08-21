@@ -76,10 +76,8 @@ export default function Login() {
 
       toast.success("Login efetuado com sucesso!")
       setUsuario(usuarioLogado)
+      router.push("/adm")
 
-      setTimeout(() => {
-        router.push("/adm")
-      }, 2000)
     } catch(e) {
       toast.error("Erro ao efetuar login!")
     }  
