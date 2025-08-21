@@ -1,4 +1,5 @@
 import { UsuarioUnidade } from "@/core/usuario";
+import { logout } from "@/service/auth";
 import { getUsuarioLogado } from "@/service/usuario";
 import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     
     function deslogar() {
         setUsuario(undefined)
+        logout()
     }
 
     useEffect(() => {
