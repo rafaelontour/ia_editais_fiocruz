@@ -1,6 +1,7 @@
 import { UsuarioUnidade } from "@/core/usuario";
 import { getUsuarioLogado } from "@/service/usuario";
 import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export interface ContextoProps {
     usuario: UsuarioUnidade | undefined
@@ -16,11 +17,14 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     
     async function logarUsuario() {
         try {
-            const res = await getUsuarioLogado();
-            console.log("res: ", res)
-            setUsuario(res)
+            const [res, status] = await getUsuarioLogado();
+            
+            if (status === 200) {
+                setUsuario(res)
+                toast.success("Logado com sucesso!")
+            }
         } catch(error) {
-            console.error("Erro ao logar: ", error)
+            return
         }
     }
     

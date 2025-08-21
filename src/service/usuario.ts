@@ -1,25 +1,25 @@
-import { Usuario } from "@/core";
 import { UsuarioUnidade } from "@/core/usuario";
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-async function getUsuarioLogado(): Promise<UsuarioUnidade | undefined> {
+async function getUsuarioLogado() {
     try {
+
         const res = await fetch(`${urlBase}/user/my-self/`, {
             method: "GET",
             credentials: "include",
             headers: {
-                "content-type": "application/json"
+                "Content-type": "application/json"
             }
         })
 
         const data =  await res.json();
 
-        console.log("usuario: ", data)
+        console.log("USUARIO LOGADO: ", data)
 
-        return data
+        return [data, res.status]
     } catch(e) {
-        console.error("Erro na busca de usuario: ", e)
+        return [undefined, 401]
     }
 }
 
@@ -40,7 +40,7 @@ async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<Usu
         return data
         
     } catch(e) {
-        console.error("Erro na busca de usuario: ", e)
+        return
     }
 }
 

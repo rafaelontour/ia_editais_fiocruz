@@ -2,7 +2,7 @@ const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
 async function adicionarUsuarioService(name : string, password: string, email: string) {
     try{
-        const url = `${urlBase}/users `;
+        const url = `${urlBase}/user/`;
 
         const res = await fetch(url, {
             method: "POST",
@@ -41,7 +41,7 @@ async function getToken(dados: any) {
 
         return data;
     } catch (e) {
-        console.error("Erro ao tentar criar usuário: ", e);
+        return
     }
 }
 
