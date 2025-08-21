@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 
 export const metadata = {
   title: "Autenticação - IAEditais",
@@ -15,7 +16,9 @@ export default function AuthLayout({
       <Head>Autenticação - IAEditais</Head>
       
       <div className="flex flex-col justify-between p-24 bg-vermelho text-branco w-full h-full ">
-        <h1 className="text-5xl font-bold">IAeditais</h1>
+        <Link href="/" className="hover:cursor-pointer" title="Voltar para página inicial">
+          <h1 className="text-5xl font-bold">IAeditais</h1>
+        </Link>
         <p className="text-2xl font-light">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo numquam dolorum voluptate quaerat quas sit animi eum delectus necessitatibus earum impedit laudantium facilis possimus, suscipit labore amet quasi libero blanditiis.
         </p>
