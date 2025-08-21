@@ -1,27 +1,5 @@
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
-async function adicionarUsuarioService(name : string, password: string, email: string) {
-    try{
-        const url = `${urlBase}/user/`;
-
-        const res = await fetch(url, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                name,password, email
-            })
-
-        });
-
-        return res.status
-
-    } catch(e) {
-        console.error("Erro ao tentar criar usuário: ", e);
-    }
-}
-
 async function getToken(dados: any) {
      try {
         const url = `${urlBase}/auth/login`;
@@ -45,9 +23,27 @@ async function getToken(dados: any) {
     }
 }
 
+async function logout() {
+    try {
+        const url = `${urlBase}/auth/logout`;
+
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            credentials: "include"
+        });
+
+        return res.status
+    } catch(e) {
+        return
+    }
+}
+
 export {
-    adicionarUsuarioService,
-    getToken
+    getToken,
+    logout
 }
 
 // async function atualizarUsuario(email: string, password: string) {
