@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-import { FilePen, Home, IdCard, Sheet, Type, TypeOutline, University } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -13,9 +12,19 @@ import {
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
+import { useEffect, useState } from "react";
+import { itemsUsuarioComum } from "@/core/constants";
+import Head from "next/head";
 
 export const metadata = {
-  title: "IAEditais - Início"
+  title: "IAEditais - Início",
+}
+
+
+interface MenuItem {
+  title: string;
+  url: string;
+  icon: any;
 }
 
 export default function RootLayout({
@@ -23,47 +32,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
- 
-  const items = [
-    {
-      title: "Página Inicial",
-      url: "/",
-      icon: Home,
-    },
-    {
-      title: "Meus editais",
-      url: "/adm/editais",
-      icon: Sheet,
-    },
-    {
-      title: "Tipificações",
-      url: "/adm/tipificacoes",
-      icon: Type,
-    },
-    {
-      title: "Taxonomias",
-      url: "/adm/taxonomias",
-      icon: TypeOutline,
-    },
-    {
-      title: "Fontes",
-      url: "/adm/fontes",
-      icon: FilePen,
-    },
-    {
-      title: "Unidade",
-      url: "/adm/unidades",
-      icon: University,
-    },
-    {
-      title: "Atribuição de cargo",
-      url:"/adm/cargos",
-      icon: IdCard,
-    },
-  ]
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
+      <Head>IAEditais - Início</Head>
       <Cabecalho />
       <div className="flex flex-1 overflow-y-hidden">
         <SidebarProvider>
@@ -73,7 +45,7 @@ export default function RootLayout({
               <SidebarContent>
                 <SidebarGroup>
                   <SidebarMenu>
-                    {items.map((item) => (
+                    {itemsUsuarioComum.map((item) => (
                       <SidebarMenuItem
                         key={item.title}
                       >

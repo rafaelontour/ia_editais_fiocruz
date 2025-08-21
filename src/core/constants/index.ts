@@ -1,7 +1,10 @@
 import { infoBarInfos, firstChartData, secondChartData } from "./informacoes";
+import { itemsAdm, itemsUsuarioComum } from "./itensMenu";
 
 export {
     infoBarInfos,
     firstChartData,
-    secondChartData
+    secondChartData,
+    itemsAdm,
+    itemsUsuarioComum
 }
