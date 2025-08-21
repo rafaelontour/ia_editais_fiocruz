@@ -1,16 +1,17 @@
 "use client"
 
 import { useForm } from "react-hook-form"
-import { set, z } from "zod"
+import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getToken } from "@/service/auth"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
 import useUsuario from "@/data/hooks/useUsuario"
 import { getUsuarioLogado } from "@/service/usuario"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+
+import { toast } from 'sonner';
 
 const loginSchema = z.object({
   email: z
@@ -39,41 +40,48 @@ export default function Login() {
 
   async function logar(data: LoginFormData) {
     try {
-        if (!data.email) {
-          setError("email", {
-            type: "manual",
-            message: "O email é obrigatório"
-          })
+      if (!data.email) {
+        setError("email", {
+          type: "manual",
+          message: "O email é obrigatório"
+        })
 
-          return
-        }
+        return
+      }
 
-        if (!data.senha) {
-          setError("senha", {
-            type: "manual",
-            message: "A senha é obrigatória"
-          })
+      if (!data.senha) {
+        setError("senha", {
+          type: "manual",
+          message: "A senha é obrigatória"
+        })
 
-          return
-        }
+        return
+      }
 
-        const formData = new FormData();
-        formData.append("username", data.email)
-        formData.append("password", data.senha)
-        const token = await getToken(formData)
+      const formData = new FormData();
+      formData.append("username", data.email)
+      formData.append("password", data.senha)
+      const token = await getToken(formData)
 
-        if (!token) {
-          return
-        }
+      if (!token) {
+        return
+      }
 
-        const usuarioLogado = await getUsuarioLogado()
+      const [usuarioLogado, status] = await getUsuarioLogado()
 
-        console.log("usuario logado: ", usuarioLogado)
-        setUsuario(usuarioLogado)
+      if (status == 401) {
+        toast.error("Erro ao fazer login! Credenciais inválidas.")
+        return
+      }
 
+      toast.success("Login efetuado com sucesso!")
+      setUsuario(usuarioLogado)
+
+      setTimeout(() => {
         router.push("/adm")
+      }, 2000)
     } catch(e) {
-        console.log(e)
+      toast.error("Erro ao efetuar login!")
     }  
   }
 

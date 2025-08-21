@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { Toaster } from "sonner";
 
 export const metadata = {
   title: "Autenticação - IAEditais",
@@ -13,6 +14,7 @@ export default function AuthLayout({
   return (
     <div className="flex bg-branco h-screen">
       <Head>Autenticação - IAEditais</Head>
+      <Toaster richColors position="top-right" duration={1500} />
       <div className="flex flex-col justify-between p-24 bg-vermelho text-branco w-full h-full ">
         <h1 className="text-5xl font-bold">IAeditais</h1>
         <p className="text-2xl font-light">
