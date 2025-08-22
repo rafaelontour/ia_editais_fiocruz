@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 import { toast } from 'sonner';
+import { UsuarioUnidade } from "@/core/usuario"
 
 const loginSchema = z.object({
   email: z
@@ -75,12 +76,20 @@ export default function Login() {
       }
 
       toast.success("Login efetuado com sucesso!")
-      setUsuario(usuarioLogado)
-      router.push("/adm")
 
+      verificarLocalStorage()
+
+      router.push("/adm")
+      
     } catch(e) {
       toast.error("Erro ao efetuar login!")
     }  
+  }
+  
+  function verificarLocalStorage() {
+    if (localStorage.getItem("logado") === null || localStorage.getItem("logado") === "false") {
+      localStorage.setItem("logado", "true")  
+    }
   }
 
   return (

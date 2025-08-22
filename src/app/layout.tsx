@@ -2,7 +2,8 @@
 
 import "@/app/globals.css";
 import { UsuarioContextoProvider } from "@/data/context/UsuarioContext";
-import { useState } from "react";
+import useUsuario from "@/data/hooks/useUsuario";
+import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 
 export default function RootLayout({
@@ -11,7 +12,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const [teste, setTeste] = useState<boolean>(false)
+  const [montado, setMontado] = useState(false);
+
+  useEffect(() => {
+    setMontado(true);
+  }, []);
   
   return (
     <html lang="pt-BR">
@@ -19,11 +24,17 @@ export default function RootLayout({
         className={`antialiased bg-[#F5F5F5] `}
       >
         <UsuarioContextoProvider>
-          <Toaster richColors position="top-right" duration={3000} />
-          
-          <div>
-            {children}
-          </div>
+        {
+          montado && (
+            <div>
+              <Toaster richColors position="top-right" duration={3000} />
+              
+              <div>
+                {children}
+              </div>
+            </div>
+          )
+        }
         </UsuarioContextoProvider>
       </body>
     </html>

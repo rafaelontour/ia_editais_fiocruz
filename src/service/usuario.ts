@@ -15,8 +15,6 @@ async function getUsuarioLogado() {
 
         const data =  await res.json();
 
-        console.log("USUARIO LOGADO: ", data)
-
         return [data, res.status]
     } catch(e) {
         return [undefined, 401]
@@ -74,7 +72,7 @@ async function adicionarUsuarioService(dados: any) {
 
 }
 
-async function atualizarUsuarioService(usuarioId: string, email:string, username: string, access_level : string, phone_number: string, unit_id: string) {
+async function atualizarUsuarioService(email:string, username: string, access_level : string, phone_number: string, unit_id: string) {
      try {
         const url = `${urlBase}/user/`;
 
@@ -90,7 +88,6 @@ async function atualizarUsuarioService(usuarioId: string, email:string, username
                 unit_id: unit_id,
                 phone_number: phone_number,
                 access_level: access_level,
-                id: usuarioId,
             })
         });
 

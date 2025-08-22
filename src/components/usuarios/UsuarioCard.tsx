@@ -7,13 +7,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { UsuarioUnidade } from "@/core/usuario";
 import { Unidade } from "@/core/unidade";
-import { NivelAcesso } from "@/core/enum/nivelAcessoEnum";
 import { atualizarUsuarioService, excluirUsuarioService } from "@/service/usuario";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 
 const schemaUsuario = z.object({
+  nome: z.string().min(1, "O nome é obrigatório"),
+  email: z.string().min(1, "O email é obrigatório"),
   unidade: z.string().min(1, "A unidade é obrigatória"),
   nivelAcesso: z.string().min(1, "O nível de acesso é obrigatório"),
   phone_number: z.string().min(7, "O telefone é obrigatório"),
@@ -35,7 +36,14 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
     reset,
     control
   } = useForm<FormData>({
-    resolver: zodResolver(schemaUsuario)
+    resolver: zodResolver(schemaUsuario),
+    defaultValues: {
+      nome: usuario.username,
+      email: usuario.email,
+      unidade: usuario.unit_id ?? "",
+      nivelAcesso: usuario.access_level ?? "",
+      phone_number: usuario.phone_number ?? ""
+    }
   });
 
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
@@ -43,12 +51,19 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
 
   useEffect(() => {
     if (openDialogEditar) {
-      reset();
+      reset({
+        nome: usuario.username,
+        email: usuario.email,
+        unidade: usuario.unit_id ?? "",
+        nivelAcesso: usuario.access_level ?? "",
+        phone_number: usuario.phone_number ?? ""
+    });
     }
   }, [openDialogEditar, reset, usuario]);
 
   const atualizarUsuario = (data: FormData) => {
-    atualizarUsuarioService(usuario.id, usuario.email, usuario.username, data.nivelAcesso, data.phone_number, usuario.unit_id)
+    console.log("data: ", data);
+    atualizarUsuarioService(data.email, data.nome, data.nivelAcesso, data.phone_number, data.unidade)
     buscarUsuarios(usuario.unit_id);
     setOpenDialogEditar(false);
   };
@@ -113,6 +128,32 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
               <form onSubmit={handleSubmit(atualizarUsuario)} className="flex text-lg flex-col gap-4">
 
                 <div className="flex flex-col gap-2">
+                  <Label htmlFor="nome">Nome</Label>
+                  <Input
+                    defaultValue={usuario.username}
+                    {...register("nome")}
+                    id="username"
+                    className="border-2 border-gray-300 rounded-md p-2 w-full"
+                  />
+                  {errors.nome && (
+                    <span className="text-red-500 text-sm italic">{errors.nome.message}</span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input
+                    defaultValue={usuario.email}
+                    {...register("email")}
+                    id="email"
+                    className="border-2 border-gray-300 rounded-md p-2 w-full"
+                  />
+                  {errors.email && (
+                    <span className="text-red-500 text-sm italic">{errors.email.message}</span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="phone_number">WhatsApp</Label>
                   <Input
                     defaultValue={usuario.phone_number}
@@ -132,7 +173,6 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                     control={control}
                     render={({ field }) => (
                       <Select
-                        defaultValue={usuario.unit_id}
                         value={field.value}
                         onValueChange={field.onChange}
                       >
@@ -165,7 +205,6 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                     control={control}
                     render={({ field }) => (
                         <Select
-                          defaultValue={usuario.access_level}
                           value={field.value}
                           onValueChange={field.onChange}
                         >

@@ -1,13 +1,23 @@
 'use client'
 
+import { UsuarioUnidade } from "@/core/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { IconLogin, IconLogout } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Cabecalho() {
 
     const { usuario, deslogar } = useUsuario()
     const router = useRouter()
+
+    const [logado, setLogado ] = useState<boolean>(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("logado") === "true";
+        }
+
+        return false
+    })
 
     return (
         <header
@@ -35,7 +45,7 @@ export default function Cabecalho() {
             </div>
 
             {
-                !usuario ?
+                !logado ?
                 <button
                     onClick={() => router.push("/auth/login")}
                     className="

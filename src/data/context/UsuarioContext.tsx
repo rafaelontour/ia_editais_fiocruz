@@ -1,8 +1,9 @@
+'use client'
+
 import { UsuarioUnidade } from "@/core/usuario";
 import { logout } from "@/service/auth";
 import { getUsuarioLogado } from "@/service/usuario";
 import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
-import { toast } from "sonner";
 
 export interface ContextoProps {
     usuario: UsuarioUnidade | undefined
@@ -15,27 +16,36 @@ export const UsuarioContexto = createContext<ContextoProps | undefined>({} as Co
 
 export const UsuarioContextoProvider = ({ children }: { children: React.ReactNode }) => {
     const [usuario, setUsuario] = useState<UsuarioUnidade | undefined>();
-    
+
     async function logarUsuario() {
         try {
             const [res, status] = await getUsuarioLogado();
+
+            console.log("usuario logado: ", usuario)
             
             if (status === 200) {
-                setUsuario(res)
-                toast.success("Logado com sucesso!")
+                localStorage.setItem("logado", "true")
+                const usuarioComLogin: UsuarioUnidade = {...res, logado: true}
+                setUsuario(usuarioComLogin)
+                console.log("logado: ", localStorage.getItem("logado"))
             }
         } catch(error) {
             return
         }
     }
     
-    
     function deslogar() {
         setUsuario(undefined)
+        localStorage.removeItem("logado")
         logout()
     }
 
     useEffect(() => {
+        if (localStorage.getItem("logado") === null) {
+            localStorage.setItem("logado", "false")
+            return
+        }
+
         logarUsuario()
     }, [])
     
