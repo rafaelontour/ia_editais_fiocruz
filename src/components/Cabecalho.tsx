@@ -5,6 +5,7 @@ import useUsuario from "@/data/hooks/useUsuario";
 import { IconLogin, IconLogout } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "./ui/button";
 
 export default function Cabecalho() {
 
@@ -46,8 +47,9 @@ export default function Cabecalho() {
 
             {
                 !logado ?
-                <button
+                <Button
                     onClick={() => router.push("/auth/login")}
+                    variant={"destructive"}
                     className="
                         flex h-fit ml-auto mr-2 py-[5px] px-4
                         items-center gap-1 bg-vermelho rounded-sm
@@ -59,13 +61,14 @@ export default function Cabecalho() {
                 >
                     <IconLogin color="white" size={26} />
                     <p className="text-branco text-sm">Fazer login</p>
-                </button>
+                </Button>
                 :
-                <button
+                <Button
                     onClick={() => {
                         router.push("/")
                         deslogar()
                     }}
+                    variant={"destructive"}
                     className="
                         flex h-fit ml-auto mr-2 py-[5px] px-4
                         items-center gap-1 bg-vermelho rounded-sm
@@ -77,7 +80,7 @@ export default function Cabecalho() {
                 >
                     <IconLogout color="white" size={26} />
                     <p className="text-branco text-sm">Sair</p>
-                </button>
+                </Button>
             }
         </header>
     )

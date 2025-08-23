@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AdicionarUsuario from "@/components/usuarios/AdicionarUsuario";
 import { UsuarioCard } from "@/components/usuarios/UsuarioCard";
@@ -59,11 +60,12 @@ export default function AtribuirCargo () {
                     <h2 className="text-2xl font-semibold">Gerenciar usuários</h2>
                 </div>
                 
-                <div
+                <Button
+                    variant={"destructive"}
                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                     className={`
                         flex rounded-md gap-2 items-center px-4 py-2
-                        bg-vermelho hover:bg-vermelho text-white
+                        bg-vermelho text-white
                         hover:cursor-pointer
                     `}
                     onClick={(e) => {
@@ -73,7 +75,7 @@ export default function AtribuirCargo () {
                 >
                     <UserPlus size={18} />
                     <span className="text-sm">Adicionar usuário</span>
-                </div>
+                </Button>
             </div>
 
             {/* FILTRO + BUSCA */}
