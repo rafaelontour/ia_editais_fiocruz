@@ -296,13 +296,14 @@ export default function Taxonomias() {
 
         <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
           <DialogTrigger asChild >
-            <button
-              className=" flex items-center gap-2 bg-vermelho hover:bg-vermelho cursor-pointer hover:shadow-md text-white py-2 px-4 rounded-sm"
+            <Button
+              variant={"destructive"}
+              className=" flex items-center gap-2 bg-vermelho cursor-pointer hover:shadow-md text-white py-2 px-4 rounded-sm"
               style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
             >
               <Plus size={18} />
               <p className="text-sm">Adicionar taxonomia</p>
-            </button>
+            </Button>
           </DialogTrigger>
 
           <DialogContent onCloseAutoFocus={limparCampos}>

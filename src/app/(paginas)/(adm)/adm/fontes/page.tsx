@@ -126,18 +126,19 @@ export default function Fontes() {
                 </h2>
 
                 <Dialog open={openDialogFontes} onOpenChange={setOpenDialogFontes}>
-                    <DialogTrigger>
-                        <div
+                    <DialogTrigger asChild>
+                        <Button
+                        variant={"destructive"}
                             style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                             className={`
                                 flex rounded-md gap-2 items-center px-4 py-2
-                                bg-vermelho hover:bg-vermelho text-white
+                                bg-vermelho  text-white
                                 hover:cursor-pointer
                             `}
                         >
                             <Plus size={18}/>
                             <p className="text-white text-sm">Adicionar fonte</p>
-                        </div>
+                        </Button>
                     </DialogTrigger>
 
                     <DialogContent onCloseAutoFocus={limparCampos}>

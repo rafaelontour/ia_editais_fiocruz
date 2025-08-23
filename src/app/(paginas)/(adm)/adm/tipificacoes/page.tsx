@@ -148,11 +148,12 @@ export default function Tipificacoes() {
                     <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
                         <DialogTrigger asChild>
                             <Button
+                                variant={"destructive"}
                                 style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
                                 className={`
                                     flex rounded-md gap-2 items-center px-4 py-2
                                     transition duration-100
-                                    bg-vermelho hover:bg-vermelho text-white
+                                    bg-vermelho text-white
                                     hover:cursor-pointer
                                 `}
                             >
