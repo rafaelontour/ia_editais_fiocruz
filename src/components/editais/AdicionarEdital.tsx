@@ -18,10 +18,10 @@ export default function AdicionarEdital () {
                     </Button> 
                 </SheetTrigger>
                 
-                <SheetContent side="right" className="w-full px-10">
-                    <SheetHeader>
-                        <SheetTitle className="text-2xl">Adicionar</SheetTitle>
-                        <SheetDescription>Edital</SheetDescription>
+                <SheetContent side="right" className="w-full px-10 pt-5 overflow-y-auto">
+                    <SheetHeader className="pl-0">
+                        <SheetTitle className="text-2xl">Adicionar edital</SheetTitle>
+                        <SheetDescription>Preencha as informações abaixo</SheetDescription>
                     </SheetHeader>
                 
                     <div className="space-y-6">
@@ -74,6 +74,7 @@ export default function AdicionarEdital () {
                                 <Input id="fate" placeholder="Selecione a data"></Input>
                             </div>
                         </div>
+
                         <div className="flex flex-row gap-3 w-full">
                             <div className="flex flex-col gap-3 w-[55%]">
                                 <Label htmlFor="responsavel">Responsavel*</Label>
@@ -85,20 +86,30 @@ export default function AdicionarEdital () {
                                 <Input id="fate" placeholder="Informe o número do edital"></Input>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-3">
-                            <Label>Descrição</Label>
-                            <Textarea/>
-                        </div>
-                        <div className="">
-                            <Label>Upload do documento*</Label>
-                            <div className="h-16">
-                                <FileUpload />
-                            </div> 
+
+                        <div className="flex items-start gap-3">
+                            <div className="flex flex-col gap-3 w-1/2">
+                                <Label htmlFor="descricao">Descrição</Label>
+                                <Textarea id="descricao" className="resize-y h-[154px]" placeholder="Insira a descrição"/>
+                            </div>
+
+                            <div className="flex flex-col gap-3 w-1/2">
+                                <Label>Upload do documento</Label>
+                                <div className="h-16">
+                                    <FileUpload />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 
-                    <SheetFooter className="flex w-full justify-end">
-                        <Button className="bg-orange-600 text-white w-fit hover:text-black transition-all ml-auto">
+                    <SheetFooter className="flex w-full justify-end relative mb-6">
+                        <Button
+                            variant={"destructive"}
+                            className="
+                                bg-vermelho text-white w-fit transition-all -mr-4 ml-auto
+                            "
+                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                        >
                             <Upload/>
                             <p>Salvar Edital</p>
                         </Button>
