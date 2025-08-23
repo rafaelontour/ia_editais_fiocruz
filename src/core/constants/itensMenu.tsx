@@ -38,6 +38,19 @@ const itemsAdm = [
   },
 ]
 
+const itemsAuditorAnalista = [
+  {
+    title: "Página Inicial",
+    url: "/",
+    icon: Home,
+  },
+  {
+    title: "Meus editais",
+    url: "/adm/editais",
+    icon: Sheet,
+  },
+]
+
 const itemsUsuarioComum = [
   {
     title: "Página Inicial",
@@ -53,5 +66,6 @@ const itemsUsuarioComum = [
 
 export {
   itemsAdm,
-  itemsUsuarioComum
+  itemsUsuarioComum,
+  itemsAuditorAnalista
 };
