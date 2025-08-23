@@ -16,6 +16,7 @@ import {
 import Cabecalho from "@/components/Cabecalho";
 import { itemsAdm, itemsUsuarioComum } from "@/core/constants";
 import useUsuario from "@/data/hooks/useUsuario";
+import { usePathname } from "next/navigation";
 
 export default function RootLayout({
   children,
@@ -24,6 +25,7 @@ export default function RootLayout({
 }>) {
 
   const { usuario } = useUsuario()
+  const pathname = usePathname()
 
   const items = usuario ? itemsAdm : itemsUsuarioComum
 
@@ -39,30 +41,33 @@ export default function RootLayout({
               <SidebarContent>
                 <SidebarGroup>
                   <SidebarMenu>
-                    {items.map((item) => (
-                      <SidebarMenuItem
-                        key={item.title}
-                      >
-                        <SidebarMenuButton
-                          className="
-                            hover:bg-[#D03C30] rounded-sm
-                            hover:text-white bg-[#CCCCCC]
-                            transition-all duration-150
-                          "
-                          asChild
+                    {items.map((item) => {
+                      const ativo = item.url === pathname
+
+                      return (
+                        <SidebarMenuItem
+                          key={item.title}
                         >
-                          <a
-                            href={item.url}
-                            className="
-                              flex items-center gap-2
-                            "
+                          <SidebarMenuButton
+                            className={`
+                              ${ ativo ? "bg-[#D03C30] hover:text-white hover:bg-[#D03C30] text-white" : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
+                              rounded-sm transition-all duration-150
+                            `}
+                            asChild
                           >
-                            <item.icon className="w-5 h-5" />
-                            <span>{item.title}</span>
-                          </a>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
+                            <a
+                              href={item.url}
+                              className="
+                                flex items-center gap-2
+                              "
+                            >
+                              <item.icon className="w-5 h-5" />
+                              <span>{item.title}</span>
+                            </a>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      )
+                    })}
                   </SidebarMenu>
                 </SidebarGroup>
               </SidebarContent>

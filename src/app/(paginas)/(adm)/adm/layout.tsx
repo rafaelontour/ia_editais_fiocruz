@@ -5,10 +5,12 @@ import Image from "next/image";
 import { FilePen, Home, IdCard, Sheet, Type, TypeOutline, University } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
 import { itemsAdm } from "@/core/constants";
+import useUsuario from "@/data/hooks/useUsuario";
+import { itemsAuditorAnalista } from "@/core/constants/itensMenu";
 
 export default function RootLayout({
   children,
@@ -16,6 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
+  const { usuario } = useUsuario();
 
   const titulosMap: Record<string, string> = {
     "/adm": "Início",
@@ -34,43 +37,17 @@ export default function RootLayout({
     document.title = `Administrativo - ${title}`;
   }, [title]);
  
-  const items = [
-    {
-      title: "Página Inicial",
-      url: "/",
-      icon: Home,
-    },
-    {
-      title: "Meus editais",
-      url: "/adm/editais",
-      icon: Sheet,
-    },
-    {
-      title: "Tipificações",
-      url: "/adm/tipificacoes",
-      icon: Type,
-    },
-    {
-      title: "Taxonomias",
-      url: "/adm/taxonomias",
-      icon: TypeOutline,
-    },
-    {
-      title: "Fontes",
-      url: "/adm/fontes",
-      icon: FilePen,
-    },
-    {
-      title: "Unidade",
-      url: "/adm/unidades",
-      icon: University,
-    },
-    {
-      title: "Atribuição de cargo",
-      url:"/adm/cargos",
-      icon: IdCard,
-    },
-  ]
+  const [items, setItems] = useState<{ title: string; url: string; icon: any;}[]>([]);
+
+  useEffect(() => {
+    switch (usuario?.access_level) {
+      case "ADMIN":
+        setItems(itemsAdm);
+        break;
+      default:
+        setItems(itemsAuditorAnalista);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -88,30 +65,27 @@ export default function RootLayout({
               <SidebarContent>
                 <SidebarGroup>
                   <SidebarMenu>
-                    {itemsAdm.map((item) => (
-                      <SidebarMenuItem
-                        key={item.title}
-                      >
-                        <SidebarMenuButton
-                          className="
-                            hover:bg-[#D03C30] rounded-sm
-                            hover:text-white bg-[#CCCCCC]
-                            transition-all duration-150
-                          "
-                          asChild
-                        >
-                          <a
-                            href={item.url}
-                            className="
-                              flex items-center gap-2
-                            "
+                    {items!.map((item) => {
+                      // Verifica se o item é a página atual
+                      const ativo = pathname === item.url;
+
+                      return (
+                        <SidebarMenuItem key={item.title}>
+                          <SidebarMenuButton
+                            className={`
+                              rounded-sm transition-all duration-150
+                              ${ ativo ? "bg-[#D03C30] text-white hover:bg-[#D03C30] hover:text-white" : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
+                            `}
+                            asChild
                           >
-                            <item.icon className="w-5 h-5" />
-                            <span>{item.title}</span>
-                          </a>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
+                            <a className="flex items-center gap-2" href={item.url}>
+                              <item.icon className="w-5 h-5" />
+                              <span>{item.title}</span>
+                            </a>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
                   </SidebarMenu>
                 </SidebarGroup>
               </SidebarContent>
