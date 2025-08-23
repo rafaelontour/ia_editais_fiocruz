@@ -40,7 +40,9 @@ export default function RootLayout({
   const [items, setItems] = useState<{ title: string; url: string; icon: any;}[]>([]);
 
   useEffect(() => {
-    switch (usuario?.access_level) {
+    if (!usuario) return; // só executa se o usuário já tiver sido carregado
+  
+    switch (usuario.access_level) {
       case "ADMIN":
         setItems(itemsAdm);
         break;
@@ -48,7 +50,8 @@ export default function RootLayout({
         setItems(itemsAuditorAnalista);
         break;
     }
-  }, []);
+  }, [usuario]);
+
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">

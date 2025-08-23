@@ -18,10 +18,9 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     const [usuario, setUsuario] = useState<UsuarioUnidade | undefined>();
 
     async function logarUsuario() {
+
         try {
             const [res, status] = await getUsuarioLogado();
-
-            console.log("usuario logado: ", usuario)
             
             if (status === 200) {
                 localStorage.setItem("logado", "true")
