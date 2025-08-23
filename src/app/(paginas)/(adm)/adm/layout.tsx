@@ -46,6 +46,7 @@ export default function RootLayout({
         break;
       default:
         setItems(itemsAuditorAnalista);
+        break;
     }
   }, []);
 
