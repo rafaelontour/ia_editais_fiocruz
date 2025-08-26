@@ -45,9 +45,9 @@ async function getUnidadePorId(unidadeId: string) {
     }
 }
 
-async function adicionarUsuarioService(name: string, location : string){
+async function adicionarUnidadeService(name: string, location : string){
     try {
-        const res = await fetch(`${urlBase}/unit`,{
+        const res = await fetch(`${urlBase}/unit/`,{
             method: "POST",
             credentials: "include",
             headers: {
@@ -68,7 +68,7 @@ async function adicionarUsuarioService(name: string, location : string){
 
 async function excluirUsuarioService(unidadeId: string){
     try {
-        const res = await fetch(`${urlBase}/unit/${unidadeId}`, {
+        const res = await fetch(`${urlBase}/unit/${unidadeId}/`, {
             method: "DELETE",
             credentials: "include",
             headers: {
@@ -89,6 +89,6 @@ async function excluirUsuarioService(unidadeId: string){
 export {
     getTodasUnidades,
     getUnidadePorId,
-    adicionarUsuarioService,
+    adicionarUnidadeService,
     excluirUsuarioService
 }

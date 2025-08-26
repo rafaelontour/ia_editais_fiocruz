@@ -72,8 +72,8 @@ async function adicionarUsuarioService(dados: any) {
 
 }
 
-async function atualizarUsuarioService(email:string, username: string, access_level : string, phone_number: string, unit_id: string) {
-     try {
+async function atualizarUsuarioService(dados: any, id: string) {
+    try {
         const url = `${urlBase}/user/`;
 
         const res = await fetch(url, {
@@ -83,11 +83,12 @@ async function atualizarUsuarioService(email:string, username: string, access_le
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                username: username,
-                email: email,
-                unit_id: unit_id,
-                phone_number: phone_number,
-                access_level: access_level,
+                id: id,
+                username: dados.username,
+                email: dados.email,
+                unit_id: dados.unit_id,
+                phone_number: dados.phone_number,
+                access_level: dados.access_level
             })
         });
 
