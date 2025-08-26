@@ -9,16 +9,8 @@ import { Button } from "./ui/button";
 
 export default function Cabecalho() {
 
-    const { usuario, deslogar } = useUsuario()
+    const { usuario, deslogar, mensagemLogin } = useUsuario()
     const router = useRouter()
-
-    const [logado, setLogado ] = useState<boolean>(() => {
-        if (typeof window !== "undefined") {
-            return localStorage.getItem("logado") === "true";
-        }
-
-        return false
-    })
 
     return (
         <header
@@ -46,7 +38,7 @@ export default function Cabecalho() {
             </div>
 
             {
-                !logado ?
+                !usuario ?
                 <Button
                     onClick={() => router.push("/auth/login")}
                     variant={"destructive"}
@@ -60,7 +52,7 @@ export default function Cabecalho() {
                     }}
                 >
                     <IconLogin color="white" size={26} />
-                    <p className="text-branco text-sm">Fazer login</p>
+                    <p className="text-branco text-sm">{mensagemLogin}</p>
                 </Button>
                 :
                 <Button
@@ -79,7 +71,7 @@ export default function Cabecalho() {
                     }}
                 >
                     <IconLogout color="white" size={26} />
-                    <p className="text-branco text-sm">Sair</p>
+                    <p className="text-branco text-sm">{mensagemLogin}</p>
                 </Button>
             }
         </header>
