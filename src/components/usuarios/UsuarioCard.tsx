@@ -7,16 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { UsuarioUnidade } from "@/core/usuario";
 import { Unidade } from "@/core/unidade";
-import { atualizarUsuarioService, excluirUsuarioService } from "@/service/usuario";
+import { adicionarUsuarioService, atualizarUsuarioService, excluirUsuarioService } from "@/service/usuario";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 
 const schemaUsuario = z.object({
-  nome: z.string().min(1, "O nome é obrigatório"),
+  username: z.string().min(1, "O nome é obrigatório"),
   email: z.string().min(1, "O email é obrigatório"),
-  unidade: z.string().min(1, "A unidade é obrigatória"),
-  nivelAcesso: z.string().min(1, "O nível de acesso é obrigatório"),
+  unit_id: z.string().min(1, "A unidade é obrigatória"),
+  access_level: z.string().min(1, "O nível de acesso é obrigatório"),
   phone_number: z.string().min(7, "O telefone é obrigatório"),
 });
 
@@ -38,10 +38,10 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
   } = useForm<FormData>({
     resolver: zodResolver(schemaUsuario),
     defaultValues: {
-      nome: usuario.username,
+      username: usuario.username,
       email: usuario.email,
-      unidade: usuario.unit_id ?? "",
-      nivelAcesso: usuario.access_level ?? "",
+      unit_id: usuario.unit_id ?? "",
+      access_level: usuario.access_level ?? "",
       phone_number: usuario.phone_number ?? ""
     }
   });
@@ -52,18 +52,17 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
   useEffect(() => {
     if (openDialogEditar) {
       reset({
-        nome: usuario.username,
+        username: usuario.username,
         email: usuario.email,
-        unidade: usuario.unit_id ?? "",
-        nivelAcesso: usuario.access_level ?? "",
+        unit_id: usuario.unit_id ?? "",
+        access_level: usuario.access_level ?? "",
         phone_number: usuario.phone_number ?? ""
     });
     }
   }, [openDialogEditar, reset, usuario]);
 
   const atualizarUsuario = (data: FormData) => {
-    console.log("data: ", data);
-    atualizarUsuarioService(data.email, data.nome, data.nivelAcesso, data.phone_number, data.unidade)
+    atualizarUsuarioService(data, usuario.id);
     buscarUsuarios(usuario.unit_id);
     setOpenDialogEditar(false);
   };
@@ -83,7 +82,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
     <div
       style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
       className="
-        flex flex-col gap-2 rounded-md p-4 mb-4
+        flex flex-col justify-between gap-2 rounded-md p-4 mb-4
         transition ease-in-out duration-100
         min-w-[290px]
       "
@@ -131,12 +130,12 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                   <Label htmlFor="nome">Nome</Label>
                   <Input
                     defaultValue={usuario.username}
-                    {...register("nome")}
+                    {...register("username")}
                     id="username"
                     className="border-2 border-gray-300 rounded-md p-2 w-full"
                   />
-                  {errors.nome && (
-                    <span className="text-red-500 text-sm italic">{errors.nome.message}</span>
+                  {errors.username && (
+                    <span className="text-red-500 text-sm italic">{errors.username.message}</span>
                   )}
                 </div>
 
@@ -169,7 +168,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="unidade">Unidade</Label>
                   <Controller
-                    name="unidade"
+                    name="unit_id"
                     control={control}
                     render={({ field }) => (
                       <Select
@@ -193,15 +192,15 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                       </Select>
                     )}
                 />
-                  {errors.unidade && (
-                    <span className="text-red-500 text-sm italic">{errors.unidade.message}</span>
+                  {errors.unit_id && (
+                    <span className="text-red-500 text-sm italic">{errors.unit_id.message}</span>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="nivelAcesso">Nível de Acesso</ Label>
                   <Controller
-                    name="nivelAcesso"
+                    name="access_level"
                     control={control}
                     render={({ field }) => (
                         <Select
@@ -223,8 +222,8 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                         </Select>
                     )}
                 />
-                  {errors.nivelAcesso && (
-                    <span className="text-red-500 text-sm italic">{errors.nivelAcesso.message}</span>
+                  {errors.access_level && (
+                    <span className="text-red-500 text-sm italic">{errors.access_level.message}</span>
                   )}
                 </div>
 
