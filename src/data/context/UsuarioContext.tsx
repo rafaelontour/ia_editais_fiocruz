@@ -1,5 +1,6 @@
 'use client'
 
+import { itemsAdm, itemsAuditorAnalista, itemsUsuarioComum, MenuItem } from "@/core/constants/itensMenu";
 import { UsuarioUnidade } from "@/core/usuario";
 import { logout } from "@/service/auth";
 import { getUsuarioLogado } from "@/service/usuario";
@@ -10,24 +11,41 @@ export interface ContextoProps {
     setUsuario: Dispatch<SetStateAction<UsuarioUnidade | undefined>>
     logarUsuario: () => void
     deslogar: () => void
+    items: MenuItem[]
+    mensagemLogin: string,
 }
 
 export const UsuarioContexto = createContext<ContextoProps | undefined>({} as ContextoProps);
 
 export const UsuarioContextoProvider = ({ children }: { children: React.ReactNode }) => {
     const [usuario, setUsuario] = useState<UsuarioUnidade | undefined>();
+    const [items, setItems] = useState<MenuItem[]>([])
+    const [mensagemLogin, setMensagemLogin] = useState<string>("");
 
     async function logarUsuario() {
 
         try {
             const [res, status] = await getUsuarioLogado();
+
+            if (status === 401) {
+                setItems(itemsUsuarioComum)
+                setMensagemLogin("Fazer login")
+                return
+            }
             
             if (status === 200) {
-                localStorage.setItem("logado", "true")
+                setMensagemLogin("Sair")
                 const usuarioComLogin: UsuarioUnidade = {...res, logado: true}
                 setUsuario(usuarioComLogin)
-                console.log("logado: ", localStorage.getItem("logado"))
+                const novosItems = res.access_level === "ADMIN"
+
+                ? itemsAdm
+                : res.access_level === "AUDITOR" || res.access_level === "ANALYST"
+                ? itemsAuditorAnalista
+                : itemsUsuarioComum;
+                setItems(novosItems)
             }
+            
         } catch(error) {
             return
         }
@@ -35,16 +53,12 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     
     function deslogar() {
         setUsuario(undefined)
-        localStorage.removeItem("logado")
+        setMensagemLogin("Fazer login")
+        setItems(itemsUsuarioComum)
         logout()
     }
 
     useEffect(() => {
-        if (localStorage.getItem("logado") === null) {
-            localStorage.setItem("logado", "false")
-            return
-        }
-
         logarUsuario()
     }, [])
     
@@ -54,7 +68,9 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
                 usuario: usuario,
                 setUsuario: setUsuario,
                 logarUsuario: logarUsuario,
-                deslogar: deslogar
+                deslogar: deslogar,
+                items: items,
+                mensagemLogin: mensagemLogin,
             }}
         >
             {children}
