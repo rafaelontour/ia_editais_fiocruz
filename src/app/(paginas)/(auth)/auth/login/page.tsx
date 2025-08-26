@@ -26,7 +26,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function Login() {
 
-  const { setUsuario } = useUsuario()
+  const { logarUsuario } = useUsuario()
 
   const router = useRouter()
 
@@ -74,7 +74,7 @@ export default function Login() {
         return
       }
 
-      setUsuario(usuarioLogado)
+      logarUsuario()
       toast.success("Login efetuado com sucesso!")
 
       verificarLocalStorage()

@@ -11,12 +11,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  const [montado, setMontado] = useState(false);
-
-  useEffect(() => {
-    setMontado(true);
-  }, []);
   
   return (
     <html lang="pt-BR">
@@ -24,17 +18,13 @@ export default function RootLayout({
         className={`antialiased bg-[#F5F5F5] `}
       >
         <UsuarioContextoProvider>
-        {
-          montado && (
+          <div>
+            <Toaster richColors position="top-right" duration={3000} />
+            
             <div>
-              <Toaster richColors position="top-right" duration={3000} />
-              
-              <div>
-                {children}
-              </div>
+              {children}
             </div>
-          )
-        }
+          </div>
         </UsuarioContextoProvider>
       </body>
     </html>

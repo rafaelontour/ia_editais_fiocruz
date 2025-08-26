@@ -1,5 +1,11 @@
 import { FilePen, Home, IdCard, Sheet, Type, TypeOutline, University } from "lucide-react";
 
+export interface MenuItem {
+  title: string;
+  url: string;
+  icon: any;
+}
+
 const itemsAdm = [
   {
     title: "Página Inicial",
@@ -67,5 +73,5 @@ const itemsUsuarioComum = [
 export {
   itemsAdm,
   itemsUsuarioComum,
-  itemsAuditorAnalista
+  itemsAuditorAnalista,
 };

@@ -17,6 +17,8 @@ import Cabecalho from "@/components/Cabecalho";
 import { itemsAdm, itemsUsuarioComum } from "@/core/constants";
 import useUsuario from "@/data/hooks/useUsuario";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { itemsAuditorAnalista, MenuItem } from "@/core/constants/itensMenu";
 
 export default function RootLayout({
   children,
@@ -24,10 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const { usuario } = useUsuario()
+  const { items } = useUsuario()
   const pathname = usePathname()
-
-  const items = usuario ? itemsAdm : itemsUsuarioComum
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">

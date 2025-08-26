@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation";
 import Head from "next/head";
 import { itemsAdm } from "@/core/constants";
 import useUsuario from "@/data/hooks/useUsuario";
-import { itemsAuditorAnalista } from "@/core/constants/itensMenu";
+import { itemsAuditorAnalista, itemsUsuarioComum, MenuItem } from "@/core/constants/itensMenu";
 
 export default function RootLayout({
   children,
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const { usuario } = useUsuario();
+  const { items } = useUsuario();
 
   const titulosMap: Record<string, string> = {
     "/adm": "Início",
@@ -37,24 +37,15 @@ export default function RootLayout({
     document.title = `Administrativo - ${title}`;
   }, [title]);
  
-  const [items, setItems] = useState<{ title: string; url: string; icon: any;}[]>([]);
+  const [montado, setMontado] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!usuario) return; // só executa se o usuário já tiver sido carregado
-  
-    switch (usuario.access_level) {
-      case "ADMIN":
-        setItems(itemsAdm);
-        break;
-      default:
-        setItems(itemsAuditorAnalista);
-        break;
-    }
-  }, [usuario]);
-
+    setMontado(true);
+  }, [])
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    montado && (
+      <div className="flex flex-col h-screen overflow-hidden">
       <Head>
         <title>Administrativo - {title}</title>
         <link rel="icon" sizes="32x32" type="image/x-icon" href="/favicon.ico" />
@@ -69,7 +60,7 @@ export default function RootLayout({
               <SidebarContent>
                 <SidebarGroup>
                   <SidebarMenu>
-                    {items!.map((item) => {
+                    {items.map((item) => {
                       // Verifica se o item é a página atual
                       const ativo = pathname === item.url;
 
@@ -157,5 +148,6 @@ export default function RootLayout({
         </SidebarProvider>
       </div>
     </div>
+    )
   );
 }
