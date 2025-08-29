@@ -1,11 +1,12 @@
 // CardListaTeste.tsx
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import CardEditaisTeste from "./CardEditaisTeste";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
+import { getEditaisService } from "@/service/edital";
 
 export interface Categoria {
   nome: string;
@@ -17,6 +18,7 @@ interface Props {
   categoria: Categoria[];
   editais: Edital[];
 }
+
 
 export default function CardListaTeste({ status, categoria, editais }: Props) {
   // Droppable container com data.containerId = status

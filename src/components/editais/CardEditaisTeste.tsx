@@ -64,15 +64,15 @@ export default function CardEditaisTeste({ edital, containerId }: Props) {
             </div>
 
             <div className="p-3">
-                <h3 className="font-semibold text-sm">{edital.titulo}</h3>
+                <h3 className="font-semibold text-sm">{edital.name}</h3>
                 <div
                     className="
                         flex justify-between items-center
                     "
                 >
                     <div className="flex flex-col-reverse text-xs text-gray-500 justify-between mt-2">
-                        <span>{edital.categoria}</span>
-                        <span>{edital.data}</span>
+                        <span>Compras</span>
+                        <span>{edital.created_at}</span>
                     </div>
 
                     <div className="self-end flex gap-2">
