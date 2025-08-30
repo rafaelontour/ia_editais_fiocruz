@@ -72,7 +72,7 @@ async function adicionarUsuarioService(dados: any) {
 
 }
 
-async function atualizarUsuarioService(dados: any, id: string) {
+async function atualizarUsuarioService(dados: any, id: string): Promise<number | undefined> {
     try {
         const url = `${urlBase}/user/`;
 
@@ -92,9 +92,10 @@ async function atualizarUsuarioService(dados: any, id: string) {
             })
         });
 
-        const data = await res.json()
-        
-        return data;
+        console.log("Status: ", res.status);
+        console.log("Body: ", await res.json());
+
+        return res.status
     } catch(e) {
         console.error("Erro ao tentar criar usuário: ", e);
     }

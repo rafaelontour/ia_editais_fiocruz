@@ -11,6 +11,7 @@ import { adicionarUsuarioService, atualizarUsuarioService, excluirUsuarioService
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { toast } from "sonner";
 
 const schemaUsuario = z.object({
   username: z.string().min(1, "O nome é obrigatório"),
@@ -61,8 +62,15 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
     }
   }, [openDialogEditar, reset, usuario]);
 
-  const atualizarUsuario = (data: FormData) => {
-    atualizarUsuarioService(data, usuario.id);
+  const atualizarUsuario = async (data: FormData) => {
+    const resposta =atualizarUsuarioService(data, usuario.id);
+
+    if (await resposta !== 200) {
+      toast.error('Não foi possível atualizar o usuário!');
+      return
+    }
+    
+    toast.success('Usuário atualizado com sucesso!');
     buscarUsuarios(usuario.unit_id);
     setOpenDialogEditar(false);
   };
@@ -233,7 +241,6 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                   </DialogClose>
 
                   <Button
-                    type="submit"
                     variant={"destructive"}
                     className="flex bg-verde hover:bg-green-900 text-white hover:cursor-pointer"
                   >

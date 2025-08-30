@@ -52,7 +52,7 @@ export default function Cabecalho() {
                     }}
                 >
                     <IconLogin color="white" size={26} />
-                    <p className="text-branco text-sm">{mensagemLogin}</p>
+                    <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
                 </Button>
                 :
                 <Button
@@ -71,7 +71,7 @@ export default function Cabecalho() {
                     }}
                 >
                     <IconLogout color="white" size={26} />
-                    <p className="text-branco text-sm">{mensagemLogin}</p>
+                    <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
                 </Button>
             }
         </header>

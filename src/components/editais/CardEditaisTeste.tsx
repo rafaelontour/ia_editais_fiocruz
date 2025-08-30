@@ -6,17 +6,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import EditarEdital from "./EditarEdital";
-import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { Trash } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
@@ -78,7 +67,7 @@ export default function CardEditaisTeste({ edital, containerId }: Props) {
                     <div className="self-end flex gap-2">
                         <EditarEdital />
                         <Dialog>
-                            <DialogTrigger>
+                            <DialogTrigger asChild>
                                 <Button
                                     size={"icon"}
                                     className="
@@ -88,6 +77,7 @@ export default function CardEditaisTeste({ edital, containerId }: Props) {
                                     <Trash />
                                 </Button>
                             </DialogTrigger>
+
                             <DialogContent className="rounded-2xl">
                                 <DialogHeader>
                                     <DialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital Edital Fiocruz 2025/1?</DialogTitle>

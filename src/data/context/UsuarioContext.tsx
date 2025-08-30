@@ -13,6 +13,8 @@ export interface ContextoProps {
     deslogar: () => void
     items: MenuItem[]
     mensagemLogin: string,
+    setEstadoSidebar: (open: boolean) => void,
+    estadoSidebar: boolean
 }
 
 export const UsuarioContexto = createContext<ContextoProps | undefined>({} as ContextoProps);
@@ -21,6 +23,16 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     const [usuario, setUsuario] = useState<UsuarioUnidade | undefined>();
     const [items, setItems] = useState<MenuItem[]>([])
     const [mensagemLogin, setMensagemLogin] = useState<string>("");
+
+    const [stateSidebar, setStateSidebar] = useState<boolean>(true);
+
+    useEffect(() => {
+        if (!localStorage.getItem("sidebar")) {
+            localStorage.setItem("sidebar", "open")
+            setStateSidebar(true)
+        }
+        
+    }, [])
 
     async function logarUsuario() {
 
@@ -71,6 +83,8 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
                 deslogar: deslogar,
                 items: items,
                 mensagemLogin: mensagemLogin,
+                setEstadoSidebar: setStateSidebar,
+                estadoSidebar: stateSidebar
             }}
         >
             {children}

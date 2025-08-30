@@ -36,6 +36,7 @@ export default function AdicionarEdital () {
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Selcione a unidade" />
                                     </SelectTrigger>
+                                    
                                     <SelectContent className="w-full">
                                         <SelectGroup>
                                             <SelectLabel>Unidade</SelectLabel>
@@ -56,6 +57,7 @@ export default function AdicionarEdital () {
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Selcione o tipo" />
                                     </SelectTrigger>
+
                                     <SelectContent>
                                         <SelectGroup>
                                             <SelectLabel>tipo</SelectLabel>
