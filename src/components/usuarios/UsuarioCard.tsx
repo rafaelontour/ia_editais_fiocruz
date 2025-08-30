@@ -228,13 +228,14 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                 </div>
 
                 <div className="flex justify-end gap-4 mt-4">
-                  <DialogClose className="transition ease-in-out text-white rounded-md px-3 bg-red-500 hover:cursor-pointer hover:scale-110 active:scale-100">
-                    Cancelar
+                  <DialogClose asChild>
+                    <Button variant="outline" className="cursor-pointer">Cancelar</Button>
                   </DialogClose>
 
                   <Button
                     type="submit"
-                    className="flex bg-green-500 hover:bg-green-600 text-white hover:cursor-pointer hover:scale-110 active:scale-100"
+                    variant={"destructive"}
+                    className="flex bg-verde hover:bg-green-900 text-white hover:cursor-pointer"
                   >
                     Salvar alterações
                   </Button>
