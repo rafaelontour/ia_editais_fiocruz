@@ -1,20 +1,24 @@
 // CardEditaisTeste.tsx
 "use client";
 
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import EditarEdital from "./EditarEdital";
 import { Button } from "../ui/button";
-import { Trash } from "lucide-react";
+import { EyeIcon, Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { excluirEditalService } from "@/service/edital";
+import { toast } from "sonner";
 interface Props {
     edital: Edital;
     containerId: string; // StatusEdital como string
+    funcaoAtualizarEditais: Dispatch<SetStateAction<boolean>>
+    flagEdital: boolean
 }
 
-export default function CardEditaisTeste({ edital, containerId }: Props) {
+export default function CardEdital({ edital, containerId, funcaoAtualizarEditais, flagEdital }: Props) {
     // passa data.containerId para o hook
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: edital.id,
@@ -26,6 +30,17 @@ export default function CardEditaisTeste({ edital, containerId }: Props) {
         transition: transition || "transform 150ms ease",
         zIndex: isDragging ? 9999 : undefined, // se sem DragOverlay, garante estar acima
     };
+
+    async function excluirEdital() {
+        const resposta = await excluirEditalService(edital.id);
+
+        if (resposta !== 204) {
+            toast.error("Erro ao excluir edital!");
+        }
+
+        toast.success("Edital excluido com sucesso!");
+        funcaoAtualizarEditais(!flagEdital);
+    }
 
     const cor = () => {
         switch (edital.status) {
@@ -65,7 +80,14 @@ export default function CardEditaisTeste({ edital, containerId }: Props) {
                     </div>
 
                     <div className="self-end flex gap-2">
-                        <EditarEdital />
+                        { 
+                            edital.status === "COMPLETED" ?
+                            <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
+                                <View  />
+                            </Button>
+                            :
+                            <EditarEdital />
+                        }
                         <Dialog>
                             <DialogTrigger asChild>
                                 <Button
@@ -89,7 +111,7 @@ export default function CardEditaisTeste({ edital, containerId }: Props) {
                                 <DialogFooter>
                                     <DialogClose className="border bg-slate-300 px-3 py-1 rounded-sm hover:cursor-pointer">Cancelar</DialogClose>
 
-                                    <Button className="bg-vermelho hover:cursor-pointer"><Trash /><p>Excluir edital</p></Button>
+                                    <Button onClick={excluirEdital} variant={"destructive"} className="bg-vermelho hover:cursor-pointer"><Trash /><p>Excluir edital</p></Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>

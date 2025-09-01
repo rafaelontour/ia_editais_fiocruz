@@ -47,6 +47,22 @@ async function adicionarEditalService(dados: any): Promise<number | undefined> {
     }
 }
 
+async function excluirEditalService(editalId: string): Promise<number | undefined> {
+    try {
+        const responsta = await fetch(`${urlBase}/doc/${editalId}/`, {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
+
+        return responsta.status
+    } catch(e) {
+        return
+    }
+}
+
 async function definirStatusRascunho(editalId: string): Promise<number | undefined> {
     try {
         const res = await fetch(`${urlBase}/doc/${editalId}/status/pending`, {
@@ -114,6 +130,7 @@ async function definirStatusConcluido(editalId: string): Promise<number | undefi
 export {
     getEditaisService,
     adicionarEditalService,
+    excluirEditalService,
     definirStatusRascunho,
     definirStatusEmConstrucao,
     definirStatusEmAnalise,

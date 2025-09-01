@@ -13,12 +13,13 @@ import {
     PointerSensor,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import CardListaTeste from "@/components/editais/CardListaTeste";
+import CardListaTeste from "@/components/editais/CardLista";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
 import SuperiorEditais from "@/components/editais/SuperiorEditais";
 import { definirStatusConcluido, definirStatusEmAnalise, definirStatusEmConstrucao, definirStatusRascunho, getEditaisService } from "@/service/edital";
 import { toast } from "sonner";
+import CardLista from "@/components/editais/CardLista";
 
 export default function Editais() {
     const [montado, setMontado] = useState<boolean>(false);
@@ -38,7 +39,6 @@ export default function Editais() {
     }, [])
 
     useEffect(() => {
-        console.log("adicionou")
         getEditais();
     }, [adicionouNovoEdital])
 
@@ -269,7 +269,9 @@ export default function Editais() {
                     {statuses.map((status) => (
                         <div className="w-full max-w-80 min-w-56" key={status}>
                             <SortableContext items={columns[status].map((c) => c.id)} strategy={verticalListSortingStrategy}>
-                                <CardListaTeste
+                                <CardLista
+                                    funcaoAtualizarEditais={setAdicionouNovoEdital}
+                                    flagEdital={adicionouNovoEdital}
                                     status={status}
                                     categoria={[{ nome: formatStatus(status), color: getStatusColor(status) }]}
                                     editais={columns[status]}

@@ -13,7 +13,7 @@ import {
   PointerSensor,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import CardListaTeste from "@/components/editais/CardListaTeste";
+import CardListaTeste from "@/components/editais/CardLista";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
 import SuperiorEditais from "@/components/editais/SuperiorEditais";

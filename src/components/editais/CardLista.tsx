@@ -3,10 +3,11 @@
 
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
-import CardEditaisTeste from "./CardEditaisTeste";
+import CardEditaisTeste from "./CardEdital";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
 import { getEditaisService } from "@/service/edital";
+import CardEdital from "./CardEdital";
 
 export interface Categoria {
   nome: string;
@@ -17,10 +18,12 @@ interface Props {
   status: StatusEdital;
   categoria: Categoria[];
   editais: Edital[];
+  funcaoAtualizarEditais: Dispatch<SetStateAction<boolean>>;
+  flagEdital: boolean
 }
 
 
-export default function CardListaTeste({ status, categoria, editais }: Props) {
+export default function CardLista({ status, categoria, editais, funcaoAtualizarEditais, flagEdital }: Props) {
   // Droppable container com data.containerId = status
   const { setNodeRef } = useDroppable({
     id: status,
@@ -49,7 +52,7 @@ export default function CardListaTeste({ status, categoria, editais }: Props) {
       <div className="space-y-3">
         {editais.map((edital) => (
           // PASSA containerId para o cartão (necessário para usar data.containerId no useSortable)
-          <CardEditaisTeste key={edital.id} edital={edital} containerId={status} />
+          <CardEdital funcaoAtualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} key={edital.id} edital={edital} containerId={status} />
         ))}
       </div>
     </div>
