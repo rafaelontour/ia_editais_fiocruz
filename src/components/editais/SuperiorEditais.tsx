@@ -3,15 +3,15 @@
 import { ChevronRightIcon } from "lucide-react";
 import CategoriaColor from "./CategoriaColor";
 import { Button } from "../ui/button";
-//import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
-//import { Input } from "../ui/input";
-//import { Label } from "@radix-ui/react-label";
-//import { Textarea } from "../ui/textarea";
-//import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
-//import { FileUpload } from "../ui/file-upload";
 import AdicionarEdital from "./AdicionarEdital";
+import { Dispatch, SetStateAction } from "react";
 
-export default function SuperiorEditais () {
+interface Props {
+    funcaoAtualizarEditais: Dispatch<SetStateAction<boolean>>
+    flagEdital: boolean
+}
+
+export default function SuperiorEditais ({ funcaoAtualizarEditais, flagEdital } : Props) {
 
     const status = [
         { nome:"Retrabalhando", color:"green" },
@@ -31,7 +31,7 @@ export default function SuperiorEditais () {
                 
                 </div>
                 <div className="w-full">
-                    <AdicionarEdital />
+                    <AdicionarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} />
                 </div>
             </div>
         </div>

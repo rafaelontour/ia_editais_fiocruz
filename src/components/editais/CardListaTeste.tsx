@@ -1,7 +1,7 @@
 // CardListaTeste.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import CardEditaisTeste from "./CardEditaisTeste";
 import type { Edital } from "@/core";

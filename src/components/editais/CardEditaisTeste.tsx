@@ -29,13 +29,13 @@ export default function CardEditaisTeste({ edital, containerId }: Props) {
 
     const cor = () => {
         switch (edital.status) {
-            case "rascunho":
+            case "PENDING":
                 return "bg-gray-400";
-            case "construcao":
+            case "UNDER_CONSTRUCTION":
                 return "bg-red-500";
-            case "analise":
+            case "WAITING_FOR_REVIEW":
                 return "bg-[#656149]";
-            case "concluido":
+            case "COMPLETED":
                 return "bg-green-800";
         }
     };

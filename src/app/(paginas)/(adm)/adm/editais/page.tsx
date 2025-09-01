@@ -17,56 +17,96 @@ import CardListaTeste from "@/components/editais/CardListaTeste";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
 import SuperiorEditais from "@/components/editais/SuperiorEditais";
-import { getEditaisService } from "@/service/edital";
+import { definirStatusConcluido, definirStatusEmAnalise, definirStatusEmConstrucao, definirStatusRascunho, getEditaisService } from "@/service/edital";
+import { toast } from "sonner";
 
 export default function Editais() {
-
-    const [docs, setDocs] = useState<Edital[]>([]);
-
-    
-    const statuses: StatusEdital[] = ["rascunho", "construcao", "analise", "concluido"];
+    const [montado, setMontado] = useState<boolean>(false);
+    const [adicionouNovoEdital, setAdicionouNovoEdital] = useState<boolean>(false);
+    const statuses: StatusEdital[] = ["PENDING", "UNDER_CONSTRUCTION", "WAITING_FOR_REVIEW", "COMPLETED"];
     
     const [columns, setColumns] = useState<Record<StatusEdital, Edital[]>>({
-        rascunho: [
-            { id: '1', typification: [], name: 'Edital Fiocruz 2023/2', created_at: '25/02/2025' },
-            { id: '2', typification: [], name: 'Edital Fiocruz 2023/2', created_at: '25/02/2025' },
-            { id: '3', typification: [], name: 'Edital Fiocruz 2023/2', created_at: '25/02/2025' },
-        ],
-        construcao: [],
-        analise: [],
-        concluido: [],
+        PENDING: [],
+        UNDER_CONSTRUCTION: [],
+        WAITING_FOR_REVIEW: [],
+        COMPLETED: [],
     });
     
     useEffect(() => {
         getEditais();
+        setMontado(true);
     }, [])
 
-    const getEditais = async () => {
-    try {
-        const resposta = await getEditaisService(); // pega do backend
-        const dados = resposta || [];
+    useEffect(() => {
+        console.log("adicionou")
+        getEditais();
+    }, [adicionouNovoEdital])
 
-        // Agrupa os editais por status
-        const novasColunas: Record<StatusEdital, Edital[]> = {
-            rascunho: [],
-            construcao: [],
-            analise: [],
-            concluido: [],
-        };
+    async function moverParaRascunho(editalId: string) {
+        const resposta = await definirStatusRascunho(editalId);
 
-        dados.forEach((edital) => {
-            // garante que o status bate com a chave
-            if (statuses.includes(edital.status as StatusEdital)) {
-                novasColunas[edital.status as StatusEdital].push(edital);
-            }
-        });
+        if (resposta !== 200) {
+            toast.error("Erro ao mover para rascunho");
+            return
+        }
 
-        setColumns(novasColunas);
-        setDocs(dados);
-    } catch (error) {
-        console.error("Erro ao buscar editais", error);
     }
-};
+
+    async function moverParaEmConstrucao(editalId: string) {
+        const resposta = await definirStatusEmConstrucao(editalId);
+
+        if (resposta !== 200) {
+            toast.error("Erro ao mover para em construção");
+            return
+        }
+
+    }
+
+    async function moverParaEmAnalise(editalId: string) {
+        const resposta = await definirStatusEmAnalise(editalId);
+
+        if (resposta !== 200) {
+            toast.error("Erro ao mover para em análise");
+            return
+        }
+
+    }
+
+    async function moverParaConcluido(editalId: string) {
+        const resposta = await definirStatusConcluido(editalId);
+
+        if (resposta !== 200) {
+            toast.error("Erro ao mover para concluído");
+            return
+        }
+
+    }
+
+    const getEditais = async () => {
+        try {
+            const resposta = await getEditaisService();
+            const dados = resposta || [];
+
+            // Agrupa os editais por status
+            const novasColunas: Record<StatusEdital, Edital[]> = {
+                PENDING: [],
+                UNDER_CONSTRUCTION: [],
+                WAITING_FOR_REVIEW: [],
+                COMPLETED: [],
+            };
+
+            dados.forEach((edital) => {
+                // garante que o status bate com a chave
+                if (statuses.includes(edital.status as StatusEdital)) {
+                    novasColunas[edital.status as StatusEdital].push(edital);
+                }
+            });
+
+            setColumns(novasColunas);
+        } catch (error) {
+            console.error("Erro ao buscar editais", error);
+        }
+    };
     
     // sensor para melhorar ativação do drag
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -114,6 +154,7 @@ export default function Editais() {
                     if (oldIndex === -1) return prev;
                     const [moved] = col.splice(oldIndex, 1);
                     col.push(moved);
+
                     return { ...prev, [activeContainer]: col };
                 } 
 
@@ -151,13 +192,29 @@ export default function Editais() {
 
             const oldIndex = source.findIndex(i => i.id === activeId);
             if (oldIndex === -1) return prev;
-
+            
             const [movedItem] = source.splice(oldIndex, 1);
-
+            
             const overIndex = dest.findIndex(i => i.id === overId);
             const insertIndex = overIndex === -1 ? dest.length : overIndex;
-
+            
             dest.splice(insertIndex, 0, { ...movedItem, status: overContainer });
+
+            if (overContainer === "PENDING") {
+                moverParaRascunho(movedItem.id);
+            }
+
+            if (overContainer === "UNDER_CONSTRUCTION") {
+                moverParaEmConstrucao(movedItem.id);
+            }
+            
+            if (overContainer === "WAITING_FOR_REVIEW") {
+                moverParaEmAnalise(movedItem.id);
+            }
+
+            if (overContainer === "COMPLETED") {
+                moverParaConcluido(movedItem.id);
+            }
 
             return { 
                 ...prev, 
@@ -170,34 +227,35 @@ export default function Editais() {
 
     const formatStatus = (status: StatusEdital): string => {
         switch (status) {
-            case "rascunho":
+            case "PENDING":
                 return "Rascunho";
-            case "construcao":
+            case "UNDER_CONSTRUCTION":
                 return "Em construção";
-            case "analise":
+            case "WAITING_FOR_REVIEW":
                 return "Em Análise";
-            case "concluido":
+            case "COMPLETED":
                 return "Concluído";
         }
     };
 
     const getStatusColor = (status: StatusEdital): string => {
         switch (status) {
-            case "rascunho":
+            case "PENDING":
                 return "#99A1AF";
-            case "construcao":
+            case "UNDER_CONSTRUCTION":
                 return "red";
-            case "analise":
+            case "WAITING_FOR_REVIEW":
                 return "#656149";
-            case "concluido":
+            case "COMPLETED":
                 return "darkgreen";
         }
     };
 
     return (
+        montado &&
         <div className="flex flex-col gap-4">
 
-            <SuperiorEditais />
+            <SuperiorEditais funcaoAtualizarEditais={setAdicionouNovoEdital} flagEdital={adicionouNovoEdital} />
 
             <DndContext
                 sensors={sensors}

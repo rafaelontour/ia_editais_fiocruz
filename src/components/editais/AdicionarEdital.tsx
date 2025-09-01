@@ -1,4 +1,6 @@
-import { Upload } from "lucide-react";
+"use client";
+
+import { Upload, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { FileUpload } from "../ui/file-upload";
 import { Input } from "../ui/input";
@@ -6,11 +8,117 @@ import { Label } from "../ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Textarea } from "../ui/textarea";
+import z, { file, set } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Unidade } from "@/core/unidade";
+import { toast } from "sonner";
+import { getTodasUnidades } from "@/service/unidade";
+import { Tipificacao } from "@/core";
+import { getTipificacoesService } from "@/service/tipificacao";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UsuarioUnidade } from "@/core/usuario";
+import { getUsuariosPorUnidade } from "@/service/usuario";
+import { adicionarEditalService } from "@/service/edital";
 
-export default function AdicionarEdital () {
+const schemaEdital = z.object({
+    nome: z.string().min(5, "O nome do edital é obrigatório"),
+    unidade: z.string().min(1, "Selecione uma unidade"),
+    tipificacoes: z.array(z.string().min(1)).min(1, "Selecione pelo menos uma tipificação"),
+    responsavel: z.string().min(1, "Selecione o responsável por este edital"),
+    identificador: z.string().min(1, "O número de identificação do edital é obrigatório"),
+    descricao: z.string().min(6, "A descrição do edital é obrigatória"),
+    arquivo: z
+    .custom<File>((file) => file instanceof File) // valida se é File
+    .refine((file) => file.size > 0, "O arquivo é obrigatório"),
+})
+
+interface Props {
+    atualizarEditais: Dispatch<SetStateAction<boolean>>
+    flagEdital: boolean
+}
+
+export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props) {
+
+    type formData = z.infer<typeof schemaEdital>;
+    const { 
+        register,
+        handleSubmit,
+        formState: { errors },
+        control,
+        setValue,
+        reset
+    } = useForm<formData>({
+        resolver: zodResolver(schemaEdital),
+        defaultValues: {
+            unidade: "",
+            tipificacoes: [],
+            responsavel: "",
+        }
+    })
+
+    const [openSheet, setOpenSheet] = useState<boolean>(false);
+    const [unidades, setUnidades] = useState<Unidade[]>([]);
+    const [usuarios, setUsuarios] = useState<UsuarioUnidade[] | undefined>([]);
+    const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
+    const [tipificacoesSelecionadas, setTipificacoesSelecionadas] = useState<Tipificacao[] | []>([]);
+    const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
+
+    async function buscarUnidades() {
+        const unidades = await getTodasUnidades();
+        setUnidades(unidades);
+    }
+    
+    async function buscarTipificacoes() {
+        const tipificacoes = await getTipificacoesService();
+        setTipificacoes(tipificacoes);
+    }
+    
+    async function buscarUsuariosPorUnidade(id: string | undefined) {
+        const usuarios = await getUsuariosPorUnidade(id);
+        setUsuarios(usuarios);
+    }
+
+    async function enviarEdital(data: formData) {
+        const dados = {
+            name: data.nome,
+            identifier: data.identificador,
+            description: data.descricao,
+            typification: data.tipificacoes,
+            editors: responsaveisEdital.map(usuario => usuario.id)
+        }
+        
+        const resposta = await adicionarEditalService(dados);
+
+        if (resposta === 201) {
+            atualizarEditais(!flagEdital);
+            toast.success("Edital enviado com sucesso!");
+            limparDados();
+            setOpenSheet(false);
+        } else {
+            toast.error("Erro ao enviar edital!");
+        }
+    }
+
+    useEffect(() => {
+        try {
+            buscarUnidades();
+            buscarTipificacoes();
+        } catch(e: any) {
+            toast.error("Erro", e.message);
+        }
+    }, [])
+
+    function limparDados() {
+        reset();
+        setTipificacoesSelecionadas([]);
+        setResponsaveisEdital([]);
+    }
+
+
     return(
-        <div className="">
-            <Sheet>
+        <div>
+            <Sheet open={openSheet} onOpenChange={setOpenSheet}>
                 <SheetTrigger asChild>
                     <Button variant={"outline"} className="bg-vermelho hover:bg-vermelho hover:cursor-pointer hover:scale-105 active:scale-100 duration-100 text-white"> {/* AJEITAR ÍCONE */}
                         <Upload color="white" className=""/>
@@ -18,104 +126,323 @@ export default function AdicionarEdital () {
                     </Button> 
                 </SheetTrigger>
                 
-                <SheetContent side="right" className="w-full px-10 pt-5 overflow-y-auto">
+                <SheetContent onCloseAutoFocus={limparDados} side="right" className="w-full px-10 pt-5 overflow-y-auto">
                     <SheetHeader className="pl-0">
                         <SheetTitle className="text-2xl">Adicionar edital</SheetTitle>
                         <SheetDescription>Preencha as informações abaixo</SheetDescription>
                     </SheetHeader>
                 
-                    <div className="space-y-6">
-                        <div className="flex flex-row gap-5 w-full">
-                            <div className="flex flex-col gap-3 w-[60%]">
-                                <Label htmlFor="name">Nome do Edial*</Label>
-                                <Input id="name" placeholder="Insira o nome do edital"></Input>
-                            </div>
-                            <div className="flex flex-col gap-3 w-[40%]">
-                                <Label htmlFor="unit">Unidade*</Label>
-                                <Select>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Selcione a unidade" />
-                                    </SelectTrigger>
-                                    
-                                    <SelectContent className="w-full">
-                                        <SelectGroup>
-                                            <SelectLabel>Unidade</SelectLabel>
-                                            <SelectItem value="unit">Unidade01</SelectItem>
-                                            <SelectItem value="unit">Unidade02</SelectItem>
-                                            <SelectItem value="unit">Unidade03</SelectItem>
-                                            <SelectItem value="unit">Unidade04</SelectItem>
-                                            <SelectItem value="unit">Unidade05</SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="flex flex-row gap-5 w-full">
-                            <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="tipe">Tipo</Label>
-                                <Select>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Selcione o tipo" />
-                                    </SelectTrigger>
+                    <form onSubmit={handleSubmit(enviarEdital)}>
+                        <div className="space-y-6">
+                            <div className="flex flex-row gap-5 w-full">
+                                <div className="flex flex-col gap-3 w-[60%]">
+                                    <Label htmlFor="name">Nome do edital</Label>
+                                    <Input
+                                        {...register("nome")}
+                                        id="name"
+                                        placeholder="Insira o nome do edital"
+                                    />
+                                    {errors.nome && (
+                                        <span className="text-xs text-red-500 italic">
+                                            {errors.nome.message}
+                                        </span>
+                                    )}
+                                </div>
 
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel>tipo</SelectLabel>
-                                            <SelectItem value="type">tipo01</SelectItem>
-                                            <SelectItem value="type">tipo02</SelectItem>
-                                            <SelectItem value="type">tipo03</SelectItem>
-                                            <SelectItem value="type">tipo04</SelectItem>
-                                            <SelectItem value="type">tipo05</SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex flex-col gap-3 w-[40%]">
+                                    <Label htmlFor="unit">Unidade</Label>
 
-                            </div>
-                            <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="date">Data</Label>
-                                <Input id="fate" placeholder="Selecione a data"></Input>
-                            </div>
-                        </div>
+                                    <Controller
+                                        name="unidade"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                value={field.value}
+                                                onValueChange={(value) => {
+                                                    field.onChange(value);
+                                                    setResponsaveisEdital([]);
+                                                    buscarUsuariosPorUnidade(value);
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Selecione a unidade" />
+                                                </SelectTrigger>
+                                
+                                                <SelectContent className="w-full">
+                                                    <SelectGroup>
+                                                        <SelectLabel>Unidade</SelectLabel>
+                                                        {
+                                                            unidades.map((unidade) => (
+                                                                <SelectItem
+                                                                    key={unidade.id}
+                                                                    value={unidade.id}
+                                                                >
+                                                                    {unidade.name}
+                                                                </SelectItem>
+                                                            ))
+                                                        }
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        )}
+                                    />
 
-                        <div className="flex flex-row gap-3 w-full">
-                            <div className="flex flex-col gap-3 w-[55%]">
-                                <Label htmlFor="responsavel">Responsavel*</Label>
-                                <Input id="responsavel" placeholder="Informe o responsável"></Input>
-
-                            </div>
-                            <div className="flex flex-col gap-3 w-[45%]">
-                                <Label htmlFor="date">Número do edital*</Label>
-                                <Input id="fate" placeholder="Informe o número do edital"></Input>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-3">
-                            <div className="flex flex-col gap-3 w-1/2">
-                                <Label htmlFor="descricao">Descrição</Label>
-                                <Textarea id="descricao" className="resize-y h-[154px]" placeholder="Insira a descrição"/>
+                                    {errors.unidade && (
+                                        <span className="text-xs text-red-500 italic">
+                                            {errors.unidade.message}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
 
-                            <div className="flex flex-col gap-3 w-1/2">
-                                <Label>Upload do documento</Label>
-                                <div className="h-16">
-                                    <FileUpload />
+                            <div className="flex flex-row gap-5 w-full">
+                                <div className="flex w-full flex-col gap-3">
+                                    <Label htmlFor="tipe">Tipificações</Label>
+                                    <Controller
+                                        name="tipificacoes"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                onValueChange={(value) => {
+                                                    field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
+                                                    const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
+
+                                                    if (tipificacaoEncontrada) {
+                                                        setTipificacoesSelecionadas((prev) => [...prev, tipificacaoEncontrada]);
+                                                    }
+
+                                                    console.log("Tipificacoes selecionadas: ", tipificacoesSelecionadas);
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Selcione tipificações" />
+                                                </SelectTrigger>
+
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Tipificações</SelectLabel>
+                                                        {
+                                                            tipificacoes.map((tipificacao) => (
+                                                                <SelectItem
+                                                                    key={tipificacao.id}
+                                                                    value={tipificacao.id}
+                                                                >
+                                                                    {tipificacao.name}
+                                                                </SelectItem>
+                                                            ))
+                                                        }
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                            
+                                        )}
+                                    />
+
+                                    {errors.tipificacoes && (
+                                        <span className="text-xs text-red-500 italic">
+                                            {errors.tipificacoes.message}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {
+                                tipificacoesSelecionadas.length > 0 && (
+                                    <div className="flex flex-col gap-3 w-full">
+                                        <Label htmlFor="tipe">Tipificações selecionadas</Label>
+                                        <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                            {
+                                                tipificacoesSelecionadas.map((t: Tipificacao) => (
+                                                    <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                        <button onClick={() => {
+                                                            const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
+                                                            setTipificacoesSelecionadas(novaLista);
+                                                            setValue("tipificacoes", novaLista.map((tp) => tp.id));
+                                                            console.log("Tipificacoes selecionadas: ", tipificacoesSelecionadas);
+                                                        }}>
+                                                            <div className="flex items-center" title="Remover tipificação">
+                                                                <span
+                                                                    className="
+                                                                        bg-red-200 p-[10px]
+                                                                        hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                        transition-all duration-200 ease-in-out
+                                                                    "
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </span>
+                                                            </div>
+                                                        </button>
+                                                        <p className=" w-full text-[11px]">{t.name}</p>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                    </div>
+                                )
+                            }
+
+                            <div className="flex flex-row gap-3 w-full">
+                                <div className="flex flex-col gap-3 w-full relative">
+                                    <Label htmlFor="responsavel">Responsável</Label>
+                                    <Controller
+                                        name="responsavel"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                value=""
+                                                defaultValue="Selecione um usuário"
+                                                onValueChange={(value) => {
+                                                    field.onChange(value);
+                                                    if (responsaveisEdital.find((u) => u.id === value)) return
+                                                    setResponsaveisEdital((anteriores) => [...anteriores, usuarios?.find((u) => u.id === value)!]);
+                                                    console.log("Responsaveis selecionados: ", responsaveisEdital);
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Selecione um usuário" />
+                                                </SelectTrigger>
+
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Usuários</SelectLabel>
+                                                        {
+                                                            usuarios?.map((usuario) => (
+                                                                <SelectItem
+                                                                    key={usuario.id}
+                                                                    value={usuario.id}
+                                                                >
+                                                                    {usuario.username}
+                                                                </SelectItem>
+                                                            ))
+                                                        }
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                            
+                                        )}
+                                    />
+
+                                    {
+                                        errors.responsavel && (
+                                            <span className="text-xs text-red-500 italic">
+                                                {errors.responsavel.message}
+                                            </span>
+                                        )
+                                    }
+                                </div>
+
+                                <div className="flex flex-col gap-3 w-full">
+                                    <Label htmlFor="date">Número do edital</Label>
+                                    <Input
+                                        {...register("identificador")}
+                                        id="date"
+                                        placeholder="Informe o número do edital"
+                                    />
+                                    {
+                                        errors.identificador && (
+                                            <span className="text-xs text-red-500 italic">
+                                                {errors.identificador.message}
+                                            </span>
+                                        )
+                                    }
+                                </div>
+                            </div>
+
+                            <div>
+                                {
+                                    responsaveisEdital.length > 0 && (
+                                        <div className="flex flex-col gap-3 w-full">
+                                            <Label htmlFor="tipe">{responsaveisEdital.length > 1 ? "Responsáveis selecionados" : "Responsável selecionado"}</Label>
+                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                                {
+                                                    responsaveisEdital.map((usuario: UsuarioUnidade) => (
+                                                        <div key={usuario.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                            <button onClick={() => {
+                                                                const novaLista = responsaveisEdital.filter((u) => u.id !== usuario.id)
+                                                                setResponsaveisEdital(novaLista);
+                                                                setValue("responsavel", "");
+                                                            }}>
+                                                                <div className="flex items-center" title="Remover usuário">
+                                                                    <span
+                                                                        className="
+                                                                            bg-red-200 p-[10px]
+                                                                            hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                            transition-all duration-200 ease-in-out
+                                                                        "
+                                                                    >
+                                                                        <X className="w-4 h-4" />
+                                                                    </span>
+                                                                </div>
+                                                            </button>
+                                                            <p className=" w-full text-[11px]">{usuario.username}</p>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                            </div>
+
+                            <div className="flex items-start gap-3">
+                                <div className="flex flex-col gap-3 w-1/2">
+                                    <Label htmlFor="descricao">Descrição</Label>
+                                    <Textarea
+                                        {...register("descricao")}
+                                        id="descricao"
+                                        className="resize-y h-[154px]"
+                                        placeholder="Insira a descrição"
+                                    />
+                                    {
+                                        errors.descricao && (
+                                            <span className="text-xs text-red-500 italic">
+                                                {errors.descricao.message}
+                                            </span>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col gap-3 w-1/2">
+                                    <Label>Upload do documento</Label>
+                                    <div className="h-16">
+                                       <Controller
+                                            name="arquivo"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <FileUpload
+                                                    onChange={(files: File[]) => {
+                                                        field.onChange(files[0]);
+                                                    }}
+                                                />
+                                            )}
+                                        />
+
+                                        {
+                                            errors.arquivo && (
+                                                <span className="text-xs text-red-500 italic">
+                                                    {errors.arquivo.message}
+                                                </span>
+                                        )}
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                
-                    <SheetFooter className="flex w-full justify-end relative mb-6">
-                        <Button
-                            variant={"destructive"}
-                            className="
-                                bg-vermelho text-white w-fit transition-all -mr-4 ml-auto
-                            "
-                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                        >
-                            <Upload/>
-                            <p>Salvar Edital</p>
-                        </Button>
-                    </SheetFooter>
+
+                        <SheetFooter className="flex absolute z-50 w-fit justify-end bottom-6 right-10">
+                            <Button
+                                type="submit"
+                                variant={"destructive"}
+                                className="
+                                    bg-vermelho text-white w-fit transition-all -mr-4 ml-auto
+                                    hover:cursor-pointer
+                                "
+                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                            >
+                                <Upload/>
+                                <p>Salvar edital</p>
+                            </Button>
+                        </SheetFooter>
+                    </form>
                 </SheetContent>
             </Sheet>
         </div>
