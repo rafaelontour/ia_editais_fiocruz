@@ -47,6 +47,31 @@ async function adicionarEditalService(dados: any): Promise<number | undefined> {
     }
 }
 
+async function atualizarEditalService(idEdital: string, dados: any): Promise<number | undefined> {
+    try {
+        const resposta = await fetch(`${urlBase}/doc/`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({
+                id: idEdital,
+                name: dados.nome,
+                identifier: dados.identificador,
+                description: dados.descricao,
+                editors: dados.responsavel,
+                typification: dados.tipificacoes,
+                updated_at: new Date().toISOString()
+            })
+        })
+
+        return resposta.status
+    } catch(e) {
+        return
+    }
+}
+
 async function excluirEditalService(editalId: string): Promise<number | undefined> {
     try {
         const responsta = await fetch(`${urlBase}/doc/${editalId}/`, {
@@ -130,6 +155,7 @@ async function definirStatusConcluido(editalId: string): Promise<number | undefi
 export {
     getEditaisService,
     adicionarEditalService,
+    atualizarEditalService,
     excluirEditalService,
     definirStatusRascunho,
     definirStatusEmConstrucao,

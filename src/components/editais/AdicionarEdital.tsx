@@ -29,8 +29,11 @@ const schemaEdital = z.object({
     identificador: z.string().min(1, "O número de identificação do edital é obrigatório"),
     descricao: z.string().min(6, "A descrição do edital é obrigatória"),
     arquivo: z
-    .custom<File>((file) => file instanceof File) // valida se é File
-    .refine((file) => file.size > 0, "O arquivo é obrigatório"),
+    .instanceof(File)
+    .refine(
+      (file) => file.size > 0 && file.type === "application/pdf",
+      { message: "Envie um PDF válido" }
+    ),
 })
 
 interface Props {
@@ -203,6 +206,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                         control={control}
                                         render={({ field }) => (
                                             <Select
+                                                value=""
                                                 onValueChange={(value) => {
                                                     field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
                                                     const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
@@ -210,8 +214,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                     if (tipificacaoEncontrada) {
                                                         setTipificacoesSelecionadas((prev) => [...prev, tipificacaoEncontrada]);
                                                     }
-
-                                                    console.log("Tipificacoes selecionadas: ", tipificacoesSelecionadas);
                                                 }}
                                             >
                                                 <SelectTrigger className="w-full">
@@ -258,7 +260,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                             const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
                                                             setTipificacoesSelecionadas(novaLista);
                                                             setValue("tipificacoes", novaLista.map((tp) => tp.id));
-                                                            console.log("Tipificacoes selecionadas: ", tipificacoesSelecionadas);
                                                         }}>
                                                             <div className="flex items-center" title="Remover tipificação">
                                                                 <span
@@ -282,7 +283,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                             }
 
                             <div className="flex flex-row gap-3 w-full">
-                                <div className="flex flex-col gap-3 w-full relative">
+                                <div className="flex flex-col gap-3 w-full">
                                     <Label htmlFor="responsavel">Responsável</Label>
                                     <Controller
                                         name="responsavel"
@@ -295,7 +296,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                     field.onChange(value);
                                                     if (responsaveisEdital.find((u) => u.id === value)) return
                                                     setResponsaveisEdital((anteriores) => [...anteriores, usuarios?.find((u) => u.id === value)!]);
-                                                    console.log("Responsaveis selecionados: ", responsaveisEdital);
                                                 }}
                                             >
                                                 <SelectTrigger className="w-full">
@@ -390,7 +390,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                     <Textarea
                                         {...register("descricao")}
                                         id="descricao"
-                                        className="resize-y h-[154px]"
+                                        className="resize-y min-h-[154px]"
                                         placeholder="Insira a descrição"
                                     />
                                     {

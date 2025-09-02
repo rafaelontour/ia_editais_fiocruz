@@ -86,7 +86,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                 <View  />
                             </Button>
                             :
-                            <EditarEdital />
+                            <EditarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} edital={edital} />
                         }
                         <Dialog>
                             <DialogTrigger asChild>

@@ -1,4 +1,3 @@
-// Teste.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -13,7 +12,6 @@ import {
     PointerSensor,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import CardListaTeste from "@/components/editais/CardLista";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
 import SuperiorEditais from "@/components/editais/SuperiorEditais";
@@ -104,7 +102,7 @@ export default function Editais() {
 
             setColumns(novasColunas);
         } catch (error) {
-            console.error("Erro ao buscar editais", error);
+            toast.error("Erro ao buscar editais");
         }
     };
     
