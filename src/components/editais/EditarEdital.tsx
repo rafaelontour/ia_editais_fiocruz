@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, PencilLine, X } from "lucide-react";
+import { PencilLine, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { FileUpload } from "../ui/file-upload";
 import { Input } from "../ui/input";

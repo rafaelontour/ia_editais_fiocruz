@@ -2,8 +2,6 @@
 
 import "@/app/globals.css";
 import { UsuarioContextoProvider } from "@/data/context/UsuarioContext";
-import useUsuario from "@/data/hooks/useUsuario";
-import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 
 export default function RootLayout({

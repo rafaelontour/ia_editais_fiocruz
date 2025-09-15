@@ -1,12 +1,9 @@
-// CardListaTeste.tsx
 "use client";
 
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { useDroppable } from "@dnd-kit/core";
-import CardEditaisTeste from "./CardEdital";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
-import { getEditaisService } from "@/service/edital";
 import CardEdital from "./CardEdital";
 
 export interface Categoria {

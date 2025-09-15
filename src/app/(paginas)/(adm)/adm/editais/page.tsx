@@ -101,8 +101,8 @@ export default function Editais() {
             });
 
             setColumns(novasColunas);
-        } catch (error) {
-            toast.error("Erro ao buscar editais");
+        } catch(e) {
+            toast.error("Erro ao buscar editais: " + e);
         }
     };
     

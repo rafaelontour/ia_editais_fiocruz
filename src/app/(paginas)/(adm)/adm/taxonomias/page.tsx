@@ -29,7 +29,7 @@ import { adicionarRamoService, atualizarRamoService, buscarRamosDaTaxonomiaServi
 import { adicionarTaxonomiaService, atualizarTaxonomiaService, excluirTaxonomiaService, getTaxonomiasService } from "@/service/taxonomia";
 import { getTipificacoesService } from "@/service/tipificacao";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, ChevronLeft, PencilLine, Plus, Trash } from "lucide-react";
+import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import z from "zod";
@@ -57,7 +57,7 @@ export default function Taxonomias() {
   })
 
   type FormDataRamo = z.infer<typeof schemaRamo>;
-  const { register: registerRamo, handleSubmit: handleSubmitRamo, formState: { errors: errorsRamo }, setValue: setValueRamo, watch: watchRamo, reset: resetRamo } = useForm<FormDataRamo>({
+  const { register: registerRamo, handleSubmit: handleSubmitRamo, formState: { errors: errorsRamo }, reset: resetRamo } = useForm<FormDataRamo>({
     resolver: zodResolver(schemaRamo)
   })
 
@@ -135,7 +135,7 @@ export default function Taxonomias() {
   }, [openDialogRamo]);
 
 
-  const adicionarRamo = async (data: FormDataRamo) => {
+  const adicionarRamo = async () => {
     const ramo: Ramo = {
       taxonomy_id: taxonomiaSelecionada?.id,
       title: tituloRamo,
@@ -239,15 +239,11 @@ export default function Taxonomias() {
   }
 
   const buscarRamos = async (idTaxonomia: string | undefined) => {
-    try {
-      const ramos = await buscarRamosDaTaxonomiaService(idTaxonomia);
-      setRamosDaTaxonomia(ramos || []);
-    } catch (error) {
-      console.error('Erro ao buscar ramos:', error);
-    }
+    const ramos = await buscarRamosDaTaxonomiaService(idTaxonomia);
+    setRamosDaTaxonomia(ramos || []);
   }
 
-  const atualizarRamoDaTaxonomia: SubmitHandler<{ tituloRamo: string; descricaoRamo: string }> = async (data) => {
+  const atualizarRamoDaTaxonomia: SubmitHandler<{ tituloRamo: string; descricaoRamo: string }> = async () => {
     try {
       const dado: Ramo = {
         id: ramoSelecionado?.id,

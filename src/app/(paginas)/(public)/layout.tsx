@@ -14,11 +14,8 @@ import {
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
-import { itemsAdm, itemsUsuarioComum } from "@/core/constants";
 import useUsuario from "@/data/hooks/useUsuario";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { itemsAuditorAnalista, MenuItem } from "@/core/constants/itensMenu";
 
 export default function RootLayout({
   children,

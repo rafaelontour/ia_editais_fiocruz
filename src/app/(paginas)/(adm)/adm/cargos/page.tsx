@@ -8,9 +8,8 @@ import { Unidade } from "@/core/unidade";
 import { UsuarioUnidade } from "@/core/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { getTodasUnidades } from "@/service/unidade";
-import { getUnidadePorId } from "@/service/unidade";
 import { getUsuariosPorUnidade } from "@/service/usuario";
-import { ChevronLeft, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function AtribuirCargo () {
@@ -19,9 +18,6 @@ export default function AtribuirCargo () {
     const [usuariosDaUnidade, setUsuariosDaUnidade] = useState<UsuarioUnidade[] | undefined>([]);
     const [unidades, setUnidades] = useState<Unidade[]>([]);
     const [idUnidadeSelecionada, setIdUnidadeSelecionada] = useState<string | undefined>("");
-    const [loading, setLoading] = useState(true);
-
-    const { usuario } = useUsuario();
 
     async function buscarTodasUnidades() {
         const unidades = await getTodasUnidades();
@@ -29,7 +25,7 @@ export default function AtribuirCargo () {
     }
 
     async function buscarUsuariosDaUnidade(unidadeId: string | undefined) {
-        const usuarios = await getUsuariosPorUnidade(idUnidadeSelecionada);
+        const usuarios = await getUsuariosPorUnidade(unidadeId);
         setUsuariosDaUnidade(usuarios);
     }
     

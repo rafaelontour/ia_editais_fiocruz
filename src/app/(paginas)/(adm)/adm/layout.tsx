@@ -2,15 +2,12 @@
 
 import Image from "next/image";
 
-import { FilePen, Home, IdCard, Sheet, Type, TypeOutline, University } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
-import { itemsAdm } from "@/core/constants";
 import useUsuario from "@/data/hooks/useUsuario";
-import { itemsAuditorAnalista, itemsUsuarioComum, MenuItem } from "@/core/constants/itensMenu";
 
 export default function RootLayout({
   children,

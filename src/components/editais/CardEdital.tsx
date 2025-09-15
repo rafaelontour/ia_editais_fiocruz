@@ -7,7 +7,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import EditarEdital from "./EditarEdital";
 import { Button } from "../ui/button";
-import { EyeIcon, Trash, View } from "lucide-react";
+import { Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { excluirEditalService } from "@/service/edital";
 import { toast } from "sonner";
