@@ -28,7 +28,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
 # Expõe a porta padrão do Next
-EXPOSE 3000
+EXPOSE 4000
 
 # Comando de produção
 CMD ["npm", "start"]
