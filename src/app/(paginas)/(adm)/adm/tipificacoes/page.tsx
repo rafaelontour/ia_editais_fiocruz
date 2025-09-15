@@ -128,8 +128,8 @@ export default function Tipificacoes() {
         }
     }
 
-    const filtrarPraEdicao = (ids: string[]): Fonte[] => {
-        return fontes.filter(fonte => ids.includes(fonte.id));
+    const filtrarPraEdicao = (ids: string[] | undefined): Fonte[] => {
+        return fontes.filter(fonte => ids?.includes(fonte.id));
     }
 
     function limparCampos() {
