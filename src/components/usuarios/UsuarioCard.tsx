@@ -24,7 +24,7 @@ const schemaUsuario = z.object({
 interface UsuarioCardProps {
   usuario: UsuarioUnidade;
   unidades: Unidade[];
-  buscarUsuarios: (unidadeId: string) => Promise<void>;
+  buscarUsuarios: (unidadeId: string | undefined) => Promise<void>;
 }
 
 export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardProps) => {
