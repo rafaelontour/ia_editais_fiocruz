@@ -24,7 +24,7 @@ async function getEditaisService(): Promise<Edital[] | undefined> {
     }
 }
 
-async function adicionarEditalService(dados: any): Promise<number | undefined> {
+async function adicionarEditalService(dados: any): Promise<[number, string] | undefined> {
     try {
         const resposta = await fetch(`${urlBase}/doc/`, {
             method: "POST",
@@ -41,7 +41,9 @@ async function adicionarEditalService(dados: any): Promise<number | undefined> {
             })
         })
 
-        return resposta.status
+        const json = await resposta.json()
+
+        return [resposta.status, json.id]
     } catch(e) {
         return
     }

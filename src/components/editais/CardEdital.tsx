@@ -103,8 +103,8 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                             <DialogContent className="rounded-2xl">
                                 <DialogHeader>
                                     <DialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital Edital Fiocruz 2025/1?</DialogTitle>
-                                    <DialogDescription className="font-bold text-xs">
-                                        Após a exclusão, não será possibile recuperar os dados desse edital e análise realizada
+                                    <DialogDescription className="text-[14px] text-vermelho">
+                                        Após a exclusão, não será possível recuperar os dados desse edital e análise realizada
                                     </DialogDescription>
                                 </DialogHeader>
 

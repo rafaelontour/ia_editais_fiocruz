@@ -20,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UsuarioUnidade } from "@/core/usuario";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import { adicionarEditalService } from "@/service/edital";
+import { enviarArquivoService } from "@/service/editalArquivo";
 
 const schemaEdital = z.object({
     nome: z.string().min(5, "O nome do edital é obrigatório"),
@@ -29,11 +30,11 @@ const schemaEdital = z.object({
     identificador: z.string().min(1, "O número de identificação do edital é obrigatório"),
     descricao: z.string().min(6, "A descrição do edital é obrigatória"),
     arquivo: z
-    .instanceof(File)
-    .refine(
-      (file) => file.size > 0 && file.type === "application/pdf",
-      { message: "Envie um PDF válido" }
-    ),
+    .instanceof(File, { message: "O arquivo é obrigatório" })
+    .refine((file) => file.size > 0, { message: "O arquivo é obrigatório" })
+    .refine((file) => file.type === "application/pdf", {
+      message: "O arquivo deve ser um PDF",
+    }),
 })
 
 interface Props {
@@ -91,16 +92,26 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
             editors: responsaveisEdital.map(usuario => usuario.id)
         }
         
-        const resposta = await adicionarEditalService(dados);
+        const [resposta, idEdital] = (await adicionarEditalService(dados)) ?? [];
 
-        if (resposta === 201) {
-            atualizarEditais(!flagEdital);
-            toast.success("Edital enviado com sucesso!");
-            limparDados();
-            setOpenSheet(false);
-        } else {
+        if (resposta !== 201) {
             toast.error("Erro ao enviar edital!");
+            return
         }
+
+        atualizarEditais(!flagEdital);
+        toast.success("Edital enviado com sucesso!");
+        limparDados();
+        setOpenSheet(false);
+
+        const respostaArquivo = await enviarArquivoService(idEdital, data.arquivo);
+
+        if (respostaArquivo !== 201) {
+            toast.error("Erro ao enviar arquivo!");
+            return
+        }
+
+        toast.success("Arquivo enviado com sucesso!");
     }
 
     useEffect(() => {

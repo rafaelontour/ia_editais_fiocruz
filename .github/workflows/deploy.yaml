@@ -1,45 +1,28 @@
-name: Deploy do protótipo IA Editais
+name: Deploy no Servidor
 
 on:
   push:
     branches:
-      - main
+      - main   # dispara só quando fizer push na branch main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout do repositório
-        uses: actions/checkout@v3
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-      - name: Build da imagem Docker
-        run: docker build -t ia_editais .
-
-      - name: Salvar imagem como .tar
-        run: docker save ia_editais:latest -o ia_editais.tar
-
-      - name: Ajustar permissões do arquivo .tar
-        run: chmod 644 ia_editais.tar
-
-      - name: Enviar imagem para a EC2
-        uses: appleboy/scp-action@master
+      - name: Configurar chave SSH
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          host: ${{ secrets.EC2_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_CHAVE_SSH }}
-          source: "ia_editais.tar"
-          target: "/home/ubuntu/prototipo_ia_editais/"
-          debug: true
+          ssh-private-key: ${{ secrets.IA_EDITAIS_SSH }}
 
-      - name: Rodar container na EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_CHAVE_SSH }}
-          script: |
-            sudo docker stop ia_editais || true
-            sudo docker rm ia_editais || true
-            sudo docker load -i /home/ubuntu/prototipo_ia_editais/ia_editais.tar
-            sudo docker run -d --name ia_editais -p 3000:80 ia_editais:latest
+      - name: Deploy no servidor
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} << 'EOF'
+            cd /home/ubuntu/teste
+            git pull origin main
+            npm install --production
+            npm run build
+            pm2 restart app
+          EOF

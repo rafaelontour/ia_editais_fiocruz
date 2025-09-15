@@ -78,7 +78,6 @@ async function excluirFonteService(id: string): Promise<number | undefined> {
             }
         });
 
-        console.log("Status: ", resposta.status);
         return resposta.status
     } catch (error) {
         console.error('Erro ao excluir fonte:', error);

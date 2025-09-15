@@ -1,4 +1,3 @@
-// Teste.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -20,16 +19,16 @@ import SuperiorEditais from "@/components/editais/SuperiorEditais";
 
 export default function Teste() {
   const [columns, setColumns] = useState<Record<StatusEdital, Edital[]>>({
-    rascunho: [
-      { id: "1", titulo: "Edital 1", status: "rascunho", data: "25/02/2025", categoria: "compras" },
-      { id: "2", titulo: "Edital 2", status: "rascunho", data: "25/02/2025", categoria: "compras" },
+    PENDING: [
+      { id: "1", name: "Edital 1", status: "PENDING", created_at: "25/02/2025", categoria: "compras" },
+      { id: "2", name: "Edital 2", status: "PENDING", created_at: "25/02/2025", categoria: "compras" },
     ],
-    construcao: [],
-    analise: [],
-    concluido: [],
+    UNDER_CONSTRUCTION: [],
+    WAITING_FOR_REVIEW: [],
+    COMPLETED: [],
   });
 
-  const statuses: StatusEdital[] = ["rascunho", "construcao", "analise", "concluido"];
+  const statuses: StatusEdital[] = ["PENDING", "UNDER_CONSTRUCTION", "WAITING_FOR_REVIEW", "COMPLETED"];
 
   // sensor para melhorar ativação do drag
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -108,26 +107,26 @@ export default function Teste() {
 
   const formatStatus = (status: StatusEdital): string => {
     switch (status) {
-      case "rascunho":
+      case "PENDING":
         return "Rascunho";
-      case "construcao":
+      case "UNDER_CONSTRUCTION":
         return "Em construção";
-      case "analise":
+      case "WAITING_FOR_REVIEW":
         return "Em Análise";
-      case "concluido":
+      case "COMPLETED":
         return "Concluído";
     }
   };
 
   const getStatusColor = (status: StatusEdital): string => {
     switch (status) {
-      case "rascunho":
+      case "PENDING":
         return "#99A1AF";
-      case "construcao":
+      case "UNDER_CONSTRUCTION":
         return "red";
-      case "analise":
+      case "WAITING_FOR_REVIEW":
         return "#656149";
-      case "concluido":
+      case "COMPLETED":
         return "darkgreen";
     }
   };
