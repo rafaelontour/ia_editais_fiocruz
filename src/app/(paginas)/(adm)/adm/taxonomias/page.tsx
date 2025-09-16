@@ -178,7 +178,7 @@ export default function Taxonomias() {
       const taxs = await getTaxonomiasService()
       setTax(taxs || []);
     } catch (error) {
-      console.error('Erro ao excluir taxonomia:', error); // Chamar um toast no lugar
+      toast.error('Erro ao excluir taxonomia!');
     }
   };
 
