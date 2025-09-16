@@ -49,8 +49,8 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
                 setMensagemLogin("Sair")
                 const usuarioComLogin: UsuarioUnidade = {...res, logado: true}
                 setUsuario(usuarioComLogin)
-                const novosItems = res.access_level === "ADMIN"
 
+                const novosItems = res.access_level === "ADMIN"
                 ? itemsAdm
                 : res.access_level === "AUDITOR" || res.access_level === "ANALYST"
                 ? itemsAuditorAnalista

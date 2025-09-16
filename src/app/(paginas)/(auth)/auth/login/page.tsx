@@ -67,7 +67,7 @@ export default function Login() {
         return
       }
 
-      const [ status] = await getUsuarioLogado()
+      const [ daados, status ] = await getUsuarioLogado()
 
       if (status == 401) {
         toast.error("Erro ao fazer login! Credenciais inválidas.")
@@ -75,21 +75,13 @@ export default function Login() {
       }
 
       logarUsuario()
-      toast.success("Login efetuado com sucesso! Redirecionando...")
-
-      verificarLocalStorage()
+      toast.success("Login efetuado com sucesso!")
 
       router.push("/adm")
       
     } catch(e) {
       toast.error("Erro ao efetuar login! - " + e)
     }  
-  }
-  
-  function verificarLocalStorage() {
-    if (localStorage.getItem("logado") === null || localStorage.getItem("logado") === "false") {
-      localStorage.setItem("logado", "true")  
-    }
   }
 
   return (

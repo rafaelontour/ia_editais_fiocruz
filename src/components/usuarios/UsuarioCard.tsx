@@ -76,13 +76,15 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
   };
 
   const excluirUsuario = async (id: string) => {
-    console.log("id: " + id);
     const resposta = await excluirUsuarioService(id)
 
     if (resposta !== 204) {
-      throw new Error('Erro ao excluir usuario')
+      toast.error('Erro ao excluir usuario')
+      return
     }
     
+    toast.success('Usuário excluido com sucesso!');
+    buscarUsuarios(usuario.unit_id);
     setOpenDialogExcluir(false);
   };
 

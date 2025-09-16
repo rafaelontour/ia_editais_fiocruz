@@ -18,6 +18,8 @@ import SuperiorEditais from "@/components/editais/SuperiorEditais";
 import { definirStatusConcluido, definirStatusEmAnalise, definirStatusEmConstrucao, definirStatusRascunho, getEditaisService } from "@/service/edital";
 import { toast } from "sonner";
 import CardLista from "@/components/editais/CardLista";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function Editais() {
     const [montado, setMontado] = useState<boolean>(false);
@@ -30,6 +32,14 @@ export default function Editais() {
         WAITING_FOR_REVIEW: [],
         COMPLETED: [],
     });
+
+    // NOVO: estado para guardar movimentação pendente
+    const [pendingMove, setPendingMove] = useState<{
+        item: Edital
+        from: StatusEdital
+        to: StatusEdital
+        overId: string | null
+    } | null>(null);
     
     useEffect(() => {
         getEditais();
@@ -47,7 +57,6 @@ export default function Editais() {
             toast.error("Erro ao mover para rascunho");
             return
         }
-
     }
 
     async function moverParaEmConstrucao(editalId: string) {
@@ -57,7 +66,6 @@ export default function Editais() {
             toast.error("Erro ao mover para em construção");
             return
         }
-
     }
 
     async function moverParaEmAnalise(editalId: string) {
@@ -67,7 +75,6 @@ export default function Editais() {
             toast.error("Erro ao mover para em análise");
             return
         }
-
     }
 
     async function moverParaConcluido(editalId: string) {
@@ -77,7 +84,6 @@ export default function Editais() {
             toast.error("Erro ao mover para concluído");
             return
         }
-
     }
 
     const getEditais = async () => {
@@ -85,7 +91,6 @@ export default function Editais() {
             const resposta = await getEditaisService();
             const dados = resposta || [];
 
-            // Agrupa os editais por status
             const novasColunas: Record<StatusEdital, Edital[]> = {
                 PENDING: [],
                 UNDER_CONSTRUCTION: [],
@@ -94,7 +99,6 @@ export default function Editais() {
             };
 
             dados.forEach((edital) => {
-                // garante que o status bate com a chave
                 if (statuses.includes(edital.status as StatusEdital)) {
                     novasColunas[edital.status as StatusEdital].push(edital);
                 }
@@ -106,10 +110,7 @@ export default function Editais() {
         }
     };
     
-    // sensor para melhorar ativação do drag
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
-
-    // id do item sendo arrastado (para o DragOverlay)
     const [activeId, setActiveId] = useState<string | null>(null);
 
     const findItem = (id: string) => {
@@ -133,21 +134,18 @@ export default function Editais() {
         const activeId = String(active.id);
         const overId = String(over.id);
 
-        // origem e destino (containerId) vindos do data do useSortable/useDroppable
         const activeContainer = active.data.current?.containerId as StatusEdital | undefined;
         const overContainer = over.data.current?.containerId as StatusEdital | undefined;
 
-        // se não tiver container info, aborta
         if (!activeContainer || !overContainer) return;
 
-        // mesma coluna: reordenar (se over é container vazio -> move para final)
+        // mesma coluna: reordenar
         if (activeContainer === overContainer) {
             setColumns((prev) => {
                 const col = [...prev[activeContainer]];
                 const oldIndex = col.findIndex((i) => i.id === activeId);
                 const overIndex = col.findIndex((i) => i.id === overId);
 
-                // se soltou no espaço da coluna (overIndex === -1), coloca no final
                 if (overIndex === -1) {
                     if (oldIndex === -1) return prev;
                     const [moved] = col.splice(oldIndex, 1);
@@ -156,7 +154,6 @@ export default function Editais() {
                     return { ...prev, [activeContainer]: col };
                 } 
 
-                // reordena dentro da coluna
                 if (oldIndex === -1) return prev;
                 const reordered = arrayMove(col, oldIndex, overIndex);
                 return { ...prev, [activeContainer]: reordered };
@@ -164,27 +161,8 @@ export default function Editais() {
             return;
         }
 
-        // containers diferentes -> mover entre colunas
+        // containers diferentes: aqui adicionamos confirmação
         setColumns(prev => {
-            const sameColumn = activeContainer === overContainer;
-
-            if (sameColumn) {
-                const items = [...prev[activeContainer]];
-                const oldIndex = items.findIndex(i => i.id === activeId);
-                if (oldIndex === -1) return prev;
-
-                const [moved] = items.splice(oldIndex, 1); // remove primeiro
-
-                // agora procura o overId NO ARRAY JÁ SEM O ITEM
-                const idx = items.findIndex(i => i.id === overId);
-                const newIndex = idx === -1 ? items.length : idx;
-
-                items.splice(newIndex, 0, moved);
-
-                return { ...prev, [activeContainer]: items };
-            }
-
-            // movimento entre colunas diferentes
             const source = [...prev[activeContainer]];
             const dest = [...prev[overContainer]];
 
@@ -192,60 +170,68 @@ export default function Editais() {
             if (oldIndex === -1) return prev;
             
             const [movedItem] = source.splice(oldIndex, 1);
-            
-            const overIndex = dest.findIndex(i => i.id === overId);
+
+            // guarda movimentação pendente e abre Dialog
+            setPendingMove({
+                item: movedItem,
+                from: activeContainer,
+                to: overContainer,
+                overId: overId,
+            });
+
+            // não move nada ainda
+            return prev;
+        });
+    };
+
+    // confirma a movimentação
+    const confirmMove = () => {
+        if (!pendingMove) return;
+
+        setColumns(prev => {
+            const source = [...prev[pendingMove.from]];
+            const dest = [...prev[pendingMove.to]];
+
+            const overIndex = pendingMove.overId
+                ? dest.findIndex(i => i.id === pendingMove.overId)
+                : -1;
             const insertIndex = overIndex === -1 ? dest.length : overIndex;
-            
-            dest.splice(insertIndex, 0, { ...movedItem, status: overContainer });
 
-            if (overContainer === "PENDING") {
-                moverParaRascunho(movedItem.id);
-            }
+            dest.splice(insertIndex, 0, { ...pendingMove.item, status: pendingMove.to });
 
-            if (overContainer === "UNDER_CONSTRUCTION") {
-                moverParaEmConstrucao(movedItem.id);
-            }
-            
-            if (overContainer === "WAITING_FOR_REVIEW") {
-                moverParaEmAnalise(movedItem.id);
-            }
-
-            if (overContainer === "COMPLETED") {
-                moverParaConcluido(movedItem.id);
-            }
+            if (pendingMove.to === "PENDING") moverParaRascunho(pendingMove.item.id);
+            if (pendingMove.to === "UNDER_CONSTRUCTION") moverParaEmConstrucao(pendingMove.item.id);
+            if (pendingMove.to === "WAITING_FOR_REVIEW") moverParaEmAnalise(pendingMove.item.id);
+            if (pendingMove.to === "COMPLETED") moverParaConcluido(pendingMove.item.id);
 
             return { 
-                ...prev, 
-                [activeContainer]: source, 
-                [overContainer]: dest 
+                ...prev,
+                [pendingMove.from]: source.filter(i => i.id !== pendingMove.item.id),
+                [pendingMove.to]: dest,
             };
         });
 
+        setPendingMove(null);
     };
 
-    const formatStatus = (status: StatusEdital): string => {
+    const cancelMove = () => setPendingMove(null);
+
+    const formatStatus = (status: StatusEdital | undefined): string => {
         switch (status) {
-            case "PENDING":
-                return "Rascunho";
-            case "UNDER_CONSTRUCTION":
-                return "Em construção";
-            case "WAITING_FOR_REVIEW":
-                return "Em Análise";
-            case "COMPLETED":
-                return "Concluído";
+            case "PENDING": return "Rascunho";
+            case "UNDER_CONSTRUCTION": return "Em construção";
+            case "WAITING_FOR_REVIEW": return "Em Análise";
+            case "COMPLETED": return "Concluído";
+            default: return "";
         }
     };
 
     const getStatusColor = (status: StatusEdital): string => {
         switch (status) {
-            case "PENDING":
-                return "#99A1AF";
-            case "UNDER_CONSTRUCTION":
-                return "red";
-            case "WAITING_FOR_REVIEW":
-                return "#656149";
-            case "COMPLETED":
-                return "darkgreen";
+            case "PENDING": return "#99A1AF";
+            case "UNDER_CONSTRUCTION": return "red";
+            case "WAITING_FOR_REVIEW": return "#656149";
+            case "COMPLETED": return "darkgreen";
         }
     };
 
@@ -261,9 +247,7 @@ export default function Editais() {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
             >
-                <div
-                    className="flex justify-between relative gap-4"
-                >
+                <div className="flex justify-between relative gap-4">
                     {statuses.map((status) => (
                         <div className="w-full max-w-80 min-w-56" key={status}>
                             <SortableContext items={columns[status].map((c) => c.id)} strategy={verticalListSortingStrategy}>
@@ -279,10 +263,8 @@ export default function Editais() {
                     ))}
                 </div>
 
-                {/* Drag overlay: renderiza por cima tudo enquanto arrasta */}
                 <DragOverlay>
                     {activeId ? (
-                        // renderiza uma cópia visual leve do item arrastado
                         <div className="bg-white p-3 w-full min-w-56 max-w-80 rounded shadow-lg">
                             {(() => {
                                 const item = findItem(activeId);
@@ -302,6 +284,22 @@ export default function Editais() {
                     ) : null}
                 </DragOverlay>
             </DndContext>
+
+            {/* DIALOG DE CONFIRMAÇÃO */}
+            <Dialog open={!!pendingMove} onOpenChange={cancelMove}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Confirmar movimentação</DialogTitle>
+                    </DialogHeader>
+                    <p>
+                        Tem certeza que deseja mover <strong>{pendingMove?.item.name}</strong> para <strong>{formatStatus(pendingMove?.to || undefined)}</strong>?
+                    </p>
+                    <DialogFooter className="flex justify-end gap-2">
+                        <Button variant="outline" className="hover:cursor-pointer" onClick={cancelMove}>Cancelar</Button>
+                        <Button className="bg-vermelho text-white hover:cursor-pointer" onClick={confirmMove}>Confirmar</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

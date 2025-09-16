@@ -32,6 +32,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 const schemaTaxonomia = z.object({
@@ -124,9 +125,17 @@ export default function Taxonomias() {
         ref?.contains(target)
       );
 
+      if (clicouDentroDeAlguma) {
+        console.log("Clicou dentro de uma taxonomia");
+      }
+
       if (!clicouDentroDeAlguma && !openDialogRamo) {
+        console.log("CLICOU FORA DE UMA TAXONOMIA");
+
+        if(flagHook.current === true) return
         setTaxonomiaSelecionada(null);
         setIdSelecionado("");
+        console.log("EXECUTOU ESSA DESGRAÇA")
       }
     };
 
@@ -149,6 +158,7 @@ export default function Taxonomias() {
     }
 
     setOpenDialogRamo(false);
+    limparCamposRamo();
     const ramos = await buscarRamosDaTaxonomiaService(taxonomiaSelecionada?.id);
     setRamosDaTaxonomia(ramos || []);
   }
@@ -203,26 +213,25 @@ export default function Taxonomias() {
 
       const taxs = await getTaxonomiasService();
       setTax(taxs || []);
-    } catch (error) {
-      console.error('Erro ao adicionar taxonomia:', error);
+    } catch(e) {
+      toast.error('Erro ao adicionar taxonomia: ' + e);
     }
     setOpenTaxonomia(false);
     limparCampos();
   }
 
-  const atualizarTaxonomia = async () => {
+  const atualizarTaxonomia = async (data: FormData) => {
     try {
       const novaTaxonomia: Taxonomia = {
         id: taxonomiaSelecionada?.id,
         typification_id: taxonomiaSelecionada?.typification_id,
-        title: tituloTaxonomia,
-        description: descricaoTaxonomia,
+        title: data.titulo,
+        description: data.descricao,
         source: fontesSelecionadas.map(fonte => fonte.id),
       }
 
       const resposta = await atualizarTaxonomiaService(novaTaxonomia);
 
-      console.log(resposta)
 
       if (resposta !== 200) {
         throw new Error("Erro ao atualizar taxonomia");
@@ -243,13 +252,13 @@ export default function Taxonomias() {
     setRamosDaTaxonomia(ramos || []);
   }
 
-  const atualizarRamoDaTaxonomia: SubmitHandler<{ tituloRamo: string; descricaoRamo: string }> = async () => {
+  const atualizarRamoDaTaxonomia = async (data: FormDataRamo) => {
     try {
       const dado: Ramo = {
         id: ramoSelecionado?.id,
         taxonomy_id: taxonomiaSelecionada?.id,
-        title: tituloRamo,
-        description: descricaoRamo
+        title: data.tituloRamo,
+        description: data.descricaoRamo
       }
 
       const resposta = await atualizarRamoService(dado);
@@ -261,8 +270,8 @@ export default function Taxonomias() {
       const ramos = await buscarRamosDaTaxonomiaService(taxonomiaSelecionada?.id);
       setRamosDaTaxonomia(ramos || []);
       setOpenDialogIdRamo(null);
-    } catch (error) {
-      console.error('Erro ao atualizar ramo:', error);
+    } catch(e) {
+      toast.error('Erro ao atualizar ramo');
     }
   }
 
@@ -278,12 +287,15 @@ export default function Taxonomias() {
     setTituloRamo("");
     setDescricaoRamo("");
     setRamoSelecionado(null);
+    flagHook.current = false;
     resetRamo()
   }
 
   const filtrarPraEdicao = (ids: string[]): Fonte[] => {
     return fontes.filter(fonte => ids.includes(fonte.id));
   }
+
+  let flagHook = useRef<boolean>(false);
 
   return (
     <div className="flex flex-col flex-1 h-full relalive">
@@ -443,6 +455,7 @@ export default function Taxonomias() {
         <div className="flex h-[calc(100%-20px)] flex-col w-1/2 overflow-y-scroll">
           {tax.map((item, index) => (
             <Card
+              ref={(e) => { divRefs.current["divtax_" + index] = e }}
               key={index}
               className={`
                 hover:cursor-pointer m-4 ml-0
@@ -696,7 +709,7 @@ export default function Taxonomias() {
           ))}
         </div>
 
-        <div className="w-1/2 h-full relative">
+        <div className="w-1/2 h-[69vh] relative overflow-y-auto">
           <Card className="m-4 overflow-y-auto">
             <CardHeader>
               <CardTitle className="flex flex-row justify-between items-center">
@@ -717,7 +730,7 @@ export default function Taxonomias() {
 
                   </DialogTrigger>
 
-                  <DialogContent onCloseAutoFocus={limparCampos}>
+                  <DialogContent ref={(e) => { divRefs.current["dialog_ramo_"] = e }} onCloseAutoFocus={limparCampos}>
                     <DialogHeader>
                       <DialogTitle>Adicionar Ramo</DialogTitle>
                       <DialogDescription>
@@ -792,6 +805,7 @@ export default function Taxonomias() {
                               <DialogTrigger asChild>
                                 <button
                                   onClick={() => {
+                                    flagHook.current = true
                                     setRamoSelecionado(ramo)
                                   }}
                                   title="Editar ramo"
@@ -802,8 +816,9 @@ export default function Taxonomias() {
                               </DialogTrigger>
 
                               <DialogContent
-                                ref={(e) => { divRefs.current["ramo_editar_" + index] = e }}
+                                ref={(e) => { divRefs.current["dialog_ramo_" + ramo.id] = e }}
                                 onCloseAutoFocus={limparCamposRamo}
+
                               >
                                 <DialogHeader>
                                   <DialogTitle>Editar ramo</DialogTitle>
@@ -831,7 +846,7 @@ export default function Taxonomias() {
 
                                   <div>
                                     <label htmlFor="descriptionRamo" className="block text-sm font-medium text-gray-700">
-                                      Descrição da Taxonomia
+                                      Descrição do ramo
                                     </label>
 
                                     <textarea
