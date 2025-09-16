@@ -89,6 +89,9 @@ export default function Editais() {
     const getEditais = async () => {
         try {
             const resposta = await getEditaisService();
+
+            if (!resposta) throw new Error();
+
             const dados = resposta || [];
 
             const novasColunas: Record<StatusEdital, Edital[]> = {
@@ -106,7 +109,7 @@ export default function Editais() {
 
             setColumns(novasColunas);
         } catch(e) {
-            toast.error("Erro ao buscar editais: " + e);
+            toast.error("Erro ao buscar editais!");
         }
     };
     

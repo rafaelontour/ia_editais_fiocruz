@@ -13,14 +13,14 @@ async function getEditaisService(): Promise<Edital[] | undefined> {
             }
         })
 
-        if (!res.ok) toast.error("Erro ao buscar editais")
+        if (!res.ok) return
 
         const data = await res.json();
 
         return data;
         
     } catch(e) {
-        throw new Error("Erro ao buscar edital: " + e)
+        return
     }
 }
 
