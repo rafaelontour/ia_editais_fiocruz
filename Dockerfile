@@ -27,6 +27,8 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
+RUN npm install pm2 -g
+
 # Expõe a porta padrão do Next
 EXPOSE 4000
 
