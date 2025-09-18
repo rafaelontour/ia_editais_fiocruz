@@ -32,5 +32,5 @@ RUN npm install pm2 -g
 # Expõe a porta padrão do Next
 EXPOSE 4000
 
-# Comando de produção
-CMD ["npm", "start"]
+# Comando para rodar a aplicação com PM2 em produção
+CMD ["pm2-runtime", "start", "npm", "--name", "app", "--", "start"]
