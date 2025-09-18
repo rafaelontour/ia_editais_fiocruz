@@ -11,6 +11,10 @@ import { Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { excluirEditalService } from "@/service/edital";
 import { toast } from "sonner";
+import VisualizarEdital from "@/app/(paginas)/(adm)/adm/editais/[id]/page";
+import Link from "next/link";
+
+
 interface Props {
     edital: Edital;
     containerId: string; // StatusEdital como string
@@ -55,6 +59,22 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
         }
     };
 
+    function formatarData(data: string | undefined): string {
+        const date = new Date(data || "");
+        
+        const formatado = date.toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+
+        return formatado;
+    }
+
+
     return (
         <div
             ref={setNodeRef}
@@ -76,10 +96,21 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                 >
                     <div className="flex flex-col-reverse text-xs text-gray-500 justify-between mt-2">
                         <span>Compras</span>
-                        <span>{edital.created_at}</span>
+                        <span>{formatarData(edital.created_at)}</span>
                     </div>
 
                     <div className="self-end flex gap-2">
+
+                        {
+                            edital.status !== "COMPLETED" && (
+                                <Link href={`/adm/editais/${edital.id}`}>
+                                    <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
+                                        <View  />
+                                    </Button>
+                                </Link>
+                            )
+                        }
+
                         { 
                             edital.status === "COMPLETED" ?
                             <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
