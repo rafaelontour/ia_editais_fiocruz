@@ -68,8 +68,6 @@ async function excluirTaxonomiaService(idTaxomonia: string | undefined) : Promis
                 'Content-Type': 'application/json'
             }
         });
-    
-        console.log("Status: ", resposta.status);
         
         return resposta.status
     } catch (error) {

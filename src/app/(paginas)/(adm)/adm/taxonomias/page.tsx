@@ -1,5 +1,7 @@
 "use client";
 
+import EditarEdital from "@/components/editais/EditarEdital";
+import EditarRamo from "@/components/ramos/EditarRamo";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -86,17 +88,27 @@ export default function Taxonomias() {
 
   const divRefs = useRef<Record<string, HTMLDivElement | HTMLButtonElement | null>>({});
 
+  async function getTaxonomias() {
+    const taxs = await getTaxonomiasService()
+    setTax(taxs || []);
+  }
+
+  async function getFontes() {
+    const fnts = await getFontesService()
+    setFontes(fnts || []);
+  }
+
+  async function getTipificacoes() {
+    const tips = await getTipificacoesService()
+    setTipificacoes(tips || []);
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const taxs = await getTaxonomiasService()
-        setTax(taxs || []);
-
-        const fnts = await getFontesService()
-        setFontes(fnts || []);
-
-        const tips = await getTipificacoesService()
-        setTipificacoes(tips || []);
+        await getTaxonomias();
+        await getFontes();
+        await getTipificacoes();
 
       } catch (error) {
         console.error("Erro ao buscar taxonomias:", error); // Chamar um toast no lugar
@@ -125,17 +137,14 @@ export default function Taxonomias() {
         ref?.contains(target)
       );
 
-      if (clicouDentroDeAlguma) {
-        console.log("Clicou dentro de uma taxonomia");
-      }
+      console.log("clicouDentroDeAlguma: ", clicouDentroDeAlguma);
+      console.log("VALOR DE FLAGHOOK:", flagHook.current);
 
       if (!clicouDentroDeAlguma && !openDialogRamo) {
-        console.log("CLICOU FORA DE UMA TAXONOMIA");
-
         if(flagHook.current === true) return
         setTaxonomiaSelecionada(null);
         setIdSelecionado("");
-        console.log("EXECUTOU ESSA DESGRAÇA")
+
       }
     };
 
@@ -154,7 +163,7 @@ export default function Taxonomias() {
     const resposta = await adicionarRamoService(ramo);
 
     if (resposta !== 201) {
-      throw new Error("Erro ao adicionar ramo");
+      toast.error("Erro ao adicionar ramo");
     }
 
     setOpenDialogRamo(false);
@@ -168,7 +177,7 @@ export default function Taxonomias() {
       const resposta = await excluirTaxonomiaService(taxonomiaId);
 
       if (resposta !== 204) {
-        throw new Error("Erro ao excluir taxonomia");
+        toast.error("Erro ao excluir taxonomia");
       }
 
       setIdSelecionado("");
@@ -190,9 +199,14 @@ export default function Taxonomias() {
       setRamosDaTaxonomia(ramos || []);
 
     } catch (error) {
-      console.error('Erro ao excluir ramo:', error);
+      toast.error('Erro ao excluir ramo!');
     }
   };
+
+  async function atualizarTaxonomiaDepoisDeAdicionarRamo(idTaxonomia: string | undefined) {
+    const ramos = await buscarRamosDaTaxonomiaService(idTaxonomia);
+    setRamosDaTaxonomia(ramos || []);
+  }
 
   const adicionarTaxonomia = async () => {
     try {
@@ -710,7 +724,7 @@ export default function Taxonomias() {
         </div>
 
         <div className="w-1/2 h-[69vh] relative overflow-y-auto">
-          <Card className="m-4 overflow-y-auto">
+          <Card ref={(e) => { divRefs.current["card_ramos"] = e }} className="m-4 overflow-y-auto">
             <CardHeader>
               <CardTitle className="flex flex-row justify-between items-center">
                 <h1 className="text-2xl">Ramos</h1>
@@ -801,82 +815,88 @@ export default function Taxonomias() {
                           <span>{ramo.title}</span>
 
                           <div className="flex flex-row gap-2">
-                            <Dialog open={openDialogIdRamo === ramo.id} onOpenChange={(open) => { setOpenDialogIdRamo(open ? ramo.id : null) }}>
-                              <DialogTrigger asChild>
-                                <button
-                                  onClick={() => {
-                                    flagHook.current = true
-                                    setRamoSelecionado(ramo)
-                                  }}
-                                  title="Editar ramo"
-                                  className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 hover:cursor-pointer"
+                            <EditarRamo flagHook={flagHook} divRefs={divRefs} atualizarRamos={atualizarTaxonomiaDepoisDeAdicionarRamo} idTaxonomia={taxonomiaSelecionada.id} ramo={ramo} />
+                            {
+                              /*
+                              
+                              <Dialog open={openDialogIdRamo === ramo.id} onOpenChange={(open) => { setOpenDialogIdRamo(open ? ramo.id : null) }}>
+                                <DialogTrigger asChild>
+                                  <button
+                                    onClick={() => {
+                                      flagHook.current = true
+                                      setRamoSelecionado(ramo)
+                                    }}
+                                    title="Editar ramo"
+                                    className="flex items-center justify-center h-8 w-8 bg-white rounded-sm border border-gray-300 hover:cursor-pointer"
+                                  >
+                                    <PencilLine className="h-4 w-4" strokeWidth={1.5} />
+                                  </button>
+                                </DialogTrigger>
+  
+                                <DialogContent
+                                  ref={(e) => { divRefs.current["dialog_ramo_" + ramo.id] = e }}
+                                  onCloseAutoFocus={limparCamposRamo}
+                                  onOpenAutoFocus={() => alert(JSON.stringify(ramoSelecionado))}
                                 >
-                                  <PencilLine className="h-4 w-4" strokeWidth={1.5} />
-                                </button>
-                              </DialogTrigger>
-
-                              <DialogContent
-                                ref={(e) => { divRefs.current["dialog_ramo_" + ramo.id] = e }}
-                                onCloseAutoFocus={limparCamposRamo}
-
-                              >
-                                <DialogHeader>
-                                  <DialogTitle>Editar ramo</DialogTitle>
-                                  <DialogDescription>
-                                    Atualize os dados do ramo selecionado
-                                  </DialogDescription>
-                                </DialogHeader>
-
-                                <form onSubmit={handleSubmitRamo(atualizarRamoDaTaxonomia)} className="space-y-4">
-                                  <div>
-                                    <label htmlFor="titleRamo" className="block text-sm font-medium text-gray-700">
-                                      Título
-                                    </label>
-
-                                    <input
-                                      {...registerRamo("tituloRamo")}
-                                      defaultValue={ramoSelecionado?.title}
-                                      onChange={(e) => setTituloRamo(e.target.value)}
-                                      type="text"
-                                      id="titleTaxonomia"
-                                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                    />
-                                    {errorsRamo.tituloRamo && <span className="text-red-500 text-sm italic">{errorsRamo.tituloRamo.message}</span>}
-                                  </div>
-
-                                  <div>
-                                    <label htmlFor="descriptionRamo" className="block text-sm font-medium text-gray-700">
-                                      Descrição do ramo
-                                    </label>
-
-                                    <textarea
-                                      {...registerRamo("descricaoRamo")}
-                                      defaultValue={ramoSelecionado?.description}
-                                      onChange={(e) => setDescricaoRamo(e.target.value)}
-                                      id="descriptionTaxonomia"
-                                      placeholder="Digite uma descrição para a taxonomia"
-                                      rows={4}
-                                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                    />
-                                    {errorsRamo.descricaoRamo && <span className="text-red-500 text-sm italic">{errorsRamo.descricaoRamo.message}</span>}
-                                  </div>
-
-                                  <DialogFooter>
-                                    <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
-                                      Cancelar
-                                    </DialogClose>
-
-                                    <button
-                                      className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md"
-                                      type="submit"
-                                    >
-                                      Salvar alterações
-                                    </button>
-                                  </DialogFooter>
-                                </form>
-
-                              </DialogContent>
-                            </Dialog>
+                                  <DialogHeader>
+                                    <DialogTitle>Editar ramo</DialogTitle>
+                                    <DialogDescription>
+                                      Atualize os dados do ramo selecionado
+                                    </DialogDescription>
+                                  </DialogHeader>
+  
+                                  <form onSubmit={handleSubmitRamo(atualizarRamoDaTaxonomia)} className="space-y-4">
+                                    <div>
+                                      <label htmlFor="titleRamo" className="block text-sm font-medium text-gray-700">
+                                        Título
+                                      </label>
+  
+                                      <input
+                                        {...registerRamo("tituloRamo")}
+                                        defaultValue={ramoSelecionado ?.title || "asfasdfsadf"}
+                                        onChange={(e) => setTituloRamo(e.target.value)}
+                                        type="text"
+                                        id="titleTaxonomia"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                      />
+                                      {errorsRamo.tituloRamo && <span className="text-red-500 text-sm italic">{errorsRamo.tituloRamo.message}</span>}
+                                    </div>
+  
+                                    <div>
+                                      <label htmlFor="descriptionRamo" className="block text-sm font-medium text-gray-700">
+                                        Descrição do ramo
+                                      </label>
+  
+                                      <textarea
+                                        {...registerRamo("descricaoRamo")}
+                                        defaultValue={ramoSelecionado?.description}
+                                        onChange={(e) => setDescricaoRamo(e.target.value)}
+                                        id="descriptionTaxonomia"
+                                        placeholder="Digite uma descrição para a taxonomia"
+                                        rows={4}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                      />
+                                      {errorsRamo.descricaoRamo && <span className="text-red-500 text-sm italic">{errorsRamo.descricaoRamo.message}</span>}
+                                    </div>
+  
+                                    <DialogFooter>
+                                      <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
+                                        Cancelar
+                                      </DialogClose>
+  
+                                      <button
+                                        className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md"
+                                        type="submit"
+                                      >
+                                        Salvar alterações
+                                      </button>
+                                    </DialogFooter>
+                                  </form>
+  
+                                </DialogContent>
+                              </Dialog>
+                              */
+                            }
 
                             <Dialog open={openDialogIdRamoExcluir === ramo.id} onOpenChange={(open) => { setOpenDialogIdRamoExcluir(open ? ramo.id : null) }}>
                               <DialogTrigger asChild>
@@ -941,10 +961,10 @@ export default function Taxonomias() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="ml-3">Nenhum ramo disponível adicione um novo ramo.</p>
+                  <p className="ml-3 animate-pulse">Nenhum ramo disponível para a taxonomia selecionada.</p>
                 )
               ) : (
-                <p className="ml-3">Selecione uma taxonomia.</p>
+                <p className="ml-3 animate-pulse">Selecione uma taxonomia.</p>
               )
 
               }
