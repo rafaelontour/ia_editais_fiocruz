@@ -11,8 +11,8 @@ import { Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { excluirEditalService } from "@/service/edital";
 import { toast } from "sonner";
-import VisualizarEdital from "@/app/(paginas)/(adm)/adm/editais/[id]/page";
 import Link from "next/link";
+import { formatarData } from "@/lib/utils";
 
 
 interface Props {
@@ -58,22 +58,6 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                 return "bg-green-800";
         }
     };
-
-    function formatarData(data: string | undefined): string {
-        const date = new Date(data || "");
-        
-        const formatado = date.toLocaleString("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        });
-
-        return formatado;
-    }
-
 
     return (
         <div

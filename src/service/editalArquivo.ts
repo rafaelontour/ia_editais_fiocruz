@@ -1,7 +1,28 @@
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-async function enviarArquivoService(idEdital: string | undefined, arquivo: File): Promise<number | undefined> {
+async function getEditalArquivoService(id: string): Promise<any> {
+    try {
+        const resposta = await fetch(`${urlBase}/doc/${id}/release/`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
 
+        if (!resposta.ok) return
+
+        const data = await resposta.json();
+
+        return data;
+        
+    } catch(e) {
+        return
+    }
+}
+
+
+async function enviarArquivoService(idEdital: string | undefined, arquivo: File): Promise<number | undefined> {
     try {
         const formData = new FormData();
         formData.append('file', arquivo);
@@ -19,5 +40,6 @@ async function enviarArquivoService(idEdital: string | undefined, arquivo: File)
 }
 
 export {
-    enviarArquivoService
+    enviarArquivoService,
+    getEditalArquivoService
 }

@@ -116,10 +116,29 @@ async function excluirUsuarioService(usuarioId: string): Promise<number | undefi
     }
 }
 
+async function buscarResponsavelEdital(idResponsavel: string): Promise<string> {
+    try {
+        const res = await fetch(`${urlBase}/user/${idResponsavel}/`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
+
+        const data =  await res.json();
+
+        return data.username;
+    } catch(e) {
+        return ""
+    }
+}
+
 export {
     getUsuarioLogado,
     getUsuariosPorUnidade,
     adicionarUsuarioService,
     atualizarUsuarioService,
     excluirUsuarioService,
+    buscarResponsavelEdital
 }

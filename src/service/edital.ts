@@ -24,6 +24,27 @@ async function getEditaisService(): Promise<Edital[] | undefined> {
     }
 }
 
+async function getEditalPorIdService(id: string): Promise<Edital | undefined> {
+    try {
+        const res = await fetch(`${urlBase}/doc/${id}`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
+
+        if (!res.ok) return
+
+        const data = await res.json();
+
+        return data;
+        
+    } catch(e) {
+        return
+    }
+}
+
 async function adicionarEditalService(dados: any): Promise<[number, string] | undefined> {
     try {
         const resposta = await fetch(`${urlBase}/doc/`, {
@@ -156,6 +177,7 @@ async function definirStatusConcluido(editalId: string): Promise<number | undefi
 
 export {
     getEditaisService,
+    getEditalPorIdService,
     adicionarEditalService,
     atualizarEditalService,
     excluirEditalService,
