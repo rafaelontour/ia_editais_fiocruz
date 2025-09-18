@@ -39,40 +39,40 @@ export default function Cabecalho() {
 
             {
                 !usuario ?
-                <Button
-                    onClick={() => router.push("/auth/login")}
-                    variant={"destructive"}
-                    className="
+                    <Button
+                        onClick={() => router.push("/auth/login")}
+                        variant={"destructive"}
+                        className="
                         flex h-fit ml-auto mr-2 py-[5px] px-4
                         items-center gap-1 bg-vermelho rounded-sm
                         hover:cursor-pointer
                     "
-                    style={{
-                        boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)"
-                    }}
-                >
-                    <IconLogin color="white" size={26} />
-                    <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
-                </Button>
-                :
-                <Button
-                    onClick={() => {
-                        router.push("/")
-                        deslogar()
-                    }}
-                    variant={"destructive"}
-                    className="
+                        style={{
+                            boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)"
+                        }}
+                    >
+                        <IconLogin color="white" size={26} />
+                        <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
+                    </Button>
+                    :
+                    <Button
+                        onClick={() => {
+                            router.push("/")
+                            deslogar()
+                        }}
+                        variant={"destructive"}
+                        className="
                         flex h-fit ml-auto mr-2 py-[5px] px-4
                         items-center gap-1 bg-vermelho rounded-sm
                         hover:cursor-pointer
                     "
-                    style={{
-                        boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)"
-                    }}
-                >
-                    <IconLogout color="white" size={26} />
-                    <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
-                </Button>
+                        style={{
+                            boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)"
+                        }}
+                    >
+                        <IconLogout color="white" size={26} />
+                        <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
+                    </Button>
             }
         </header>
     )

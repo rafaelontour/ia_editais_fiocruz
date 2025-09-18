@@ -1,4 +1,4 @@
-export default interface Fonte {
+export interface Fonte {
     id: string;
     name: string;
     description: string;

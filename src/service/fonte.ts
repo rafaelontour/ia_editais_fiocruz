@@ -4,27 +4,28 @@ const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getFontesService(): Promise<Fonte[] | undefined> {
     try {
-        const dados = await fetch(`${urlBase}/source/`, { 
+        const dados = await fetch(`${urlBase}/source/`, {
             method: 'GET',
             credentials: "include"
         })
-        
+
         if (!dados.ok) {
             throw new Error('Erro ao buscar fontes')
         }
-        const fontes: Fonte[] = await dados.json()
+        const { sources } = await dados.json()
+        const fontes: Fonte[] = sources
 
         for (let fonte of fontes) {
             fonte.created_at = new Date(fonte.created_at).toLocaleString()
         }
-        
+
         return fontes
     } catch (error) {
         console.error('Erro ao buscar fontes', error)
     }
 }
 
-async function adicionarFonteService(nome: string, descricao: string) : Promise<number | undefined> {
+async function adicionarFonteService(nome: string, descricao: string): Promise<number | undefined> {
     try {
         const url = `${urlBase}/source/`
         const resposta = await fetch(`${url}`, {
@@ -45,7 +46,7 @@ async function adicionarFonteService(nome: string, descricao: string) : Promise<
     }
 }
 
-async function atualizarFonteService(id: string, nome: string, descricao: string) : Promise<number | undefined> {
+async function atualizarFonteService(id: string, nome: string, descricao: string): Promise<number | undefined> {
     try {
         const url = `${urlBase}/source/`
         const resposta = await fetch(`${url}`, {
@@ -70,21 +71,20 @@ async function atualizarFonteService(id: string, nome: string, descricao: string
 async function excluirFonteService(id: string): Promise<number | undefined> {
     const url = `${urlBase}/source/${id}`
     try {
-        const resposta = await fetch(`${url}`, { 
+        const resposta = await fetch(`${url}`, {
             method: "DELETE",
             credentials: "include",
             headers: {
                 "content-type": "application/json"
             }
         });
-
         return resposta.status
     } catch (error) {
         console.error('Erro ao excluir fonte:', error);
     }
 }
 
-export { 
+export {
     getFontesService,
     adicionarFonteService,
     atualizarFonteService,

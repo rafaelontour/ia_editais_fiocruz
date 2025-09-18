@@ -1,8 +1,8 @@
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getToken(dados: any) {
-     try {
-        const url = `${urlBase}/auth/login`;
+    try {
+        const url = `${urlBase}/auth/sign-in`;
 
         const dadosLogin = new URLSearchParams(dados).toString();
 
@@ -25,7 +25,7 @@ async function getToken(dados: any) {
 
 async function logout() {
     try {
-        const url = `${urlBase}/auth/logout`;
+        const url = `${urlBase}/auth/sign-in`;
 
         const res = await fetch(url, {
             method: "POST",
@@ -36,7 +36,7 @@ async function logout() {
         });
 
         return res.status
-    } catch(e) {
+    } catch (e) {
         return
     }
 }

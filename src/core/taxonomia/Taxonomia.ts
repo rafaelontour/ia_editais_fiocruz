@@ -1,7 +1,7 @@
 import { Fonte } from "../fonte";
-import Ramo from "../ramo/Ramo";
+import { Ramo } from "../ramo/Ramo";
 
-export default interface Taxonomia {
+export interface Taxonomia {
     typification_id: string | undefined;
     id?: string;
     title: string;

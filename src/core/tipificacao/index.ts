@@ -1,3 +1,3 @@
-import Tipificacoes from "./Tipificacao";
+import { Tipificacao } from "./Tipificacao";
 
-export type { Tipificacoes }
+export type { Tipificacao }

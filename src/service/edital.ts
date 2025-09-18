@@ -12,14 +12,10 @@ async function getEditaisService(): Promise<Edital[] | undefined> {
                 "Content-type": "application/json"
             }
         })
-
         if (!res.ok) return
-
-        const data = await res.json();
-
-        return data;
-        
-    } catch(e) {
+        const { documents } = await res.json();
+        return documents;
+    } catch (e) {
         return
     }
 }
@@ -65,7 +61,7 @@ async function adicionarEditalService(dados: any): Promise<[number, string] | un
         const json = await resposta.json()
 
         return [resposta.status, json.id]
-    } catch(e) {
+    } catch (e) {
         return
     }
 }
@@ -90,7 +86,7 @@ async function atualizarEditalService(idEdital: string, dados: any): Promise<num
         })
 
         return resposta.status
-    } catch(e) {
+    } catch (e) {
         return
     }
 }
@@ -106,7 +102,7 @@ async function excluirEditalService(editalId: string): Promise<number | undefine
         })
 
         return responsta.status
-    } catch(e) {
+    } catch (e) {
         return
     }
 }
@@ -122,7 +118,7 @@ async function definirStatusRascunho(editalId: string): Promise<number | undefin
         })
 
         return res.status
-    } catch(e) {
+    } catch (e) {
         return
     }
 }
@@ -138,7 +134,7 @@ async function definirStatusEmConstrucao(editalId: string): Promise<number | und
         })
 
         return res.status
-    } catch(e) {
+    } catch (e) {
         return
     }
 }
@@ -154,7 +150,7 @@ async function definirStatusEmAnalise(editalId: string): Promise<number | undefi
         })
 
         return res.status
-    } catch(e) {
+    } catch (e) {
         return
     }
 }
@@ -170,7 +166,7 @@ async function definirStatusConcluido(editalId: string): Promise<number | undefi
         })
 
         return res.status
-    } catch(e) {
+    } catch (e) {
         return
     }
 }

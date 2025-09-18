@@ -1,3 +1,3 @@
-import Fonte from "./Fonte";
+import { Fonte } from "./Fonte";
 
 export type { Fonte } 

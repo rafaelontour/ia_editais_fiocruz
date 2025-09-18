@@ -13,12 +13,10 @@ async function getTodasUnidades(): Promise<Unidade[]> {
         });
 
         if (!res.ok) throw new Error("Erro ao buscar Unidades");
-
         const data = await res.json();
+        return data.units;
 
-        return data;
-        
-    } catch(e) {
+    } catch (e) {
         throw new Error("Erro ao buscar tipificacoes: " + e)
 
     }
@@ -39,34 +37,34 @@ async function getUnidadePorId(unidadeId: string) {
         const data = await res.json();
 
         return data;
-        
-    } catch(e) {
+
+    } catch (e) {
         throw new Error("Erro ao buscar unidade: " + e)
     }
 }
 
-async function adicionarUnidadeService(name: string, location : string){
+async function adicionarUnidadeService(name: string, location: string) {
     try {
-        const res = await fetch(`${urlBase}/unit/`,{
+        const res = await fetch(`${urlBase}/unit/`, {
             method: "POST",
             credentials: "include",
             headers: {
                 "content-type": "application/json"
             },
-            body: JSON.stringify({name, location})
+            body: JSON.stringify({ name, location })
         });
 
         if (!res.ok) throw new Error("Erro ao criar unidade ");
 
         const data = await res.json();
         return data;
-        
-    } catch(e) {
+
+    } catch (e) {
         throw new Error("Erro ao criar unidade: " + e)
     }
 }
 
-async function excluirUsuarioService(unidadeId: string){
+async function excluirUsuarioService(unidadeId: string) {
     try {
         const res = await fetch(`${urlBase}/unit/${unidadeId}/`, {
             method: "DELETE",
@@ -80,8 +78,8 @@ async function excluirUsuarioService(unidadeId: string){
 
         const data = await res.json();
         return data;
-        
-    } catch(e) {
+
+    } catch (e) {
         throw new Error("Erro ao deletar unidade: " + e)
     }
 }

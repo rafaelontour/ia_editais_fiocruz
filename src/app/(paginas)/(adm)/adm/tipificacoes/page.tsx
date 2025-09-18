@@ -19,8 +19,8 @@ import Masonry from "react-masonry-css";
 const schemaTipificacao = z.object({
     nome: z.string().min(1, "O nome da tipificação é obrigatório"),
     fontesSelecionadas: z
-    .array(z.string().min(1))
-    .min(1, "Selecione pelo menos uma fonte")
+        .array(z.string().min(1))
+        .min(1, "Selecione pelo menos uma fonte")
 })
 
 export default function Tipificacoes() {
@@ -31,18 +31,18 @@ export default function Tipificacoes() {
             fontesSelecionadas: []
         }
     });
-    
+
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [fontes, setFontes] = useState<Fonte[]>([]);
-    
+
     const [nomeTipificacao, setNomeTipificacao] = useState<string>("");
-    
+
     const [dialogTipificacao, setDialogTipificacao] = useState(false);
     const [idDialogExcluir, setIdDialogExcluir] = useState<string | null>("");
     const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
-    
+
     const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
-    
+
     const breakpointColumns = {
         default: 3,
         1100: 3,
@@ -58,10 +58,10 @@ export default function Tipificacoes() {
             console.error("Erro ao buscar tipificacoes ou fontes", erro)
         }
     }, []);
-    
+
     const getTipificacoes = async () => {
         const dados = await getTipificacoesService();
-        
+
         if (dados == null) {
             throw new Error('Erro ao buscar tipificacoes')
         }
@@ -95,21 +95,16 @@ export default function Tipificacoes() {
         const tip: Tipificacao = {
             id: idDialogEditar as string,
             name: data.nome,
-            source: data.fontesSelecionadas
+            source_ids: data.fontesSelecionadas
         }
-
-        console.log(tip);
-        
         const resposta = await atualizarTipificacaoService(tip);
-
         if (resposta !== 200) {
             throw new Error('Erro ao atualizar tipificacao')
         }
-
         getTipificacoes();
         limparCampos();
         setDialogTipificacao(false)
-        
+
     }
 
     const excluirTipificacao = async (id: string) => {
@@ -180,7 +175,7 @@ export default function Tipificacoes() {
                                         {...register("nome")}
                                         type="text"
                                         className="border-2 border-gray-300 rounded-md p-2 w-full"
-                                        // onChange={(e) => setNomeTipificacao(e.target.value)}
+                                        onChange={(e) => setNomeTipificacao(e.target.value)}
                                     />
                                     {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
                                 </p>
@@ -276,215 +271,215 @@ export default function Tipificacoes() {
                     </Dialog>
 
                 </div>
-                    <Masonry
-                        breakpointCols={breakpointColumns}
-                        className="flex gap-5 mb-10"
-                    >
+                <Masonry
+                    breakpointCols={breakpointColumns}
+                    className="flex gap-5 mb-10"
+                >
                     {tipificacoes && tipificacoes.map((tipificacao, index) => (
-                            <div
-                                style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
-                                key={index}
-                                className="
+                        <div
+                            style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
+                            key={index}
+                            className="
                                     flex flex-col gap-2 rounded-md p-4 w-full
                                     transition ease-in-out duration-100 mb-5
                                 "
-                            >
-                                <div className="flex flex-col gap-2">
-                                    <h2 className="text-xl font-semibold">{tipificacao.name}</h2>
-                                    <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
-                                        Lei: {tipificacao.name}
-                                    </p>
-                                    <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
-                                        Lei Complementar: {tipificacao.name}
-                                    </p>
-                                </div>
+                        >
+                            <div className="flex flex-col gap-2">
+                                <h2 className="text-xl font-semibold">{tipificacao.name}</h2>
+                                <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
+                                    Lei: {tipificacao.name}
+                                </p>
+                                <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
+                                    Lei Complementar: {tipificacao.name}
+                                </p>
+                            </div>
 
-                                <div className="flex justify-between items-center mt-3">
-                                    <p className="flex items-center gap-2 text-sm text-gray-400">
-                                        <Calendar size={27} />
-                                        <span className="flex justify-center flex-col">
-                                            <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
-                                            <span>{tipificacao.created_at}</span>
-                                        </span>
-                                    </p>
-                                    <div className="flex gap-3">
-                                        <Dialog open={idDialogEditar === tipificacao.id} onOpenChange={(open) => setIdDialogEditar(open ? tipificacao.id : null)}>
-                                            <DialogTrigger asChild>
-                                                <Button
-                                                    onClick={() => {
-                                                        const fontesDaTaxonomia = filtrarPraEdicao(tipificacao.source)
-                                                        setFontesSelecionadas(fontesDaTaxonomia)
-                                                        setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))
-                                                    }}
-                                                    title="Editar tipificação"
-                                                    className={`
+                            <div className="flex justify-between items-center mt-3">
+                                <p className="flex items-center gap-2 text-sm text-gray-400">
+                                    <Calendar size={27} />
+                                    <span className="flex justify-center flex-col">
+                                        <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
+                                        <span>{tipificacao.created_at}</span>
+                                    </span>
+                                </p>
+                                <div className="flex gap-3">
+                                    <Dialog open={idDialogEditar === tipificacao.id} onOpenChange={(open) => setIdDialogEditar(open ? tipificacao.id : null)}>
+                                        <DialogTrigger asChild>
+                                            <Button
+                                                onClick={() => {
+                                                    const fontesDaTaxonomia = filtrarPraEdicao(tipificacao.source_ids)
+                                                    setFontesSelecionadas(fontesDaTaxonomia)
+                                                    setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))
+                                                }}
+                                                title="Editar tipificação"
+                                                className={`
                                                         h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
                                                         bg-branco hover:bg-branco
                                                     `}
-                                                    size={"icon"}
-                                                >
-                                                    <PencilLine color="black" />
-                                                </Button>
-                                            </DialogTrigger>
+                                                size={"icon"}
+                                            >
+                                                <PencilLine color="black" />
+                                            </Button>
+                                        </DialogTrigger>
 
-                                            <DialogContent onCloseAutoFocus={limparCampos}>
-                                                <DialogHeader>
-                                                    <DialogTitle className="text-3xl font-bold">
-                                                        Editar tipificação
-                                                    </DialogTitle>
+                                        <DialogContent onCloseAutoFocus={limparCampos}>
+                                            <DialogHeader>
+                                                <DialogTitle className="text-3xl font-bold">
+                                                    Editar tipificação
+                                                </DialogTitle>
 
-                                                    <DialogDescription className="text-md pb-4">
-                                                        Atualize os dados da tipificação.
-                                                    </DialogDescription>
-                                                </DialogHeader>
+                                                <DialogDescription className="text-md pb-4">
+                                                    Atualize os dados da tipificação.
+                                                </DialogDescription>
+                                            </DialogHeader>
 
-                                                <form onSubmit={handleSubmit(atualizarTipificacao)} className="flex text-lg flex-col gap-4">
-                                                    <p className="flex flex-col gap-2">
-                                                        <label className="">Nome da tipificação</label>
-                                                        <input
-                                                            defaultValue={tipificacao.name}
-                                                            {...register("nome")}
-                                                            type="text"
-                                                            className="border-2 border-gray-300 rounded-md p-2 w-full"
-                                                            // onChange={(e) => setNomeTipificacao(e.target.value)}
-                                                        />
-                                                        {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
-                                                    </p>
+                                            <form onSubmit={handleSubmit(atualizarTipificacao)} className="flex text-lg flex-col gap-4">
+                                                <p className="flex flex-col gap-2">
+                                                    <label className="">Nome da tipificação</label>
+                                                    <input
+                                                        defaultValue={tipificacao.name}
+                                                        {...register("nome")}
+                                                        type="text"
+                                                        className="border-2 border-gray-300 rounded-md p-2 w-full"
+                                                    // onChange={(e) => setNomeTipificacao(e.target.value)}
+                                                    />
+                                                    {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
+                                                </p>
 
-                                                    <p className="flex flex-col gap-2">
-                                                        <label>Fontes</label>
-                                                        <select
-                                                            defaultValue={"Selecione uma fonte"}
-                                                            className="border-2 border-gray-300 rounded-md p-2"
-                                                            onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                                                                setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
-                                                                const novaFonteId = e.target.value;
-                                                                const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
+                                                <p className="flex flex-col gap-2">
+                                                    <label>Fontes</label>
+                                                    <select
+                                                        defaultValue={"Selecione uma fonte"}
+                                                        className="border-2 border-gray-300 rounded-md p-2"
+                                                        onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                                            setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
+                                                            const novaFonteId = e.target.value;
+                                                            const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
 
-                                                                if (!fonteJaSelecionada) {
-                                                                    const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
-                                                                    setValue("fontesSelecionadas", novasFontes);
-                                                                    setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
-                                                                }
-                                                            }}
-                                                        >
-                                                            <option disabled>Selecione uma fonte</option>
-                                                            {fontes && fontes.map((fonte, index) => (
-                                                                <option
-                                                                    key={index}
-                                                                    value={fonte.id}
-                                                                >
-                                                                    {fonte.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                        {errors.fontesSelecionadas && (
-                                                            <span className="text-red-500 text-sm italic">{errors.fontesSelecionadas.message}</span>
-                                                        )}
-                                                    </p>
-                                                    {
-                                                        fontesSelecionadas.length > 0 && (
-                                                            <div className="flex flex-col gap-2">
-                                                                <p>Fontes selecionadas: </p>
-                                                                <div className="grid grid-cols-3 gap-2 border-2 border-gray-300 rounded-md p-2">
-                                                                    {fontesSelecionadas.map((fonte, index) => (
-                                                                        <span key={index} className="flex gap-2 items-center w-fit">
-                                                                            <Checkbox
-                                                                                className="cursor-pointer"
-                                                                                checked
-                                                                                onClick={() => {
-                                                                                    const novaLista = fontesSelecionadas.filter(f => f.id !== fonte.id);
-                                                                                    setFontesSelecionadas(novaLista);
-                                                                                    setValue("fontesSelecionadas", novaLista.map(f => f.id)); // atualiza também o react-hook-form
-                                                                                }}
-                                                                                id="fonte"
-                                                                                key={index}
-                                                                            />
-                                                                            <Label className="cursor-pointer" htmlFor={"fonte"} key={fonte.id}>{fonte.name}</Label>
-                                                                        </span>
-                                                                    ))}
-                                                                </div>
+                                                            if (!fonteJaSelecionada) {
+                                                                const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
+                                                                setValue("fontesSelecionadas", novasFontes);
+                                                                setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <option disabled>Selecione uma fonte</option>
+                                                        {fontes && fontes.map((fonte, index) => (
+                                                            <option
+                                                                key={index}
+                                                                value={fonte.id}
+                                                            >
+                                                                {fonte.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    {errors.fontesSelecionadas && (
+                                                        <span className="text-red-500 text-sm italic">{errors.fontesSelecionadas.message}</span>
+                                                    )}
+                                                </p>
+                                                {
+                                                    fontesSelecionadas.length > 0 && (
+                                                        <div className="flex flex-col gap-2">
+                                                            <p>Fontes selecionadas: </p>
+                                                            <div className="grid grid-cols-3 gap-2 border-2 border-gray-300 rounded-md p-2">
+                                                                {fontesSelecionadas.map((fonte, index) => (
+                                                                    <span key={index} className="flex gap-2 items-center w-fit">
+                                                                        <Checkbox
+                                                                            className="cursor-pointer"
+                                                                            checked
+                                                                            onClick={() => {
+                                                                                const novaLista = fontesSelecionadas.filter(f => f.id !== fonte.id);
+                                                                                setFontesSelecionadas(novaLista);
+                                                                                setValue("fontesSelecionadas", novaLista.map(f => f.id)); // atualiza também o react-hook-form
+                                                                            }}
+                                                                            id="fonte"
+                                                                            key={index}
+                                                                        />
+                                                                        <Label className="cursor-pointer" htmlFor={"fonte"} key={fonte.id}>{fonte.name}</Label>
+                                                                    </span>
+                                                                ))}
                                                             </div>
-                                                        )
-                                                    }
-                                                    <div className="flex justify-end gap-4 mt-4">
-                                                        <DialogClose
-                                                            className={`
+                                                        </div>
+                                                    )
+                                                }
+                                                <div className="flex justify-end gap-4 mt-4">
+                                                    <DialogClose
+                                                        className={`
                                                                 transition ease-in-out text-white
                                                                 rounded-md px-3 bg-vermelho
                                                                 hover:cursor-pointer
                                                             `}
-                                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                        >
-                                                            Cancelar
-                                                        </DialogClose>
-
-                                                        <Button
-                                                            type="submit"
-                                                            className={`
-                                                                flex bg-verde hover:bg-verde
-                                                                text-white hover:cursor-pointer
-                                                                active:scale-100
-                                                            `}
-                                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                        >
-                                                            Salvar alterações
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            </DialogContent>
-                                        </Dialog>
-
-                                        <Dialog open={idDialogExcluir === tipificacao.id} onOpenChange={(open) => setIdDialogExcluir(open ? tipificacao.id : null)}>
-                                            <DialogTrigger asChild>
-                                                <Button
-                                                    title="Excluir tipificação"
-                                                    className={`
-                                                        h-8 w-8 bg-vermelho hover:bg-vermelho
-                                                        hover:cursor-pointer rounded-sm
-                                                    `}
-                                                    size={"icon"}
-                                                >
-                                                    <Trash />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>Excluir Tipificação</DialogTitle>
-                                                    <DialogDescription>
-                                                        Tem certeza que deseja excluir a tipificação <strong>{tipificacao.name}</strong>?
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <div className="flex justify-end gap-4 mt-4">
-                                                    <DialogClose
-                                                        className={`
-                                                            transition ease-in-out
-                                                            rounded-md px-3
-                                                            hover:cursor-pointer
-                                                        `}
                                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                     >
                                                         Cancelar
                                                     </DialogClose>
+
                                                     <Button
+                                                        type="submit"
                                                         className={`
+                                                                flex bg-verde hover:bg-verde
+                                                                text-white hover:cursor-pointer
+                                                                active:scale-100
+                                                            `}
+                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                    >
+                                                        Salvar alterações
+                                                    </Button>
+                                                </div>
+                                            </form>
+                                        </DialogContent>
+                                    </Dialog>
+
+                                    <Dialog open={idDialogExcluir === tipificacao.id} onOpenChange={(open) => setIdDialogExcluir(open ? tipificacao.id : null)}>
+                                        <DialogTrigger asChild>
+                                            <Button
+                                                title="Excluir tipificação"
+                                                className={`
+                                                        h-8 w-8 bg-vermelho hover:bg-vermelho
+                                                        hover:cursor-pointer rounded-sm
+                                                    `}
+                                                size={"icon"}
+                                            >
+                                                <Trash />
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>Excluir Tipificação</DialogTitle>
+                                                <DialogDescription>
+                                                    Tem certeza que deseja excluir a tipificação <strong>{tipificacao.name}</strong>?
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="flex justify-end gap-4 mt-4">
+                                                <DialogClose
+                                                    className={`
+                                                            transition ease-in-out
+                                                            rounded-md px-3
+                                                            hover:cursor-pointer
+                                                        `}
+                                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                >
+                                                    Cancelar
+                                                </DialogClose>
+                                                <Button
+                                                    className={`
                                                             flex bg-vermelho hover:bg-vermelho
                                                             text-white hover:cursor-pointer
                                                         `}
-                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                        onClick={() => excluirTipificacao(tipificacao.id)}
-                                                    >
-                                                        Excluir
-                                                    </Button>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </div>
+                                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                    onClick={() => excluirTipificacao(tipificacao.id)}
+                                                >
+                                                    Excluir
+                                                </Button>
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                             </div>
+                        </div>
                     ))}
-                    </Masonry>
-                
+                </Masonry>
+
             </div>
         </div>
     )

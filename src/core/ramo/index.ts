@@ -1,3 +1,3 @@
-import Ramo from "./Ramo";
+import { Ramo } from "./Ramo";
 
 export type { Ramo }

@@ -5,7 +5,7 @@ const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 async function getUsuarioLogado() {
     try {
 
-        const res = await fetch(`${urlBase}/user/my-self/`, {
+        const res = await fetch(`${urlBase}/user/my`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -13,10 +13,10 @@ async function getUsuarioLogado() {
             }
         })
 
-        const data =  await res.json();
+        const data = await res.json();
 
         return [data, res.status]
-    } catch(e) {
+    } catch (e) {
         return [undefined, 401]
     }
 }
@@ -30,14 +30,14 @@ async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<Usu
                 "content-type": "application/json"
             }
         })
-        
-        const data =  await res.json();
 
-        if(!data || data.lenght === 0) return []
-        
-        return data
-        
-    } catch(e) {
+        const data = await res.json();
+
+        if (!data || data.lenght === 0) return []
+
+        return data.users
+
+    } catch (e) {
         return
     }
 }
@@ -47,7 +47,7 @@ async function adicionarUsuarioService(dados: any) {
         const url = `${urlBase}/user/`;
 
         console.log(dados)
-        
+
         const res = await fetch(url, {
             method: "POST",
             credentials: "include",
@@ -63,10 +63,10 @@ async function adicionarUsuarioService(dados: any) {
             })
 
         });
-        
+
         return res.status
 
-    } catch(e) {
+    } catch (e) {
         console.error("Erro ao tentar criar usuário: ", e);
     }
 
@@ -96,7 +96,7 @@ async function atualizarUsuarioService(dados: any, id: string): Promise<number |
         console.log("Body: ", await res.json());
 
         return res.status
-    } catch(e) {
+    } catch (e) {
         console.error("Erro ao tentar criar usuário: ", e);
     }
 }
@@ -109,8 +109,8 @@ async function excluirUsuarioService(usuarioId: string): Promise<number | undefi
         });
 
         return res.status;
-        
-    } catch(e) {
+
+    } catch (e) {
         throw new Error("Erro ao deletar Usuario: " + e)
 
     }

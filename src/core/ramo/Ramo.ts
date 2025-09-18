@@ -1,4 +1,4 @@
-export default interface Ramo {
+export interface Ramo {
     taxonomy_id: string | undefined;
     id?: string;
     title: string;

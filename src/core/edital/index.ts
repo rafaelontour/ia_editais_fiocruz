@@ -1,3 +1,3 @@
-import Edital from "./Edital"
+import { Edital } from "./Edital"
 
 export type { Edital }

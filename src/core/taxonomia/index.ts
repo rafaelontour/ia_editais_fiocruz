@@ -1,3 +1,3 @@
-import Taxonomia from "./Taxonomia";
+import { Taxonomia } from "./Taxonomia";
 
 export type { Taxonomia }

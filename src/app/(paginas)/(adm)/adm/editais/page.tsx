@@ -25,7 +25,7 @@ export default function Editais() {
     const [montado, setMontado] = useState<boolean>(false);
     const [adicionouNovoEdital, setAdicionouNovoEdital] = useState<boolean>(false);
     const statuses: StatusEdital[] = ["PENDING", "UNDER_CONSTRUCTION", "WAITING_FOR_REVIEW", "COMPLETED"];
-    
+
     const [columns, setColumns] = useState<Record<StatusEdital, Edital[]>>({
         PENDING: [],
         UNDER_CONSTRUCTION: [],
@@ -40,7 +40,7 @@ export default function Editais() {
         to: StatusEdital
         overId: string | null
     } | null>(null);
-    
+
     useEffect(() => {
         getEditais();
         setMontado(true);
@@ -52,7 +52,6 @@ export default function Editais() {
 
     async function moverParaRascunho(editalId: string) {
         const resposta = await definirStatusRascunho(editalId);
-
         if (resposta !== 200) {
             toast.error("Erro ao mover para rascunho");
             return
@@ -89,7 +88,7 @@ export default function Editais() {
     const getEditais = async () => {
         try {
             const resposta = await getEditaisService();
-
+            console.log(resposta);
             if (!resposta) throw new Error();
 
             const dados = resposta || [];
@@ -102,17 +101,20 @@ export default function Editais() {
             };
 
             dados.forEach((edital) => {
-                if (statuses.includes(edital.status as StatusEdital)) {
-                    novasColunas[edital.status as StatusEdital].push(edital);
+                const status = edital.history?.[0]?.status as StatusEdital;
+
+                if (status && statuses.includes(status)) {
+                    novasColunas[status].push(edital);
                 }
             });
 
             setColumns(novasColunas);
-        } catch(e) {
+        } catch (e) {
             toast.error("Erro ao buscar editais!");
         }
     };
-    
+
+
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
     const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -155,7 +157,7 @@ export default function Editais() {
                     col.push(moved);
 
                     return { ...prev, [activeContainer]: col };
-                } 
+                }
 
                 if (oldIndex === -1) return prev;
                 const reordered = arrayMove(col, oldIndex, overIndex);
@@ -171,7 +173,7 @@ export default function Editais() {
 
             const oldIndex = source.findIndex(i => i.id === activeId);
             if (oldIndex === -1) return prev;
-            
+
             const [movedItem] = source.splice(oldIndex, 1);
 
             // guarda movimentação pendente e abre Dialog
@@ -207,7 +209,7 @@ export default function Editais() {
             if (pendingMove.to === "WAITING_FOR_REVIEW") moverParaEmAnalise(pendingMove.item.id);
             if (pendingMove.to === "COMPLETED") moverParaConcluido(pendingMove.item.id);
 
-            return { 
+            return {
                 ...prev,
                 [pendingMove.from]: source.filter(i => i.id !== pendingMove.item.id),
                 [pendingMove.to]: dest,
