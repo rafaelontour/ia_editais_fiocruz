@@ -84,6 +84,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     }
 
     async function enviarEdital(data: formData) {
+
         const dados = {
             name: data.nome,
             identifier: data.identificador,

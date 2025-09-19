@@ -304,6 +304,7 @@ export default function Taxonomias() {
     }
 
     const filtrarPraEdicao = (ids: string[]): Fonte[] => {
+        console.log("ids: ", ids);
         return fontes.filter(fonte => ids.includes(fonte.id));
     }
 
@@ -470,9 +471,9 @@ export default function Taxonomias() {
                             ref={(e) => { divRefs.current["divtax_" + index] = e }}
                             key={index}
                             className={`
-                hover:cursor-pointer m-4 ml-0
-                ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}
-              `}
+                                hover:cursor-pointer m-4 ml-0
+                                ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}
+                            `}
                             onMouseDown={() => {
                                 // setTaxonomiaSelecionada(item)
                                 setIdSelecionado(index.toString())
@@ -509,6 +510,7 @@ export default function Taxonomias() {
                                         <DialogTrigger asChild>
                                             <button
                                                 onClick={() => {
+                                                    console.log("item: ", item);
                                                     const fontesDaTaxonomia = filtrarPraEdicao(item.source)
                                                     setFontesSelecionadas(fontesDaTaxonomia)
                                                     setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))

@@ -8,4 +8,6 @@ export interface UsuarioUnidade {
     email?: string,
     access_level?: string,
     created_at?: string | number
+    updated_at?: string | number
+    editable_documents?: string[]
 }
