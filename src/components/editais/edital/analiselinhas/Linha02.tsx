@@ -11,8 +11,11 @@ export default function Linha02 ({ responsavel, data, numero, descricao }: Props
             <div className="flex flex-row justify-between">
                 <div>
                     <h3 className="text-lg font-semibold">Responsável</h3>
-                    <p className="text-sm text-gray-400">{responsavel}</p>
+                    {
+                        responsavel ? <p className="text-sm text-gray-400">{responsavel}</p> : <p className="text-sm text-white bg-red-400 px-2 py-0.5 rounded-sm">Falha ao buscar informação</p>
+                    }
                 </div>
+
                 <div>
                     <h3 className="text-lg font-semibold">Data</h3>
                     <p className="text-sm text-gray-400">{data}</p>
