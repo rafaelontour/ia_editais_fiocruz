@@ -6,8 +6,12 @@ export interface Taxonomia {
     id?: string;
     title: string;
     description: string;
-    source: string[];
+
+    sources: Fonte[];
+    source_ids?: string[];
+
     branches?: Ramo[];
+
     created_at?: string;
     updated_at?: string;
 }

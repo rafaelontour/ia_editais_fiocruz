@@ -211,8 +211,9 @@ export default function Taxonomias() {
             const novaTaxonomia: Taxonomia = {
                 typification_id: idTipificacao,
                 title: tituloTaxonomia,
+                sources: [],
                 description: descricaoTaxonomia,
-                source: fontesSelecionadas.map(fonte => fonte.id),
+                source_ids: fontesSelecionadas.map(fonte => fonte.id),
             }
 
             console.log(novaTaxonomia)
@@ -233,13 +234,15 @@ export default function Taxonomias() {
     }
 
     const atualizarTaxonomia = async (data: FormData) => {
+        console.log('XPTO')
         try {
             const novaTaxonomia: Taxonomia = {
                 id: taxonomiaSelecionada?.id,
                 typification_id: taxonomiaSelecionada?.typification_id,
                 title: data.titulo,
+                sources: [],
                 description: data.descricao,
-                source: fontesSelecionadas.map(fonte => fonte.id),
+                source_ids: fontesSelecionadas.map(fonte => fonte.id),
             }
 
             const resposta = await atualizarTaxonomiaService(novaTaxonomia);
@@ -510,8 +513,7 @@ export default function Taxonomias() {
                                         <DialogTrigger asChild>
                                             <button
                                                 onClick={() => {
-                                                    console.log("item: ", item);
-                                                    const fontesDaTaxonomia = filtrarPraEdicao(item.source)
+                                                    const fontesDaTaxonomia = item.sources
                                                     setFontesSelecionadas(fontesDaTaxonomia)
                                                     setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))
                                                     setTaxonomiaSelecionada(item)
@@ -655,10 +657,7 @@ export default function Taxonomias() {
                                                         Cancelar
                                                     </DialogClose>
 
-                                                    <button
-                                                        className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md"
-                                                        type="submit"
-                                                    >
+                                                    <button className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md" type="submit" >
                                                         Salvar alterações
                                                     </button>
                                                 </DialogFooter>
