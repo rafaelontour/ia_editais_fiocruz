@@ -1,4 +1,5 @@
 import { Taxonomia } from "@/core"
+import { title } from "process";
 
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
@@ -37,7 +38,12 @@ async function adicionarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(taxonomia)
+            body: JSON.stringify({
+                title: taxonomia.title,
+                description: taxonomia.description,
+                typification_id: taxonomia.typification_id,
+                source_ids: taxonomia.source_ids?.map(fonte => fonte.id)
+            })
         });
 
         return resposta.status
@@ -47,6 +53,8 @@ async function adicionarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
 }
 
 async function atualizarTaxonomiaService(taxonomia: Taxonomia): Promise<number | undefined> {
+
+    console.log("TAXONOMIA A SER ATUALIZADA NO SERVICE: ", taxonomia)
     try {
         const resposta = await fetch(`${urlBase}/taxonomy`, {
             method: "PUT",
@@ -54,12 +62,18 @@ async function atualizarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(taxonomia)
+            body: JSON.stringify({
+                id: taxonomia.id,
+                title: taxonomia.title,
+                description: taxonomia.description,
+                typification_id: taxonomia.typification_id,
+                source_ids: taxonomia.source_ids?.map(fonte => fonte.id)
+            })
         })
 
         return resposta.status
-    } catch (error) {
-        console.error('Erro ao atualizar taxonomia:', error);
+    } catch(error) {
+        return
     }
 }
 
@@ -75,7 +89,7 @@ async function excluirTaxonomiaService(idTaxomonia: string | undefined): Promise
 
         return resposta.status
     } catch (error) {
-        console.error('Erro ao excluir taxonomia:', error);
+        return
     }
 }
 

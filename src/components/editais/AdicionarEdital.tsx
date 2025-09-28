@@ -89,8 +89,8 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
             name: data.nome,
             identifier: data.identificador,
             description: data.descricao,
-            typification: data.tipificacoes,
-            editors: responsaveisEdital.map(usuario => usuario.id)
+            typification_ids: data.tipificacoes,
+            editors_ids: responsaveisEdital.map(usuario => usuario.id)
         }
         
         const [resposta, idEdital] = (await adicionarEditalService(dados)) ?? [];

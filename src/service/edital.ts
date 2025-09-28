@@ -51,13 +51,7 @@ async function adicionarEditalService(dados: any): Promise<[number, string] | un
             headers: {
                 "Content-type": "application/json"
             },
-            body: JSON.stringify({
-                name: dados.name,
-                identifier: dados.identifier,
-                description: dados.description,
-                editors_ids: dados.editors,
-                typification_ids: dados.typification,
-            })
+            body: JSON.stringify(dados)
         })
 
         const json = await resposta.json()

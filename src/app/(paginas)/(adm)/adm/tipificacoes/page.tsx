@@ -15,6 +15,8 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Calendar, ChevronRightIcon, PencilLine, Plus, Trash } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import Masonry from "react-masonry-css";
+import { toast } from "sonner";
+import { formatarData } from "@/lib/utils";
 
 const schemaTipificacao = z.object({
     nome: z.string().min(1, "O nome da tipificação é obrigatório"),
@@ -63,8 +65,10 @@ export default function Tipificacoes() {
         const dados = await getTipificacoesService();
 
         if (dados == null) {
-            throw new Error('Erro ao buscar tipificacoes')
+            toast.error('Erro ao buscar tipificacoes')
         }
+
+        console.log("TIPIFICACOES BUSCADAS GET: ", dados)
 
         setTipificacoes(dados)
     }
@@ -81,6 +85,7 @@ export default function Tipificacoes() {
 
 
     const adicionarTipificacao = async (data: FormData) => {
+        console.log("TIPIFICAÇÃO ADICIONADA ANTES DO POST: ", data)
         const dados = await adicionarTipificacaoService(data.nome, fontesSelecionadas);
         if (dados == null) {
             throw new Error('Erro ao adicionar tipificacao')
@@ -99,11 +104,11 @@ export default function Tipificacoes() {
         }
         const resposta = await atualizarTipificacaoService(tip);
         if (resposta !== 200) {
-            throw new Error('Erro ao atualizar tipificacao')
+            toast.error('Erro ao atualizar tipificacao')
         }
         getTipificacoes();
         limparCampos();
-        setDialogTipificacao(false)
+        setIdDialogEditar(null);
 
     }
 
@@ -124,6 +129,7 @@ export default function Tipificacoes() {
     }
 
     const filtrarPraEdicao = (ids: string[] | undefined): Fonte[] => {
+        console.log("ids passados: ", ids)
         return fontes.filter(fonte => ids?.includes(fonte.id));
     }
 
@@ -138,7 +144,7 @@ export default function Tipificacoes() {
         <div>
             <div className="flex flex-col gap-7">
                 <div className="flex justify-between w-full top-0 items-center bg-white">
-                    <p className="text-2xl font-bold">Gestão de tipificações</p>
+                    <p className="text-4xl font-bold">Gestão de tipificações</p>
 
                     <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
                         <DialogTrigger asChild>
@@ -160,11 +166,11 @@ export default function Tipificacoes() {
                         <DialogContent onCloseAutoFocus={limparCampos}>
                             <DialogHeader>
                                 <DialogTitle className="text-3xl font-bold">
-                                    Criar tipificação
+                                    Adicionar tipificação
                                 </DialogTitle>
 
                                 <DialogDescription className="text-md pb-4">
-                                    Adicione todos os dados da tipificação.
+                                    Preencha os campos abaixo para adicionar uma nova tipificação
                                 </DialogDescription>
                             </DialogHeader>
 
@@ -245,7 +251,7 @@ export default function Tipificacoes() {
                                         className={`
                                                 transition ease-in-out text-white
                                                 rounded-md px-3 bg-vermelho
-                                                hover:cursor-pointer
+                                                hover:cursor-pointer text-sm
                                             `}
                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                     >
@@ -273,9 +279,9 @@ export default function Tipificacoes() {
                 </div>
                 <Masonry
                     breakpointCols={breakpointColumns}
-                    className="flex gap-5 mb-10"
+                    className="flex relative gap-5 mb-10"
                 >
-                    {tipificacoes && tipificacoes.map((tipificacao, index) => (
+                    {tipificacoes.length > 0 ? tipificacoes.map((tipificacao, index) => (
                         <div
                             style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
                             key={index}
@@ -299,7 +305,7 @@ export default function Tipificacoes() {
                                     <Calendar size={27} />
                                     <span className="flex justify-center flex-col">
                                         <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
-                                        <span>{tipificacao.created_at}</span>
+                                        <span>{formatarData(tipificacao.created_at)}</span>
                                     </span>
                                 </p>
                                 <div className="flex gap-3">
@@ -307,7 +313,8 @@ export default function Tipificacoes() {
                                         <DialogTrigger asChild>
                                             <Button
                                                 onClick={() => {
-                                                    const fontesDaTaxonomia = filtrarPraEdicao(tipificacao.source_ids)
+                                                    const idsFontes = tipificacao.sources?.map((f: Fonte) => f.id);
+                                                    const fontesDaTaxonomia = filtrarPraEdicao(idsFontes);
                                                     setFontesSelecionadas(fontesDaTaxonomia)
                                                     setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))
                                                 }}
@@ -329,7 +336,7 @@ export default function Tipificacoes() {
                                                 </DialogTitle>
 
                                                 <DialogDescription className="text-md pb-4">
-                                                    Atualize os dados da tipificação.
+                                                    Atualize os dados da tipificação selecionada
                                                 </DialogDescription>
                                             </DialogHeader>
 
@@ -407,7 +414,7 @@ export default function Tipificacoes() {
                                                         className={`
                                                                 transition ease-in-out text-white
                                                                 rounded-md px-3 bg-vermelho
-                                                                hover:cursor-pointer
+                                                                hover:cursor-pointer text-sm
                                                             `}
                                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                     >
@@ -477,7 +484,7 @@ export default function Tipificacoes() {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    )) : <p className="absolute left-1/2 top-10 translate-x-[-50%] text-gray-400 text-2xl text-center animate-pulse">Nenhuma tipificação cadastrada.</p>}
                 </Masonry>
 
             </div>

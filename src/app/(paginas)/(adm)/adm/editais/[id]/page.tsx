@@ -9,13 +9,18 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { getEditalArquivoService } from "@/service/editalArquivo";
 import { getEditalPorIdService } from "@/service/edital";
+import { EditalArquivo } from "@/core/edital/Edital";
 
 export default async function VisualizarEdital({ params }: any) {
 
     const { id } = await params
 
-    const editalArquivo: File = await getEditalArquivoService(id);
-    const edital: Edital | undefined = await getEditalPorIdService(id); 
+    const urlBase = process.env.NEXT_PUBLIC_URL_BASE
+
+    const editalArquivo: EditalArquivo = await getEditalArquivoService(id);
+
+    console.log("editalArquivo: ", editalArquivo);
+    const edital: Edital | undefined = await getEditalPorIdService(id);
 
     return (
         <div className="flex flex-col w-full h-full max-h-full gap-10">
@@ -34,30 +39,37 @@ export default async function VisualizarEdital({ params }: any) {
                 direction="horizontal"
                 className="flex gap-6 w-full mb-10"
             >
-                    <ResizablePanel minSize={25} defaultSize={50}>
+                <div className="w-1/2 h-screen bg-red-500"></div>
+                {/* 
+                    <ResizablePanel minSize={36} defaultSize={50}>
                         <div className="flex w-full h-full">
-                            <div className="h-full border-2 border-gray-300 rounded-md items-center w-full">
-                                
-                            </div>
+                            <iframe
+                                src={urlBase + editalArquivo.releases[0].file_path}
+                                className="h-full border-2 border-gray-300 rounded-md items-center w-full"
+                            >
+
+                            </iframe>
                         </div>
                     </ResizablePanel>
+                
+                */}
 
-                    <div className="flex flex-col items-center gap-4">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <InfoIcon color="green" size={15} />
-                            </TooltipTrigger>
-                            <TooltipContent className="italic">Clique sobre a linha abaixo, segure e puxe para os lados para alterar a vizualização</TooltipContent>
-                        </Tooltip>
+                <div className="flex flex-col items-center gap-4">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <InfoIcon color="green" size={15} />
+                        </TooltipTrigger>
+                        <TooltipContent className="italic">Clique sobre a linha abaixo, segure e puxe para os lados para alterar a vizualização</TooltipContent>
+                    </Tooltip>
 
-                        <ResizableHandle className="w-[1px] h-full" />
+                    <ResizableHandle className="w-[1px] h-full" />
+                </div>
+
+                <ResizablePanel minSize={35} defaultSize={50}>
+                    <div className="w-full">
+                        <AnaliseEdital edital={edital} />
                     </div>
-
-                    <ResizablePanel minSize={35} defaultSize={50}>
-                        <div className="w-full">
-                            <AnaliseEdital edital={edital} />
-                        </div>
-                    </ResizablePanel>
+                </ResizablePanel>
             </ResizablePanelGroup>
         </div>
     )

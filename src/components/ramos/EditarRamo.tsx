@@ -17,6 +17,7 @@ import { PencilLine } from "lucide-react";
 import { atualizarRamoService } from "@/service/ramo";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
+import { Button } from "../ui/button";
 
 const schemaRamo = z.object({
   tituloRamo: z.string().min(1, "O título do ramo é obrigatório!"),
@@ -121,16 +122,28 @@ export default function EditarRamo({ ramo, idTaxonomia, atualizarRamos, divRefs,
                     </div>
 
                     <DialogFooter>
-                        <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
+                        <DialogClose
+                            className={`
+                                    transition ease-in-out text-white
+                                    rounded-md px-3 bg-vermelho
+                                    hover:cursor-pointer text-sm
+                                `}
+                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                        >
                             Cancelar
                         </DialogClose>
 
-                        <button
-                            className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md"
+                        <Button
                             type="submit"
+                            className={`
+                                    flex bg-verde hover:bg-verde
+                                    text-white hover:cursor-pointer
+                                    active:scale-100
+                                `}
+                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                         >
                             Salvar alterações
-                        </button>
+                        </Button>
                     </DialogFooter>
                 </form>
 

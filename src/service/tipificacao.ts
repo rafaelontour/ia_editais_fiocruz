@@ -31,14 +31,14 @@ async function adicionarTipificacaoService(nome: string, fontesSelecionadas: Fon
     try {
         let listaIds = fontesSelecionadas.map(fonte => fonte.id)
         const dados = await fetch(url, {
-            "method": "POST",
-            "credentials": "include",
-            "headers": {
+            method: "POST",
+            credentials: "include",
+            headers: {
                 "content-type": "application/json"
             },
-            "body": JSON.stringify({
-                "name": nome,
-                "source": listaIds
+            body: JSON.stringify({
+                name: nome,
+                source_ids: listaIds
             })
         })
 

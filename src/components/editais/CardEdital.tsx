@@ -47,7 +47,10 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     }
 
     const cor = () => {
-        switch (edital.status) {
+        if (!edital.history) return "white";
+        console.log(edital.history[0].status);
+        const status = edital.history && edital.history[0].status;
+        switch (status) {
             case "PENDING":
                 return "bg-gray-400";
             case "UNDER_CONSTRUCTION":

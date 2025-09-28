@@ -15,10 +15,6 @@ async function getFontesService(): Promise<Fonte[] | undefined> {
         const { sources } = await dados.json()
         const fontes: Fonte[] = sources
 
-        for (let fonte of fontes) {
-            fonte.created_at = new Date(fonte.created_at).toLocaleString()
-        }
-
         return fontes
     } catch (error) {
         console.error('Erro ao buscar fontes', error)

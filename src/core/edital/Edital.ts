@@ -1,3 +1,5 @@
+import { UsuarioUnidade } from "../usuario";
+
 export type StatusEdital = "PENDING" | "UNDER_CONSTRUCTION" | "WAITING_FOR_REVIEW" | "COMPLETED";
 
 export interface EditalHistory {
@@ -22,12 +24,22 @@ export interface Edital {
     identifier?: string;
     description?: string;
     status?: StatusEdital;
-    editors?: string[];
+    editors?: UsuarioUnidade[];
     typification?: string[];
     history?: EditalHistory[];
     typifications?: EditalTypification[];
     created_at?: string;
     updated_at?: string | null;
+}
+
+export interface EditalArquivo {
+    releases: [
+        {
+            id: string;
+            file_path: string;
+            created_at: string;
+        }
+    ]
 }
 
 export interface ListaEditais {

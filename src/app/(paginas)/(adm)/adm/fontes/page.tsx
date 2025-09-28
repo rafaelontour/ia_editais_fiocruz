@@ -13,6 +13,8 @@ import z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { watch } from 'fs';
+import { formatarData } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const schemaFonte = z.object({
     nome: z.string().min(1, "O nome da fonte é obrigatório"),
@@ -44,8 +46,10 @@ export default function Fontes() {
             const fnts = await getFontesService()
 
             if (!fnts) {
-                throw new Error("Erro ao buscar fontes")
+                toast.error("Erro ao buscar fontes")
+                return
             }
+
             setFontes([...fnts])
         } catch (error) {
             console.error("Erro ao buscar fontes", error)
@@ -61,7 +65,7 @@ export default function Fontes() {
             const fonteParaEditar = fontes.find(f => f.id === openDialogIdEditar);
             if (fonteParaEditar) {
                 setValue("nome", fonteParaEditar.name);
-                setValue("descricao", fonteParaEditar.description);
+                setValue("descricao", fonteParaEditar.description ?? "");
             }
         }
     }, [openDialogIdEditar, fontes, setValue]);
@@ -121,7 +125,7 @@ export default function Fontes() {
     return (
         <div className="flex flex-col gap-5">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-4xl font-bold">
                     Fontes
                 </h2>
 
@@ -149,7 +153,7 @@ export default function Fontes() {
                             </DialogTitle>
 
                             <DialogDescription className="text-md pb-2">
-                                Adicione os dados da fonte
+                                Preencha os campos abaixo para adicionar uma nova fonte
                             </DialogDescription>
 
                         </DialogHeader>
@@ -197,8 +201,7 @@ export default function Fontes() {
                                     className={`
                                         transition ease-in-out text-white
                                         rounded-md px-3 bg-vermelho
-                                        hover:cursor-pointer
-                                        hover:scale-110 active:scale-100
+                                        hover:cursor-pointer text-sm
                                     `}
                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                 >
@@ -210,11 +213,10 @@ export default function Fontes() {
                                     className={`
                                         flex bg-verde hover:bg-verde
                                         text-white hover:cursor-pointer
-                                        hover:scale-110 active:scale-100
                                     `}
                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                 >
-                                    Salvar
+                                    Adicionar fonte
                                 </Button>
                             </div>
                         </form>
@@ -227,9 +229,9 @@ export default function Fontes() {
             <Masonry
                 breakpointCols={breakpointColumnsObj}
                 columnClassName="pl-4"
-                className={'flex -ml-4 w-auto'}
+                className={'flex -ml-4 w-auto relative'}
             >
-                {fontes.map((fonte, index) => (
+                {fontes.length > 0 ? fontes.map((fonte, index) => (
                     <div
                         style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
                         key={index}
@@ -251,7 +253,7 @@ export default function Fontes() {
                                 <Calendar size={16} />
                                 <span className="flex justify-center flex-col">
                                     <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
-                                    <span>{fonte.created_at}</span>
+                                    <span>{formatarData(fonte.created_at)}</span>
                                 </span>
                             </p>
                             <div className="flex gap-3">
@@ -277,7 +279,7 @@ export default function Fontes() {
                                             </DialogTitle>
 
                                             <DialogDescription className="text-md pb-4">
-                                                Modifique os dados da fonte
+                                                Atualize os dados da fonte selecionada
                                             </DialogDescription>
 
                                         </DialogHeader>
@@ -324,8 +326,7 @@ export default function Fontes() {
                                                     className={`
                                                         transition ease-in-out text-white
                                                         rounded-md px-3 bg-vermelho
-                                                        hover:cursor-pointer
-                                                        hover:scale-110 active:scale-100
+                                                        hover:cursor-pointer text-sm
                                                     `}
                                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                 >
@@ -337,7 +338,6 @@ export default function Fontes() {
                                                     className={`
                                                         flex bg-verde hover:bg-verde
                                                         text-white hover:cursor-pointer
-                                                        hover:scale-110 active:scale-100
                                                     `}
                                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                 >
@@ -379,7 +379,6 @@ export default function Fontes() {
                                                         transition ease-in-out text-black
                                                         rounded-md px-3
                                                         hover:cursor-pointer
-                                                        hover:scale-110 active:scale-100
                                                     `}
                                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                             >
@@ -390,7 +389,6 @@ export default function Fontes() {
                                                 className={`
                                                         flex bg-vermelho hover:bg-vermelho
                                                         text-white hover:cursor-pointer
-                                                        hover:scale-110 active:scale-100
                                                     `}
                                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                 onClick={() => {
@@ -406,7 +404,7 @@ export default function Fontes() {
                             </div>
                         </div>
                     </div>
-                ))}
+                )) : <p className="absolute left-1/2 top-10 translate-x-[-50%] text-gray-400 text-2xl text-center animate-pulse">Nenhuma fonte cadastrada.</p>}
             </Masonry>
         </div>
     )

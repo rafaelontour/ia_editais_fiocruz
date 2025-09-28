@@ -72,7 +72,7 @@ export default function Taxonomias() {
     const [tituloRamo, setTituloRamo] = useState<string>("");
     const [tax, setTax] = useState<Taxonomia[]>([]);
 
-    const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
+    const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[] | undefined>([]);
     const [fontes, setFontes] = useState<Fonte[]>([]);
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [idTipificacao, setIdTipificacao] = useState<string>("");
@@ -109,8 +109,8 @@ export default function Taxonomias() {
                 await getTaxonomias();
                 await getFontes();
                 await getTipificacoes();
-            } catch (error) {
-                console.error("Erro ao buscar taxonomias:", error);
+            } catch (err) {
+                toast.error("Erro ao buscar dados: " + err);
             }
         }
         fetchData();
@@ -121,7 +121,7 @@ export default function Taxonomias() {
             const fonteParaEditar = fontes.find(f => f.id === openTaxonomiaId);
             if (fonteParaEditar) {
                 setValue("titulo", fonteParaEditar.name);
-                setValue("descricao", fonteParaEditar.description);
+                setValue("descricao", fonteParaEditar.description || "");
             }
         }
     }, [openTaxonomiaId, fontes, setValue]);
@@ -135,8 +135,8 @@ export default function Taxonomias() {
                 ref?.contains(target)
             );
 
-            console.log("clicouDentroDeAlguma: ", clicouDentroDeAlguma);
-            console.log("VALOR DE FLAGHOOK:", flagHook.current);
+            // console.log("clicouDentroDeAlguma: ", clicouDentroDeAlguma);
+            // console.log("VALOR DE FLAGHOOK:", flagHook.current);
 
             if (!clicouDentroDeAlguma && !openDialogRamo) {
                 if (flagHook.current === true) return
@@ -211,46 +211,48 @@ export default function Taxonomias() {
             const novaTaxonomia: Taxonomia = {
                 typification_id: idTipificacao,
                 title: tituloTaxonomia,
-                sources: [],
+
                 description: descricaoTaxonomia,
-                source_ids: fontesSelecionadas.map(fonte => fonte.id),
+                source_ids: fontesSelecionadas && fontesSelecionadas.map(fonte => fonte.id),
             }
 
-            console.log(novaTaxonomia)
+            console.log("TAXONOMIA ADICIONADA: ", novaTaxonomia)
 
             const resposta = await adicionarTaxonomiaService(novaTaxonomia);
 
             if (resposta !== 201) {
-                throw new Error("Erro ao adicionar taxonomia");
+                toast("Erro ao adicionar taxonomia");
             }
 
             const taxs = await getTaxonomiasService();
             setTax(taxs || []);
         } catch (e) {
-            toast.error('Erro ao adicionar taxonomia: ' + e);
+            toast.error("Erro ao adicionar taxonomia");
         }
         setOpenTaxonomia(false);
         limparCampos();
     }
 
     const atualizarTaxonomia = async (data: FormData) => {
-        console.log('XPTO')
         try {
             const novaTaxonomia: Taxonomia = {
                 id: taxonomiaSelecionada?.id,
-                typification_id: taxonomiaSelecionada?.typification_id,
+                typification_id: idTipificacao,
                 title: data.titulo,
-                sources: [],
+                source_ids: fontesSelecionadas && fontesSelecionadas.map(fonte => fonte.id),
                 description: data.descricao,
-                source_ids: fontesSelecionadas.map(fonte => fonte.id),
             }
+
+            console.log("TAXONOMIA A SER ATUALIZADA: ", novaTaxonomia)
 
             const resposta = await atualizarTaxonomiaService(novaTaxonomia);
 
 
             if (resposta !== 200) {
-                throw new Error("Erro ao atualizar taxonomia");
+                toast.error("Erro ao atualizar taxonomia");
+                return
             }
+
 
             const taxs = await getTaxonomiasService();
             setTax(taxs || []);
@@ -306,17 +308,17 @@ export default function Taxonomias() {
         resetRamo()
     }
 
-    const filtrarPraEdicao = (ids: string[]): Fonte[] => {
-        console.log("ids: ", ids);
-        return fontes.filter(fonte => ids.includes(fonte.id));
-    }
+    // const filtrarPraEdicao = (ids: string[]): Fonte[] => {
+    //     console.log("ids: ", ids);
+    //     return fontes.filter(fonte => ids.includes(fonte.id));
+    // }
 
     let flagHook = useRef<boolean>(false);
 
     return (
         <div className="flex flex-col flex-1 h-full relalive">
             <div className="flex items-center gap-2 mb-4 justify-between">
-                <p className="font-semibold text-2xl">Gestão de taxonomia e ramos</p>
+                <p className="font-semibold text-4xl">Gestão de taxonomia e ramos</p>
 
                 <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
                     <DialogTrigger asChild >
@@ -334,7 +336,7 @@ export default function Taxonomias() {
                         <DialogHeader>
                             <DialogTitle>Adicionar taxonomia</DialogTitle>
                             <DialogDescription>
-                                Preencha os campos abaixo para adicionar uma nova taxonomia.
+                                Preencha os campos abaixo para adicionar uma nova taxonomia
                             </DialogDescription>
                         </DialogHeader>
 
@@ -399,14 +401,14 @@ export default function Taxonomias() {
                                     defaultValue={"Selecione uma fonte"}
                                     className="border-2 border-gray-300 rounded-md p-2"
                                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                                        setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
+                                        setFontesSelecionadas([...(fontesSelecionadas ?? []), fontes.find(fonte => fonte.id === e.target.value)!])
                                         const novaFonteId = e.target.value;
                                         const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
 
                                         if (!fonteJaSelecionada) {
                                             const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
                                             setValue("fontesSelecionadas", novasFontes);
-                                            setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
+                                            setFontesSelecionadas([...(fontesSelecionadas ?? []), fontes.find(f => f.id === novaFonteId)!]);
                                         }
                                     }}
                                 >
@@ -424,7 +426,7 @@ export default function Taxonomias() {
                             </p>
 
                             {
-                                fontesSelecionadas.length > 0 && (
+                                fontesSelecionadas && fontesSelecionadas.length > 0 && (
                                     <div className="flex flex-col gap-2">
                                         <p>Fontes selecionadas: </p>
                                         <div className="grid grid-cols-3 gap-2 border-2 border-gray-300 rounded-md p-2">
@@ -450,16 +452,28 @@ export default function Taxonomias() {
                             }
 
                             <DialogFooter>
-                                <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
+                                <DialogClose
+                                    className={`
+                                            transition ease-in-out text-white
+                                            rounded-md px-3 bg-vermelho
+                                            hover:cursor-pointer text-sm
+                                        `}
+                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                >
                                     Cancelar
                                 </DialogClose>
 
-                                <button
-                                    className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
+                                <Button
                                     type="submit"
+                                    className={`
+                                            flex bg-verde hover:bg-verde
+                                            text-white hover:cursor-pointer
+                                            active:scale-100
+                                        `}
+                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                 >
-                                    Adicionar
-                                </button>
+                                    Salvar
+                                </Button>
                             </DialogFooter>
                         </form>
 
@@ -489,7 +503,7 @@ export default function Taxonomias() {
                                 setIdSelecionado(index.toString())
                                 buscarRamos(item.id)
                             }}
-                        // onMouseUp={() => setTaxonomiaSelecionada(item)}
+                            // onMouseUp={() => setTaxonomiaSelecionada(item)}
                         >
                             <CardHeader>
                                 <CardTitle>{item.title}</CardTitle>
@@ -513,9 +527,10 @@ export default function Taxonomias() {
                                         <DialogTrigger asChild>
                                             <button
                                                 onClick={() => {
-                                                    const fontesDaTaxonomia = item.sources
+                                                    // const ids_fontes = item.source_ids?.map(f => f.id)
+                                                    const fontesDaTaxonomia = item.sources // fontes.filter(f => ids_fontes?.includes(f.id))
                                                     setFontesSelecionadas(fontesDaTaxonomia)
-                                                    setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))
+                                                    setValue("fontesSelecionadas", (fontesDaTaxonomia ?? []).map(f => f.id))
                                                     setTaxonomiaSelecionada(item)
                                                     setValue("id_tipificacao", [item.typification_id as string])
                                                     setValue("titulo", item.title)
@@ -529,7 +544,7 @@ export default function Taxonomias() {
                                         </DialogTrigger>
 
                                         <DialogContent
-                                            ref={(e) => { divRefs.current["editartax_" + index] = e }}
+                                            // ref={(e) => { divRefs.current["editartax_" + index] = e }}
                                             onCloseAutoFocus={limparCampos}
                                         >
                                             <DialogHeader>
@@ -549,6 +564,9 @@ export default function Taxonomias() {
                                                         className="bg-white p-2 w-full rounded-md"
                                                         defaultValue={taxonomiaSelecionada?.typification_id}
                                                         onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                                            console.log("TIPIFICAÇÃO SELECIONADA: ", e.target.value)
+                                                            console.log("TAXONOMIA SELECIONADA: ", item)
+                                                            setIdTipificacao(e.target.value)
                                                             setTaxonomiaSelecionada(item);
                                                             setValue("id_tipificacao", [e.target.value]);
                                                         }}
@@ -602,14 +620,14 @@ export default function Taxonomias() {
                                                         defaultValue={"Selecione uma fonte"}
                                                         className="border-2 border-gray-300 rounded-md p-2"
                                                         onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                                                            setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
+                                                            setFontesSelecionadas([...(fontesSelecionadas || []), fontes.find(fonte => fonte.id === e.target.value)!])
                                                             const novaFonteId = e.target.value;
                                                             const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
 
                                                             if (!fonteJaSelecionada) {
                                                                 const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
                                                                 setValue("fontesSelecionadas", novasFontes);
-                                                                setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
+                                                                setFontesSelecionadas([...(fontesSelecionadas || []), fontes.find(f => f.id === novaFonteId)!]);
                                                             }
                                                         }}
                                                     >
@@ -627,7 +645,7 @@ export default function Taxonomias() {
                                                 </p>
 
                                                 {
-                                                    fontesSelecionadas.length > 0 && (
+                                                    fontesSelecionadas && fontesSelecionadas.length > 0 && (
                                                         <div className="flex flex-col gap-2">
                                                             <p>Fontes selecionadas: </p>
                                                             <div className="grid grid-cols-3 gap-2 border-2 border-gray-300 rounded-md p-2">
@@ -653,13 +671,23 @@ export default function Taxonomias() {
                                                 }
 
                                                 <DialogFooter>
-                                                    <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
+                                                    <DialogClose
+                                                        className={`
+                                                                transition ease-in-out text-white
+                                                                rounded-md px-3 bg-vermelho
+                                                                hover:cursor-pointer text-sm
+                                                            `}
+                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                    >
                                                         Cancelar
                                                     </DialogClose>
 
-                                                    <button className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md" type="submit" >
+                                                    <Button
+                                                        className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 hover:cursor-pointer rounded-md"
+                                                        type="submit"
+                                                    >
                                                         Salvar alterações
-                                                    </button>
+                                                    </Button>
                                                 </DialogFooter>
                                             </form>
 
@@ -690,11 +718,11 @@ export default function Taxonomias() {
                                             <div className="flex justify-end gap-4 mt-4">
                                                 <DialogClose
                                                     className={`
-                            transition ease-in-out text-black
-                            rounded-md px-3
-                            hover:cursor-pointer
-                            hover:scale-110 active:scale-100
-                          `}
+                                                        transition ease-in-out text-black
+                                                        rounded-md px-3
+                                                        hover:cursor-pointer
+                                                        hover:scale-110 active:scale-100
+                                                    `}
                                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                 >
                                                     Cancelar
@@ -702,10 +730,10 @@ export default function Taxonomias() {
 
                                                 <Button
                                                     className={`
-                            flex bg-vermelho hover:bg-vermelho
-                            text-white hover:cursor-pointer
-                            hover:scale-110 active:scale-100
-                          `}
+                                                        flex bg-vermelho hover:bg-vermelho
+                                                        text-white hover:cursor-pointer
+                                                        hover:scale-110 active:scale-100
+                                                    `}
                                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                     onClick={() => {
                                                         excluirTaxonomia(item.id)
@@ -785,15 +813,28 @@ export default function Taxonomias() {
                                             </div>
 
                                             <DialogFooter>
-                                                <DialogClose className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:cursor-pointer rounded-md">
-                                                    Cancelar
-                                                </DialogClose>
+                                                <DialogClose
+                                                        className={`
+                                                                transition ease-in-out text-white
+                                                                rounded-md px-3 bg-vermelho
+                                                                hover:cursor-pointer text-sm
+                                                            `}
+                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                    >
+                                                        Cancelar
+                                                    </DialogClose>
 
-                                                <button
-                                                    className="px-4 py-2 text-sm hover:cursor-pointer font-semibold text-white bg-red-500 hover:bg-red-600 rounded-md"
-                                                >
-                                                    Adicionar
-                                                </button>
+                                                    <Button
+                                                        type="submit"
+                                                        className={`
+                                                                flex bg-verde hover:bg-verde
+                                                                text-white hover:cursor-pointer
+                                                                active:scale-100
+                                                            `}
+                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                    >
+                                                        Salvar
+                                                    </Button>
                                             </DialogFooter>
                                         </form>
 
@@ -922,11 +963,11 @@ export default function Taxonomias() {
                                                                 <div className="flex justify-end gap-4 mt-4">
                                                                     <DialogClose
                                                                         className={`
-                                      transition ease-in-out text-black
-                                      rounded-md px-3
-                                      hover:cursor-pointer
-                                      hover:scale-110 active:scale-100
-                                    `}
+                                                                            transition ease-in-out text-black
+                                                                            rounded-md px-3
+                                                                            hover:cursor-pointer
+                                                                            hover:scale-110 active:scale-100
+                                                                        `}
                                                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                                     >
                                                                         Cancelar
@@ -934,10 +975,10 @@ export default function Taxonomias() {
 
                                                                     <Button
                                                                         className={`
-                                      flex bg-vermelho hover:bg-vermelho
-                                      text-white hover:cursor-pointer
-                                      hover:scale-110 active:scale-100
-                                    `}
+                                                                            flex bg-vermelho hover:bg-vermelho
+                                                                            text-white hover:cursor-pointer
+                                                                            hover:scale-110 active:scale-100
+                                                                        `}
                                                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                                         onClick={() => {
                                                                             excluirRamo(ramo?.id, taxonomiaSelecionada?.id);
