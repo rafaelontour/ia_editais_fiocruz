@@ -10,6 +10,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
     return (
         <div className="flex flex-col flex-1 border border-gray-300 rounded-sm p-4">
             <Tabs defaultValue="tabRamo0">
+                <span className="font-bold text-xl italic text-zinc-700 text-center">Ramos para a taxonomia selecionada</span>
                 <TabsList className="mb-4">
                     {
                         ramos.map((ramo, index) => (
