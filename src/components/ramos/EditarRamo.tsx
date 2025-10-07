@@ -142,7 +142,7 @@ export default function EditarRamo({ ramo, idTaxonomia, atualizarRamos, divRefs,
                                 `}
                             style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                         >
-                            Salvar alterações
+                            Salvar
                         </Button>
                     </DialogFooter>
                 </form>

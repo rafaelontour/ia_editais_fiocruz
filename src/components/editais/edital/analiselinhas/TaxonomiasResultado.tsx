@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Taxonomia } from "@/core/tipificacao/Tipificacao";
 import { ChevronLeft, ChevronRight, Link } from "lucide-react";
 import RamosDaTaxonomiaResultado from "./RamosDaTaxonomiaResultado";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -15,29 +15,42 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
 
     const [ultimaTab, setUltimaTab] = useState<boolean>(false)
     const [primeiraTab, setPrimeiraTab] = useState<boolean>(true)
-    const [abaSelecionada, setAbaSelecionada] = useState<string>("tab0")
+    const [abaSelecionada, setAbaSelecionada] = useState<string>("tabTax0")
 
     const [taxonomiaSelecionada, setTaxonomiaSelecionada] = useState({
         taxonomia: taxonomias && taxonomias.length > 0 ? taxonomias[0] : undefined,
         index: 0
     })
 
+    
     const scrollToIndex = (index: number) => {
         const el = refs.current[index];
         if (el) {
-        el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+            el.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
         }
     };
 
+    useEffect(() => {
+        if (taxonomias?.length === 1) {
+            setPrimeiraTab(true)
+            setUltimaTab(true)
+        }
+    }, [taxonomias])
+    
     return (
         taxonomias && taxonomias.length > 0 && (
             <div className="flex flex-1 border border-gray-300 rounded-sm p-4">
-                <Tabs defaultValue="tabTax0">
-                    <span className="font-bold text-xl italic text-zinc-700 text-center">Taxonomias para a tipificação selecionada acima</span>
-                    <div className="flex w-full items-center justify-between gap-2">
+                <Tabs
+                    className="w-full"
+                    defaultValue="tabTax0"
+                    value={abaSelecionada}
+                    onValueChange={(val) => setAbaSelecionada(val)}
+                >
+                    <span className="font-bold text-2xl text-black text-left">Taxonomias da tipificação</span>
+                    <div className="flex items-center justify-between gap-2">
                         <Button
                             className={`
-                                ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-gray-300 hover:bg-gray-300"}
+                                ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
                                 hover:cursor-pointer
                             `}
                             title={`${primeiraTab ? "Você está na primeira aba" : "Tipificação anterior"}`}
@@ -47,43 +60,73 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                                 if (taxonomiaSelecionada.index === null) return
                                 const indexAnterior = taxonomiaSelecionada.index - 1
                                 if (indexAnterior < 0) return
+
                                 setTaxonomiaSelecionada(anterior => ({
                                     ...anterior,
                                     index: indexAnterior,
-                                    tipificacao: taxonomias[indexAnterior]
+                                    taxonomia: taxonomias[indexAnterior]
                                 }))
-                                setAbaSelecionada("tab" + indexAnterior)
+
+                                setAbaSelecionada("tabTax" + indexAnterior)
                                 scrollToIndex(indexAnterior);
                                 setPrimeiraTab(indexAnterior === 0)
                                 setUltimaTab(indexAnterior === taxonomias.length - 1)
                             }}
                         >
-                            <ChevronLeft />
+                            <ChevronLeft className={`${primeiraTab ? "text-gray-400" : "text-white"}`} />
                         </Button>
                         
-                        <TabsList className="max-w-[75%]">
-                            {
-                                taxonomias.map((taxonomia, index) => (
-                                    <TabsTrigger
-                                        className={`
-                                            hover:cursor-pointer rounded-sm
-                                            text-xs text-gray-600 px-2
-                                            ${taxonomias.length >= 3  && "truncate max-w-[100px]"}         
-                                            block max-w-fit
-                                        `}
-                                        title={taxonomia.title}
-                                        key={index}
-                                        value={"tabTax" + index}
-                                    >
-                                        {taxonomia.title}
-                                    </TabsTrigger>
-                                ))
-                            }
+                        <TabsList className="flex overflow-hidden">
+                            <div className="flex gap-2 items-center mx-3 overflow-x-hidden">
+                                <div className="flex w-max">
+                                    {
+                                        taxonomias.map((tax, index) => (
+                                            <div key={index} className="flex items-center">
+                                                <TabsTrigger
+                                                    ref={el => {refs.current[index] = el}} // ← aqui conecta cada aba ao array de refs
+                                                    onClick={() => {
+                                                        setTaxonomiaSelecionada(anterior => ({
+                                                            ...anterior,
+                                                            index: index,
+                                                            taxonomia: tax
+                                                        }))
+
+                                                        if (index === 0) {
+                                                            setPrimeiraTab(true)
+                                                        } else {
+                                                            setPrimeiraTab(false)
+                                                        }
+                                                        if (index === taxonomias.length - 1) {
+                                                            setUltimaTab(true)
+                                                        } else {
+                                                            setUltimaTab(false)
+                                                        }
+                                                    }}
+                                                    className={`
+                                                        hover:cursor-pointer rounded-sm
+                                                        text-lg text-black px-2
+                                                        block
+                                                    `}
+                                                    title={tax.title}
+                                                    key={index}
+                                                    value={"tabTax" + index}
+                                                >
+                                                    {tax.title}
+                                                </TabsTrigger>
+
+                                                {index < taxonomias.length - 1 && (
+                                                <span className="text-xs text-zinc-500 mx-4">|</span>
+                                            )}
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </div>
                         </TabsList>
 
                         <Button
                             className={`
-                                ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-gray-300 hover:bg-gray-300"} hover:cursor-pointer
+                                ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"} hover:cursor-pointer
                                 `}
                             title={`${!ultimaTab ? "Tipificação seguinte" : "Você está na última aba"}`}
                             variant={"outline"}
@@ -99,7 +142,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                                         taxonomia: taxonomias[proximoIndex],
                                         index: proximoIndex
                                     })
-                                    setAbaSelecionada("tab" + proximoIndex.toString())
+                                    setAbaSelecionada("tabTax" + proximoIndex.toString())
                                 }
                                 scrollToIndex(proximoIndex);
 
@@ -108,7 +151,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                             }
                             }
                         >
-                            <ChevronRight />
+                            <ChevronRight className={`${ultimaTab ? "text-gray-400" : "text-white"}`} />
                         </Button>
                     </div>
 
@@ -117,6 +160,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                             <TabsContent
                                 value={"tabTax" + index}
                                 key={taxonomia.id}
+                                className="w-[98%] mx-auto"
                             >
                                 <RamosDaTaxonomiaResultado
                                     ramos={taxonomia.branches ? taxonomia.branches : []}

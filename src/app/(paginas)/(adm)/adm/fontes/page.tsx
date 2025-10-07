@@ -1,7 +1,7 @@
 'use client'
 
 import Masonry from 'react-masonry-css'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -196,7 +196,7 @@ export default function Fontes() {
 
                             <FileUpload />
 
-                            <div className="flex justify-end gap-4 mt-4">
+                            <DialogFooter>
                                 <DialogClose
                                     className={`
                                         transition ease-in-out text-white
@@ -216,9 +216,9 @@ export default function Fontes() {
                                     `}
                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                 >
-                                    Adicionar fonte
+                                    Salvar
                                 </Button>
-                            </div>
+                            </DialogFooter>
                         </form>
 
 
@@ -242,15 +242,15 @@ export default function Fontes() {
                         "
                     >
                         <div className="flex flex-col gap-2">
-                            <h2 className="text-xl font-semibold">{fonte.name}</h2>
-                            <p className={`py-1 w-fit break-words text-sm`}>
+                            <h2 className="text-2xl font-semibold">{fonte.name}</h2>
+                            <p className={`py-1 w-fit break-words text-md`}>
                                 {fonte.description}
                             </p>
                         </div>
 
                         <div className="flex justify-between items-center mt-3">
                             <p className="flex items-center gap-2 text-sm text-gray-400">
-                                <Calendar size={16} />
+                                <Calendar size={18} />
                                 <span className="flex justify-center flex-col">
                                     <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
                                     <span>{formatarData(fonte.created_at)}</span>
@@ -321,7 +321,7 @@ export default function Fontes() {
                                                 
                                             </p>
 
-                                            <div className="flex justify-end gap-4 mt-4">
+                                            <div className="flex justify-end gap-2 mt-4">
                                                 <DialogClose
                                                     className={`
                                                         transition ease-in-out text-white
@@ -341,7 +341,7 @@ export default function Fontes() {
                                                     `}
                                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                 >
-                                                    Salvar alterações
+                                                    Salvar
                                                 </Button>
                                             </div>
                                         </form>

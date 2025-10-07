@@ -376,7 +376,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                 "
                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                             >
-                                <p>Salvar alterações</p>
+                                <p>Salvar</p>
                             </Button>
                         </SheetFooter>
                     </form>

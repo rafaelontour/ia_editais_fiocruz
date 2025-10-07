@@ -42,7 +42,7 @@ export default function RootLayout({
 
   return (
     montado && (
-      <div className="flex flex-col h-screen overflow-hidden">
+      <div className="flex flex-col h-screen overflow-hidden w-full scrollbar-hidden">
       <Head>
         <title>Administrativo - {title}</title>
         <link rel="icon" sizes="32x32" type="image/x-icon" href="/favicon.ico" />
@@ -90,9 +90,10 @@ export default function RootLayout({
               </SidebarFooter>
     
           </Sidebar>
+
           <div
             className="
-              flex flex-1 relative
+              flex relative w-full min-w-0 overflow-hidden
             "
           >
             <div
@@ -129,15 +130,15 @@ export default function RootLayout({
             
             <div
               className="
-                flex w-full flex-col h-[98%]
-                bg-white flex-1 pt-20 px-12 overflow-y-auto scrollbar-hide
+                flex flex-1 flex-col h-[98%]
+                bg-white pt-20 px-12 overflow-y-auto scrollbar-hidde
               "
               style={{
                 boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
                 borderRadius: "10px",
               }}
             >
-              <div className="w-full">
+              <div className="">
                 {children}
               </div>
             </div>

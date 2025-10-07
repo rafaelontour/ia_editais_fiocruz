@@ -19,6 +19,15 @@ interface Props {
   flagEdital: boolean
 }
 
+const getStatusColor = (status: StatusEdital): string => {
+  switch (status) {
+      case "PENDING": return "#99A1AF";
+      case "UNDER_CONSTRUCTION": return "red";
+      case "WAITING_FOR_REVIEW": return "#656149";
+      case "COMPLETED": return "darkgreen";
+  }
+};
+
 
 export default function CardLista({ status, categoria, editais, funcaoAtualizarEditais, flagEdital }: Props) {
   // Droppable container com data.containerId = status
@@ -30,20 +39,23 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col w-full max-w-80 min-w-56 gap-4 p-2 border border-gray-200 rounded bg-gray-50 min-h-[160px]"
+      className="flex flex-col gap-4 p-2 border border-gray-200 rounded-2xl bg-slate-600"
     >
       <div
-        className="flex justify-between items-center mb-2"
-    >
+        className="flex justify-between mx-2 mt-2 items-center mb-2"
+      >
         <div className="flex items-center gap-2">
           {categoria.map((c) => (
             <div key={c.nome} className="flex items-center gap-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: c.color }} />
-              <span className="text-sm text-slate-400">{c.nome}</span>
+              <span className="text-xl text-white">{c.nome}</span>
             </div>
           ))}
         </div>
-        <div className="text-sm text-slate-500">{editais.length}</div>
+
+        <div className={`flex items-center justify-center w-6 h-6 bg-black rounded-full`}>
+          <span className="font-semibold text-white text-md mt-0.5">{editais.length}</span>
+        </div>
       </div>
 
       <div className="space-y-3">

@@ -48,7 +48,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
     const cor = () => {
         if (!edital.history) return "white";
-        console.log(edital.history[0].status);
+        
         const status = edital.history && edital.history[0].status;
         switch (status) {
             case "PENDING":
@@ -67,21 +67,21 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             ref={setNodeRef}
             style={style}
             // se quiser esconder o original enquanto usa overlay: opacity reduzida
-            className={`bg-white rounded-md border border-gray-300 shadow-sm ${isDragging ? "opacity-30" : "opacity-100"}`}
+            className={`bg-white rounded-md  shadow-sm ${isDragging ? "opacity-30" : "opacity-100"}`}
         >
             {/* drag handle: aplicamos attributes & listeners aqui (evita conflitos com botões dentro do card) */}
             <div {...attributes} {...listeners} className={`h-12 ${cor()} rounded-t-sm flex items-center justify-center`}>
-                <span className="text-xs text-white pointer-events-none italic">Segure nesta área para arrastar</span>
+                <span className="text-md text-white pointer-events-none italic">Segure nesta área para arrastar</span>
             </div>
 
             <div className="p-3">
-                <h3 className="font-semibold text-sm">{edital.name}</h3>
+                <h3 className="font-semibold text-xl">{edital.name}</h3>
                 <div
                     className="
                         flex justify-between items-center
                     "
                 >
-                    <div className="flex flex-col-reverse text-xs text-gray-500 justify-between mt-2">
+                    <div className="flex flex-col-reverse text-md text-gray-500 justify-between mt-2">
                         <span>Compras</span>
                         <span>{formatarData(edital.created_at)}</span>
                     </div>

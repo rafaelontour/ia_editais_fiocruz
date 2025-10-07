@@ -37,6 +37,7 @@ export interface EditalArquivo {
         {
             id: string;
             file_path: string;
+            description: string;
             created_at: string;
         }
     ]

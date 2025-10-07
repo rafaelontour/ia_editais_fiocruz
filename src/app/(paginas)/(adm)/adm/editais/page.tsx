@@ -20,11 +20,13 @@ import { toast } from "sonner";
 import CardLista from "@/components/editais/CardLista";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import useUsuario from "@/data/hooks/useUsuario";
 
 export default function Editais() {
     const [montado, setMontado] = useState<boolean>(false);
     const [adicionouNovoEdital, setAdicionouNovoEdital] = useState<boolean>(false);
     const statuses: StatusEdital[] = ["PENDING", "UNDER_CONSTRUCTION", "WAITING_FOR_REVIEW", "COMPLETED"];
+    const { usuario } = useUsuario();
 
     const [columns, setColumns] = useState<Record<StatusEdital, Edital[]>>({
         PENDING: [],
@@ -88,7 +90,7 @@ export default function Editais() {
     const getEditais = async () => {
         try {
             const resposta = await getEditaisService();
-            console.log(resposta);
+
             if (!resposta) throw new Error();
 
             const dados = resposta || [];
@@ -131,6 +133,7 @@ export default function Editais() {
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
+        
         const { active, over } = event;
         setActiveId(null);
 
@@ -141,6 +144,18 @@ export default function Editais() {
 
         const activeContainer = active.data.current?.containerId as StatusEdital | undefined;
         const overContainer = over.data.current?.containerId as StatusEdital | undefined;
+
+        if ( // Somente ADM e ANALIST podem mover de RASCUNHO -> EM CONSTRUÇÃO -> EM ANALISE
+            (
+                activeContainer === "PENDING" && (overContainer === "UNDER_CONSTRUCTION" || overContainer === "WAITING_FOR_REVIEW" || overContainer === "COMPLETED") ||
+                activeContainer === "UNDER_CONSTRUCTION" && (overContainer === "PENDING" || overContainer === "WAITING_FOR_REVIEW" || overContainer === "COMPLETED") ||
+                activeContainer === "WAITING_FOR_REVIEW" && overContainer === "PENDING"
+            ) &&
+            !(usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST")
+        ) {
+            toast.info("Você não tem permissão para mover este edital para esta coluna.");
+            return;
+        }
 
         if (!activeContainer || !overContainer) return;
 
@@ -168,6 +183,7 @@ export default function Editais() {
 
         // containers diferentes: aqui adicionamos confirmação
         setColumns(prev => {
+            
             const source = [...prev[activeContainer]];
             const dest = [...prev[overContainer]];
 
@@ -217,6 +233,12 @@ export default function Editais() {
         });
 
         setPendingMove(null);
+
+        setTimeout(() => {
+            getEditais();
+        }, 300);
+
+        console.log("Movimentação confirmada");
     };
 
     const cancelMove = () => setPendingMove(null);
@@ -252,9 +274,9 @@ export default function Editais() {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
             >
-                <div className="flex justify-between relative gap-4">
+                <div className="flex justify-between relative gap-3">
                     {statuses.map((status) => (
-                        <div className="w-full max-w-80 min-w-56" key={status}>
+                        <div className="w-full" key={status}>
                             <SortableContext items={columns[status].map((c) => c.id)} strategy={verticalListSortingStrategy}>
                                 <CardLista
                                     funcaoAtualizarEditais={setAdicionouNovoEdital}
@@ -270,7 +292,7 @@ export default function Editais() {
 
                 <DragOverlay>
                     {activeId ? (
-                        <div className="bg-white p-3 w-full min-w-56 max-w-80 rounded shadow-lg">
+                        <div className="bg-white p-3 rounded shadow-lg">
                             {(() => {
                                 const item = findItem(activeId);
                                 if (!item) return null;
@@ -305,6 +327,16 @@ export default function Editais() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {
+                columns["PENDING"].length === 0 &&
+                columns["UNDER_CONSTRUCTION"].length === 0 &&
+                columns["WAITING_FOR_REVIEW"].length === 0 &&
+                columns["COMPLETED"].length === 0 &&
+                <div className="flex justify-center items-center h-80">
+                    <p className="text-xl animate-pulse">Nenhum edital cadastrado</p>
+                </div>
+            }
         </div>
     );
 }

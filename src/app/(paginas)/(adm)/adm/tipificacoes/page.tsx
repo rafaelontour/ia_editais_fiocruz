@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
@@ -246,7 +246,7 @@ export default function Tipificacoes() {
                                     )
                                 }
 
-                                <div className="flex justify-end gap-4 mt-4">
+                                <DialogFooter>
                                     <DialogClose
                                         className={`
                                                 transition ease-in-out text-white
@@ -269,14 +269,14 @@ export default function Tipificacoes() {
                                     >
                                         Salvar
                                     </Button>
-                                </div>
+                                </DialogFooter>
                             </form>
 
                         </DialogContent>
 
                     </Dialog>
-
                 </div>
+
                 <Masonry
                     breakpointCols={breakpointColumns}
                     className="flex relative gap-5 mb-10"
@@ -286,23 +286,23 @@ export default function Tipificacoes() {
                             style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
                             key={index}
                             className="
-                                    flex flex-col gap-2 rounded-md p-4 w-full
-                                    transition ease-in-out duration-100 mb-5
-                                "
+                                flex flex-col gap-2 rounded-md p-4 w-full
+                                transition ease-in-out duration-100 mb-5
+                            "
                         >
                             <div className="flex flex-col gap-2">
-                                <h2 className="text-xl font-semibold">{tipificacao.name}</h2>
-                                <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
+                                <h2 className="text-2xl font-semibold">{tipificacao.name}</h2>
+                                <p className={`bg-zinc-400 py-1 px-2 text-white rounded-md border-1 border-gray-300 w-fit text-sm`}>
                                     Lei: {tipificacao.name}
                                 </p>
-                                <p className={`bg-verde py-1 px-2 text-white rounded-md border-2 border-gray-300 w-fit text-sm`}>
+                                <p className={`bg-zinc-400 py-1 px-2 text-white rounded-md border-1 border-gray-300 w-fit text-sm`}>
                                     Lei Complementar: {tipificacao.name}
                                 </p>
                             </div>
 
                             <div className="flex justify-between items-center mt-3">
                                 <p className="flex items-center gap-2 text-sm text-gray-400">
-                                    <Calendar size={27} />
+                                    <Calendar size={18} />
                                     <span className="flex justify-center flex-col">
                                         <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
                                         <span>{formatarData(tipificacao.created_at)}</span>
@@ -430,7 +430,7 @@ export default function Tipificacoes() {
                                                             `}
                                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                     >
-                                                        Salvar alterações
+                                                        Salvar
                                                     </Button>
                                                 </div>
                                             </form>

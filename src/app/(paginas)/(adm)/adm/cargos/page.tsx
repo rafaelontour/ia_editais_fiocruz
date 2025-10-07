@@ -53,7 +53,7 @@ export default function AtribuirCargo () {
             <div className="flex flex-row justify-between w-full">
                 <div className="flex flex-row gap-2 items-center">
                     {/* <Button variant={"outline"} size={"icon"} className="cursor-pointer"><ChevronLeft /></Button> */}
-                    <h2 className="text-2xl font-semibold">Gerenciar usuários</h2>
+                    <h2 className="text-4xl font-semibold">Gerenciar usuários</h2>
                 </div>
                 
                 <Button
@@ -77,13 +77,13 @@ export default function AtribuirCargo () {
             {/* FILTRO + BUSCA */}
             <div className="flex flex-row gap-5">
                 <div className="flex flex-row gap-2 items-center">
-                    <p className="font-semibold">Unidade: </p>
+                    <p className="font-semibold text-xl">Unidade: </p>
                     <Select
                         onValueChange={(value) => {
                             setIdUnidadeSelecionada(value);
                         }}
                     >
-                        <SelectTrigger className="">
+                        <SelectTrigger className="text-md">
                             <SelectValue placeholder="Selecione a unidade" />
                         </SelectTrigger>
 

@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
+import { formatarData } from "@/lib/utils";
 
 const schemaUsuario = z.object({
   username: z.string().min(1, "O nome é obrigatório"),
@@ -109,7 +110,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
           <Calendar size={16} />
             <span className="flex justify-center flex-col">
                 <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criado em</span>
-                <span>{usuario.created_at}</span>
+                <span>{formatarData(usuario.created_at)}</span>
             </span>
         </p>
 
@@ -246,7 +247,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                     variant={"destructive"}
                     className="flex bg-verde hover:bg-green-900 text-white hover:cursor-pointer"
                   >
-                    Salvar alterações
+                    Salvar
                   </Button>
                 </div>
               </form>

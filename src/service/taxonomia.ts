@@ -17,8 +17,6 @@ async function getTaxonomiasService(): Promise<Taxonomia[] | undefined> {
     const json = await response.json();
     const taxonomias: Taxonomia[] = json.taxonomies;
 
-    console.log("taxonomias: ", taxonomias);
-
     for (let taxonomia of taxonomias) {
         if (taxonomia.created_at) {
             taxonomia.created_at = new Date(taxonomia.created_at).toLocaleString();
@@ -42,7 +40,7 @@ async function adicionarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
                 title: taxonomia.title,
                 description: taxonomia.description,
                 typification_id: taxonomia.typification_id,
-                source_ids: taxonomia.source_ids?.map(fonte => fonte.id)
+                source_ids: taxonomia.source_ids
             })
         });
 
@@ -53,8 +51,6 @@ async function adicionarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
 }
 
 async function atualizarTaxonomiaService(taxonomia: Taxonomia): Promise<number | undefined> {
-
-    console.log("TAXONOMIA A SER ATUALIZADA NO SERVICE: ", taxonomia)
     try {
         const resposta = await fetch(`${urlBase}/taxonomy`, {
             method: "PUT",
@@ -67,7 +63,7 @@ async function atualizarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
                 title: taxonomia.title,
                 description: taxonomia.description,
                 typification_id: taxonomia.typification_id,
-                source_ids: taxonomia.source_ids?.map(fonte => fonte.id)
+                source_ids: taxonomia.source_ids
             })
         })
 
