@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react"
+import { NivelAcesso } from "../enum/nivelAcessoEnum"
 
 export interface UsuarioUnidade {
     id: string,

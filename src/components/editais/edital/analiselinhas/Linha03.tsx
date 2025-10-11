@@ -3,24 +3,31 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Edital, Tipificacao } from "@/core";
 import { ChevronLeft, ChevronRight, Stars } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import TaxonommiasResultado from "./TaxonomiasResultado";
+import { EditalArquivo } from "@/core/edital/Edital";
+
+import style from "@/components/css_personalizado/resumoIA.module.css";
+
+import DOMPurify from "dompurify";
 
 interface Props {
-    edital: Edital | undefined
+    edital: EditalArquivo | undefined
     resumoIA?: string | undefined
 }
 
 export default function Linha03({ edital, resumoIA }: Props) {
 
-    const tipificacoes = edital && edital?.typifications || []
-
-    
-
+    const tipificacoes = edital && edital?.releases[0].check_tree || []
+    const [htmlSeguro, setHtmlSeguro] = useState<string>("")
     const refs = useRef<(HTMLButtonElement | null)[]>([]);
+
+    useEffect(() => {
+        if (resumoIA) {
+            setHtmlSeguro(DOMPurify.sanitize(resumoIA))
+        }
+    }, [resumoIA])
 
     const scrollToIndex = (index: number) => {
         const el = refs.current[index];
@@ -67,11 +74,11 @@ export default function Linha03({ edital, resumoIA }: Props) {
                     <TabsList className="w-full flex items-start flex-col gap-4 p-3 border border-gray-300 h-fit">
                         <div className="w-full flex flex-col gap-2 border-2 border-black border-dotted rounded-md py-3 px-4">
                             <h3 className="text-2xl font-semibold text-black flex items-center gap-2">Resumo gerado por IA <Stars color="blue" size={18}/></h3>
-                            <p className="text-lg text-black">
-                                {resumoIA}
-                            </p>
+                            <div className={style.resumoIA} dangerouslySetInnerHTML={{ __html: htmlSeguro }} />
                         </div>
+
                         <h3 className="font-bold self-start text-2xl text-black">Tipificações</h3>
+
                         <div className="w-full flex justify-between items-center gap-2">
                             <Button
                                 className={`

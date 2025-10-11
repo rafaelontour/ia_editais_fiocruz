@@ -46,8 +46,6 @@ async function adicionarUsuarioService(dados: any) {
     try {
         const url = `${urlBase}/user/`;
 
-        console.log(dados)
-
         const res = await fetch(url, {
             method: "POST",
             credentials: "include",
@@ -91,9 +89,6 @@ async function atualizarUsuarioService(dados: any, id: string): Promise<number |
                 access_level: dados.access_level
             })
         });
-
-        console.log("Status: ", res.status);
-        console.log("Body: ", await res.json());
 
         return res.status
     } catch (e) {

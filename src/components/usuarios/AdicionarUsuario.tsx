@@ -50,8 +50,6 @@ export default function AdicionarUsuario({ open, onOpenChange, unidade, unidades
     async function adicionarUsuario(data: UsuarioFormData) {
         const resposta = await adicionarUsuarioService(data);
 
-        console.log("Status: ", resposta);
-
         if (resposta !== 201) {
             setErroGeral("Já existe um usuário cadastrado com algum dos dados informados!");
             return

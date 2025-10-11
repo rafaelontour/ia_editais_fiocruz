@@ -48,7 +48,7 @@ export default function RootLayout({
                           <SidebarMenuButton
                             className={`
                               ${ ativo ? "bg-[#D03C30] hover:text-white hover:bg-[#D03C30] text-white" : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
-                              rounded-sm transition-all duration-150
+                              rounded-sm transition-all duration-150 py-[18px] pl-3
                             `}
                             asChild
                           >
@@ -59,7 +59,7 @@ export default function RootLayout({
                               "
                             >
                               <item.icon className="w-5 h-5" />
-                              <span>{item.title}</span>
+                              <span className="text-[16px]">{item.title}</span>
                             </a>
                           </SidebarMenuButton>
                         </SidebarMenuItem>

@@ -21,6 +21,7 @@ import CardLista from "@/components/editais/CardLista";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import useUsuario from "@/data/hooks/useUsuario";
+import { formatarData } from "@/lib/utils";
 
 export default function Editais() {
     const [montado, setMontado] = useState<boolean>(false);
@@ -42,6 +43,8 @@ export default function Editais() {
         to: StatusEdital
         overId: string | null
     } | null>(null);
+
+    const isDialogOpen = pendingMove !== null;
 
     useEffect(() => {
         getEditais();
@@ -116,7 +119,6 @@ export default function Editais() {
         }
     };
 
-
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
     const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -181,18 +183,15 @@ export default function Editais() {
             return;
         }
 
-        // containers diferentes: aqui adicionamos confirmação
-        setColumns(prev => {
-            
-            const source = [...prev[activeContainer]];
-            const dest = [...prev[overContainer]];
-
+        // colunas diferentes: mover
+        if (activeContainer !== overContainer) {
+            const source = columns[activeContainer];
             const oldIndex = source.findIndex(i => i.id === activeId);
-            if (oldIndex === -1) return prev;
+            if (oldIndex === -1) return;
+            
+            const movedItem = source[oldIndex];
 
-            const [movedItem] = source.splice(oldIndex, 1);
-
-            // guarda movimentação pendente e abre Dialog
+            // guarda a movimentação pendente e abre o diálogo
             setPendingMove({
                 item: movedItem,
                 from: activeContainer,
@@ -200,45 +199,60 @@ export default function Editais() {
                 overId: overId,
             });
 
-            // não move nada ainda
-            return prev;
-        });
+            return; // <-- não chama setColumns aqui!
+        }
+
     };
 
     // confirma a movimentação
     const confirmMove = () => {
         if (!pendingMove) return;
 
+        // Atualiza colunas primeiro
         setColumns(prev => {
-            const source = [...prev[pendingMove.from]];
-            const dest = [...prev[pendingMove.to]];
+            const source = structuredClone(prev[pendingMove.from]);
+            const dest = structuredClone(prev[pendingMove.to]);
 
             const overIndex = pendingMove.overId
                 ? dest.findIndex(i => i.id === pendingMove.overId)
                 : -1;
             const insertIndex = overIndex === -1 ? dest.length : overIndex;
 
-            dest.splice(insertIndex, 0, { ...pendingMove.item, status: pendingMove.to });
+            const movedItem = structuredClone(pendingMove.item);
+            movedItem.status = pendingMove.to;
 
-            if (pendingMove.to === "PENDING") moverParaRascunho(pendingMove.item.id);
-            if (pendingMove.to === "UNDER_CONSTRUCTION") moverParaEmConstrucao(pendingMove.item.id);
-            if (pendingMove.to === "WAITING_FOR_REVIEW") moverParaEmAnalise(pendingMove.item.id);
-            if (pendingMove.to === "COMPLETED") moverParaConcluido(pendingMove.item.id);
+            dest.splice(insertIndex, 0, movedItem);
 
             return {
                 ...prev,
-                [pendingMove.from]: source.filter(i => i.id !== pendingMove.item.id),
+                [pendingMove.from]: source.filter(i => i.id !== movedItem.id),
                 [pendingMove.to]: dest,
             };
         });
 
+        // Guarda a referência antes de limpar pendingMove
+        const move = pendingMove;
         setPendingMove(null);
+
+        // 🔹 Chama o backend fora do setState
+        switch (move.to) {
+            case "PENDING":
+                moverParaRascunho(move.item.id);
+                break;
+            case "UNDER_CONSTRUCTION":
+                moverParaEmConstrucao(move.item.id);
+                break;
+            case "WAITING_FOR_REVIEW":
+                moverParaEmAnalise(move.item.id);
+                break;
+            case "COMPLETED":
+                moverParaConcluido(move.item.id);
+                break;
+        }
 
         setTimeout(() => {
             getEditais();
         }, 300);
-
-        console.log("Movimentação confirmada");
     };
 
     const cancelMove = () => setPendingMove(null);
@@ -301,8 +315,8 @@ export default function Editais() {
                                         <div className="h-16 bg-gray-200 rounded-sm mb-2" />
                                         <div>
                                             <h3 className="font-semibold">{item.name}</h3>
-                                            <p className="text-sm text-gray-600">Data: {item.created_at}</p>
-                                            <p className="text-sm text-gray-600">Categoria: Comprass</p>
+                                            <p className="text-sm text-gray-600">Data: {formatarData(item.created_at)}</p>
+                                            <p className="text-sm text-gray-600">Categoria: Compras</p>
                                         </div>
                                     </>
                                 );
@@ -323,7 +337,7 @@ export default function Editais() {
                     </p>
                     <DialogFooter className="flex justify-end gap-2">
                         <Button variant="outline" className="hover:cursor-pointer" onClick={cancelMove}>Cancelar</Button>
-                        <Button className="bg-vermelho text-white hover:cursor-pointer" onClick={confirmMove}>Confirmar</Button>
+                        <Button type="button" className="bg-vermelho text-white hover:cursor-pointer" onClick={() => confirmMove()}>Confirmar</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

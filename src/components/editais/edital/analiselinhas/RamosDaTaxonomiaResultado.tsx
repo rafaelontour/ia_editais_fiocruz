@@ -38,7 +38,9 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
     return (
         <div className="w-full flex flex-col flex-1 border border-gray-300 rounded-sm p-4">
             <Tabs defaultValue="tabRamo0" value={abaSelecionada} onValueChange={(val) => setAbaSelecionada(val)}>
-                <span className="font-bold text-2xl text-black text-left">Ramos da taxonomia</span>
+                <h3 className="font-bold text-2xl text-black text-left">Ramos da taxonomia</h3>
+
+                <hr className="mt-2 mb-4 border-gray-300 w-full" />
 
                 <div className="flex w-min-0 justify-between items-center gap-2">
                     <Button
@@ -153,68 +155,28 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
                             className=""
                             key={ramo.id}
                         >
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 text-black">
                                 <div className="flex flex-row gap-7 px-3 w-full">
                                     <div className="flex flex-col gap-2 w-1/3">
                                         <h3 className="text-lg font-semibold">Item</h3>
-                                        <p className=" text-gray-400">
+                                        <p className="">
                                             {ramo.title}
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-col gap-2 w-1/3">
+                                    <div className="flex flex-col gap-2 w-full">
                                         <h3 className="text-lg font-semibold">Detalhamento</h3>
-                                        <p className=" text-gray-400">
+                                        <p className="h-[180px] overflow-y-auto">
                                             {ramo.evaluation?.feedback}
                                         </p>
                                     </div>
-
-                                    <div className="flex flex-col gap-2 w-1/3">
-                                        <h3 className="text-lg font-semibold">Resultado</h3>
-                                        <div className="flex flex-col">
-                                            <div className="flex items-center gap-3">
-                                                <div className="rounded-xs w-3 h-3" style={{ backgroundColor: "green" }}></div>
-                                                <p className="text-gray-400">1,2 (0k)</p>
-                                            </div>
-
-                                            <div className="flex items-center gap-3">
-                                                <div className="rounded-xs w-3 h-3" style={{ backgroundColor: "yellow" }}></div>
-                                                <p className="text-gray-400">3 (Parcial) : XXXXXX</p>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
-                                <div className="h-0.5 w-full bg-gray-300"></div>
+                                <hr className="mt-2 mb-4 border-gray-300 w-full" />
 
-                                <div className="flex flex-row gap-7 px-3 w-full">
-                                    <div className="w-1/3 text-gray-400">
-                                        <p>
-                                            Em que parte do texto o edital especifica “as Responsabilidade dos Licitantes” com base na
-                                            “Lei nº 14.133/2021, especificamente nos artigos 56 e 57”
-                                        </p>
-                                    </div>
-
-                                    <div className="w-1/3 text-gray-400">
-                                        <p>
-                                            1. Foi definido “a Responsabilidade pela Proposta” 2. Foi definido “Cumprimento das Disposições”
-                                            3. Foi definida “ a Declarações de Conformidade” 4. Foi definida “a Veracidade das Informações”
-                                        </p>
-                                    </div>
-
-                                    <div className="flex flex-col w-1/3 ">
-                                        <div className="flex items-center gap-3">
-                                            <div className="rounded-xs w-3 h-3" style={{ backgroundColor: "green" }}></div>
-                                            <p className="text-gray-400">1,2,3 (0k)</p>
-                                            <Link size={16} />
-                                        </div>
-
-                                        <div className="flex items-center gap-3">
-                                            <div className="rounded-xs w-3 h-3" style={{ backgroundColor: "orange" }}></div>
-                                            <p className="text-gray-400">4 (Não Identificado)</p>
-                                            <Link size={16} />
-                                        </div>
-                                    </div>
+                                <div className="flex flex-row gap-3 px-3 w-full">
+                                    <h3 className="font-semibold">Resutado: </h3>
+                                    { ramo?.evaluation?.score }
                                 </div>
                             </div>
                         </TabsContent>

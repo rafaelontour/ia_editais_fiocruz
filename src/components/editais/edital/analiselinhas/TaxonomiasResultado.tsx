@@ -46,7 +46,8 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                     value={abaSelecionada}
                     onValueChange={(val) => setAbaSelecionada(val)}
                 >
-                    <span className="font-bold text-2xl text-black text-left">Taxonomias da tipificação</span>
+                    <h3 className="font-bold text-2xl text-black text-left">Taxonomias da tipificação</h3>
+                    
                     <div className="flex items-center justify-between gap-2">
                         <Button
                             className={`

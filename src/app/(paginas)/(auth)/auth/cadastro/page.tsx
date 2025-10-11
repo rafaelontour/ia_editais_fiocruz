@@ -41,6 +41,7 @@ export default function Cadastro(){
                 </div>
 
                 <button type="submit" className="bg-vermelho text-branco rounded-md px-6 py-3 text-xl">Criar Conta</button>
+                
                 <div className="flex justify-between"> 
                    <Link href={"/login"} className="cursor-pointer">Já possui conta? Fazer login</Link>
                 </div>

@@ -494,9 +494,6 @@ export default function Taxonomias() {
                                 setIdSelecionado(index.toString())
                             }}
                             onClick={() => {
-                                if (idSelecionado === taxonomiaSelecionada?.id) {
-                                    console.log("click no mewsmo")
-                                }
                                 setTaxonomiaSelecionada(item)
                                 setIdSelecionado(index.toString())
                                 buscarRamos(item.id)
@@ -562,8 +559,6 @@ export default function Taxonomias() {
                                                         className="bg-white p-2 w-full rounded-md"
                                                         defaultValue={taxonomiaSelecionada?.typification_id}
                                                         onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                                                            console.log("TIPIFICAÇÃO SELECIONADA: ", e.target.value)
-                                                            console.log("TAXONOMIA SELECIONADA: ", item)
                                                             setIdTipificacao(e.target.value)
                                                             setTaxonomiaSelecionada(item);
                                                             setValue("id_tipificacao", [e.target.value]);

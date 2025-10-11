@@ -1,11 +1,10 @@
 'use client'
 
-import { UsuarioUnidade } from "@/core/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
-import { IconLogin, IconLogout } from "@tabler/icons-react";
+import { IconLogin, IconLogout, IconUsersGroup } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Button } from "./ui/button";
+import { UserCheck, UserCog2Icon } from "lucide-react";
 
 export default function Cabecalho() {
 
@@ -35,6 +34,26 @@ export default function Cabecalho() {
                         ml-2 inline-block mb-[3px]
                     "
                 />
+
+                {
+                    usuario && (
+                        <div
+                            title="Seu cargo/nível de acesso"
+                            className="
+                                bg-vermelho rounded-md flex items-center gap-2
+                                text-white px-3 py-2 text-sm italic ml-4 select-none
+                            "
+                            style={{
+                                boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)"
+                            }}
+                        >
+                            <UserCog2Icon size={16} />
+                            <p>
+                                {usuario && usuario.access_level === "ADMIN" ? "ADMINISTRADOR" : usuario.access_level === "ANALYST" ? "ANALISTA" : "AUDITOR"}
+                            </p> 
+                        </div>
+                    )
+                }
             </div>
 
             {
@@ -62,10 +81,10 @@ export default function Cabecalho() {
                         }}
                         variant={"destructive"}
                         className="
-                        flex h-fit ml-auto mr-2 py-[5px] px-4
-                        items-center gap-1 bg-vermelho rounded-sm
-                        hover:cursor-pointer
-                    "
+                            flex h-fit ml-auto mr-2 py-[5px] px-4
+                            items-center gap-1 bg-vermelho rounded-sm
+                            hover:cursor-pointer
+                        "
                         style={{
                             boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)"
                         }}

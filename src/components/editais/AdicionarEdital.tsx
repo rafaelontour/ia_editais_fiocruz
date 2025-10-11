@@ -135,27 +135,33 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         <div>
             <Sheet open={openSheet} onOpenChange={setOpenSheet}>
                 <SheetTrigger asChild>
-                    <Button variant={"outline"} className="bg-vermelho hover:bg-vermelho hover:cursor-pointer hover:scale-105 active:scale-100 duration-100 text-white"> {/* AJEITAR ÍCONE */}
-                        <Upload color="white" className=""/>
-                        <p className="text-white">Enviar novo edital</p>
+                    <Button
+                        variant={"destructive"}
+                        className="
+                            bg-vermelho text-white
+                            hover:cursor-pointer px-4
+                        "
+                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                    >
+                        <Upload size={18} color="white" />
+                        <p className="text-white text-[16px]">Enviar novo edital</p>
                     </Button> 
                 </SheetTrigger>
                 
                 <SheetContent onCloseAutoFocus={limparDados} side="right" className="w-full px-10 pt-5 overflow-y-auto">
                     <SheetHeader className="pl-0">
-                        <SheetTitle className="text-2xl">Adicionar edital</SheetTitle>
-                        <SheetDescription>Preencha as informações abaixo</SheetDescription>
+                        <SheetTitle className="text-4xl">Adicionar edital</SheetTitle>
+                        <SheetDescription className="text-xl">Preencha as informações abaixo</SheetDescription>
                     </SheetHeader>
                 
                     <form onSubmit={handleSubmit(enviarEdital)}>
                         <div className="space-y-6">
                             <div className="flex flex-row gap-5 w-full">
                                 <div className="flex flex-col gap-3 w-[60%]">
-                                    <Label htmlFor="name">Nome do edital</Label>
+                                    <Label htmlFor="name" className="text-lg">Nome do edital</Label>
                                     <Input
                                         {...register("nome")}
                                         id="name"
-                                        placeholder="Insira o nome do edital"
                                     />
                                     {errors.nome && (
                                         <span className="text-xs text-red-500 italic">
@@ -165,7 +171,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                 </div>
 
                                 <div className="flex flex-col gap-3 w-[40%]">
-                                    <Label htmlFor="unit">Unidade</Label>
+                                    <Label htmlFor="unit" className="text-lg">Unidade</Label>
 
                                     <Controller
                                         name="unidade"
@@ -212,7 +218,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
 
                             <div className="flex flex-row gap-5 w-full">
                                 <div className="flex w-full flex-col gap-3">
-                                    <Label htmlFor="tipe">Tipificações</Label>
+                                    <Label htmlFor="tipe" className="text-lg">Tipificações</Label>
                                     <Controller
                                         name="tipificacoes"
                                         control={control}
@@ -263,7 +269,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                             {
                                 tipificacoesSelecionadas.length > 0 && (
                                     <div className="flex flex-col gap-3 w-full">
-                                        <Label htmlFor="tipe">Tipificações selecionadas</Label>
+                                        <Label htmlFor="tipe" className="text-lg">Tipificações selecionadas</Label>
                                         <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
                                             {
                                                 tipificacoesSelecionadas.map((t: Tipificacao) => (
@@ -285,7 +291,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                 </span>
                                                             </div>
                                                         </button>
-                                                        <p className=" w-full text-[11px]">{t.name}</p>
+                                                        <p className=" w-full text-sm">{t.name}</p>
                                                     </div>
                                                 ))
                                             }
@@ -296,7 +302,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
 
                             <div className="flex flex-row gap-3 w-full">
                                 <div className="flex flex-col gap-3 w-full">
-                                    <Label htmlFor="responsavel">Responsável</Label>
+                                    <Label htmlFor="responsavel" className="text-lg">Responsável</Label>
                                     <Controller
                                         name="responsavel"
                                         control={control}
@@ -344,11 +350,10 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                 </div>
 
                                 <div className="flex flex-col gap-3 w-full">
-                                    <Label htmlFor="date">Número do edital</Label>
+                                    <Label htmlFor="date" className="text-lg">Número do edital</Label>
                                     <Input
                                         {...register("identificador")}
                                         id="date"
-                                        placeholder="Informe o número do edital"
                                     />
                                     {
                                         errors.identificador && (
@@ -364,7 +369,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                 {
                                     responsaveisEdital.length > 0 && (
                                         <div className="flex flex-col gap-3 w-full">
-                                            <Label htmlFor="tipe">{responsaveisEdital.length > 1 ? "Responsáveis selecionados" : "Responsável selecionado"}</Label>
+                                            <Label htmlFor="tipe" className="text-lg">{responsaveisEdital.length > 1 ? "Responsáveis selecionados" : "Responsável selecionado"}</Label>
                                             <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
                                                 {
                                                     responsaveisEdital.map((usuario: UsuarioUnidade) => (
@@ -386,7 +391,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                     </span>
                                                                 </div>
                                                             </button>
-                                                            <p className=" w-full text-[11px]">{usuario.username}</p>
+                                                            <p className=" w-full text-sm">{usuario.username}</p>
                                                         </div>
                                                     ))
                                                 }
@@ -398,7 +403,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
 
                             <div className="flex items-start gap-3">
                                 <div className="flex flex-col gap-3 w-1/2">
-                                    <Label htmlFor="descricao">Descrição</Label>
+                                    <Label htmlFor="descricao" className="text-lg">Descrição</Label>
                                     <Textarea
                                         {...register("descricao")}
                                         id="descricao"
@@ -414,7 +419,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                 </div>
 
                                 <div className="flex flex-col gap-3 w-1/2">
-                                    <Label>Upload do documento</Label>
+                                    <Label className="text-lg">Upload do documento</Label>
                                     <div className="h-16">
                                        <Controller
                                             name="arquivo"
@@ -440,7 +445,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                             </div>
                         </div>
 
-                        <SheetFooter className="flex absolute z-50 w-fit justify-end bottom-6 right-10">
+                        <SheetFooter className="absolute z-50 w-fit self-end bottom-2 right-6">
                             <Button
                                 type="submit"
                                 variant={"destructive"}

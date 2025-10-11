@@ -42,8 +42,6 @@ async function getEditalPorIdService(id: string): Promise<Edital | undefined> {
 }
 
 async function adicionarEditalService(dados: any): Promise<[number, string] | undefined> {
-
-    console.log("EDITAL: ", dados);
     try {
         const resposta = await fetch(`${urlBase}/doc/`, {
             method: "POST",

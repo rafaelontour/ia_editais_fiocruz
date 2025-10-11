@@ -81,7 +81,6 @@ async function atualizarRamoService(dadosRamos: Ramo): Promise<number | undefine
 async function excluirRamoService(idRamo: string | undefined): Promise<number | undefined> {
     try {
         const resposta = await fetch(`${urlBase}/branch/${idRamo}/`, { method: "DELETE", credentials: "include" });
-        console.log("Status: ", resposta.status);
         return resposta.status
     } catch (error) {
         console.error('Erro ao excluir ramo:', error);

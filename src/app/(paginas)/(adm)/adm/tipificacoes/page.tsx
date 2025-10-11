@@ -68,8 +68,6 @@ export default function Tipificacoes() {
             toast.error('Erro ao buscar tipificacoes')
         }
 
-        console.log("TIPIFICACOES BUSCADAS GET: ", dados)
-
         setTipificacoes(dados)
     }
 
@@ -85,7 +83,6 @@ export default function Tipificacoes() {
 
 
     const adicionarTipificacao = async (data: FormData) => {
-        console.log("TIPIFICAÇÃO ADICIONADA ANTES DO POST: ", data)
         const dados = await adicionarTipificacaoService(data.nome, fontesSelecionadas);
         if (dados == null) {
             throw new Error('Erro ao adicionar tipificacao')
@@ -129,7 +126,6 @@ export default function Tipificacoes() {
     }
 
     const filtrarPraEdicao = (ids: string[] | undefined): Fonte[] => {
-        console.log("ids passados: ", ids)
         return fontes.filter(fonte => ids?.includes(fonte.id));
     }
 

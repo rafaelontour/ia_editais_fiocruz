@@ -5,6 +5,7 @@ import CategoriaColor from "./CategoriaColor";
 import { Button } from "../ui/button";
 import AdicionarEdital from "./AdicionarEdital";
 import { Dispatch, SetStateAction } from "react";
+import useUsuario from "@/data/hooks/useUsuario";
 
 interface Props {
     funcaoAtualizarEditais: Dispatch<SetStateAction<boolean>>
@@ -12,6 +13,8 @@ interface Props {
 }
 
 export default function SuperiorEditais ({ funcaoAtualizarEditais, flagEdital } : Props) {
+
+    const { usuario } = useUsuario();
 
     const status = [
         { nome:"Retrabalhando", color:"green" },
@@ -21,18 +24,19 @@ export default function SuperiorEditais ({ funcaoAtualizarEditais, flagEdital } 
     return(
         <div className="flex felx-row justify-between items-center gap-5 px-2 h-12">
             <div className="flex flex-row gap-7 items-center">
-                <Button variant={"outline"} size={"icon"}> <ChevronRightIcon /> </Button>
-                <h2 className="text-2xl font-bold">Meus editais</h2>
+                <h2 className="text-4xl font-bold">Meus editais</h2>
             </div>
+            
             <div className="flex flex-row gap-7 items-center">
-                <div className="text-slate-400 flex gap-5 text-sm">
-                    <p>Legendas:</p>
-                    <CategoriaColor categoria={status}/>
-                
-                </div>
-                <div className="w-full">
-                    <AdicionarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} />
-                </div>
+
+                {
+                    (usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (
+                    <div className="w-full">
+                        <AdicionarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} />
+                    </div>
+                    )
+                }
+
             </div>
         </div>
     );

@@ -14,8 +14,8 @@ export interface EditalTypification {
     name: string;
     sources: any[];
     taxonomies: any[];
-    created_at: string;
-    updated_at: string | null;
+    created_at?: string;
+    updated_at?: string | null;
 }
 
 export interface Edital {
@@ -38,6 +38,7 @@ export interface EditalArquivo {
             id: string;
             file_path: string;
             description: string;
+            check_tree: EditalTypification[]
             created_at: string;
         }
     ]

@@ -1,0 +1,28 @@
+.resumoIA {
+    color: black;
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.resumoIA h3 {
+    font-size: 1.2em;
+}
+
+.resumoIA ol {
+    padding-left: 10px;
+    font-size: large;
+}
+
+.resumoIA ul {
+    padding-left: 40px;
+    list-style-type: disc;
+}
+
+.resumoIA p {
+    margin-top: 10px;
+}
+
+.resumoIA p::before {
+    content: "❗";
+    font-weight: bold;
+}

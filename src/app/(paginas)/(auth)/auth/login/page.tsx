@@ -91,7 +91,7 @@ export default function Login() {
           <h2 className="text-cinza text-center text-4xl self-baseline font-bold mb-5">
             Fazer Login
           </h2>
-          <p className="text-lg text-center">
+          <p className="text-xl text-center">
             Para acessar a plataforma e gerenciar os editais, faça o login abaixo!
           </p>
         </div>
@@ -101,7 +101,7 @@ export default function Login() {
           className="flex flex-col gap-4 font-medium text-lg 2xl:text-xl"
         >
           <div className="flex flex-col gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-xl">Email</Label>
             <Input
               id="email"
               {...register("email")}
@@ -116,7 +116,7 @@ export default function Login() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="senha">Senha</Label>
+            <Label htmlFor="senha" className="text-xl">Senha</Label>
             <Input
               id="senha"
               {...register("senha")}
@@ -130,19 +130,20 @@ export default function Login() {
             )}
           </div>
 
-          <Button
+          <button
             type="submit"
-            className="bg-vermelho text-branco rounded-md px-6 py-3 cursor-pointer"
+            className="bg-vermelho hover:bg-red-800 text-branco rounded-md cursor-pointer py-2 px-4"
           >
-            Fazer Login
-          </Button>
+            <span className="text-xl">Entrar</span>
+          </button>
           
           <div className="flex justify-between">
             <a
               href="#"
               className="hover:cursor-pointer hover:underline text-sm"
             >
-              Esqueci a senha</a>
+              Esqueci a senha
+            </a>
           </div>
         </form>
       </div>
