@@ -1,5 +1,5 @@
 services:
-  fiotec-front-front: 
+  fiotec-front: 
     build: .
     container_name: fiotec-front
     fiotec-front ports:
