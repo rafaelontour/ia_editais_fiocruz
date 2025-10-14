@@ -3,5 +3,5 @@ services:
     build: .
     container_name: fiotec-front
     fiotec-front ports:
-      - "4000:4000"
+      - "3000:4000"
     restart: unless-stopped
