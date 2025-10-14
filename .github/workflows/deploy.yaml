@@ -3,7 +3,7 @@ name: Deploy no Servidor
 on:
   push:
     branches:
-      - main   # dispara só quando fizer push na branch main
+      - master   # dispara só quando fizer push na branch master
 
 jobs:
   deploy:
