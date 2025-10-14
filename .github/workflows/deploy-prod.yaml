@@ -30,10 +30,10 @@ jobs:
 
             # Atualiza o repositório
             if [ ! -d ".git" ]; then
-              git clone -b master https://github.com/rafaelontour/ia_editais_fiocruz.git .
+              git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git .
             else
-              git fetch origin master
-              git reset --hard origin/master
+              git fetch origin main
+              git reset --hard origin/main
             fi
 
             # Limpa containers antigos
