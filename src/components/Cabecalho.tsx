@@ -5,11 +5,27 @@ import { IconLogin, IconLogout, IconUsersGroup } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { UserCheck, UserCog2Icon } from "lucide-react";
+import { Unidade } from "@/core/unidade";
+import { use, useEffect, useState } from "react";
+import { getUnidadePorId } from "@/service/unidade";
 
 export default function Cabecalho() {
 
     const { usuario, deslogar, mensagemLogin } = useUsuario()
-    const router = useRouter()
+    const router = useRouter();
+    const [unidade, setUnidade] = useState<Unidade | null>(null);
+
+    async function unidadeLogada() {
+        const u = await getUnidadePorId(usuario?.unit_id)
+        setUnidade(u)
+    }
+
+    useEffect(() => {
+        if (usuario) {
+            unidadeLogada()
+        }
+    }, [usuario])
+
 
     return (
         <header
@@ -36,12 +52,12 @@ export default function Cabecalho() {
                 />
 
                 {
-                    usuario && (
+                    unidade ? (
                         <div
-                            title="Seu cargo/nível de acesso"
+                            title="Seu cargo/nível de acesso e unidade"
                             className="
-                                bg-vermelho rounded-md flex items-center gap-2
-                                text-white px-3 py-2 text-sm italic ml-4 select-none
+                                bg-zinc-600 rounded-md flex items-center gap-2 ml-5
+                                text-white px-3 py-2 text-sm italic select-none 
                             "
                             style={{
                                 boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)"
@@ -49,8 +65,19 @@ export default function Cabecalho() {
                         >
                             <UserCog2Icon size={16} />
                             <p>
-                                {usuario && usuario.access_level === "ADMIN" ? "ADMINISTRADOR" : usuario.access_level === "ANALYST" ? "ANALISTA" : "AUDITOR"}
+                                {usuario && usuario.access_level === "ADMIN" ? "ADMINISTRADOR" : usuario?.access_level === "ANALYST" ? "ANALISTA" : "AUDITOR"}
+                                &nbsp; - Unidade {unidade && unidade.name}
                             </p> 
+                        </div>
+                    ) : (
+                        <div
+                            className="
+                                bg-zinc-600 rounded-md flex items-center
+                                gap-2 ml-5 text-white px-3 py-2 text-sm italic select-none
+                                animate-pulse opacity-65 w-[330px] h-10
+                            "
+                        >
+                            
                         </div>
                     )
                 }

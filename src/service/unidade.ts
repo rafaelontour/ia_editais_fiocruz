@@ -22,7 +22,7 @@ async function getTodasUnidades(): Promise<Unidade[]> {
     }
 }
 
-async function getUnidadePorId(unidadeId: string) {
+async function getUnidadePorId(unidadeId: string | undefined) {
     try {
         const res = await fetch(`${urlBase}/unit/${unidadeId}/`, {
             method: "GET",

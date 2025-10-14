@@ -13,8 +13,6 @@ export interface ContextoProps {
     deslogar: () => void
     items: MenuItem[]
     mensagemLogin: string,
-    setEstadoSidebar: (open: boolean) => void,
-    estadoSidebar: boolean
 }
 
 export const UsuarioContexto = createContext<ContextoProps | undefined>({} as ContextoProps);
@@ -82,8 +80,6 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
                 deslogar: deslogar,
                 items: items,
                 mensagemLogin: mensagemLogin,
-                setEstadoSidebar: setStateSidebar,
-                estadoSidebar: stateSidebar
             }}
         >
             {children}

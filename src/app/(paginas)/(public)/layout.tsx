@@ -38,33 +38,31 @@ export default function RootLayout({
               <SidebarContent>
                 <SidebarGroup>
                   <SidebarMenu>
-                    {items.map((item) => {
-                      const ativo = item.url === pathname
-
-                      return (
-                        <SidebarMenuItem
-                          key={item.title}
-                        >
-                          <SidebarMenuButton
-                            className={`
-                              ${ ativo ? "bg-[#D03C30] hover:text-white hover:bg-[#D03C30] text-white" : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
-                              rounded-sm transition-all duration-150 py-[18px] pl-3
-                            `}
-                            asChild
-                          >
-                            <a
-                              href={item.url}
-                              className="
-                                flex items-center gap-2
-                              "
+                    {items && items.length > 0 ? (
+                      items.map((item) => {
+                        const ativo = pathname === item.url;
+                        return (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                              className={`
+                                rounded-sm transition-all duration-15 py-[18px] pl-3
+                                ${ativo
+                                  ? "bg-[#D03C30] text-white hover:bg-[#D03C30] hover:text-white"
+                                  : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
+                              `}
+                              asChild
                             >
-                              <item.icon className="w-5 h-5" />
-                              <span className="text-[16px]">{item.title}</span>
-                            </a>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      )
-                    })}
+                              <a className="flex items-center gap-2" href={item.url}>
+                                <item.icon className="w-5 h-5" />
+                                <span className="text-[16px]">{item.title}</span>
+                              </a>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })
+                    ) : (
+                      <div className="p-4 text-gray-400 animate-pulse w-fit">Carregando menu...</div>
+                    )}
                   </SidebarMenu>
                 </SidebarGroup>
               </SidebarContent>

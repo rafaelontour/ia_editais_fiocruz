@@ -164,6 +164,8 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
                                         </p>
                                     </div>
 
+                                    <div className="flex flex-col bg-zinc-400 gap-2 w-[1px]" />
+
                                     <div className="flex flex-col gap-2 w-full">
                                         <h3 className="text-lg font-semibold">Detalhamento</h3>
                                         <p className="h-[180px] overflow-y-auto">
@@ -176,7 +178,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
 
                                 <div className="flex flex-row gap-3 px-3 w-full">
                                     <h3 className="font-semibold">Resutado: </h3>
-                                    { ramo?.evaluation?.score }
+                                    { ramo?.evaluation?.score } / 10
                                 </div>
                             </div>
                         </TabsContent>

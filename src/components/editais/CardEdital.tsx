@@ -83,7 +83,9 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                     <h3 className="font-semibold text-xl">{edital.name}</h3>
 
                     {
-                        edital.history && edital.history.filter((edital) => edital.status === "UNDER_CONSTRUCTION").length >= 2 && (
+                        edital.history &&
+                        edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 2 &&
+                        edital.history.filter((h) => h.status === "WAITING_FOR_REVIEW").length >= 1 && (
                             <Tooltip>
                                 <div className="flex items-center bg-black pl-3 pr-2 py-1 rounded-md" style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}>
                                     <TooltipTrigger>

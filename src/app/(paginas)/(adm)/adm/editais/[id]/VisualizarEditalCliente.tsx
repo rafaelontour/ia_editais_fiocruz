@@ -145,7 +145,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
                 </div>
 
                 <ResizablePanel minSize={35} defaultSize={50}>
-                    <div className="w-full">
+                    <div className="w-full h-full pr-2 overflow-y-auto">
                         <AnaliseEdital edital={edital} editalArquivo={editalArquivo} resumoIA={resumoIA} />
                     </div>
                 </ResizablePanel>
