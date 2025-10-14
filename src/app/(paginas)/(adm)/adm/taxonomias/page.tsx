@@ -1,6 +1,5 @@
 "use client";
 
-import EditarEdital from "@/components/editais/EditarEdital";
 import EditarRamo from "@/components/ramos/EditarRamo";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +32,7 @@ import { getTipificacoesService } from "@/service/tipificacao";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 

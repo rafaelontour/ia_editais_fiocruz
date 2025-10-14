@@ -1,0 +1,46 @@
+name: Deploy no Servidor
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar chave SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.IA_EDITAIS_SSH }}
+
+      - name: Deploy no servidor via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} << 'EOF'
+            set -e
+
+            echo "🚀 Iniciando deploy via docker-compose..."
+
+            mkdir -p /home/ubuntu/iaEditais-prod
+            cd /home/ubuntu/iaEditais-prod
+
+            # Atualiza o repositório
+            if [ ! -d ".git" ]; then
+              git clone -b master https://github.com/rafaelontour/ia_editais_fiocruz.git .
+            else
+              git fetch origin master
+              git reset --hard origin/master
+            fi
+
+            # Limpa containers antigos
+            docker compose down --rmi all --remove-orphans || true
+
+            # Build e start usando docker-compose
+            docker compose up -d --build
+
+            echo "✅ Deploy concluído com docker compose!"
+          EOF

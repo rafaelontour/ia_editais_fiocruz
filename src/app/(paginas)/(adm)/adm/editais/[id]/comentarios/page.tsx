@@ -1,5 +1,4 @@
 import ComentarioEdital from "@/components/editais/edital/ComentarioEdital";
-import PdfEdital from "@/components/editais/edital/PdfEdital";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft } from "lucide-react";
@@ -16,7 +15,7 @@ export default function Comentarios () {
             </div>
             <div className="flex flex-row gap-10 w-full h-full">
                 <div className="flex-1 w-1/2 h-full max-h-full">
-                    <PdfEdital/>
+                    
                 </div>
                 <div className="w-1/2">
                     <ComentarioEdital/>
