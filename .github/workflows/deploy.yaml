@@ -20,7 +20,8 @@ jobs:
       - name: Deploy no servidor
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} << 'EOF'
-            cd /home/ubuntu/teste
+            mkdir -p /home/ubuntu/iaeditais
+            cd /home/ubuntu/iaeditais
             git pull origin main
             npm install --production
             npm run build
