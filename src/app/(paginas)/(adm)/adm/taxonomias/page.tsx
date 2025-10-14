@@ -719,7 +719,6 @@ export default function Taxonomias() {
                                                         transition ease-in-out text-black
                                                         rounded-md px-3
                                                         hover:cursor-pointer
-                                                        hover:scale-110 active:scale-100
                                                     `}
                                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                 >
@@ -730,7 +729,6 @@ export default function Taxonomias() {
                                                     className={`
                                                         flex bg-vermelho hover:bg-vermelho
                                                         text-white hover:cursor-pointer
-                                                        hover:scale-110 active:scale-100
                                                     `}
                                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                     onClick={() => {
@@ -887,7 +885,6 @@ export default function Taxonomias() {
                                                                             transition ease-in-out text-black
                                                                             rounded-md px-3
                                                                             hover:cursor-pointer
-                                                                            hover:scale-110 active:scale-100
                                                                         `}
                                                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                                     >
@@ -898,7 +895,6 @@ export default function Taxonomias() {
                                                                         className={`
                                                                             flex bg-vermelho hover:bg-vermelho
                                                                             text-white hover:cursor-pointer
-                                                                            hover:scale-110 active:scale-100
                                                                         `}
                                                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                                         onClick={() => {

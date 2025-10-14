@@ -145,42 +145,49 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                             }
 
                             {
-                                (edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && (
-                                    <EditarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} edital={edital} />
+                                usuario?.access_level !== "AUDITOR" && (
+                                    <div className="flex items-center gap-2">
+                                        {
+                                            (edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && (
+                                                <EditarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} edital={edital} />
+                                            )
+                                        }
+
+                                        {
+                                            ((usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (edital.history && (edital.history[0].status === "PENDING" || edital.history[0].status === "UNDER_CONSTRUCTION"))) && (
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button
+                                                            size={"icon"}
+                                                            className="
+                                                            h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
+                                                            text-white transition-all rounded-sm p-[14px]
+                                                            ">
+                                                                <Trash />
+                                                        </Button>
+                                                    </DialogTrigger>
+
+                                                    <DialogContent className="rounded-2xl">
+                                                        <DialogHeader>
+                                                            <DialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital Edital Fiocruz 2025/1?</DialogTitle>
+                                                            <DialogDescription className="text-[14px] text-vermelho">
+                                                                Após a exclusão, não será possível recuperar os dados desse edital e análise realizada
+                                                            </DialogDescription>
+                                                        </DialogHeader>
+
+                                                        <DialogFooter>
+                                                            <DialogClose className="border bg-slate-300 px-3 py-1 rounded-sm hover:cursor-pointer">Cancelar</DialogClose>
+
+                                                            <Button onClick={excluirEdital} variant={"destructive"} className="bg-vermelho hover:cursor-pointer"><Trash /><p>Excluir edital</p></Button>
+                                                        </DialogFooter>
+                                                    </DialogContent>
+                                                </Dialog>
+                                            )
+                                        }
+                                    </div>
                                 )
                             }
 
-                            {
-                                ((usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (edital.history && (edital.history[0].status === "PENDING" || edital.history[0].status === "UNDER_CONSTRUCTION"))) && (
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button
-                                                size={"icon"}
-                                                className="
-                                                h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
-                                                text-white transition-all rounded-sm p-[14px]
-                                                ">
-                                                    <Trash />
-                                            </Button>
-                                        </DialogTrigger>
-
-                                        <DialogContent className="rounded-2xl">
-                                            <DialogHeader>
-                                                <DialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital Edital Fiocruz 2025/1?</DialogTitle>
-                                                <DialogDescription className="text-[14px] text-vermelho">
-                                                    Após a exclusão, não será possível recuperar os dados desse edital e análise realizada
-                                                </DialogDescription>
-                                            </DialogHeader>
-
-                                            <DialogFooter>
-                                                <DialogClose className="border bg-slate-300 px-3 py-1 rounded-sm hover:cursor-pointer">Cancelar</DialogClose>
-
-                                                <Button onClick={excluirEdital} variant={"destructive"} className="bg-vermelho hover:cursor-pointer"><Trash /><p>Excluir edital</p></Button>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
-                                )
-                            }
                         </div>
                     </div>
                 </div>

@@ -13,6 +13,7 @@ import { definirStatusConcluido, definirStatusEmConstrucao } from "@/service/edi
 import { toast } from "sonner";
 import { useState } from "react";
 import { getStatusColor, iconeParaStatusDoEdital, verificarStatusEdital } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface VisualizarEditalClienteProps {
     edital: Edital | undefined
@@ -25,6 +26,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
 
     const { usuario } = useUsuario();
     const [enviouAnaliseOuConcluido, setEnviouAnaliseOuConcluido] = useState<boolean>(false);
+    const router = useRouter();
 
     async function enviarEditalParaConcluido() {
         if (!edital) {
@@ -36,6 +38,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
         if (resposta === 200) {
             toast.success("Análise do edital concluida!");
             setEnviouAnaliseOuConcluido(true);
+            router.push('/adm/editais');
             return;
         }
 
@@ -53,6 +56,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
         if (resposta === 200) {
             toast.success("Edital movido para fase de construção!");
             setEnviouAnaliseOuConcluido(true);
+            router.push('/adm/editais');
             return;
         }
     
@@ -71,52 +75,47 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
                             boxShadow: "0 0 3px rgba(0, 0, 0, .5)"
                         }}
                     >
-
                         <span>{edital?.history && verificarStatusEdital(edital?.history[0].status)}</span>
                         {iconeParaStatusDoEdital(edital?.history ? edital.history[0].status : "PENDING")}
                     </div>
                 </div>
                 
-                {
-                    edital?.history && (edital.history[0].status === "WAITING_FOR_REVIEW") && (
-                        <div className={`flex items-center gap-2 ${enviouAnaliseOuConcluido && "cursor-not-allowed"}`}>
-                            {
-                                (usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (
-                                    <Button
-                                        disabled={enviouAnaliseOuConcluido}
-                                        className="hover:cursor-pointer flex items-center bg-red-500 hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
-                                    >
-                                        <Play size={30} />
-                                        <span className="text-[16px]">Analisar nova versão</span>
-                                    </Button>
-                                )
-                            }
+                <div className={`flex items-center gap-2 ${enviouAnaliseOuConcluido && "cursor-not-allowed"}`}>
+                    {
+                        (usuario?.access_level !== "AUDITOR" && edital?.history && edital?.history[0].status === "UNDER_CONSTRUCTION") && (
+                            <Button
+                                disabled={enviouAnaliseOuConcluido}
+                                className="hover:cursor-pointer flex items-center bg-red-500 hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
+                            >
+                                <Play size={30} />
+                                <span className="text-[16px]">Analisar nova versão</span>
+                            </Button>
+                        )
+                    }
 
-                            {
-                                (usuario?.access_level === "ADMIN" || usuario?.access_level === "AUDITOR") && (
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            disabled={enviouAnaliseOuConcluido}
-                                            onClick={enviarEditalParaEmContrucao}
-                                            className="hover:cursor-pointer text-[16px] text-white bg-vermelho hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
-                                        >
-                                            Rejeitar
-                                        </Button>
+                    {
+                        (usuario?.access_level === "ADMIN" || usuario?.access_level === "AUDITOR") && edital?.history && edital?.history[0].status === "WAITING_FOR_REVIEW" && (
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    disabled={enviouAnaliseOuConcluido}
+                                    onClick={enviarEditalParaEmContrucao}
+                                    className="hover:cursor-pointer text-[16px] text-white bg-vermelho hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
+                                >
+                                    Rejeitar
+                                </Button>
 
-                                        <Button
-                                            disabled={enviouAnaliseOuConcluido}
-                                            onClick={enviarEditalParaConcluido}
-                                            className="hover:cursor-pointer text-[16px] text-white bg-verde hover:bg-green-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
-                                        >
-                                            Aceitar
-                                        </Button>
-                                    </div>
+                                <Button
+                                    disabled={enviouAnaliseOuConcluido}
+                                    onClick={enviarEditalParaConcluido}
+                                    className="hover:cursor-pointer text-[16px] text-white bg-verde hover:bg-green-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
+                                >
+                                    Aceitar
+                                </Button>
+                            </div>
 
-                                )
-                            }
-                        </div>
-                    )
-                }
+                        )
+                    }
+                </div>
             </div>
 
             <ResizablePanelGroup

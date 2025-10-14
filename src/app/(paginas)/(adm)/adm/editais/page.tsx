@@ -153,8 +153,13 @@ export default function Editais() {
                 activeContainer === "UNDER_CONSTRUCTION" && (overContainer === "PENDING" || overContainer === "WAITING_FOR_REVIEW" || overContainer === "COMPLETED") ||
                 activeContainer === "WAITING_FOR_REVIEW" && overContainer === "PENDING"
             ) &&
-            !(usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST")
+            !(usuario?.access_level === "ANALYST" || usuario?.access_level === "ADMIN")
         ) {
+            toast.info("Você não tem permissão para mover este edital para esta coluna.");
+            return;
+        }
+
+        if (activeContainer === "WAITING_FOR_REVIEW" && (overContainer === "UNDER_CONSTRUCTION" || overContainer === "PENDING" || overContainer === "COMPLETED") && usuario?.access_level === "ANALYST") {
             toast.info("Você não tem permissão para mover este edital para esta coluna.");
             return;
         }
@@ -278,7 +283,7 @@ export default function Editais() {
 
     return (
         montado &&
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col h-full relative gap-4">
 
             <SuperiorEditais funcaoAtualizarEditais={setAdicionouNovoEdital} flagEdital={adicionouNovoEdital} />
 
@@ -288,7 +293,7 @@ export default function Editais() {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
             >
-                <div className="flex justify-between relative gap-3">
+                <div className="flex justify-between h-[85%] relative gap-3">
                     {statuses.map((status) => (
                         <div className="w-full" key={status}>
                             <SortableContext items={columns[status].map((c) => c.id)} strategy={verticalListSortingStrategy}>

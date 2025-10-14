@@ -9,6 +9,16 @@ body {
   font-family: 'Lexend', sans-serif;
 }
 
+.scrollbar-style::-webkit-scrollbar {
+  background-color: transparent;
+  scrollbar-width: thin;
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
 /* global.css */
 .scrollbar-hide {
   scrollbar-width: none; /* Firefox */
@@ -22,6 +32,7 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

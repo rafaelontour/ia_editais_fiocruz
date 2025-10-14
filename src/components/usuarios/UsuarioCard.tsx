@@ -275,12 +275,12 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
               </DialogHeader>
 
               <div className="flex justify-end gap-4 mt-4">
-                <DialogClose className="transition ease-in-out text-black rounded-md px-3 hover:cursor-pointer hover:scale-110 active:scale-100">
+                <DialogClose className="transition ease-in-out text-black rounded-md px-3 hover:cursor-pointer">
                   Cancelar
                 </DialogClose>
 
                 <Button
-                  className="flex bg-red-500 hover:bg-red-600 text-white hover:cursor-pointer hover:scale-110 active:scale-100"
+                  className="flex bg-red-500 hover:bg-red-600 text-white hover:cursor-pointer"
                   onClick={() => excluirUsuario(usuario.id)}
                 >
                   Excluir

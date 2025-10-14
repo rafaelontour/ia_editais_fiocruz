@@ -138,7 +138,7 @@ export default function RootLayout({
                 borderRadius: "10px",
               }}
             >
-              <div className="">
+              <div className="h-full">
                 {children}
               </div>
             </div>

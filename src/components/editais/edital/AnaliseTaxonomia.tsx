@@ -9,6 +9,7 @@ export default function AnaliseTasxonomia () {
                         para a habilitação dos licitantes” com base no “artigos 62 a 70 da Lei nº 14.133/2021”
                     </p>
                 </div>
+
                 <div className="flex flex-col gap-2 w-1/3">
                     <h3 className="text-lg font-semibold">Detalhamento</h3>
                     <p className=" text-gray-400">
@@ -18,6 +19,7 @@ export default function AnaliseTasxonomia () {
                         3. Foi definido a “Comprovação de Regularidade”
                     </p>
                 </div>
+
                 <div className="flex flex-col gap-2 w-1/3">
                     <h3 className="text-lg font-semibold">Resultado</h3>
                     <div className="flex flex-col">

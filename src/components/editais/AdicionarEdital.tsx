@@ -21,10 +21,10 @@ import { UsuarioUnidade } from "@/core/usuario";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import { adicionarEditalService } from "@/service/edital";
 import { enviarArquivoService } from "@/service/editalArquivo";
+import useUsuario from "@/data/hooks/useUsuario";
 
 const schemaEdital = z.object({
     nome: z.string().min(5, "O nome do edital é obrigatório"),
-    unidade: z.string().min(1, "Selecione uma unidade"),
     tipificacoes: z.array(z.string().min(1)).min(1, "Selecione pelo menos uma tipificação"),
     responsavel: z.string().min(1, "Selecione o responsável por este edital"),
     identificador: z.string().min(1, "O número de identificação do edital é obrigatório"),
@@ -55,7 +55,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     } = useForm<formData>({
         resolver: zodResolver(schemaEdital),
         defaultValues: {
-            unidade: "",
             tipificacoes: [],
             responsavel: "",
         }
@@ -67,6 +66,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [tipificacoesSelecionadas, setTipificacoesSelecionadas] = useState<Tipificacao[] | []>([]);
     const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
+    const { usuario } = useUsuario();
 
     async function buscarUnidades() {
         const unidades = await getTodasUnidades();
@@ -78,8 +78,8 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         setTipificacoes(tipificacoes);
     }
     
-    async function buscarUsuariosPorUnidade(id: string | undefined) {
-        const usuarios = await getUsuariosPorUnidade(id);
+    async function buscarUsuariosPorUnidade() {
+        const usuarios = await getUsuariosPorUnidade(usuario?.unit_id);
         setUsuarios(usuarios);
     }
 
@@ -136,6 +136,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
             <Sheet open={openSheet} onOpenChange={setOpenSheet}>
                 <SheetTrigger asChild>
                     <Button
+                        onClick={buscarUsuariosPorUnidade}
                         variant={"destructive"}
                         className="
                             bg-vermelho text-white
@@ -157,7 +158,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                     <form onSubmit={handleSubmit(enviarEdital)}>
                         <div className="space-y-6">
                             <div className="flex flex-row gap-5 w-full">
-                                <div className="flex flex-col gap-3 w-[60%]">
+                                <div className="flex flex-col gap-3 w-1/2">
                                     <Label htmlFor="name" className="text-lg">Nome do edital</Label>
                                     <Input
                                         {...register("nome")}
@@ -170,50 +171,70 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                     )}
                                 </div>
 
-                                <div className="flex flex-col gap-3 w-[40%]">
-                                    <Label htmlFor="unit" className="text-lg">Unidade</Label>
-
-                                    <Controller
-                                        name="unidade"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                value={field.value}
-                                                onValueChange={(value) => {
-                                                    field.onChange(value);
-                                                    setResponsaveisEdital([]);
-                                                    buscarUsuariosPorUnidade(value);
-                                                }}
-                                            >
-                                                <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Selecione a unidade" />
-                                                </SelectTrigger>
-                                
-                                                <SelectContent className="w-full">
-                                                    <SelectGroup>
-                                                        <SelectLabel>Unidade</SelectLabel>
-                                                        {
-                                                            unidades.map((unidade) => (
-                                                                <SelectItem
-                                                                    key={unidade.id}
-                                                                    value={unidade.id}
-                                                                >
-                                                                    {unidade.name}
-                                                                </SelectItem>
-                                                            ))
-                                                        }
-                                                    </SelectGroup>
-                                                </SelectContent>
-                                            </Select>
-                                        )}
+                                <div className="flex flex-col gap-3 w-1/2">
+                                    <Label htmlFor="date" className="text-lg">Número do edital</Label>
+                                    <Input
+                                        {...register("identificador")}
+                                        id="date"
                                     />
-
-                                    {errors.unidade && (
-                                        <span className="text-xs text-red-500 italic">
-                                            {errors.unidade.message}
-                                        </span>
-                                    )}
+                                    {
+                                        errors.identificador && (
+                                            <span className="text-xs text-red-500 italic">
+                                                {errors.identificador.message}
+                                            </span>
+                                        )
+                                    }
                                 </div>
+
+                                {
+                                    /*
+                                        <div className="flex flex-col gap-3 w-[40%]">
+                                            <Label htmlFor="unit" className="text-lg">Unidade</Label>
+
+                                            <Controller
+                                                name="unidade"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Select
+                                                        value={field.value}
+                                                        onValueChange={(value) => {
+                                                            field.onChange(value);
+                                                            setResponsaveisEdital([]);
+                                                            buscarUsuariosPorUnidade(value);
+                                                        }}
+                                                    >
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Selecione a unidade" />
+                                                        </SelectTrigger>
+                                        
+                                                        <SelectContent className="w-full">
+                                                            <SelectGroup>
+                                                                <SelectLabel>Unidade</SelectLabel>
+                                                                {
+                                                                    unidades.map((unidade) => (
+                                                                        <SelectItem
+                                                                            key={unidade.id}
+                                                                            value={unidade.id}
+                                                                        >
+                                                                            {unidade.name}
+                                                                        </SelectItem>
+                                                                    ))
+                                                                }
+                                                            </SelectGroup>
+                                                        </SelectContent>
+                                                    </Select>
+                                                )}
+                                            />
+
+                                            {errors.unidade && (
+                                                <span className="text-xs text-red-500 italic">
+                                                    {errors.unidade.message}
+                                                </span>
+                                            )}
+                                        </div>
+                                    */
+                                }
+                                
                             </div>
 
                             <div className="flex flex-row gap-5 w-full">
@@ -274,15 +295,15 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                             {
                                                 tipificacoesSelecionadas.map((t: Tipificacao) => (
                                                     <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                        <button onClick={() => {
+                                                        <button className="h-full" onClick={() => {
                                                             const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
                                                             setTipificacoesSelecionadas(novaLista);
                                                             setValue("tipificacoes", novaLista.map((tp) => tp.id));
                                                         }}>
-                                                            <div className="flex items-center" title="Remover tipificação">
+                                                            <div className="flex items-center h-full" title="Remover tipificação">
                                                                 <span
                                                                     className="
-                                                                        bg-red-200 p-[10px]
+                                                                        bg-red-200 p-[10px] h-full flex items-center
                                                                         hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                                         transition-all duration-200 ease-in-out
                                                                     "
@@ -291,7 +312,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                 </span>
                                                             </div>
                                                         </button>
-                                                        <p className=" w-full text-sm">{t.name}</p>
+                                                        <p className="w-full text-sm py-1">{t.name}</p>
                                                     </div>
                                                 ))
                                             }
@@ -324,14 +345,28 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                     <SelectGroup>
                                                         <SelectLabel>Usuários</SelectLabel>
                                                         {
-                                                            usuarios?.map((usuario) => (
+                                                            usuarios
+                                                                ?.filter(u => !responsaveisEdital.some(r => r.id === u.id))
+                                                                .map(usuario => (
+                                                                    <SelectItem
+                                                                        key={usuario.id}
+                                                                        value={usuario.id}
+                                                                        className="hover:cursor-pointer"
+                                                                    >
+                                                                        {usuario.username}
+                                                                    </SelectItem>
+                                                                ))
+                                                        }
+                                                        {
+                                                            usuarios?.length === responsaveisEdital.length && (
                                                                 <SelectItem
-                                                                    key={usuario.id}
-                                                                    value={usuario.id}
+                                                                    value="Todos"
+                                                                    className="hover:cursor-pointer"
+                                                                    disabled
                                                                 >
-                                                                    {usuario.username}
+                                                                    Todos usuários já foram selecionados
                                                                 </SelectItem>
-                                                            ))
+                                                            )
                                                         }
                                                     </SelectGroup>
                                                 </SelectContent>
@@ -344,21 +379,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                         errors.responsavel && (
                                             <span className="text-xs text-red-500 italic">
                                                 {errors.responsavel.message}
-                                            </span>
-                                        )
-                                    }
-                                </div>
-
-                                <div className="flex flex-col gap-3 w-full">
-                                    <Label htmlFor="date" className="text-lg">Número do edital</Label>
-                                    <Input
-                                        {...register("identificador")}
-                                        id="date"
-                                    />
-                                    {
-                                        errors.identificador && (
-                                            <span className="text-xs text-red-500 italic">
-                                                {errors.identificador.message}
                                             </span>
                                         )
                                     }
