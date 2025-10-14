@@ -74,7 +74,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     }
 
     function buscarResponsaveisEdital() {
-        const re = usuariosDaUnidade?.filter(u => edital.editors?.includes(u.id)) as UsuarioUnidade[];
+        const re = usuariosDaUnidade?.filter(u => edital.editors?.includes(u)) as UsuarioUnidade[]
         setValue("responsavel", re.map(u => u.id));
         setResponsaveisEdital(re);
     }
