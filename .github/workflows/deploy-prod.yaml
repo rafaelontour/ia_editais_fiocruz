@@ -3,7 +3,7 @@ name: Deploy no Servidor
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
