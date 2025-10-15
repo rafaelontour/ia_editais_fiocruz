@@ -6,6 +6,8 @@ async function getToken(dados: any) {
 
         const dadosLogin = new URLSearchParams(dados).toString();
 
+        console.log("dadosLogin: ", dadosLogin);
+
         const res = await fetch(url, {
             method: "POST",
             headers: {
@@ -25,7 +27,7 @@ async function getToken(dados: any) {
 
 async function logout() {
     try {
-        const url = `${urlBase}/auth/sign-in`;
+        const url = `${urlBase}/auth/sign-out`;
 
         const res = await fetch(url, {
             method: "POST",
