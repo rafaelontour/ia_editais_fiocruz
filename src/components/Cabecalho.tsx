@@ -60,7 +60,7 @@ export default function Cabecalho() {
                     <div className="rounded-md flex items-center gap-2 ml-5
                                     text-white px-3 py-2 text-sm italic select-none
                                     animate-pulse opacity-65 w-[330px] h-10" />
-                ) : usuario ? (
+                ) : usuario && (
                     <div
                         title="Seu cargo/nível de acesso e unidade"
                         style={{ boxShadow: "1px 2px 4px rgba(0, 0, 0, .5)"}}
@@ -76,7 +76,7 @@ export default function Cabecalho() {
                             {cargo !== "VISITANTE" && <span>&nbsp;- Unidade {unidade?.name}</span>}
                         </p>
                     </div>
-                ) : null}
+                )}
             </div>
 
             {/* Botão login/logout */}

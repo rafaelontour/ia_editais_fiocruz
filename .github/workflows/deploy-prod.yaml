@@ -33,7 +33,7 @@ jobs:
               git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git .
             else
               git fetch origin main
-              git reset --hard origin/main
+              git pull origin/main
             fi
 
             # Limpa containers antigos
