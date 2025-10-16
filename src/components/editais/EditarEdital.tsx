@@ -63,7 +63,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [sheetOpen, setSheetOpen] = useState<boolean>(false);
 
     async function filtrarTipificacoesSelectionadas() {
-        const t = edital.typification?.map(tipificacao => tipificacoes.find(tipificacaoAux => tipificacaoAux.id === tipificacao)) as Tipificacao[]
+        const t = edital.typifications?.map(tipificacao => tipificacoes.find(tip => tip.id === tipificacao.id)) as Tipificacao[]
         setTipificacoesSelecionadas(t);
         setValue("tipificacoes", t.map(tipificacao => tipificacao.id));
     }
@@ -74,7 +74,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     }
 
     function buscarResponsaveisEdital() {
-        const re = usuariosDaUnidade?.filter(u => edital.editors?.includes(u)) as UsuarioUnidade[]
+        const re = usuariosDaUnidade?.map(u => edital.editors?.find(e => e.id === u.id)) as UsuarioUnidade[];
         setValue("responsavel", re.map(u => u.id));
         setResponsaveisEdital(re);
     }
@@ -185,6 +185,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                     )}
                                 </div>
                             </div>
+
                             {
                                 tipificacoesSelecionadas.length > 0 && (
                                     <div className="flex flex-col gap-3 w-full">
