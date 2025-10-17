@@ -357,6 +357,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                     </SelectItem>
                                                                 ))
                                                         }
+                                                        
                                                         {
                                                             usuarios?.length === responsaveisEdital.length && (
                                                                 <SelectItem

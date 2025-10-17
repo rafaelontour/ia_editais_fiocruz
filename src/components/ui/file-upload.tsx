@@ -3,6 +3,8 @@ import React, { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
+import { X } from "lucide-react";
+import { toast } from "sonner";
 
 const mainVariant = {
   initial: {
@@ -39,6 +41,11 @@ export const FileUpload = ({
   };
 
   const handleClick = () => {
+    console.log("tamanho de files: ", files.length);
+    if (files.length === 1) {
+      toast.info("Este campo aceita apenas um arquivo! Para enviar outro, remova o arquivo existente e adicione o novo!");
+      return
+    } 
     fileInputRef.current?.click();
   };
 
@@ -51,8 +58,19 @@ export const FileUpload = ({
     },
   });
 
+  const removerArquivo = () => {
+    setFiles([]);
+  }
+
   return (
-    <div className="w-full rounded-md border" {...getRootProps()}>
+    <div className="w-full rounded-md relative border" {...getRootProps()}>
+
+      { files.length === 1 &&
+        <div title="Remover arquivo" className="hover:cursor-pointer hover:scale-105 transition-all absolute top-10 right-6 z-[50]">
+          <X onClick={removerArquivo} className="bg-red-500 rounded-full p-1 text-white" />
+        </div>
+      }
+      
       <motion.div
         onClick={handleClick}
         whileHover="animate"
@@ -70,6 +88,7 @@ export const FileUpload = ({
         </div>
         <div className="flex flex-col items-center justify-center">
           <div className="relative w-full max-w-xl mx-auto">
+
             {files.length > 0 &&
               files.map((file, idx) => (
                 <motion.div
@@ -80,6 +99,7 @@ export const FileUpload = ({
                     "shadow-sm"
                   )}
                 >
+
                   <div className="flex justify-between w-full items-center gap-4">
                     <motion.p
                       initial={{ opacity: 0 }}
@@ -141,7 +161,7 @@ export const FileUpload = ({
                     animate={{ opacity: 1 }}
                     className="text-neutral-600 flex flex-col items-center"
                   >
-                    Drop it
+                    Solte o arquivo
                     <IconUpload className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                   </motion.p>
                 ) : (

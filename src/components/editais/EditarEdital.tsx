@@ -1,6 +1,6 @@
 "use client";
 
-import { PencilLine, X } from "lucide-react";
+import { Info, PencilLine, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { FileUpload } from "../ui/file-upload";
 import { Input } from "../ui/input";
@@ -19,6 +19,11 @@ import { getUsuariosPorUnidade } from "@/service/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { toast } from "sonner";
 import { atualizarEditalService } from "@/service/edital";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { getEditalArquivoService } from "@/service/editalArquivo";
+import { EditalArquivo } from "@/core/edital/Edital";
+import { IconFile } from "@tabler/icons-react";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "../ui/dialog";
 
 interface Props {
     edital: Edital
@@ -39,6 +44,18 @@ const schemaEdital = z.object({
 
 export default function EditarEdital({ edital, atualizarEditais, flagEdital }: Props) {
 
+    const [cliqueEditar, setCliqueEditar] = useState<boolean>(false);
+    const [urlArquivoEdital, setUrlArquivoEdital] = useState<string>("");
+
+    async function buscarCaminhoEdital() {
+        const arquivo: EditalArquivo = await getEditalArquivoService(edital.id!);
+        setUrlArquivoEdital(arquivo.releases[0].file_path);
+    }
+
+    useEffect(() => {
+        buscarCaminhoEdital();
+    }, [cliqueEditar]);
+
     type formData = z.infer<typeof schemaEdital>;
     const {
         register,
@@ -55,6 +72,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
         }
     })
 
+    const urlBase = process.env.NEXT_PUBLIC_URL_BASE
     const { usuario } = useUsuario();
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [tipificacoesSelecionadas, setTipificacoesSelecionadas] = useState<Tipificacao[] | []>([]);
@@ -116,6 +134,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                 <SheetContent
                     onOpenAutoFocus={() => {
                         buscarResponsaveisEdital();
+                        setCliqueEditar(!cliqueEditar);
                         filtrarTipificacoesSelectionadas();
                     }}
                     onCloseAutoFocus={limparCampos}
@@ -138,6 +157,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                         placeholder="Insira o nome do edital"
                                         defaultValue={edital.name}
                                     />
+
                                     {errors.nome && <p className="text-red-500 text-xs italic">{errors.nome.message}</p>}
                                 </div>
 
@@ -178,6 +198,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                             </Select>
                                         )}
                                     />
+
                                     {errors.tipificacoes && (
                                         <span className="text-xs text-red-500 italic">
                                             {errors.tipificacoes.message}
@@ -219,6 +240,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                     </div>
                                 )
                             }
+
                             <div className="flex flex-row gap-3 w-full">
                                 <div className="flex flex-col gap-3 w-full">
                                     <Label htmlFor="responsavel">Responsável</Label>
@@ -251,6 +273,18 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                                 </SelectItem>
                                                             ))
                                                         }
+
+                                                        {
+                                                            usuariosDaUnidade?.length === responsaveisEdital.length && (
+                                                                <SelectItem
+                                                                    value="Todos"
+                                                                    className="hover:cursor-pointer"
+                                                                    disabled
+                                                                >
+                                                                    Todos usuários já foram selecionados
+                                                                </SelectItem>
+                                                            )
+                                                        }
                                                     </SelectGroup>
                                                 </SelectContent>
                                             </Select>
@@ -264,6 +298,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                         )
                                     }
                                 </div>
+
                                 <div className="flex flex-col gap-3 w-full">
                                     <Label htmlFor="data">Número do edital</Label>
                                     <Input
@@ -281,6 +316,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                     }
                                 </div>
                             </div>
+
                             <div>
                                 {
                                     responsaveisEdital.length > 0 && (
@@ -316,6 +352,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                     )
                                 }
                             </div>
+
                             <div className="flex items-start gap-3">
                                 <div className="flex flex-col gap-3 w-1/2">
                                     <Label htmlFor="descricao">Descrição</Label>
@@ -336,7 +373,48 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                 </div>
 
                                 <div className="flex flex-col gap-3 w-1/2">
-                                    <Label>Upload do documento</Label>
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <Label>Upload do documento</Label>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Info size={16} />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Para visualizar o documento deste edital, clique no botão ao lado. <br />Para substituir o documento, clique abaixo e faça o upload do no novo arquivo.</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </div>
+
+
+                                        <Dialog>
+                                            <DialogHeader>
+                                                <DialogTrigger>
+                                                    <div
+                                                        title="Ver documento"
+                                                        className="
+                                                            flex items-center bg-red-500
+                                                            px-2 rounded-md
+                                                        "
+                                                        style={{ boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.3)" }}
+                                                    >
+                                                        <IconFile color="white" size={16} />
+                                                        <span className="text-xs text-white p-1 hover:underline hover:cursor-pointer">Visualizar edital</span>
+                                                    </div>
+                                                </DialogTrigger>
+
+                                                <DialogContent>
+                                                    <iframe
+                                                        src={``}
+                                                        width="100%"
+                                                        height="100%"
+                                                        style={{ border: "none" }}
+                                                    ></iframe>
+                                                </DialogContent>
+                                            </DialogHeader>
+                                        </Dialog>
+                                    </div>
+
                                     <div className="h-16">
                                         <Controller
                                             name="arquivo"
@@ -355,7 +433,8 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                 <span className="text-xs text-red-500 italic">
                                                     {errors.arquivo.message}
                                                 </span>
-                                        )}
+                                            )
+                                        }
                                     </div>
                                 </div>
                             </div>
