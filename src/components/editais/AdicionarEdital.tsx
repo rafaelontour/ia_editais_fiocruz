@@ -157,172 +157,107 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                 
                     <form onSubmit={handleSubmit(enviarEdital)}>
                         <div className="space-y-6">
-                            <div className="flex flex-row gap-5 w-full">
-                                <div className="flex flex-col gap-3 w-1/2">
-                                    <Label htmlFor="name" className="text-lg">Nome do edital</Label>
-                                    <Input
-                                        {...register("nome")}
-                                        id="name"
-                                    />
-                                    {errors.nome && (
-                                        <span className="text-xs text-red-500 italic">
-                                            {errors.nome.message}
-                                        </span>
-                                    )}
-                                </div>
-
-                                <div className="flex flex-col gap-3 w-1/2">
-                                    <Label htmlFor="date" className="text-lg">Número do edital</Label>
-                                    <Input
-                                        {...register("identificador")}
-                                        id="date"
-                                    />
-                                    {
-                                        errors.identificador && (
+                            <div className="flex flex-col gap-3">
+                                <div className="flex gap-3">
+                                    <div className="flex flex-col gap-3 w-1/2">
+                                        <Label htmlFor="name" className="text-lg">Nome do edital</Label>
+                                        <Input
+                                            {...register("nome")}
+                                            id="name"
+                                        />
+                                        {errors.nome && (
                                             <span className="text-xs text-red-500 italic">
-                                                {errors.identificador.message}
+                                                {errors.nome.message}
                                             </span>
-                                        )
-                                    }
+                                        )}
+                                    </div>
+
+                                    <div className="flex w-1/2 flex-col gap-3">
+                                        <Label htmlFor="tipe" className="text-lg">Tipificações</Label>
+                                        <Controller
+                                            name="tipificacoes"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Select
+                                                    value=""
+                                                    onValueChange={(value) => {
+                                                        field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
+                                                        const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
+                                                        if (tipificacaoEncontrada) {
+                                                            setTipificacoesSelecionadas((prev) => [...prev, tipificacaoEncontrada]);
+                                                        }
+                                                    }}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Selcione tipificações" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
+                                                            <SelectLabel>Tipificações</SelectLabel>
+                                                            {
+                                                                tipificacoes.map((tipificacao) => (
+                                                                    <SelectItem
+                                                                        key={tipificacao.id}
+                                                                        value={tipificacao.id}
+                                                                    >
+                                                                        {tipificacao.name}
+                                                                    </SelectItem>
+                                                                ))
+                                                            }
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
+                                
+                                            )}
+                                        />
+
+                                        {errors.tipificacoes && (
+                                            <span className="text-xs text-red-500 italic">
+                                                {errors.tipificacoes.message}
+                                            </span>
+                                        )}
+                                
+                                    </div>
                                 </div>
 
                                 {
-                                    /*
-                                        <div className="flex flex-col gap-3 w-[40%]">
-                                            <Label htmlFor="unit" className="text-lg">Unidade</Label>
-
-                                            <Controller
-                                                name="unidade"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Select
-                                                        value={field.value}
-                                                        onValueChange={(value) => {
-                                                            field.onChange(value);
-                                                            setResponsaveisEdital([]);
-                                                            buscarUsuariosPorUnidade(value);
-                                                        }}
-                                                    >
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Selecione a unidade" />
-                                                        </SelectTrigger>
-                                        
-                                                        <SelectContent className="w-full">
-                                                            <SelectGroup>
-                                                                <SelectLabel>Unidade</SelectLabel>
-                                                                {
-                                                                    unidades.map((unidade) => (
-                                                                        <SelectItem
-                                                                            key={unidade.id}
-                                                                            value={unidade.id}
+                                        tipificacoesSelecionadas.length > 0 && (
+                                            <div className="flex flex-col gap-3 w-full">
+                                                <Label htmlFor="tipe" className="text-lg">Tipificações selecionadas</Label>
+                                                <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                                    {
+                                                        tipificacoesSelecionadas.map((t: Tipificacao) => (
+                                                            <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                                <button className="h-full" onClick={() => {
+                                                                    const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
+                                                                    setTipificacoesSelecionadas(novaLista);
+                                                                    setValue("tipificacoes", novaLista.map((tp) => tp.id));
+                                                                }}>
+                                                                    <div className="flex items-center h-full" title="Remover tipificação">
+                                                                        <span
+                                                                            className="
+                                                                                bg-red-200 p-[10px] h-full flex items-center
+                                                                                hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                                transition-all duration-200 ease-in-out
+                                                                            "
                                                                         >
-                                                                            {unidade.name}
-                                                                        </SelectItem>
-                                                                    ))
-                                                                }
-                                                            </SelectGroup>
-                                                        </SelectContent>
-                                                    </Select>
-                                                )}
-                                            />
-
-                                            {errors.unidade && (
-                                                <span className="text-xs text-red-500 italic">
-                                                    {errors.unidade.message}
-                                                </span>
-                                            )}
-                                        </div>
-                                    */
-                                }
+                                                                            <X className="w-4 h-4" />
+                                                                        </span>
+                                                                    </div>
+                                                                </button>
+                                                                <p className="w-full text-sm py-1">{t.name}</p>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </div>
+                                            </div>
+                                        )
+                                    }
                                 
                             </div>
 
-                            <div className="flex flex-row gap-5 w-full">
-                                <div className="flex w-full flex-col gap-3">
-                                    <Label htmlFor="tipe" className="text-lg">Tipificações</Label>
-                                    <Controller
-                                        name="tipificacoes"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                value=""
-                                                onValueChange={(value) => {
-                                                    field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
-                                                    const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
-
-                                                    if (tipificacaoEncontrada) {
-                                                        setTipificacoesSelecionadas((prev) => [...prev, tipificacaoEncontrada]);
-                                                    }
-                                                }}
-                                            >
-                                                <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Selcione tipificações" />
-                                                </SelectTrigger>
-
-                                                <SelectContent>
-                                                    <SelectGroup>
-                                                        <SelectLabel>Tipificações</SelectLabel>
-                                                        {
-                                                            tipificacoes.map((tipificacao) => (
-                                                                <SelectItem
-                                                                    key={tipificacao.id}
-                                                                    value={tipificacao.id}
-                                                                >
-                                                                    {tipificacao.name}
-                                                                </SelectItem>
-                                                            ))
-                                                        }
-                                                    </SelectGroup>
-                                                </SelectContent>
-                                            </Select>
-                                            
-                                        )}
-                                    />
-
-                                    {errors.tipificacoes && (
-                                        <span className="text-xs text-red-500 italic">
-                                            {errors.tipificacoes.message}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {
-                                tipificacoesSelecionadas.length > 0 && (
-                                    <div className="flex flex-col gap-3 w-full">
-                                        <Label htmlFor="tipe" className="text-lg">Tipificações selecionadas</Label>
-                                        <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
-                                            {
-                                                tipificacoesSelecionadas.map((t: Tipificacao) => (
-                                                    <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                        <button className="h-full" onClick={() => {
-                                                            const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
-                                                            setTipificacoesSelecionadas(novaLista);
-                                                            setValue("tipificacoes", novaLista.map((tp) => tp.id));
-                                                        }}>
-                                                            <div className="flex items-center h-full" title="Remover tipificação">
-                                                                <span
-                                                                    className="
-                                                                        bg-red-200 p-[10px] h-full flex items-center
-                                                                        hover:bg-red-400 hover:cursor-pointer hover:text-white
-                                                                        transition-all duration-200 ease-in-out
-                                                                    "
-                                                                >
-                                                                    <X className="w-4 h-4" />
-                                                                </span>
-                                                            </div>
-                                                        </button>
-                                                        <p className="w-full text-sm py-1">{t.name}</p>
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
-                                    </div>
-                                )
-                            }
-
                             <div className="flex flex-row gap-3 w-full">
-                                <div className="flex flex-col gap-3 w-full">
+                                <div className="flex flex-col gap-3 w-1/2">
                                     <Label htmlFor="responsavel" className="text-lg">Responsável</Label>
                                     <Controller
                                         name="responsavel"
@@ -357,6 +292,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                     </SelectItem>
                                                                 ))
                                                         }
+                                                        
                                                         {
                                                             usuarios?.length === responsaveisEdital.length && (
                                                                 <SelectItem
@@ -379,6 +315,21 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                         errors.responsavel && (
                                             <span className="text-xs text-red-500 italic">
                                                 {errors.responsavel.message}
+                                            </span>
+                                        )
+                                    }
+                                </div>
+
+                                <div className="flex flex-col gap-3 w-1/2">
+                                    <Label htmlFor="date" className="text-lg">Número do edital</Label>
+                                    <Input
+                                        {...register("identificador")}
+                                        id="date"
+                                    />
+                                    {
+                                        errors.identificador && (
+                                            <span className="text-xs text-red-500 italic">
+                                                {errors.identificador.message}
                                             </span>
                                         )
                                     }

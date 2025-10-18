@@ -311,7 +311,7 @@ export default function Editais() {
 
                 <DragOverlay>
                     {activeId ? (
-                        <div className="bg-white p-3 rounded shadow-lg">
+                        <div className="bg-white p-3 rounded shadow-l teste2">
                             {(() => {
                                 const item = findItem(activeId);
                                 if (!item) return null;

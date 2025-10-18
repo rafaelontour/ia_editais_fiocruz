@@ -17,7 +17,7 @@ export default function RootLayout({
       >
         <UsuarioContextoProvider>
           <div>
-            <Toaster closeButton richColors position="top-right" duration={3000} />
+            <Toaster closeButton richColors position="top-right" duration={3500} />
             
             <div>
               {children}
