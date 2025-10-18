@@ -38,8 +38,18 @@ const schemaEdital = z.object({
     identificador: z.string().min(1, "O número de identificação do edital é obrigatório"),
     descricao: z.string().min(6, "A descrição do edital é obrigatória"),
     arquivo: z
-        .custom<File>((file) => file instanceof File) // valida se é File
-        .refine((file) => file.size > 0, "O arquivo é obrigatório"),
+        .instanceof(File)
+        .refine((file) => file.type === "application/pdf", {
+            message: "O arquivo deve ser um PDF",
+        })
+        .optional() // permite que não seja enviado
+        .nullable() // também aceita null, se vier do form assim
+        .refine((file) => {
+        // Se não existir arquivo, ok
+        if (!file) return true
+        // Se existir, tem que ser PDF
+            return file.type === "application/pdf"
+        }),
 })
 
 export default function EditarEdital({ edital, atualizarEditais, flagEdital }: Props) {
@@ -100,7 +110,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     async function atualizarEdital(data: formData) {
         const resposta = await atualizarEditalService(edital.id, data);
 
-        if (resposta !== 201) {
+        if (resposta !== 200) {
             toast.error("Erro ao atualizar edital!");
             return
         }
@@ -142,15 +152,15 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                     className="w-full px-10 pt-5 overflow-y-auto"
                 >
                     <SheetHeader className="pl-0">
-                        <SheetTitle className="text-2xl">Edital {edital.name}</SheetTitle>
-                        <SheetDescription>Modifique as informações do edital abaixo</SheetDescription>
+                        <SheetTitle className="text-4xl">Edital {edital.name}</SheetTitle>
+                        <SheetDescription className="text-xl">Modifique as informações do edital abaixo</SheetDescription>
                     </SheetHeader>
 
                     <form onSubmit={handleSubmit(atualizarEdital)}>
                         <div className="space-y-6">
-                            <div className="flex flex-row gap-3">
-                                <div className="flex flex-col gap-3 w-[60%]">
-                                    <Label htmlFor="name">Nome do Edital</Label>
+                            <div className="flex gap-3">
+                                <div className="flex flex-col gap-3 w-1/2">
+                                    <Label htmlFor="name" className="text-lg">Nome do edital</Label>
                                     <Input
                                         {...register("nome")}
                                         id="name"
@@ -161,8 +171,8 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                     {errors.nome && <p className="text-red-500 text-xs italic">{errors.nome.message}</p>}
                                 </div>
 
-                                <div className="flex w-full flex-col gap-3">
-                                    <Label htmlFor="tipe">Tipificações</Label>
+                                <div className="flex w-1/2 flex-col gap-3">
+                                    <Label htmlFor="tipe" className="text-lg">Tipificações</Label>
                                     <Controller
                                         name="tipificacoes"
                                         control={control}
@@ -210,20 +220,20 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                             {
                                 tipificacoesSelecionadas.length > 0 && (
                                     <div className="flex flex-col gap-3 w-full">
-                                        <Label htmlFor="tipe">Tipificações selecionadas</Label>
+                                        <Label htmlFor="tipe" className="text-lg">Tipificações selecionadas</Label>
                                         <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
                                             {
                                                 tipificacoesSelecionadas.map((t: Tipificacao) => (
                                                     <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                        <button onClick={() => {
+                                                        <button className="h-full" onClick={() => {
                                                             const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
                                                             setTipificacoesSelecionadas(novaLista);
                                                             setValue("tipificacoes", novaLista.map((tp) => tp.id));
                                                         }}>
-                                                            <div className="flex items-center" title="Remover tipificação">
+                                                            <div className="flex items-center h-full" title="Remover tipificação">
                                                                 <span
                                                                     className="
-                                                                            bg-red-200 p-[10px]
+                                                                            bg-red-200 p-[10px] h-full flex items-center
                                                                             hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                                             transition-all duration-200 ease-in-out
                                                                         "
@@ -232,7 +242,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                                 </span>
                                                             </div>
                                                         </button>
-                                                        <p className=" w-full text-[11px]">{t.name}</p>
+                                                        <p className=" w-full text-sm">{t.name}</p>
                                                     </div>
                                                 ))
                                             }
@@ -243,7 +253,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
                             <div className="flex flex-row gap-3 w-full">
                                 <div className="flex flex-col gap-3 w-full">
-                                    <Label htmlFor="responsavel">Responsável</Label>
+                                    <Label htmlFor="responsavel" className="text-lg">Responsável</Label>
                                     <Controller
                                         name="responsavel"
                                         control={control}
@@ -300,7 +310,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                 </div>
 
                                 <div className="flex flex-col gap-3 w-full">
-                                    <Label htmlFor="data">Número do edital</Label>
+                                    <Label htmlFor="data" className="text-lg">Número do edital</Label>
                                     <Input
                                         defaultValue={edital?.identifier}
                                         {...register("identificador")}
@@ -321,7 +331,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                 {
                                     responsaveisEdital.length > 0 && (
                                         <div className="flex flex-col gap-3 w-full">
-                                            <Label htmlFor="tipe">{responsaveisEdital.length > 1 ? "Responsáveis selecionados" : "Responsável selecionado"}</Label>
+                                            <Label htmlFor="tipe" className="text-lg">{responsaveisEdital.length > 1 ? "Responsáveis selecionados" : "Responsável selecionado"}</Label>
                                             <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
                                                 {
                                                     responsaveisEdital.map((responsavel: UsuarioUnidade) => (
@@ -343,7 +353,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                                     </span>
                                                                 </div>
                                                             </button>
-                                                            <p className=" w-full text-[11px]">{responsavel?.username}</p>
+                                                            <p className=" w-full text-sm">{responsavel?.username}</p>
                                                         </div>
                                                     ))
                                                 }
@@ -355,7 +365,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
                             <div className="flex items-start gap-3">
                                 <div className="flex flex-col gap-3 w-1/2">
-                                    <Label htmlFor="descricao">Descrição</Label>
+                                    <Label htmlFor="descricao" className="text-lg">Descrição</Label>
                                     <Textarea
                                         {...register("descricao")}
                                         defaultValue={edital?.description}
@@ -375,7 +385,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                 <div className="flex flex-col gap-3 w-1/2">
                                     <div className="flex items-center justify-between gap-2">
                                         <div className="flex items-center gap-2">
-                                            <Label>Upload do documento</Label>
+                                            <Label className="text-lg">Upload do documento</Label>
                                             <Tooltip>
                                                 <TooltipTrigger>
                                                     <Info size={16} />
@@ -446,7 +456,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                             </div>
                         </SheetFooter>*/}
 
-                        <SheetFooter className="flex absolute z-50 w-fit justify-end bottom-6 right-10">
+                        <SheetFooter className="flex w-full sticky z-50 justify-end bottom-2 right-10">
                             <Button
                                 type="submit"
                                 variant={"destructive"}

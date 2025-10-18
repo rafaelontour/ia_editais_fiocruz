@@ -35,15 +35,25 @@ export const FileUpload = ({
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  function erro() {
+    toast.info("Este campo aceita apenas um arquivo! Para enviar outro, remova o arquivo existente e adicione o novo!");
+  }
+
   const handleFileChange = (newFiles: File[]) => {
+    if (files.length === 1) {
+      erro();
+      return
+    }
+
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     onChange && onChange(newFiles);
   };
 
+
   const handleClick = () => {
-    console.log("tamanho de files: ", files.length);
+    
     if (files.length === 1) {
-      toast.info("Este campo aceita apenas um arquivo! Para enviar outro, remova o arquivo existente e adicione o novo!");
+      erro();
       return
     } 
     fileInputRef.current?.click();

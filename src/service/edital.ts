@@ -73,8 +73,8 @@ async function atualizarEditalService(idEdital: string, dados: any): Promise<num
                 name: dados.nome,
                 identifier: dados.identificador,
                 description: dados.descricao,
-                editors: dados.responsavel,
-                typification: dados.tipificacoes,
+                editors_ids: dados.responsavel,
+                typification_ids: dados.tipificacoes,
                 updated_at: new Date().toISOString()
             })
         })
