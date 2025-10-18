@@ -25,16 +25,22 @@ jobs:
 
             echo "🚀 Iniciando deploy via docker-compose..."
 
-            mkdir -p /home/ubuntu/iaEditais-prod
-            cd /home/ubuntu/iaEditais-prod
+            cd /home/ubuntu
 
-            # Atualiza o repositório
-            if [ ! -d ".git" ]; then
-              git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git .
+            # Se a pasta não existir, cria
+            if [ ! -d "iaEditais-prod" ]; then
+              echo "📦 Repositório não encontrado. Clonando..."
+              git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-prod
+              cd iaEditais-prod
             else
+              echo "🔄 Repositório existente. Atualizando..."
+              cd iaEditais-prod
               git fetch origin main
-              git pull origin/main
+              git reset --hard origin/main
             fi
+
+            # Garante que o docker compose funcione mesmo sem sudo
+            export DOCKER_BUILDKIT=1
 
             # Limpa containers antigos
             docker compose down --rmi all --remove-orphans || true
