@@ -40,7 +40,7 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col max-h-full gap-4 p-2 rounded-2xl bg-slate-700"
+      className="flex flex-col max-h-full gap-4 py-2 px-1 rounded-2xl bg-slate-700"
       style={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.6)" }}
     >
       <div
@@ -60,7 +60,7 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
         </div>
       </div>
 
-      <div className="space-y-3 overflow-y-auto px-[8px] scrollbar-style pb-[8px]">
+      <div className="space-y-3 overflow-y-auto px-[4px] scrollbar-style pb-1">
           {editais.map((edital) => (
             // PASSA containerId para o cartão (necessário para usar data.containerId no useSortable)
             <CardEdital funcaoAtualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} key={edital.id} edital={edital} containerId={status} />

@@ -74,7 +74,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             className={`bg-white rounded-md  shadow-sm ${isDragging ? "opacity-30" : "opacity-100"}`}
         >
             {/* drag handle: aplicamos attributes & listeners aqui (evita conflitos com botões dentro do card) */}
-            <div {...attributes} {...listeners} className={`h-12 ${cor()} rounded-t-sm flex items-center justify-center`}>
+            <div {...attributes} {...listeners} className={`h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
                 <span className="text-md text-white pointer-events-none italic">Segure nesta área para arrastar</span>
             </div>
 

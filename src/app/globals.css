@@ -10,13 +10,21 @@ body {
 }
 
 .scrollbar-style::-webkit-scrollbar {
-  background-color: transparent;
-  scrollbar-width: thin;
+  background-color: black;
+  width: 6px;
 }
 
 .scrollbar-style::-webkit-scrollbar-thumb {
   background-color: #888;
   border-radius: 10px;
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb:hover {
+  cursor: grab;
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb:active {
+  cursor: grabbing;
 }
 
 /* global.css */
@@ -36,6 +44,22 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.teste:hover {
+  cursor: grab;
+}
+
+.teste:active {
+  cursor: grabbing;
+}
+
+.teste2:hover {
+  cursor: grabbing;
+}
+
+.teste2 {
+  cursor: grab;
 }
 
 @theme inline {
