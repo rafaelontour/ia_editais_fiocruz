@@ -102,8 +102,10 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     }
 
     function buscarResponsaveisEdital() {
-        const re = usuariosDaUnidade?.map(u => edital.editors?.find(e => e.id === u.id)) as UsuarioUnidade[];
-        setValue("responsavel", re.map(u => u.id));
+        const re = (usuariosDaUnidade ?? []).filter((u) =>
+            (edital.editors ?? []).some((e) => e.id === u.id)
+        );
+        setValue("responsavel", re.map((u) => u.id));
         setResponsaveisEdital(re);
     }
 
