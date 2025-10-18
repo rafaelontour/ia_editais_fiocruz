@@ -40,7 +40,7 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col max-h-full gap-4 py-2 px-1 rounded-2xl bg-slate-700"
+      className="flex flex-col max-h-full gap-2 pt-2 px-1 rounded-2xl bg-slate-700"
       style={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.6)" }}
     >
       <div
@@ -56,7 +56,7 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
         </div>
 
         <div className={`flex items-center justify-center w-6 h-6 bg-black rounded-full`}>
-          <span className="font-semibold text-white text-md mt-0.5">{editais.length}</span>
+          <span className="font-semibold text-white text-md">{editais.length}</span>
         </div>
       </div>
 
