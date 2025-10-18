@@ -38,7 +38,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
     return (
         <div className="w-full flex flex-col flex-1 border border-gray-300 rounded-sm p-4">
             <Tabs defaultValue="tabRamo0" value={abaSelecionada} onValueChange={(val) => setAbaSelecionada(val)}>
-                <h3 className="font-bold text-2xl text-black text-left">Ramos da taxonomia</h3>
+                <h3 className="font-bold text-2xl text-black text-left">Ramos</h3>
 
                 <hr className="mt-2 mb-4 border-gray-300 w-full" />
 

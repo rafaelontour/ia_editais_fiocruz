@@ -46,6 +46,18 @@ export default function Linha03({ edital, resumoIA }: Props) {
     const [ultimaTab, setUltimaTab] = useState<boolean>(false)
     const [primeiraTab, setPrimeiraTab] = useState<boolean>(true)
     const [abaSelecionada, setAbaSelecionada] = useState<string>("tab0")
+    const notas = edital?.releases
+        .map((release) => release.check_tree
+        .map((tipificacao) => tipificacao.taxonomies
+        .map((taxonomia) => taxonomia.branches
+        .map((ramo: any) => ramo.evaluation.score ))))
+        .flat(Infinity)
+
+    const media = ((): number | undefined => {
+        if (!notas || notas.length === 0) return undefined;
+        const sum = notas.reduce((a, b) => a + (b ?? 0), 0);
+        return sum / notas.length;
+    })();
 
     const [tipificacaoSelecionada, setTipificacaoSelecionada] = useState({
         tipificacao: tipificacoes[0],
@@ -73,7 +85,12 @@ export default function Linha03({ edital, resumoIA }: Props) {
                 >
                     <TabsList className="w-full flex items-start flex-col gap-4 p-3 border border-gray-300 h-fit">
                         <div className="w-full flex flex-col gap-2 border-2 border-black border-dotted rounded-md py-3 px-4">
-                            <h3 className="text-2xl font-semibold text-black flex items-center gap-2">Resumo gerado por IA <Stars color="blue" size={18}/></h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-2xl font-semibold text-black flex items-center gap-2">Resumo gerado por IA <Stars color="blue" size={18}/></h3>
+                                <div>
+                                    <p className={`text-sm font-semibold px-3 py-1 rounded-md text-white ${media && media < 5 ? "bg-red-500" : media && media < 7 ? "bg-yellow-600" : "bg-green-600"}`}>Média de todos os ramos: {media?.toFixed(2)}</p>
+                                </div>
+                            </div>
                             <div className={style.resumoIA} dangerouslySetInnerHTML={{ __html: htmlSeguro }} />
                         </div>
 
@@ -169,7 +186,7 @@ export default function Linha03({ edital, resumoIA }: Props) {
                         tipificacoes.map((tipificacao, index) => (
                             <TabsContent
                                 value={"tab" + index}
-                                className="w-[98%] mx-auto"
+                                className="w-full mx-auto"
                                 key={tipificacao.id}
                             >
                                 <TaxonommiasResultado
