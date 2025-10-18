@@ -4,9 +4,7 @@ async function getToken(dados: any) {
     try {
         const url = `${urlBase}/auth/sign-in`;
 
-        const dadosLogin = new URLSearchParams(dados).toString();
-
-        console.log("dadosLogin: ", dadosLogin);
+        const dadosLogin = new URLSearchParams(dados).toString()
 
         const res = await fetch(url, {
             method: "POST",

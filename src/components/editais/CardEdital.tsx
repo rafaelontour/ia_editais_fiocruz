@@ -123,7 +123,6 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                     "
                 >
                     <div className="flex flex-col-reverse text-md justify-between mt-2">
-                        <span>Compras</span>
                         <span>{formatarData(edital.created_at)}</span>
                     </div>
 
@@ -195,13 +194,16 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                 </div>
 
                 <div>
+
+                    <h4 className="font-semibold">
                     {
                         edital.editors && edital.editors?.length > 1 ? (
-                            <h4>Responsáveis:</h4>
+                            "Responsáveis: "
                         ) : (
-                            <h4>Responsável:</h4>
+                            "Responsável: "
                         )
                     }
+                    </h4>
 
                     <ul>
                         {

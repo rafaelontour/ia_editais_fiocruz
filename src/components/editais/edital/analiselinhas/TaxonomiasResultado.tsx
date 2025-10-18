@@ -39,14 +39,14 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
     
     return (
         taxonomias && taxonomias.length > 0 && (
-            <div className="flex flex-1 border border-gray-300 rounded-sm p-4">
+            <div className="flex flex-1">
                 <Tabs
                     className="w-full"
                     defaultValue="tabTax0"
                     value={abaSelecionada}
                     onValueChange={(val) => setAbaSelecionada(val)}
                 >
-                    <h3 className="font-bold text-2xl text-black text-left">Taxonomias da tipificação</h3>
+                    <h3 className="font-bold text-2xl text-black text-left">Taxonomias</h3>
                     
                     <div className="flex items-center justify-between gap-2">
                         <Button

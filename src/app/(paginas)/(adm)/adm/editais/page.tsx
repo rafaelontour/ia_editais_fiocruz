@@ -321,7 +321,7 @@ export default function Editais() {
                                         <div>
                                             <h3 className="font-semibold">{item.name}</h3>
                                             <p className="text-sm text-gray-600">Data: {formatarData(item.created_at)}</p>
-                                            <p className="text-sm text-gray-600">Categoria: Compras</p>
+                                            <p className="text-sm text-gray-600">{(item.editors && item.editors.length > 1) ? "Responsáveis" : "Responsável"}: {(item.editors ?? []).map(e => e.username).join(", ")}</p>
                                         </div>
                                     </>
                                 );
@@ -337,9 +337,11 @@ export default function Editais() {
                     <DialogHeader>
                         <DialogTitle>Confirmar movimentação</DialogTitle>
                     </DialogHeader>
+
                     <p>
                         Tem certeza que deseja mover <strong>{pendingMove?.item.name}</strong> para <strong>{formatStatus(pendingMove?.to || undefined)}</strong>?
                     </p>
+
                     <DialogFooter className="flex justify-end gap-2">
                         <Button variant="outline" className="hover:cursor-pointer" onClick={cancelMove}>Cancelar</Button>
                         <Button type="button" className="bg-vermelho text-white hover:cursor-pointer" onClick={() => confirmMove()}>Confirmar</Button>
