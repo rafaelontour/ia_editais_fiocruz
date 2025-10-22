@@ -168,7 +168,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
 
                                     <div className="flex flex-col gap-2 w-full">
                                         <h3 className="text-lg font-semibold">Detalhamento</h3>
-                                        <p className="h-[180px] overflow-y-auto">
+                                        <p className="max-h-[220px] overflow-y-auto pr-1">
                                             {ramo.evaluation?.feedback}
                                         </p>
                                     </div>

@@ -20,17 +20,20 @@ import {
     DialogFooter,
     DialogClose,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Fonte, Tipificacao } from "@/core";
 import { Ramo } from "@/core/ramo";
 import { Taxonomia } from "@/core/taxonomia";
 import { getFontesService } from "@/service/fonte";
 import { adicionarRamoService, atualizarRamoService, buscarRamosDaTaxonomiaService, excluirRamoService } from "@/service/ramo";
 import { adicionarTaxonomiaService, atualizarTaxonomiaService, excluirTaxonomiaService, getTaxonomiasService } from "@/service/taxonomia";
-import { getTipificacoesService } from "@/service/tipificacao";
+import { getTipificacaoPorIdService, getTipificacoesService } from "@/service/tipificacao";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
+import { Calendar, Filter, PencilLine, Plus, Search, Trash, View, X } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -74,6 +77,7 @@ export default function Taxonomias() {
     const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[] | undefined>([]);
     const [fontes, setFontes] = useState<Fonte[]>([]);
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
+    const [tipificacaoDaTaxonomia, setTipificacaoDaTaxonomia] = useState<Tipificacao | null | undefined>(null);
     const [idTipificacao, setIdTipificacao] = useState<string>("");
 
     const [openTaxonomia, setOpenTaxonomia] = useState<boolean>(false);
@@ -81,15 +85,20 @@ export default function Taxonomias() {
     const [openDialogRamo, setOpenDialogRamo] = useState<boolean>(false);
     const [openDialogIdRamo, setOpenDialogIdRamo] = useState<string | null | undefined>(null);
     const [openDialogIdRamoExcluir, setOpenDialogIdRamoExcluir] = useState<string | null | undefined>(null);
-
+    const [openDialogVerRamo, setOpenDialogVerRamo] = useState<string | null | undefined>(null);
+    
     const [ramosDaTaxonomia, setRamosDaTaxonomia] = useState<Ramo[]>([]);
     const [ramoSelecionado, setRamoSelecionado] = useState<Ramo | null | undefined>(null);
-
+    
     const divRefs = useRef<Record<string, HTMLDivElement | HTMLButtonElement | null>>({});
+    const [taxFiltradas, setTaxFiltradas] = useState<Taxonomia[]>([]);
+    const [termoBusca, setTermoBusca] = useState<string>("");
 
     async function getTaxonomias() {
         const taxs = await getTaxonomiasService()
+        console.log("taxs: ", taxs);
         setTax(taxs || []);
+        setTaxFiltradas(taxs || []);
     }
 
     async function getFontes() {
@@ -100,6 +109,11 @@ export default function Taxonomias() {
     async function getTipificacoes() {
         const tips = await getTipificacoesService()
         setTipificacoes(tips || []);
+    }
+
+    async function getTipificacaoPorId(id: string | undefined) {
+        const tip = await getTipificacaoPorIdService(id)
+        setTipificacaoDaTaxonomia(tip || null);
     }
 
     useEffect(() => {
@@ -136,18 +150,34 @@ export default function Taxonomias() {
 
             // console.log("clicouDentroDeAlguma: ", clicouDentroDeAlguma);
             // console.log("VALOR DE FLAGHOOK:", flagHook.current);
+            // console.log("VALOR DE openIdDialogRamoExcluir:", openDialogIdRamoExcluir);
 
-            if (!clicouDentroDeAlguma && !openDialogRamo) {
+            if ((!clicouDentroDeAlguma && !openDialogRamo)) {
                 if (flagHook.current === true) return
                 setTaxonomiaSelecionada(null);
                 setIdSelecionado("");
+                return
+            }
 
+            if ((!clicouDentroDeAlguma && openDialogVerRamo === null)) {
+                if (flagHook.current === true) return
+                setTaxonomiaSelecionada(null);
+                setIdSelecionado("");
+                return
+            }
+
+            if ((!clicouDentroDeAlguma && openDialogIdRamoExcluir === null)) {
+                if (flagHook.current === true) return
+                setTaxonomiaSelecionada(null);
+                setIdSelecionado("");
+                return
             }
         };
 
+
         document.addEventListener("mouseup", handleClick);
         return () => document.removeEventListener("mouseup", handleClick);
-    }, [openDialogRamo]);
+    }, [openDialogRamo, openDialogVerRamo, openDialogIdRamoExcluir]);
 
 
     const adicionarRamo = async () => {
@@ -183,6 +213,7 @@ export default function Taxonomias() {
 
             const taxs = await getTaxonomiasService()
             setTax(taxs || []);
+
         } catch (error) {
             toast.error('Erro ao excluir taxonomia!');
         }
@@ -240,8 +271,6 @@ export default function Taxonomias() {
                 description: data.descricao,
             }
 
-            console.log("TAXONOMIA A SER ATUALIZADA: ", novaTaxonomia)
-
             const resposta = await atualizarTaxonomiaService(novaTaxonomia);
 
 
@@ -254,7 +283,7 @@ export default function Taxonomias() {
             const taxs = await getTaxonomiasService();
             setTax(taxs || []);
         } catch (error) {
-            console.error('Erro ao atualizar taxonomia:', error);
+            toast.error('Erro ao atualizar taxonomia',);
         }
 
         limparCampos();
@@ -265,6 +294,18 @@ export default function Taxonomias() {
         const ramos = await buscarRamosDaTaxonomiaService(idTaxonomia);
         setRamosDaTaxonomia(ramos || []);
     }
+
+
+    const filtrarTaxonomias = (busca: string) => {
+        if (busca.trim() === "") {
+        
+            setTaxFiltradas(tax);
+            console.log("tax: ", tax);
+            return;
+        }
+        const taxFiltradas = tax.filter(tax => tax.title.toLowerCase().startsWith(busca.toLowerCase()));
+        setTaxFiltradas(taxFiltradas);
+    } 
 
     const atualizarRamoDaTaxonomia = async (data: FormDataRamo) => {
         try {
@@ -278,7 +319,7 @@ export default function Taxonomias() {
             const resposta = await atualizarRamoService(dado);
 
             if (resposta !== 200) {
-                throw new Error("Erro ao atualizar ramo");
+                toast.error("Erro ao atualizar ramo");
             }
 
             const ramos = await buscarRamosDaTaxonomiaService(taxonomiaSelecionada?.id);
@@ -313,7 +354,7 @@ export default function Taxonomias() {
     let flagHook = useRef<boolean>(false);
 
     return (
-        <div className="flex flex-col flex-1 h-full relalive">
+        <div className="flex flex-col flex-1 h-full relalive px-1">
             <div className="flex items-center gap-2 mb-4 justify-between">
                 <p className="font-semibold text-4xl">Gestão de taxonomia e ramos</p>
 
@@ -479,13 +520,73 @@ export default function Taxonomias() {
             </div>
 
             <div className="flex h-[69vh] gap-3 relative">
-                <div className="flex h-[calc(100%-20px)] flex-col w-1/2 overflow-y-scroll">
-                    {tax.length > 0 ? tax.map((item, index) => (
+                <div className="flex px-1 h-[calc(100%-20px)] flex-col w-1/2 overflow-y-scroll">
+
+                    {/* Barra de busca e filtro de tipificação */}
+                    <div className="flex sticky bg-white top-0 -mb-2 pb-3 items-center gap-5 w-full">
+                        <div className="flex w-1/2 relative">
+                            
+                            <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
+
+                            { 
+                                termoBusca !== "" && (
+                                    <span onClick={() => { setTaxFiltradas(tax); setTermoBusca("") }} className="hover:cursor-pointer" title="Limpar pesquisa">
+                                        <X className="absolute mt-1 translate-y-1/2 right-2" size={17} />
+                                    </span>
+                                )
+                            }
+                                
+                            <input
+                                type="text"
+                                value={termoBusca}
+                                placeholder="Busca"
+                                className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                onChange={(e) => { 
+                                    setTermoBusca(e.target.value);
+                                    filtrarTaxonomias(e.target.value)
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-2 w-fit">
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Filter size={17} />
+                                </TooltipTrigger>
+
+                                <TooltipContent>
+                                    Filtre pela tipificação associada a cada taxonomia
+                                </TooltipContent>
+                            </Tooltip>
+
+                            Tipificação:
+                            <Select defaultValue="">
+                                <SelectTrigger className="w-fit">
+                                    <SelectValue placeholder="Selecionhe uma tipificação" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    <SelectGroup>
+
+                                        <SelectLabel>Tipificações</SelectLabel>
+
+                                        <SelectItem value="Nenhuma">nenhuma</SelectItem>
+                                        <SelectItem value="Nenhuma1">nenhuma</SelectItem>
+                                        <SelectItem value="Nenhuma2">nenhuma</SelectItem>
+                                        <SelectItem value="Nenhuma3">nenhuma</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    {taxFiltradas.length > 0 ? taxFiltradas.map((item, index) => (
                         <Card
                             ref={(e) => { divRefs.current["divtax_" + index] = e }}
                             key={index}
                             className={`
-                                hover:cursor-pointer m-4 ml-0
+                                hover:cursor-pointer m-4 ml-0 
                                 ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}
                             `}
                             onMouseDown={() => {
@@ -499,6 +600,20 @@ export default function Taxonomias() {
                             }}
                             // onMouseUp={() => setTaxonomiaSelecionada(item)}
                         >
+                            <div
+                                className="
+                                    flex items-center
+                                    px-4 py-1 h-8 text-white text-md
+                                    font-semibold bg-zinc-400 w-fit -mt-6
+                                "
+                                style={{ borderTopLeftRadius: "13px", borderBottomRightRadius: "13px" }}
+                            >
+                                <span className="font-thin">Tipificação associada: </span> &nbsp;
+                                <strong>
+                                    {item.typification_id}
+                                </strong>
+                            </div>
+
                             <CardHeader>
                                 <CardTitle className="text-2xl">{item.title}</CardTitle>
                             </CardHeader>
@@ -854,10 +969,61 @@ export default function Taxonomias() {
                                                     <span>{ramo.title}</span>
 
                                                     <div className="flex flex-row gap-2">
+                                                        <Dialog open={openDialogVerRamo === ramo.id} onOpenChange={(open) => { setOpenDialogVerRamo(open ? ramo.id : null) }}>
+                                                            <DialogTrigger onClick={() => { flagHook.current = true} } asChild>
+                                                                 <button
+                                                                    title="Ver informações deste ramo"
+                                                                    className="flex items-center justify-center h-8 w-8 bg-slate-400 text-white rounded-sm border border-gray-300 hover:cursor-pointer"
+                                                                >
+                                                                    <View className="h-4 w-4" strokeWidth={1.5} />
+                                                                </button>
+                                                            </DialogTrigger>
+
+                                                            <DialogContent
+                                                                ref={(e) => { divRefs.current["ver_ramo_" + index] = e }}
+                                                                onCloseAutoFocus={() => { flagHook.current = false }}
+                                                            >
+
+                                                                <DialogHeader>
+                                                                    <DialogTitle className="text-3xl">
+                                                                        Informações do ramo
+                                                                    </DialogTitle>
+                                                                    
+                                                                    <DialogDescription className="text-md">
+                                                                        
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+
+                                                                <div className="flex flex-col gap-2">
+                                                                    <div>
+                                                                        <h3 className="text-xl font-semibold">Título</h3>
+                                                                        <p className="text-gray-700 ml-2 text-lg">{ramo.title}</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h3 className="text-xl font-semibold">Descrição</h3>
+                                                                        <p className="text-gray-700 ml-2 text-lg">{ramo.description}</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <DialogFooter>
+                                                                    <DialogClose
+                                                                        className={`
+                                                                            transition ease-in-out text-white
+                                                                            rounded-md px-4 py-2 bg-vermelho
+                                                                            hover:cursor-pointer text-sm
+                                                                        `}
+                                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                                    >
+                                                                        Fechar
+                                                                    </DialogClose>
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
+
                                                         <EditarRamo flagHook={flagHook} divRefs={divRefs} atualizarRamos={atualizarTaxonomiaDepoisDeAdicionarRamo} idTaxonomia={taxonomiaSelecionada.id} ramo={ramo} />
 
                                                         <Dialog open={openDialogIdRamoExcluir === ramo.id} onOpenChange={(open) => { setOpenDialogIdRamoExcluir(open ? ramo.id : null) }}>
-                                                            <DialogTrigger asChild>
+                                                            <DialogTrigger onClick={() => { flagHook.current = true} } asChild>
                                                                 <button
                                                                     title="Excluir ramo"
                                                                     className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer"
@@ -866,7 +1032,10 @@ export default function Taxonomias() {
                                                                 </button>
                                                             </DialogTrigger>
 
-                                                            <DialogContent ref={(e) => { divRefs.current["excluir_" + index] = e }}>
+                                                            <DialogContent
+                                                                ref={(e) => { divRefs.current["excluir_" + index] = e }}
+                                                                onCloseAutoFocus={() => { flagHook.current = false }}
+                                                            >
 
                                                                 <DialogHeader>
                                                                     <DialogTitle>

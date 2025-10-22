@@ -25,4 +25,3 @@ export default async function VisualizarEdital({ params }: any) {
 
     return <VisualizarEditalCliente edital={edital} editalArquivo={editalArquivo} urlBase={urlBase!} resumoIA={resumoIA.toString()} />
 }
-

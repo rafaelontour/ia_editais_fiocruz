@@ -106,12 +106,12 @@ export default function Editais() {
             };
 
             dados.forEach((edital) => {
-                const status = edital.history?.[0]?.status as StatusEdital;
-
-                if (status && statuses.includes(status)) {
-                    novasColunas[status].push(edital);
-                }
-            });
+            const status = edital.history?.[0]?.status as StatusEdital;
+            if (status && statuses.includes(status)) {
+                // insere no topo
+                novasColunas[status].unshift(edital);
+            }
+        });
 
             setColumns(novasColunas);
         } catch (e) {
@@ -213,20 +213,15 @@ export default function Editais() {
     const confirmMove = () => {
         if (!pendingMove) return;
 
-        // Atualiza colunas primeiro
         setColumns(prev => {
             const source = structuredClone(prev[pendingMove.from]);
             const dest = structuredClone(prev[pendingMove.to]);
 
-            const overIndex = pendingMove.overId
-                ? dest.findIndex(i => i.id === pendingMove.overId)
-                : -1;
-            const insertIndex = overIndex === -1 ? dest.length : overIndex;
-
+            // Sempre insere no início da lista
             const movedItem = structuredClone(pendingMove.item);
             movedItem.status = pendingMove.to;
 
-            dest.splice(insertIndex, 0, movedItem);
+            dest.unshift(movedItem); // <--- A diferença: sempre no topo
 
             return {
                 ...prev,
@@ -235,11 +230,9 @@ export default function Editais() {
             };
         });
 
-        // Guarda a referência antes de limpar pendingMove
         const move = pendingMove;
         setPendingMove(null);
 
-        // 🔹 Chama o backend fora do setState
         switch (move.to) {
             case "PENDING":
                 moverParaRascunho(move.item.id);
