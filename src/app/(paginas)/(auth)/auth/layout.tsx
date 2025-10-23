@@ -1,31 +1,29 @@
 import Head from "next/head";
-import Link from "next/link";
+import Logos from "./Logos";
 
 export const metadata = {
   title: "Autenticação - IAEditais",
   description: "Faça login na plataforma",
-}
+};
+
 export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <div className="flex bg-branco h-screen">
-      <Head>Autenticação - IAEditais</Head>
-      
-      <div className="flex flex-col justify-between p-24 bg-vermelho text-branco w-full h-full ">
-        <Link href="/" className="hover:cursor-pointer" title="Voltar para página inicial">
-          <h1 className="text-5xl font-bold">IAeditais</h1>
-        </Link>
-        <p className="text-2xl font-light">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo numquam dolorum voluptate quaerat quas sit animi eum delectus necessitatibus earum impedit laudantium facilis possimus, suscipit labore amet quasi libero blanditiis.
-        </p>
+      <Head>
+        <title>Autenticação - IAEditais</title>
+      </Head>
+
+      {/* Lado esquerdo com animações */}
+      <div className="flex gap-10 justify-center items-center flex-col p-24 bg-zinc-400 text-branco w-full h-full">
+        <Logos />
       </div>
-      <div className="h-full w-full">
-        {children}
-        </div>
+
+      {/* Conteúdo dinâmico */}
+      <div className="h-full w-full">{children}</div>
     </div>
   );
 }

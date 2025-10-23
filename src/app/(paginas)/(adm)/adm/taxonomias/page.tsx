@@ -20,7 +20,6 @@ import {
     DialogFooter,
     DialogClose,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -77,7 +76,7 @@ export default function Taxonomias() {
     const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[] | undefined>([]);
     const [fontes, setFontes] = useState<Fonte[]>([]);
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
-    const [tipificacaoDaTaxonomia, setTipificacaoDaTaxonomia] = useState<Tipificacao | null | undefined>(null);
+
     const [idTipificacao, setIdTipificacao] = useState<string>("");
 
     const [openTaxonomia, setOpenTaxonomia] = useState<boolean>(false);
@@ -92,11 +91,12 @@ export default function Taxonomias() {
     
     const divRefs = useRef<Record<string, HTMLDivElement | HTMLButtonElement | null>>({});
     const [taxFiltradas, setTaxFiltradas] = useState<Taxonomia[]>([]);
-    const [termoBusca, setTermoBusca] = useState<string>("");
+
+    let termoBusca = useRef<string>("");
+    let tipificacaoFiltro = useRef<string>("Todas");
 
     async function getTaxonomias() {
         const taxs = await getTaxonomiasService()
-        console.log("taxs: ", taxs);
         setTax(taxs || []);
         setTaxFiltradas(taxs || []);
     }
@@ -109,11 +109,11 @@ export default function Taxonomias() {
     async function getTipificacoes() {
         const tips = await getTipificacoesService()
         setTipificacoes(tips || []);
-    }
 
-    async function getTipificacaoPorId(id: string | undefined) {
-        const tip = await getTipificacaoPorIdService(id)
-        setTipificacaoDaTaxonomia(tip || null);
+        const taxs = tips.flatMap(tip => tip.taxonomies?.map(tax => ({ ...tax, tip_assoc: tip.name}))) as Taxonomia[]
+
+        setTax(taxs || []);
+        setTaxFiltradas(taxs || []);
     }
 
     useEffect(() => {
@@ -121,7 +121,7 @@ export default function Taxonomias() {
             try {
                 await getFontes();
                 await getTipificacoes();
-                await getTaxonomias();
+                // await getTaxonomias();
             } catch (err) {
                 toast.error("Erro ao buscar dados: " + err);
             }
@@ -249,9 +249,11 @@ export default function Taxonomias() {
             const resposta = await adicionarTaxonomiaService(novaTaxonomia);
 
             if (resposta !== 201) {
-                toast("Erro ao adicionar taxonomia");
+                throw new Error("Erro ao adicionar taxonomia");
+                return
             }
 
+            toast.success("Taxonomia adicionada com sucesso!");
             const taxs = await getTaxonomiasService();
             setTax(taxs || []);
         } catch (e) {
@@ -273,12 +275,10 @@ export default function Taxonomias() {
 
             const resposta = await atualizarTaxonomiaService(novaTaxonomia);
 
-
             if (resposta !== 200) {
                 toast.error("Erro ao atualizar taxonomia");
                 return
             }
-
 
             const taxs = await getTaxonomiasService();
             setTax(taxs || []);
@@ -294,18 +294,40 @@ export default function Taxonomias() {
         const ramos = await buscarRamosDaTaxonomiaService(idTaxonomia);
         setRamosDaTaxonomia(ramos || []);
     }
-
-
-    const filtrarTaxonomias = (busca: string) => {
-        if (busca.trim() === "") {
-        
-            setTaxFiltradas(tax);
-            console.log("tax: ", tax);
-            return;
+    
+    const filtrarTaxonomiasPorNome = (nome: string) => {
+        // Se for uma busca vazia, retorna todas as taxonomias
+        if (nome.trim() === "") {
+            return; // Retorna todas as taxonomias originais
         }
-        const taxFiltradas = tax.filter(tax => tax.title.toLowerCase().startsWith(busca.toLowerCase()));
-        setTaxFiltradas(taxFiltradas);
-    } 
+
+        // Caso contrário, filtra as taxonomias com base no nome fornecido
+        const resultadoFiltrado = tax.filter(taxonomia => taxonomia.title.toLowerCase().startsWith(nome.toLowerCase()));
+        return resultadoFiltrado;
+    }
+
+    const filtrarTaxonomiasPorTipificacao = () => {
+        if (termoBusca.current === "") { 
+            // Se a pesquisa for só por nome da tipificação (Termo de busca é vazio)
+            if (tipificacaoFiltro.current === "Todas") {
+                return tax
+            }
+
+            // Filtra taxonomias só por tipificação
+            const taxFiltradasSoPorTipificacao = tax.filter(taxonomia => taxonomia.tip_assoc?.toLowerCase() === tipificacaoFiltro.current.toLowerCase());
+            return taxFiltradasSoPorTipificacao
+        }
+
+        // Se tiver termo de busca e tipificação para filtrar
+        const taxFiltradasPorNome = filtrarTaxonomiasPorNome(termoBusca.current);
+
+        if (tipificacaoFiltro.current === "Todas") {
+            return taxFiltradasPorNome
+        }
+
+        const taxFiltradasPorTipificacao = taxFiltradasPorNome?.filter(taxonomia => taxonomia.tip_assoc?.toLowerCase() === tipificacaoFiltro.current.toLowerCase());
+        return taxFiltradasPorTipificacao
+    }
 
     const atualizarRamoDaTaxonomia = async (data: FormDataRamo) => {
         try {
@@ -345,11 +367,6 @@ export default function Taxonomias() {
         flagHook.current = false;
         resetRamo()
     }
-
-    // const filtrarPraEdicao = (ids: string[]): Fonte[] => {
-    //     console.log("ids: ", ids);
-    //     return fontes.filter(fonte => ids.includes(fonte.id));
-    // }
 
     let flagHook = useRef<boolean>(false);
 
@@ -529,8 +546,17 @@ export default function Taxonomias() {
                             <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
 
                             { 
-                                termoBusca !== "" && (
-                                    <span onClick={() => { setTaxFiltradas(tax); setTermoBusca("") }} className="hover:cursor-pointer" title="Limpar pesquisa">
+                                termoBusca.current !== "" && (
+                                    <span
+                                        onClick={() => {
+                                            setTaxFiltradas(tax);
+                                            termoBusca.current = "";
+                                            const taxsFiltradas = filtrarTaxonomiasPorTipificacao();
+                                            setTaxFiltradas(taxsFiltradas || []); 
+                                        }}
+                                        className="hover:cursor-pointer"
+                                        title="Limpar pesquisa"
+                                    >
                                         <X className="absolute mt-1 translate-y-1/2 right-2" size={17} />
                                     </span>
                                 )
@@ -538,13 +564,15 @@ export default function Taxonomias() {
                                 
                             <input
                                 type="text"
-                                value={termoBusca}
+                                value={termoBusca.current}
                                 placeholder="Busca"
                                 className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                 onChange={(e) => { 
-                                    setTermoBusca(e.target.value);
-                                    filtrarTaxonomias(e.target.value)
+                                    termoBusca.current = e.target.value;
+                                    const taxsFiltradas = filtrarTaxonomiasPorTipificacao();
+                                    console.log("taxsFiltradas: ", taxsFiltradas);
+                                    setTaxFiltradas(taxsFiltradas || []);
                                 }}
                             />
                         </div>
@@ -560,10 +588,17 @@ export default function Taxonomias() {
                                 </TooltipContent>
                             </Tooltip>
 
-                            Tipificação:
-                            <Select defaultValue="">
+                            :
+                            <Select
+                                defaultValue="Todas"
+                                onValueChange={(e) => {
+                                    tipificacaoFiltro.current = e;
+                                    const taxsFiltradas = filtrarTaxonomiasPorTipificacao()
+                                    setTaxFiltradas(taxsFiltradas || []);
+                                }}
+                            >
                                 <SelectTrigger className="w-fit">
-                                    <SelectValue placeholder="Selecionhe uma tipificação" />
+                                    <SelectValue className="truncate" placeholder="Selecionhe uma tipificação" />
                                 </SelectTrigger>
 
                                 <SelectContent>
@@ -571,17 +606,27 @@ export default function Taxonomias() {
 
                                         <SelectLabel>Tipificações</SelectLabel>
 
-                                        <SelectItem value="Nenhuma">nenhuma</SelectItem>
-                                        <SelectItem value="Nenhuma1">nenhuma</SelectItem>
-                                        <SelectItem value="Nenhuma2">nenhuma</SelectItem>
-                                        <SelectItem value="Nenhuma3">nenhuma</SelectItem>
+                                        <SelectItem value="Todas">
+                                            Todas
+                                        </SelectItem>
+
+                                        {
+                                            tipificacoes.map((item, index) => (
+                                                <SelectItem
+                                                    key={index}
+                                                    value={item.name ?? ""}
+                                                >
+                                                    {item.name}
+                                                </SelectItem>
+                                            ))
+                                        }
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                         </div>
                     </div>
 
-                    {taxFiltradas.length > 0 ? taxFiltradas.map((item, index) => (
+                    {taxFiltradas && taxFiltradas.length > 0 ? taxFiltradas.map((item, index) => (
                         <Card
                             ref={(e) => { divRefs.current["divtax_" + index] = e }}
                             key={index}
@@ -609,9 +654,12 @@ export default function Taxonomias() {
                                 style={{ borderTopLeftRadius: "13px", borderBottomRightRadius: "13px" }}
                             >
                                 <span className="font-thin">Tipificação associada: </span> &nbsp;
-                                <strong>
-                                    {item.typification_id}
-                                </strong>
+                                <span className="text-[16px] font-semibold">
+                                    {typeof item.tip_assoc === "object" && item.tip_assoc !== null
+                                        ? (item.tip_assoc as Tipificacao).name
+                                        : String(item.tip_assoc ?? "")
+                                    }
+                                </span>
                             </div>
 
                             <CardHeader>
@@ -858,7 +906,7 @@ export default function Taxonomias() {
                             </CardFooter>
                         </Card>
                     )) : (
-                        <p className="mx-auto mt-8 text-xl animate-pulse w-fit">Nenhuma taxonomia cadastrada</p>
+                        <p className="mx-auto mt-8 text-xl animate-pulse w-fit">Nenhuma taxonomia correspondente ao filtro</p>
                     )}
                 </div>
 
