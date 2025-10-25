@@ -12,8 +12,8 @@ import { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
 import { getTipificacoesService, adicionarTipificacaoService, excluirTipificacaoService, atualizarTipificacaoService } from "@/service/tipificacao";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, ChevronRightIcon, PencilLine, Plus, Trash } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
+import { Calendar, ChevronRightIcon, PencilLine, Plus, Search, Trash, X } from "lucide-react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
 import { formatarData } from "@/lib/utils";
@@ -34,6 +34,8 @@ export default function Tipificacoes() {
         }
     });
 
+    let termoBusca = useRef<string>("");
+
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [fontes, setFontes] = useState<Fonte[]>([]);
 
@@ -44,6 +46,8 @@ export default function Tipificacoes() {
     const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
 
     const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
+
+    const [tipificacoesFiltradas, setTipificacoesFiltradas] = useState<Tipificacao[]>([]);
 
     const breakpointColumns = {
         default: 3,
@@ -69,6 +73,7 @@ export default function Tipificacoes() {
         }
 
         setTipificacoes(dados)
+        setTipificacoesFiltradas(dados)
     }
 
     const getFontes = async () => {
@@ -134,6 +139,18 @@ export default function Tipificacoes() {
         setNomeTipificacao("");
         setValue("fontesSelecionadas", []);
         setFontesSelecionadas([]);
+    }
+
+    function filtrarTipificacao() {
+        console.log("termoBusca.current: ", termoBusca.current);
+        if (termoBusca.current.trim() === "") {
+            return tipificacoes;
+        }
+
+        const tf = tipificacoes.filter(
+            tipificacao => tipificacao.name && tipificacao.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+        )
+        return tf
     }
 
     return (
@@ -273,11 +290,46 @@ export default function Tipificacoes() {
                     </Dialog>
                 </div>
 
+                <div className="flex w-1/2 relative">
+                                            
+                    <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
+
+                    { 
+                        termoBusca.current !== "" && (
+                            <span
+                                onClick={() => {
+                                    setTipificacoesFiltradas(tipificacoes);
+                                    termoBusca.current = "";
+                                    const tipsFiltradas = filtrarTipificacao();
+                                    setTipificacoesFiltradas(tipsFiltradas || []); 
+                                }}
+                                className="hover:cursor-pointer"
+                                title="Limpar pesquisa"
+                            >
+                                <X className="absolute mt-1 translate-y-1/2 right-2" size={17} />
+                            </span>
+                        )
+                    }
+                        
+                    <input
+                        type="text"
+                        value={termoBusca.current}
+                        placeholder="Pesquisar"
+                        className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                        onChange={(e) => { 
+                            termoBusca.current = e.target.value;
+                            const tipsFiltradas = filtrarTipificacao();
+                            setTipificacoesFiltradas(tipsFiltradas || []);
+                        }}
+                    />
+                </div>
+
                 <Masonry
                     breakpointCols={breakpointColumns}
                     className="flex relative gap-5 mb-10"
                 >
-                    {tipificacoes.length > 0 ? tipificacoes.map((tipificacao, index) => (
+                    {tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? tipificacoesFiltradas.map((tipificacao, index) => (
                         <div
                             style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
                             key={index}
@@ -480,7 +532,7 @@ export default function Tipificacoes() {
                                 </div>
                             </div>
                         </div>
-                    )) : <p className="absolute left-1/2 top-10 translate-x-[-50%] text-gray-400 text-2xl text-center animate-pulse">Nenhuma tipificação cadastrada.</p>}
+                    )) : <p className="absolute left-1/2 top-10 translate-x-[-50%] text-gray-400 text-2xl text-center animate-pulse">Nenhuma tipificação encontrada.</p>}
                 </Masonry>
 
             </div>

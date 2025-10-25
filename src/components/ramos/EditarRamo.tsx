@@ -56,6 +56,8 @@ export default function EditarRamo({ ramo, idTaxonomia, atualizarRamos, divRefs,
           if (resposta !== 200) {
             toast.error("Erro ao atualizar ramo");
           }
+
+          toast.success("Ramo atualizado com sucesso!");
     
           atualizarRamos(idTaxonomia);
           setOpenDialogIdRamo(null);

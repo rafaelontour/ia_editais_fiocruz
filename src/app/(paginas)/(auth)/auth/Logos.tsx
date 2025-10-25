@@ -35,6 +35,15 @@ export default function Logos() {
                     <img src="/logo_fiocruz.png" alt="Logo da FioCruz" />
                 </Link>
             </motion.div>
+
+            <motion.div
+                className="font-thin italic text-black mt-4"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 2.0, ease: "easeOut" }}
+            >
+                v1.0.0
+            </motion.div>
         </div>
     )
 }

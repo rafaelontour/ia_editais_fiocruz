@@ -27,6 +27,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Fonte, Tipificacao } from "@/core";
 import { Ramo } from "@/core/ramo";
 import { Taxonomia } from "@/core/taxonomia";
+import { formatarData } from "@/lib/utils";
 import { getFontesService } from "@/service/fonte";
 import { adicionarRamoService, atualizarRamoService, buscarRamosDaTaxonomiaService, excluirRamoService } from "@/service/ramo";
 import { adicionarTaxonomiaService, atualizarTaxonomiaService, excluirTaxonomiaService, getTaxonomiasService } from "@/service/taxonomia";
@@ -193,6 +194,8 @@ export default function Taxonomias() {
             toast.error("Erro ao adicionar ramo");
         }
 
+        toast.success("Ramo adicionado com sucesso!");
+
         setOpenDialogRamo(false);
         limparCamposRamo();
         const ramos = await buscarRamosDaTaxonomiaService(taxonomiaSelecionada?.id);
@@ -207,6 +210,7 @@ export default function Taxonomias() {
                 toast.error("Erro ao excluir taxonomia");
             }
 
+            toast.success("Taxonomia excluida com sucesso!");
             setIdSelecionado("");
             setTaxonomiaSelecionada(null);
             setRamosDaTaxonomia([]);
@@ -264,27 +268,24 @@ export default function Taxonomias() {
     }
 
     const atualizarTaxonomia = async (data: FormData) => {
-        try {
-            const novaTaxonomia: Taxonomia = {
-                id: taxonomiaSelecionada?.id,
-                typification_id: idTipificacao,
-                title: data.titulo,
-                source_ids: fontesSelecionadas && fontesSelecionadas.map(fonte => fonte.id),
-                description: data.descricao,
-            }
-
-            const resposta = await atualizarTaxonomiaService(novaTaxonomia);
-
-            if (resposta !== 200) {
-                toast.error("Erro ao atualizar taxonomia");
-                return
-            }
-
-            const taxs = await getTaxonomiasService();
-            setTax(taxs || []);
-        } catch (error) {
-            toast.error('Erro ao atualizar taxonomia',);
+        
+        const novaTaxonomia: Taxonomia = {
+            id: taxonomiaSelecionada?.id,
+            typification_id: idTipificacao,
+            title: data.titulo,
+            source_ids: fontesSelecionadas && fontesSelecionadas.map(fonte => fonte.id),
+            description: data.descricao,
         }
+
+        const resposta = await atualizarTaxonomiaService(novaTaxonomia);
+
+        if (resposta !== 200) {
+            toast.error("Erro ao atualizar taxonomia");
+            return
+        }
+
+        const taxs = await getTaxonomiasService();
+        setTax(taxs || []);
 
         limparCampos();
         setOpenTaxonomiaId(null);
@@ -434,7 +435,9 @@ export default function Taxonomias() {
                                 {errors.titulo && <p className="text-red-500 text-xs italic mt-1">{errors.titulo.message}</p>}
                             </div>
 
-                            <div>
+                            <div
+                                ref={(e) => { divRefs.current["descricao_tax"] = e }}
+                            >
                                 <label htmlFor="descriptionRamo" className="block text-sm font-medium text-gray-700">
                                     Descrição da Taxonomia
                                 </label>
@@ -565,13 +568,12 @@ export default function Taxonomias() {
                             <input
                                 type="text"
                                 value={termoBusca.current}
-                                placeholder="Busca"
+                                placeholder="Pesquisar"
                                 className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                 onChange={(e) => { 
                                     termoBusca.current = e.target.value;
                                     const taxsFiltradas = filtrarTaxonomiasPorTipificacao();
-                                    console.log("taxsFiltradas: ", taxsFiltradas);
                                     setTaxFiltradas(taxsFiltradas || []);
                                 }}
                             />
@@ -648,11 +650,12 @@ export default function Taxonomias() {
                             <div
                                 className="
                                     flex items-center
-                                    px-4 py-1 h-8 text-white text-md
-                                    font-semibold bg-zinc-400 w-fit -mt-6
+                                    h-8 px-4 text-white text-md
+                                    font-semibold bg-zinc-500 w-fit -mt-6
                                 "
                                 style={{ borderTopLeftRadius: "13px", borderBottomRightRadius: "13px" }}
                             >
+                                
                                 <span className="font-thin">Tipificação associada: </span> &nbsp;
                                 <span className="text-[16px] font-semibold">
                                     {typeof item.tip_assoc === "object" && item.tip_assoc !== null
@@ -660,6 +663,7 @@ export default function Taxonomias() {
                                         : String(item.tip_assoc ?? "")
                                     }
                                 </span>
+                                
                             </div>
 
                             <CardHeader>
@@ -675,7 +679,7 @@ export default function Taxonomias() {
                                     <Calendar size={18} />
                                     <span className="flex justify-center flex-col text-gray-400">
                                         <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
-                                        <span>{item.created_at}</span>
+                                        <span>{formatarData(item.created_at)}</span>
                                     </span>
                                 </div>
 
@@ -701,7 +705,7 @@ export default function Taxonomias() {
                                         </DialogTrigger>
 
                                         <DialogContent
-                                            // ref={(e) => { divRefs.current["editartax_" + index] = e }}
+                                            ref={(e) => { divRefs.current["editartax_" + index] = e }}
                                             onCloseAutoFocus={limparCampos}
                                         >
                                             <DialogHeader>
@@ -758,6 +762,7 @@ export default function Taxonomias() {
                                                     </label>
 
                                                     <textarea
+                                                        
                                                         {...register("descricao")}
                                                         defaultValue={taxonomiaSelecionada?.description}
                                                         onChange={(e) => setDescricaoTaxonomia(e.target.value)}
@@ -842,7 +847,6 @@ export default function Taxonomias() {
                                                         className={`
                                                                 flex bg-verde hover:bg-verde
                                                                 text-white hover:cursor-pointer
-                                                                active:scale-100
                                                             `}
                                                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                     >

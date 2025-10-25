@@ -9,6 +9,8 @@ import { Unidade } from "@/core/unidade";
 import { useEffect, useState } from "react";
 import { getUnidadePorId } from "@/service/unidade";
 
+import { motion } from "framer-motion";
+
 export default function Cabecalho() {
     const { usuario, deslogar, mensagemLogin } = useUsuario();
     const router = useRouter();
@@ -30,13 +32,12 @@ export default function Cabecalho() {
         // Define cargo
         const c = usuario.access_level === "ADMIN" ? "ADMINISTRADOR" :
                   usuario.access_level === "ANALYST" ? "ANALISTA" :
-                  usuario.access_level === "AUDITOR" ? "AUDITOR" : "VISITANTE";
+                  usuario.access_level === "AUDITOR" ? "AUDITOR" : "DEFAULT";
         setCargo(c);
     }
 
     useEffect(() => {
-        setCarregandoInfo(true);
-        carregarInfoUsuario().finally(() => setCarregandoInfo(false));
+        carregarInfoUsuario()
     }, [usuario]);
 
     return (
@@ -55,17 +56,17 @@ export default function Cabecalho() {
                     className="ml-2 inline-block mb-[3px]"
                 />
 
-                {/* Skeleton ou informação real */}
+
                 {usuario && (
                     <div
                         title="Seu cargo/nível de acesso e unidade"
                         style={{ boxShadow: "1px 2px 4px rgba(0, 0, 0, .5)"}}
                         className={`
-                            bg-zinc-600  rounded-md flex items-center gap-2 ml-6
+                            bg-zinc-600  rounded-md flex items-center gap-2 ml-3
                             text-white px-3 py-2 text-sm italic select-none
                             ${unidade ? "transiotion-all duration-500 ease-in-out delay-100" : "opacity-0"}
-                        `}
-                    >
+                            `}
+                            >
                         <UserCog2Icon size={16} />
                         <p className="flex items-center">
                             <span className="font-semibold">{cargo}</span>
@@ -74,6 +75,15 @@ export default function Cabecalho() {
                     </div>
                 )}
             </div>
+
+            <motion.div
+                className="italic text-xs relative left-6 top-4"
+                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+            >
+                Versão da plataforma: 1.0.0
+            </motion.div>
 
             {/* Botão login/logout */}
             {!usuario ? (
