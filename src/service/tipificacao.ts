@@ -23,7 +23,26 @@ async function getTipificacoesService(): Promise<Tipificacao[]> {
     }
 }
 
+async function getTipificacaoPorIdService(id: string | undefined): Promise<Tipificacao | null> {
+    const url = `${urlBase}/typification/${id}`
 
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        if (!response.ok) {
+            throw new Error("Erro ao buscar tipificacao");
+        }
+        const json = await response.json();
+        return json.typification;
+    } catch (error) {
+        throw new Error("Erro ao buscar tipificacao: " + (error instanceof Error ? error.message : String(error)));
+    }
+}
 
 async function adicionarTipificacaoService(nome: string, fontesSelecionadas: Fonte[]): Promise<Tipificacao> {
     const url = `${urlBase}/typification/`
@@ -92,6 +111,7 @@ async function atualizarTipificacaoService(tipificacao: Tipificacao): Promise<nu
 
 export {
     getTipificacoesService,
+    getTipificacaoPorIdService,
     adicionarTipificacaoService,
     atualizarTipificacaoService,
     excluirTipificacaoService

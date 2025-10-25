@@ -1,5 +1,6 @@
 import { Fonte } from "../fonte";
 import { Ramo } from "../ramo/Ramo";
+import { Tipificacao } from "../tipificacao";
 
 export interface Taxonomia {
     typification_id: string | undefined;
@@ -9,7 +10,7 @@ export interface Taxonomia {
     source_ids?: string[];
     sources?: Fonte[];
     branches?: Ramo[];
-
+    tip_assoc?: string;
     created_at?: string;
     updated_at?: string;
 }

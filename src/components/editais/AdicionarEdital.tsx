@@ -189,8 +189,9 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                     }}
                                                 >
                                                     <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Selcione tipificações" />
+                                                        <SelectValue placeholder="Selecione tipificações" />
                                                     </SelectTrigger>
+                                                    
                                                     <SelectContent>
                                                         <SelectGroup>
                                                             <SelectLabel>Tipificações</SelectLabel>

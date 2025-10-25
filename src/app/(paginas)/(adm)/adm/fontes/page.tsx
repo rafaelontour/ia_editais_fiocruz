@@ -3,8 +3,8 @@
 import Masonry from 'react-masonry-css'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, PencilLine, Plus, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Calendar, PencilLine, Plus, Search, Trash, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
 import { adicionarFonteService, atualizarFonteService, excluirFonteService, getFontesService } from '@/service/fonte';
@@ -33,13 +33,18 @@ export default function Fontes() {
         1000: 2,
         700: 1
     }
-
+    
     const [openDialogFontes, setOpenDialogFontes] = useState(false);
     const [fontes, setFontes] = useState<Fonte[]>([])
     const [openDialogIdExcluir, setOpenDialogIdExcluir] = useState<string | null>(null);
     const [openDialogIdEditar, setOpenDialogIdEditar] = useState<string | null>(null);
     const [nomeFonte, setNomeFonte] = useState<string>("");
     const [descricaoFonte, setDescricaoFonte] = useState<string>("");
+    
+    const termoBusca = useRef<string>("");
+
+    const [fontesFiltradas, setFontesFiltradas] = useState<Fonte[]>([]);
+
 
     const fetchData = async () => {
         try {
@@ -51,6 +56,7 @@ export default function Fontes() {
             }
 
             setFontes([...fnts])
+            setFontesFiltradas([...fnts])
         } catch (error) {
             console.error("Erro ao buscar fontes", error)
         }
@@ -116,6 +122,19 @@ export default function Fontes() {
         } catch (error) {
             console.error("Erro ao excluir fonte", error)
         }
+    }
+
+
+    function filtrarFontes() {
+        console.log("termoBusca.current: ", termoBusca.current);
+        if (termoBusca.current.trim() === "") {
+            return fontes;
+        }
+
+        const ff = fontes.filter(
+            f => f.name && f.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+        )
+        return ff
     }
 
     const limparCampos = () => {
@@ -226,12 +245,47 @@ export default function Fontes() {
                 </Dialog>
             </div>
 
+            <div className="flex w-1/2 relative">
+                                                        
+                <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
+
+                { 
+                    termoBusca.current !== "" && (
+                        <span
+                            onClick={() => {
+                                setFontesFiltradas(fontes);
+                                termoBusca.current = "";
+                                const fFiltradas = filtrarFontes();
+                                setFontesFiltradas(fFiltradas || []); 
+                            }}
+                            className="hover:cursor-pointer"
+                            title="Limpar pesquisa"
+                        >
+                            <X className="absolute mt-1 translate-y-1/2 right-2" size={17} />
+                        </span>
+                    )
+                }
+                    
+                <input
+                    type="text"
+                    value={termoBusca.current}
+                    placeholder="Pesquisar"
+                    className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                    onChange={(e) => { 
+                        termoBusca.current = e.target.value;
+                        const fFiltradas = filtrarFontes();
+                        setFontesFiltradas(fFiltradas || []);
+                    }}
+                />
+            </div>
+
             <Masonry
                 breakpointCols={breakpointColumnsObj}
                 columnClassName="pl-4"
                 className={'flex -ml-4 w-auto relative'}
             >
-                {fontes.length > 0 ? fontes.map((fonte, index) => (
+                {fontesFiltradas.length > 0 ? fontesFiltradas.map((fonte, index) => (
                     <div
                         style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
                         key={index}

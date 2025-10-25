@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { getStatusColor, iconeParaStatusDoEdital, verificarStatusEdital } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface VisualizarEditalClienteProps {
     edital: Edital | undefined
@@ -26,6 +28,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
 
     const { usuario } = useUsuario();
     const [enviouAnaliseOuConcluido, setEnviouAnaliseOuConcluido] = useState<boolean>(false);
+    const [justificativa, setJustificativa] = useState<string>("");
     const router = useRouter();
 
     async function enviarEditalParaConcluido() {
@@ -96,13 +99,57 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
                     {
                         (usuario?.access_level === "ADMIN" || usuario?.access_level === "AUDITOR") && edital?.history && edital?.history[0].status === "WAITING_FOR_REVIEW" && (
                             <div className="flex items-center gap-2">
-                                <Button
-                                    disabled={enviouAnaliseOuConcluido}
-                                    onClick={enviarEditalParaEmContrucao}
-                                    className="hover:cursor-pointer text-[16px] text-white bg-vermelho hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
-                                >
-                                    Rejeitar
-                                </Button>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            disabled={enviouAnaliseOuConcluido}
+                                            // onClick={enviarEditalParaEmContrucao}
+                                            className="hover:cursor-pointer text-[16px] text-white bg-vermelho hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
+                                        >
+                                            Rejeitar
+                                        </Button>
+                                    </DialogTrigger>
+
+                                    <DialogContent className="max-w-[600px]">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-2xl">Rejeitar edital</DialogTitle>
+                                        </DialogHeader>
+
+                                        <DialogDescription>
+                                            <p className="text-[16px]">Por favor, escreva abaixo uma justificativa para a rejeição do edital</p>
+                                        </DialogDescription>
+
+                                        <Textarea onChange={(e) => setJustificativa(e.target.value)} />
+
+                                        <DialogFooter>
+                                            <DialogClose>
+                                                <Button
+                                                    disabled={enviouAnaliseOuConcluido}
+                                                    className="hover:cursor-pointer text-[16px] text-black bg-white border border-gray-300 hover:bg-gray-200  data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
+                                                >
+                                                    Cancelar
+                                                </Button>
+                                            </DialogClose>
+                                            
+                                            <Button
+                                                disabled={enviouAnaliseOuConcluido}
+                                                onClick={() => {
+                                                    if (justificativa === null || justificativa === "" || justificativa.trim() === "" || justificativa.length < 10) {
+                                                        toast.warning("Escreva uma justificativa para rejeitar o edital!");
+                                                        return
+                                                    }
+
+                                                    enviarEditalParaEmContrucao()
+                                                }}
+                                                className="hover:cursor-pointer text-[16px] text-white bg-vermelho hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
+                                            >
+                                                Rejeitar
+                                            </Button>
+                                        </DialogFooter>
+
+                                        
+                                    </DialogContent>
+                                </Dialog>
 
                                 <Button
                                     disabled={enviouAnaliseOuConcluido}
