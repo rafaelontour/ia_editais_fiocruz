@@ -92,7 +92,7 @@ export default function Editais() {
 
     const getEditais = async () => {
         try {
-            const resposta = await getEditaisService();
+            const resposta = await getEditaisService(usuario?.unit_id);
 
             if (!resposta) throw new Error();
 

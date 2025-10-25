@@ -3,9 +3,9 @@ import { toast } from "sonner";
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-async function getEditaisService(): Promise<Edital[] | undefined> {
+async function getEditaisService(idUnidade: string | undefined): Promise<Edital[] | undefined> {
     try {
-        const res = await fetch(`${urlBase}/doc/`, {
+        const res = await fetch(`${urlBase}/doc/?unit_id=${idUnidade}`, {
             method: "GET",
             credentials: "include",
             headers: {
