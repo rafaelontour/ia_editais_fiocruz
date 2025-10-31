@@ -71,7 +71,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             ref={setNodeRef}
             style={style}
             // se quiser esconder o original enquanto usa overlay: opacity reduzida
-            className={`bg-white rounded-md  shadow-sm ${isDragging ? "opacity-30" : "opacity-100"}`}
+            className={`bg-white rounded-md shadow-sm ${isDragging ? "opacity-30" : "opacity-100"}`}
         >
             {/* drag handle: aplicamos attributes & listeners aqui (evita conflitos com botões dentro do card) */}
             <div {...attributes} {...listeners} className={`h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>

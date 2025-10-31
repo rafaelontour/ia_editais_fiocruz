@@ -93,7 +93,7 @@ export default function Editais() {
     const getEditais = async () => {
         try {
             const resposta = await getEditaisService(usuario?.unit_id);
-
+            
             if (!resposta) throw new Error();
 
             const dados = resposta || [];
@@ -250,7 +250,7 @@ export default function Editais() {
 
         setTimeout(() => {
             getEditais();
-        }, 300);
+        }, 500);
     };
 
     const cancelMove = () => setPendingMove(null);

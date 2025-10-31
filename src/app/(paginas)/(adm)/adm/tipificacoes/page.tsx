@@ -65,6 +65,7 @@ export default function Tipificacoes() {
         }
     }, []);
 
+
     const getTipificacoes = async () => {
         const dados = await getTipificacoesService();
 
