@@ -79,7 +79,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             </div>
 
             <div className="relative p-3">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col-reverse items-start justify-between gap-2">
                     <h3 className="font-semibold text-xl">{edital.name}</h3>
 
                     {

@@ -184,11 +184,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                         field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
                                                         const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
 
-                                                        console.group("Tamanho de vetores: ")
-                                                        console.log("Tipificacoes: ", tipificacoes.length)
-                                                        console.log("TipificacoesSelecionadas: ", tipificacoesSelecionadas.length);
-                                                        console.groupEnd();
-
                                                         if (tipificacaoEncontrada) {
                                                             setTipificacoesSelecionadas((prev) => [...prev, tipificacaoEncontrada]);
                                                         }
