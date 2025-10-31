@@ -15,6 +15,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { watch } from 'fs';
 import { formatarData } from '@/lib/utils';
 import { toast } from 'sonner';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 const schemaFonte = z.object({
     nome: z.string().min(1, "O nome da fonte é obrigatório"),
@@ -81,8 +83,11 @@ export default function Fontes() {
             const resposta = await adicionarFonteService(nomeFonte, descricaoFonte);
 
             if (resposta !== 201) {
-                throw new Error("Erro ao adicionar fonte")
+                toast.error("Erro ao adicionar fonte!")
+                return
             }
+
+            toast.success("Fonte adicionada com sucesso!");
 
             setOpenDialogFontes(false);
             limparCampos();
@@ -97,8 +102,11 @@ export default function Fontes() {
             const resposta = await atualizarFonteService(openDialogIdEditar as string, dados.nome, dados.descricao);
 
             if (resposta !== 200) {
-                throw new Error("Erro ao atualizar fonte")
+                toast.error("Erro ao atualizar fonte")
+                return
             }
+
+            toast.success("Fonte atualizada com sucesso!");
 
             setOpenDialogIdEditar(null);
             setOpenDialogFontes(false)
@@ -114,8 +122,11 @@ export default function Fontes() {
             const resposta = await excluirFonteService(id);
 
             if (resposta !== 204) {
-                throw new Error("Erro ao excluir fonte")
+                toast.error("Erro ao excluir fonte!")
+                return
             }
+
+            toast.success("Fonte excluida com sucesso!");
 
             setOpenDialogIdExcluir(null)
             fetchData();
@@ -179,8 +190,8 @@ export default function Fontes() {
 
                         <form onSubmit={handleSubmit(adicionarFonte)} className="flex text-lg flex-col gap-4">
                             <p className="flex flex-col gap-2">
-                                <label htmlFor="nomeFonte" className="">Nome da fonte</label>
-                                <input
+                                <Label htmlFor="nomeFonte" className="text-lg">Nome da fonte</Label>
+                                <Input
                                     {...register("nome")}
                                     type="text"
                                     id="nomeFonte"
@@ -197,8 +208,8 @@ export default function Fontes() {
                             </p>
 
                             <p className="flex flex-col gap-2">
-                                <label htmlFor="descricaoFonte" className="">Descrição da fonte</label>
-                                <input
+                                <Label htmlFor="descricaoFonte" className="text-lg">Descrição da fonte</Label>
+                                <Input
                                     {...register("descricao")}
                                     type="text"
                                     id="descricaoFonte"
@@ -340,8 +351,8 @@ export default function Fontes() {
 
                                         <form onSubmit={handleSubmit(atualizarFonte)} className="flex text-lg flex-col gap-4">
                                             <p className="flex flex-col gap-2">
-                                                <label htmlFor="nomeFonte" className="">Nome da fonte</label>
-                                                <input
+                                                <Label htmlFor="nomeFonte" className="text-lg">Nome da fonte</Label>
+                                                <Input
                                                     {...register("nome")}
                                                     type="text"
                                                     id="nomeFonte"
@@ -355,8 +366,8 @@ export default function Fontes() {
                                             </p>
 
                                             <p className="flex flex-col gap-2">
-                                                <label htmlFor="descricaoFonte" className="">Descrição da fonte</label>
-                                                <input
+                                                <Label htmlFor="descricaoFonte" className="text-lg">Descrição da fonte</Label>
+                                                <Input
                                                     {...register("descricao")}
                                                     type="text"
                                                     id="descricaoFonte"
@@ -369,7 +380,7 @@ export default function Fontes() {
                                                 {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
                                             </p>
 
-                                            <p className="flex flex-col gap-2">
+                                            <p className="flex flex-col gap-2 text-lg">
                                                 Upload do documento (opcional)
                                                 <FileUpload />
                                                 

@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
@@ -17,17 +17,26 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
 import { formatarData } from "@/lib/utils";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 const schemaTipificacao = z.object({
     nome: z.string().min(1, "O nome da tipificação é obrigatório"),
     fontesSelecionadas: z
-        .array(z.string().min(1))
-        .min(1, "Selecione pelo menos uma fonte")
+        .array(z.string().min(1)).min(1, "Selecione pelo menos uma fonte")
 })
 
 export default function Tipificacoes() {
     type FormData = z.infer<typeof schemaTipificacao>;
-    const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<FormData>({
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        control,
+        setValue,
+        watch,
+        reset 
+    } = useForm<FormData>({
         resolver: zodResolver(schemaTipificacao),
         defaultValues: {
             fontesSelecionadas: []
@@ -38,8 +47,6 @@ export default function Tipificacoes() {
 
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [fontes, setFontes] = useState<Fonte[]>([]);
-
-    const [nomeTipificacao, setNomeTipificacao] = useState<string>("");
 
     const [dialogTipificacao, setDialogTipificacao] = useState(false);
     const [idDialogExcluir, setIdDialogExcluir] = useState<string | null>("");
@@ -70,7 +77,7 @@ export default function Tipificacoes() {
         const dados = await getTipificacoesService();
 
         if (dados == null) {
-            toast.error('Erro ao buscar tipificacoes')
+            toast.error("Erro ao buscar tipificacoes")
         }
 
         setTipificacoes(dados)
@@ -81,7 +88,8 @@ export default function Tipificacoes() {
         const dados = await getFontesService();
 
         if (dados == null) {
-            throw new Error('Erro ao buscar fontes')
+            toast.error("Erro ao buscar fontes")
+            return
         }
 
         setFontes(dados)
@@ -90,9 +98,14 @@ export default function Tipificacoes() {
 
     const adicionarTipificacao = async (data: FormData) => {
         const dados = await adicionarTipificacaoService(data.nome, fontesSelecionadas);
+
         if (dados == null) {
-            throw new Error('Erro ao adicionar tipificacao')
+            toast.error("Erro ao adicionar tipificação")
+            return
         }
+
+        toast.success("Tipificacao adicionada com sucesso!")
+
         getTipificacoes();
         limparCampos();
         setDialogTipificacao(false);
@@ -105,10 +118,16 @@ export default function Tipificacoes() {
             name: data.nome,
             source_ids: data.fontesSelecionadas
         }
+
         const resposta = await atualizarTipificacaoService(tip);
+
         if (resposta !== 200) {
-            toast.error('Erro ao atualizar tipificacao')
+            toast.error("Erro ao atualizar tipificação")
+            return
         }
+
+        toast.success("Tipificacao atualizada com sucesso!")
+
         getTipificacoes();
         limparCampos();
         setIdDialogEditar(null);
@@ -122,8 +141,11 @@ export default function Tipificacoes() {
             const resposta = await excluirTipificacaoService(id);
 
             if (resposta !== 204) {
-                throw new Error('Erro ao excluir tipificacao')
+                toast.error("Erro ao excluir tipificação!")
+                return
             }
+
+            toast.success("Tipificacao excluida com sucesso!");
 
             getTipificacoes();
         } catch (erro) {
@@ -137,7 +159,6 @@ export default function Tipificacoes() {
 
     function limparCampos() {
         reset();
-        setNomeTipificacao("");
         setValue("fontesSelecionadas", []);
         setFontesSelecionadas([]);
     }
@@ -190,44 +211,75 @@ export default function Tipificacoes() {
 
                             <form onSubmit={handleSubmit(adicionarTipificacao)} className="flex text-lg flex-col gap-4">
                                 <p className="flex flex-col gap-2">
-                                    <label className="">Nome da tipificação</label>
-                                    <input
+                                    <Label htmlFor="nome" className="text-lg">Nome da tipificação</Label>
+                                    <Input
                                         {...register("nome")}
                                         type="text"
                                         className="border-2 border-gray-300 rounded-md p-2 w-full"
-                                        onChange={(e) => setNomeTipificacao(e.target.value)}
                                     />
                                     {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
                                 </p>
 
                                 <p className="flex flex-col gap-2">
-                                    <label>Fontes</label>
-                                    <select
-                                        defaultValue=""
-                                        className="border-2 border-gray-300 rounded-md p-2"
-                                        onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                                            setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
-                                            const novaFonteId = e.target.value;
-                                            const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
+                                    <Label className="text-lg">Fontes</Label>
+                                    <Controller 
+                                        name="fontesSelecionadas"
+                                        control={control}
+                                        render={({ field }) => (   
+                                            <Select
+                                                value=""
+                                                onValueChange={(value) => {
+                                                    field.onChange([...field.value, value]);
+                                                    const fonteEncontrada = fontes.find(fonte => fonte.id === value);
+                                                    // setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
+                                                    // const novaFonteId = e.target.value;
+                                                    // const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
+// 
+                                                    // if (!fonteJaSelecionada) {
+                                                    //     const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
+                                                    //     setValue("fontesSelecionadas", novasFontes);
+                                                    //     setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
+                                                    // }
 
-                                            if (!fonteJaSelecionada) {
-                                                const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
-                                                setValue("fontesSelecionadas", novasFontes);
-                                                setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
-                                            }
-                                        }}
-                                    >
-                                        <option value="" disabled>Selecione uma ou mais fontes</option>
-                                        {fontes && fontes.map((fonte, index) => (
-                                            <option
-                                                key={index}
-                                                value={fonte.id}
-                                                className="p-2 rounded-sm"
+                                                    if (fonteEncontrada) {
+                                                        setFontesSelecionadas([...fontesSelecionadas, fonteEncontrada]);
+                                                    }
+                                                }}
                                             >
-                                                {fonte.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Selecione uma ou mais fontes" />
+                                                </SelectTrigger>
+
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                    
+                                                    <SelectLabel>Fontes</SelectLabel>
+                                                    {fontes && fontes.filter(fonte => !fontesSelecionadas.some(fonte => fonte.id === fonte.id)).map((fonte, index) => (
+                                                        <SelectItem
+                                                            key={index}
+                                                            value={fonte.id}
+                                                            className="p-2 rounded-sm"
+                                                        >
+                                                            {fonte.name}
+                                                        </SelectItem>
+                                                    ))}
+
+                                                    {
+                                                        fontes?.length === fontesSelecionadas.length && (
+                                                            <SelectItem
+                                                                value="Todos"
+                                                                className="hover:cursor-pointer"
+                                                                disabled
+                                                            >
+                                                                Nenhuma fonte para selecionar
+                                                            </SelectItem>
+                                                        )
+                                                    }
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        )}
+                                    />
                                     {errors.fontesSelecionadas && (
                                         <span className="text-red-500 text-sm italic">{errors.fontesSelecionadas.message}</span>
                                     )}
@@ -235,26 +287,33 @@ export default function Tipificacoes() {
 
                                 {
                                     fontesSelecionadas.length > 0 && (
-                                        <div className="flex flex-col gap-2">
-                                            <p>Fontes selecionadas: </p>
-                                            <div className="grid grid-cols-3 gap-2 border-2 border-gray-300 rounded-md p-2">
-                                                {fontesSelecionadas.map((fonte, index) => (
-                                                    <span key={index} className="flex gap-2 items-center w-fit">
-                                                        <Checkbox
-                                                            className="cursor-pointer"
-                                                            checked
-                                                            onClick={() => {
-                                                                const novaLista = fontesSelecionadas.filter(f => f.id !== fonte.id);
+                                        <div className="flex flex-col gap-3 w-full">
+                                            <Label htmlFor="tipe" className="text-lg">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
+                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                                {
+                                                    fontesSelecionadas.map((fonte: Fonte) => (
+                                                        <div key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                            <button onClick={() => {
+                                                                const novaLista = fontesSelecionadas.filter((f) => f.id !== fonte.id)
                                                                 setFontesSelecionadas(novaLista);
-                                                                setValue("fontesSelecionadas", novaLista.map(f => f.id)); // atualiza também o react-hook-form
-                                                            }}
-
-                                                            id="fonte"
-                                                            key={index}
-                                                        />
-                                                        <Label className="cursor-pointer" htmlFor={"fonte"} key={fonte.id}>{fonte.name}</Label>
-                                                    </span>
-                                                ))}
+                                                                setValue("fontesSelecionadas", [""]);
+                                                            }}>
+                                                                <div className="flex items-center" title="Remover usuário">
+                                                                    <span
+                                                                        className="
+                                                                            bg-red-200 p-[10px]
+                                                                            hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                            transition-all duration-200 ease-in-out
+                                                                        "
+                                                                    >
+                                                                        <X className="w-4 h-4" />
+                                                                    </span>
+                                                                </div>
+                                                            </button>
+                                                            <p className=" w-full text-sm">{fonte.name}</p>
+                                                        </div>
+                                                    ))
+                                                }
                                             </div>
                                         </div>
                                     )
@@ -312,7 +371,7 @@ export default function Tipificacoes() {
                         )
                     }
                         
-                    <input
+                    <Input
                         type="text"
                         value={termoBusca.current}
                         placeholder="Pesquisar"
@@ -391,73 +450,116 @@ export default function Tipificacoes() {
 
                                             <form onSubmit={handleSubmit(atualizarTipificacao)} className="flex text-lg flex-col gap-4">
                                                 <p className="flex flex-col gap-2">
-                                                    <label className="">Nome da tipificação</label>
-                                                    <input
+                                                    <Label id="nome_tip" className="text-lg">Nome da tipificação</Label>
+                                                    <Input
+                                                        id="nome_tip"
                                                         defaultValue={tipificacao.name}
                                                         {...register("nome")}
                                                         type="text"
                                                         className="border-2 border-gray-300 rounded-md p-2 w-full"
-                                                    // onChange={(e) => setNomeTipificacao(e.target.value)}
                                                     />
                                                     {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
                                                 </p>
 
                                                 <p className="flex flex-col gap-2">
-                                                    <label>Fontes</label>
-                                                    <select
-                                                        defaultValue={"Selecione uma fonte"}
-                                                        className="border-2 border-gray-300 rounded-md p-2"
-                                                        onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                                                            setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
-                                                            const novaFonteId = e.target.value;
-                                                            const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
+                                                    <Label className="text-lg">Fontes</Label>
+                                                    <Controller 
+                                                        name="fontesSelecionadas"
+                                                        control={control}
+                                                        render={({ field }) => (   
+                                                            <Select
+                                                                value=""
+                                                                onValueChange={(value) => {
+                                                                    field.onChange([...field.value, value]);
+                                                                    const fonteEncontrada = fontes.find(fonte => fonte.id === value);
+                                                                    // setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
+                                                                    // const novaFonteId = e.target.value;
+                                                                    // const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
+                // 
+                                                                    // if (!fonteJaSelecionada) {
+                                                                    //     const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
+                                                                    //     setValue("fontesSelecionadas", novasFontes);
+                                                                    //     setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
+                                                                    // }
 
-                                                            if (!fonteJaSelecionada) {
-                                                                const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
-                                                                setValue("fontesSelecionadas", novasFontes);
-                                                                setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
-                                                            }
-                                                        }}
-                                                    >
-                                                        <option disabled>Selecione uma fonte</option>
-                                                        {fontes && fontes.map((fonte, index) => (
-                                                            <option
-                                                                key={index}
-                                                                value={fonte.id}
+                                                                    if (fonteEncontrada) {
+                                                                        setFontesSelecionadas([...fontesSelecionadas, fonteEncontrada]);
+                                                                    }
+                                                                }}
                                                             >
-                                                                {fonte.name}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                                <SelectTrigger className="w-full">
+                                                                    <SelectValue placeholder="Selecione uma ou mais fontes" />
+                                                                </SelectTrigger>
+
+                                                                <SelectContent>
+                                                                    <SelectGroup>
+                                                                    
+                                                                    <SelectLabel>Fontes</SelectLabel>
+                                                                    {fontes && fontes.filter(fonte => !fontesSelecionadas.some(fonte => fonte.id === fonte.id)).map((fonte, index) => (
+                                                                        <SelectItem
+                                                                            key={index}
+                                                                            value={fonte.id}
+                                                                            className="p-2 rounded-sm"
+                                                                        >
+                                                                            {fonte.name}
+                                                                        </SelectItem>
+                                                                    ))}
+
+                                                                    {
+                                                                        fontes?.length === fontesSelecionadas.length && (
+                                                                            <SelectItem
+                                                                                value="Todos"
+                                                                                className="hover:cursor-pointer"
+                                                                                disabled
+                                                                            >
+                                                                                Nenhuma fonte para selecionar
+                                                                            </SelectItem>
+                                                                        )
+                                                                    }
+                                                                    </SelectGroup>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        )}
+                                                    />
                                                     {errors.fontesSelecionadas && (
                                                         <span className="text-red-500 text-sm italic">{errors.fontesSelecionadas.message}</span>
                                                     )}
                                                 </p>
+
                                                 {
                                                     fontesSelecionadas.length > 0 && (
-                                                        <div className="flex flex-col gap-2">
-                                                            <p>Fontes selecionadas: </p>
-                                                            <div className="grid grid-cols-3 gap-2 border-2 border-gray-300 rounded-md p-2">
-                                                                {fontesSelecionadas.map((fonte, index) => (
-                                                                    <span key={index} className="flex gap-2 items-center w-fit">
-                                                                        <Checkbox
-                                                                            className="cursor-pointer"
-                                                                            checked
-                                                                            onClick={() => {
-                                                                                const novaLista = fontesSelecionadas.filter(f => f.id !== fonte.id);
+                                                        <div className="flex flex-col gap-3 w-full">
+                                                            <Label className="text-lg">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
+                                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                                                {
+                                                                    fontesSelecionadas.filter((f) => fontes.find((fnt) => fnt.id === f.id)).map((fnt: Fonte) => (
+                                                                        <div key={fnt.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                                            <button className="h-full" onClick={() => {
+                                                                                const novaLista = fontesSelecionadas.filter((f) => f.id !== fnt.id)
                                                                                 setFontesSelecionadas(novaLista);
-                                                                                setValue("fontesSelecionadas", novaLista.map(f => f.id)); // atualiza também o react-hook-form
-                                                                            }}
-                                                                            id="fonte"
-                                                                            key={index}
-                                                                        />
-                                                                        <Label className="cursor-pointer" htmlFor={"fonte"} key={fonte.id}>{fonte.name}</Label>
-                                                                    </span>
-                                                                ))}
+                                                                                setValue("fontesSelecionadas", novaLista.map((tp) => tp.id));
+                                                                            }}>
+                                                                                <div className="flex items-center h-full" title="Remover tipificação">
+                                                                                    <span
+                                                                                        className="
+                                                                                            bg-red-200 p-[10px] h-full flex items-center
+                                                                                            hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                                            transition-all duration-200 ease-in-out
+                                                                                        "
+                                                                                    >
+                                                                                        <X className="w-4 h-4" />
+                                                                                    </span>
+                                                                                </div>
+                                                                            </button>
+                                                                            <p className="w-full text-sm py-1">{fnt.name}</p>
+                                                                        </div>
+                                                                    ))
+                                                                }
                                                             </div>
                                                         </div>
                                                     )
                                                 }
+
                                                 <div className="flex justify-end gap-4 mt-4">
                                                     <DialogClose
                                                         className={`
