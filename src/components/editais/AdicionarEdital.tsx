@@ -183,6 +183,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                     onValueChange={(value) => {
                                                         field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
                                                         const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
+
                                                         if (tipificacaoEncontrada) {
                                                             setTipificacoesSelecionadas((prev) => [...prev, tipificacaoEncontrada]);
                                                         }
@@ -196,7 +197,9 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                         <SelectGroup>
                                                             <SelectLabel>Tipificações</SelectLabel>
                                                             {
-                                                                tipificacoes.map((tipificacao) => (
+                                                                tipificacoes
+                                                                .filter(t => !tipificacoesSelecionadas.some(tipificacao => tipificacao.id === t.id))
+                                                                .map((tipificacao) => (
                                                                     <SelectItem
                                                                         key={tipificacao.id}
                                                                         value={tipificacao.id}
@@ -204,6 +207,18 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                         {tipificacao.name}
                                                                     </SelectItem>
                                                                 ))
+                                                            }
+
+                                                            {
+                                                                tipificacoes?.length === tipificacoesSelecionadas.length && (
+                                                                    <SelectItem
+                                                                        value="Todos"
+                                                                        className="hover:cursor-pointer"
+                                                                        disabled
+                                                                    >
+                                                                        Todas tipificações já foram selecionadas
+                                                                    </SelectItem>
+                                                                )
                                                             }
                                                         </SelectGroup>
                                                     </SelectContent>
@@ -222,38 +237,38 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                 </div>
 
                                 {
-                                        tipificacoesSelecionadas.length > 0 && (
-                                            <div className="flex flex-col gap-3 w-full">
-                                                <Label htmlFor="tipe" className="text-lg">Tipificações selecionadas</Label>
-                                                <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
-                                                    {
-                                                        tipificacoesSelecionadas.map((t: Tipificacao) => (
-                                                            <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                                <button className="h-full" onClick={() => {
-                                                                    const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
-                                                                    setTipificacoesSelecionadas(novaLista);
-                                                                    setValue("tipificacoes", novaLista.map((tp) => tp.id));
-                                                                }}>
-                                                                    <div className="flex items-center h-full" title="Remover tipificação">
-                                                                        <span
-                                                                            className="
-                                                                                bg-red-200 p-[10px] h-full flex items-center
-                                                                                hover:bg-red-400 hover:cursor-pointer hover:text-white
-                                                                                transition-all duration-200 ease-in-out
-                                                                            "
-                                                                        >
-                                                                            <X className="w-4 h-4" />
-                                                                        </span>
-                                                                    </div>
-                                                                </button>
-                                                                <p className="w-full text-sm py-1">{t.name}</p>
-                                                            </div>
-                                                        ))
-                                                    }
-                                                </div>
+                                    tipificacoesSelecionadas.length > 0 && (
+                                        <div className="flex flex-col gap-3 w-full">
+                                            <Label htmlFor="tipe" className="text-lg">Tipificações selecionadas</Label>
+                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                                {
+                                                    tipificacoesSelecionadas.filter((t) => tipificacoes.find((tp) => tp.id === t.id)).map((t: Tipificacao) => (
+                                                        <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                            <button className="h-full" onClick={() => {
+                                                                const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
+                                                                setTipificacoesSelecionadas(novaLista);
+                                                                setValue("tipificacoes", novaLista.map((tp) => tp.id));
+                                                            }}>
+                                                                <div className="flex items-center h-full" title="Remover tipificação">
+                                                                    <span
+                                                                        className="
+                                                                            bg-red-200 p-[10px] h-full flex items-center
+                                                                            hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                            transition-all duration-200 ease-in-out
+                                                                        "
+                                                                    >
+                                                                        <X className="w-4 h-4" />
+                                                                    </span>
+                                                                </div>
+                                                            </button>
+                                                            <p className="w-full text-sm py-1">{t.name}</p>
+                                                        </div>
+                                                    ))
+                                                }
                                             </div>
-                                        )
-                                    }
+                                        </div>
+                                    )
+                                }
                                 
                             </div>
 
