@@ -15,12 +15,13 @@ import { formatarData } from "@/lib/utils";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
+import { EditalArquivo } from "@/core/edital/Edital";
 
 
 interface Props {
     edital: Edital;
     containerId: string; // StatusEdital como string
-    funcaoAtualizarEditais: Dispatch<SetStateAction<boolean>>
+    funcaoAtualizarEditais: Dispatch<SetStateAction<boolean>>;
     flagEdital: boolean
 }
 

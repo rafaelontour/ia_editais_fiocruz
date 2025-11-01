@@ -55,7 +55,7 @@ const schemaEdital = z.object({
 export default function EditarEdital({ edital, atualizarEditais, flagEdital }: Props) {
 
     const [cliqueEditar, setCliqueEditar] = useState<boolean>(false);
-    const [urlArquivoEdital, setUrlArquivoEdital] = useState<string>("");
+    const [urlCaminhoArquivoEdital, setUrlArquivoEdital] = useState<string>("");
 
     async function buscarCaminhoEdital() {
         const arquivo: EditalArquivo = await getEditalArquivoService(edital.id!);
@@ -415,9 +415,9 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                     </div>
                                                 </DialogTrigger>
 
-                                                <DialogContent>
+                                                <DialogContent className="p-10 w-[80%] h-[90%]">
                                                     <iframe
-                                                        src={``}
+                                                        src={urlBase + urlCaminhoArquivoEdital}
                                                         width="100%"
                                                         height="100%"
                                                         style={{ border: "none" }}

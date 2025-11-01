@@ -144,7 +144,7 @@ export default function RootLayout({
               }}
             >
               <div className="h-full">
-                {children}
+                  {children}
               </div>
             </div>
           </div>
