@@ -13,6 +13,8 @@ export interface ContextoProps {
     deslogar: () => void
     items: MenuItem[]
     mensagemLogin: string,
+    barraLateralAberta: boolean
+    mudarEstadoBarraLateral: () => void
 }
 
 export const UsuarioContexto = createContext<ContextoProps | undefined>({} as ContextoProps);
@@ -22,17 +24,27 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     const [items, setItems] = useState<MenuItem[]>([])
     const [mensagemLogin, setMensagemLogin] = useState<string>("");
     const [montado, setMontado] = useState<boolean>(false);
+    const [barraLateralAberta, setBarraLateralAberta] = useState<boolean>(false);
 
-    const [stateSidebar, setStateSidebar] = useState<boolean>(true);
+    function mudarEstadoBarraLateral() {
+        setBarraLateralAberta(prev => {
+            const novoEstado = !prev;
+            localStorage.setItem("barraLateralAberta", novoEstado ? "aberta" : "fechada");
+            return novoEstado;
+        });
+        
+    }
     
     useEffect(() => {
+        const estadoBarra = localStorage.getItem("barraLateralAberta")
+
+        if (estadoBarra === "aberta") {
+            setBarraLateralAberta(true)
+        } else {
+            setBarraLateralAberta(false)
+        }
         getUsuarioLogado()
         setMontado(true)
-        if (!localStorage.getItem("sidebar")) {
-            localStorage.setItem("sidebar", "open")
-            setStateSidebar(true)
-        }
-
     }, [])
 
     async function logarUsuario() {
@@ -84,6 +96,8 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
                 deslogar: deslogar,
                 items: items,
                 mensagemLogin: mensagemLogin,
+                barraLateralAberta: barraLateralAberta,
+                mudarEstadoBarraLateral: mudarEstadoBarraLateral
             }}
         >
             
