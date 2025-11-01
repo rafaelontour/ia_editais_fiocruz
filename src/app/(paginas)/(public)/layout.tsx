@@ -16,6 +16,8 @@ import {
 import Cabecalho from "@/components/Cabecalho";
 import useUsuario from "@/data/hooks/useUsuario";
 import { usePathname } from "next/navigation";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { IconLoader2 } from "@tabler/icons-react";
 
 export default function RootLayout({
   children,
@@ -25,13 +27,14 @@ export default function RootLayout({
 
   const { items } = useUsuario()
   const pathname = usePathname()
+  const { barraLateralAberta, mudarEstadoBarraLateral } = useUsuario()
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <Cabecalho />
 
       <div className="flex flex-1 overflow-y-hidden">
-        <SidebarProvider>
+        <SidebarProvider defaultOpen={barraLateralAberta}>
           <Sidebar
             variant="inset" collapsible="icon" className="relative"
           >
@@ -42,26 +45,59 @@ export default function RootLayout({
                       items.map((item) => {
                         const ativo = pathname === item.url;
                         return (
-                          <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton
-                              className={`
-                                rounded-sm transition-all duration-15 py-[18px] pl-3
-                                ${ativo
-                                  ? "bg-[#D03C30] text-white hover:bg-[#D03C30] hover:text-white"
-                                  : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
-                              `}
-                              asChild
-                            >
-                              <a className="flex items-center gap-2" href={item.url}>
-                                <item.icon className="w-5 h-5" />
-                                <span className="text-[16px]">{item.title}</span>
-                              </a>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
+                          barraLateralAberta ? (
+                            <SidebarMenuItem key={item.title}>
+                              <SidebarMenuButton
+                                className={`
+                                  rounded-sm transition-all duration-15 py-[18px] pl-3
+                                  ${ativo
+                                    ? "bg-[#D03C30] text-white hover:bg-[#D03C30] hover:text-white"
+                                    : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
+                                `}
+                                asChild
+                              >
+                                <a className="flex items-center gap-2" href={item.url}>
+                                  <item.icon className="w-5 h-5" />
+                                  <span className="text-[16px]">{item.title}</span>
+                                </a>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+
+                          ) : (
+                            <Tooltip key={item.title}>
+                              <TooltipTrigger>
+                                <SidebarMenuItem key={item.title}>
+                                  <SidebarMenuButton
+                                    className={`
+                                      rounded-sm transition-all duration-15 py-[18px] pl-3
+                                      ${ativo
+                                        ? "bg-[#D03C30] text-white hover:bg-[#D03C30] hover:text-white"
+                                        : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
+                                    `}
+                                    asChild
+                                  >
+                                    <a className="flex items-center gap-2" href={item.url}>
+                                      <item.icon className="w-5 h-5" />
+                                      <span className="text-[16px]">{item.title}</span>
+                                    </a>
+                                  </SidebarMenuButton>
+                                </SidebarMenuItem>
+                              </TooltipTrigger>
+
+                              <TooltipContent side="right">
+                                <p className="text-sm">{item.title}</p>
+                              </TooltipContent>
+
+                            </Tooltip>
+                          )
                         );
                       })
                     ) : (
-                      <div className="p-4 text-gray-400 animate-pulse w-fit">Carregando menu...</div>
+                      barraLateralAberta ? (
+                        <div className=" text-gray-400 text-sm animate-pulse w-fit">Carregando menu...</div>
+                      ) : (
+                        <IconLoader2 className="w-5 h-5 animate-spin" />
+                      )
                     )}
                   </SidebarMenu>
                 </SidebarGroup>
@@ -91,6 +127,7 @@ export default function RootLayout({
               }}
             >
               <SidebarTrigger
+                onClick={() => mudarEstadoBarraLateral()}
                 className="
                 mt-4 ml-4
                 hover:cursor-pointer
