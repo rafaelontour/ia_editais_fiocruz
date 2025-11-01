@@ -268,6 +268,8 @@ export default function Taxonomias() {
     }
 
     const atualizarTaxonomia = async (data: FormData) => {
+
+        console.log("chegou aqui")
         
         const novaTaxonomia: Taxonomia = {
             id: taxonomiaSelecionada?.id,
@@ -280,9 +282,11 @@ export default function Taxonomias() {
         const resposta = await atualizarTaxonomiaService(novaTaxonomia);
 
         if (resposta !== 200) {
-            toast.error("Erro ao atualizar taxonomia");
+            toast.error("Erro ao atualizar taxonomia!");
             return
         }
+
+        toast.success("Taxonomia atualizada com sucesso!");
 
         const taxs = await getTaxonomiasService();
         setTax(taxs || []);
@@ -342,14 +346,17 @@ export default function Taxonomias() {
             const resposta = await atualizarRamoService(dado);
 
             if (resposta !== 200) {
-                toast.error("Erro ao atualizar ramo");
+                toast.error("Erro ao atualizar ramo!");
+                return
             }
+
+            toast.success("Ramo atualizado com sucesso!");
 
             const ramos = await buscarRamosDaTaxonomiaService(taxonomiaSelecionada?.id);
             setRamosDaTaxonomia(ramos || []);
             setOpenDialogIdRamo(null);
         } catch (e) {
-            toast.error('Erro ao atualizar ramo');
+            return
         }
     }
 
