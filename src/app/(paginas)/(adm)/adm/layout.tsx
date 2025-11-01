@@ -14,6 +14,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { usuario } = useUsuario();
   const pathname = usePathname();
   const { items } = useUsuario();
 
@@ -33,15 +34,9 @@ export default function RootLayout({
   useEffect(() => {
     document.title = `Administrativo - ${title}`;
   }, [title]);
- 
-  const [montado, setMontado] = useState<boolean>(false);
-
-  useEffect(() => {
-    setMontado(true);
-  }, [])
 
   return (
-    montado && (
+    usuario && (
       <div className="flex flex-col h-screen overflow-hidden w-full scrollbar-hidden">
       <Head>
         <title>Administrativo - {title}</title>

@@ -21,14 +21,13 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     const [usuario, setUsuario] = useState<UsuarioUnidade | undefined>();
     const [items, setItems] = useState<MenuItem[]>([])
     const [mensagemLogin, setMensagemLogin] = useState<string>("");
+    const [montado, setMontado] = useState<boolean>(false);
 
     const [stateSidebar, setStateSidebar] = useState<boolean>(true);
-
-    console.log("contexto rodando")
-
     
     useEffect(() => {
         getUsuarioLogado()
+        setMontado(true)
         if (!localStorage.getItem("sidebar")) {
             localStorage.setItem("sidebar", "open")
             setStateSidebar(true)
@@ -39,7 +38,6 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     async function logarUsuario() {
         try {
             const [res, status] = await getUsuarioLogado();
-            console.log("USUARIO LOGADO: ", res);
 
             if (status === 401) {
                 setItems(itemsUsuarioComum)
@@ -50,7 +48,7 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
             if (status === 200) {
                 setMensagemLogin("Sair")
                 const usuarioComLogin: UsuarioUnidade = { ...res }
-                console.log("usuarioComLogin: ", usuarioComLogin);
+
                 setUsuario(usuarioComLogin)
 
                 const novosItems = res.access_level === "ADMIN"
@@ -90,7 +88,7 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
         >
             
             {
-                usuario && 
+                montado && 
                 children
             }
         </UsuarioContexto.Provider>

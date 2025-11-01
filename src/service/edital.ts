@@ -4,7 +4,6 @@ import { toast } from "sonner";
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getEditaisService(idUnidade: string | undefined): Promise<Edital[] | undefined> {
-    console.log("id da unidade: ", idUnidade);
     try {
         const res = await fetch(`${urlBase}/doc/?unit_id=${idUnidade}`, {
             method: "GET",
@@ -13,8 +12,9 @@ async function getEditaisService(idUnidade: string | undefined): Promise<Edital[
                 "Content-type": "application/json"
             }
         })
-        console.log("EDITAIS: ", res);
+
         if (!res.ok) return
+
         const { documents } = await res.json();
         return documents;
     } catch (e) {
