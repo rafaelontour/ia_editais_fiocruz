@@ -18,6 +18,7 @@ import useUsuario from "@/data/hooks/useUsuario";
 import { usePathname } from "next/navigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { IconLoader2 } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function RootLayout({
   children,
@@ -56,10 +57,10 @@ export default function RootLayout({
                                 `}
                                 asChild
                               >
-                                <a className="flex items-center gap-2" href={item.url}>
+                                <Link className="flex items-center gap-2" href={item.url}>
                                   <item.icon className="w-5 h-5" />
                                   <span className="text-[16px]">{item.title}</span>
-                                </a>
+                                </Link>
                               </SidebarMenuButton>
                             </SidebarMenuItem>
 
@@ -76,10 +77,10 @@ export default function RootLayout({
                                     `}
                                     asChild
                                   >
-                                    <a className="flex items-center gap-2" href={item.url}>
+                                    <Link className="flex items-center gap-2" href={item.url}>
                                       <item.icon className="w-5 h-5" />
                                       <span className="text-[16px]">{item.title}</span>
-                                    </a>
+                                    </Link>
                                   </SidebarMenuButton>
                                 </SidebarMenuItem>
                               </TooltipTrigger>

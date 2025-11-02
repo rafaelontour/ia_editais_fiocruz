@@ -65,7 +65,7 @@ const itemsUsuarioComum = [
   },
   {
     title: "Unidades",
-    url: "/unidades",
+    url: "/unidades_fiocruz",
     icon: University,
   },
 ]
