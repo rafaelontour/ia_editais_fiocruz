@@ -91,10 +91,10 @@ export default function RootLayout({
                                     `}
                                     asChild
                                   >
-                                    <a className="flex items-center gap-2" href={item.url}>
+                                    <Link className="flex items-center gap-2" href={item.url}>
                                       <item.icon className="w-5 h-5" />
                                       <span className="text-[16px]">{item.title}</span>
-                                    </a>
+                                    </Link>
                                   </SidebarMenuButton>
                                 </SidebarMenuItem>
                               </TooltipTrigger>
