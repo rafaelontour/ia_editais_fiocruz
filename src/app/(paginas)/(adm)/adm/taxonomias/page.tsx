@@ -83,12 +83,12 @@ export default function Taxonomias() {
     const [openTaxonomia, setOpenTaxonomia] = useState<boolean>(false);
     const [openTaxonomiaId, setOpenTaxonomiaId] = useState<string | null | undefined>(null);
     const [openDialogRamo, setOpenDialogRamo] = useState<boolean>(false);
-    const [openDialogIdRamo, setOpenDialogIdRamo] = useState<string | null | undefined>(null);
     const [openDialogIdRamoExcluir, setOpenDialogIdRamoExcluir] = useState<string | null | undefined>(null);
     const [openDialogVerRamo, setOpenDialogVerRamo] = useState<string | null | undefined>(null);
     
     const [ramosDaTaxonomia, setRamosDaTaxonomia] = useState<Ramo[]>([]);
     const [ramoSelecionado, setRamoSelecionado] = useState<Ramo | null | undefined>(null);
+    const [ramoParaVisualizar, setRamoParaVisualizar] = useState<Ramo | null>(null);
     
     const divRefs = useRef<Record<string, HTMLDivElement | HTMLButtonElement | null>>({});
     const [taxFiltradas, setTaxFiltradas] = useState<Taxonomia[]>([]);
@@ -157,6 +157,7 @@ export default function Taxonomias() {
                 if (flagHook.current === true) return
                 setTaxonomiaSelecionada(null);
                 setIdSelecionado("");
+                setRamoParaVisualizar(null);
                 return
             }
 
@@ -164,6 +165,7 @@ export default function Taxonomias() {
                 if (flagHook.current === true) return
                 setTaxonomiaSelecionada(null);
                 setIdSelecionado("");
+                setRamoParaVisualizar(null);
                 return
             }
 
@@ -171,6 +173,7 @@ export default function Taxonomias() {
                 if (flagHook.current === true) return
                 setTaxonomiaSelecionada(null);
                 setIdSelecionado("");
+                setRamoParaVisualizar(null);
                 return
             }
         };
@@ -354,7 +357,6 @@ export default function Taxonomias() {
 
             const ramos = await buscarRamosDaTaxonomiaService(taxonomiaSelecionada?.id);
             setRamosDaTaxonomia(ramos || []);
-            setOpenDialogIdRamo(null);
         } catch (e) {
             return
         }
@@ -1021,129 +1023,102 @@ export default function Taxonomias() {
                         <CardContent>
                             {taxonomiaSelecionada ? (
                                 ramosDaTaxonomia.length > 0 ? (
-                                    <ul>
-                                        {ramosDaTaxonomia.map((ramo, index) => (
-                                            <div ref={(e) => { divRefs.current["ramo_" + index] = e }} key={ramo.id} className="flex flex-col gap-2">
-                                                <li className="flex  justify-between items-center mb-2">
-                                                    <span>{ramo.title}</span>
-
-                                                    <div className="flex flex-row gap-2">
-                                                        <Dialog open={openDialogVerRamo === ramo.id} onOpenChange={(open) => { setOpenDialogVerRamo(open ? ramo.id : null) }}>
-                                                            <DialogTrigger onClick={() => { flagHook.current = true} } asChild>
-                                                                 <button
-                                                                    title="Ver informações deste ramo"
-                                                                    className="flex items-center justify-center h-8 w-8 bg-slate-400 text-white rounded-sm border border-gray-300 hover:cursor-pointer"
+                                    <div className="flex gap-4">
+                                        <ul className="w-1/2">
+                                            {ramosDaTaxonomia.map((ramo, index) => (
+                                                <div
+                                                    ref={(e) => { divRefs.current["ramo_" + index] = e }}
+                                                    key={ramo.id}
+                                                    className="flex flex-col gap-2 hover:cursor-pointer"
+                                                    onClick={() => setRamoParaVisualizar(ramo)}
+                                                >
+                                                    <li className="flex justify-between items-center mb-2">
+                                                        <span>{ramo.title}</span>
+                                                        <div className="flex flex-row gap-2">
+                                                            <EditarRamo flagHook={flagHook} divRefs={divRefs} atualizarRamos={atualizarTaxonomiaDepoisDeAdicionarRamo} idTaxonomia={taxonomiaSelecionada.id} ramo={ramo} />
+                                                            <Dialog open={openDialogIdRamoExcluir === ramo.id} onOpenChange={(open) => { setOpenDialogIdRamoExcluir(open ? ramo.id : null) }}>
+                                                                <DialogTrigger onClick={() => { flagHook.current = true} } asChild>
+                                                                    <button
+                                                                        title="Excluir ramo"
+                                                                        className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer"
+                                                                    >
+                                                                        <Trash className="h-4 w-4" strokeWidth={1.5} />
+                                                                    </button>
+                                                                </DialogTrigger>
+                                                                <DialogContent
+                                                                    ref={(e) => { divRefs.current["excluir_" + index] = e }}
+                                                                    onCloseAutoFocus={() => { flagHook.current = false }}
                                                                 >
-                                                                    <View className="h-4 w-4" strokeWidth={1.5} />
-                                                                </button>
-                                                            </DialogTrigger>
-
-                                                            <DialogContent
-                                                                ref={(e) => { divRefs.current["ver_ramo_" + index] = e }}
-                                                                onCloseAutoFocus={() => { flagHook.current = false }}
-                                                            >
-
-                                                                <DialogHeader>
-                                                                    <DialogTitle className="text-3xl">
-                                                                        Informações do ramo
-                                                                    </DialogTitle>
-                                                                    
-                                                                    <DialogDescription className="text-md">
-                                                                        
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-
-                                                                <div className="flex flex-col gap-2">
-                                                                    <div>
-                                                                        <h3 className="text-xl font-semibold">Título</h3>
-                                                                        <p className="text-gray-700 ml-2 text-lg">{ramo.title}</p>
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>
+                                                                            Excluir ramo
+                                                                        </DialogTitle>
+                                                                        <DialogDescription>
+                                                                            Tem certeza que deseja excluir o ramo <strong>{ramo.title}</strong>?
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+                                                                    <div className="flex justify-end gap-4 mt-4">
+                                                                        <DialogClose
+                                                                            className={`
+                                                                                transition ease-in-out text-black
+                                                                                rounded-md px-3
+                                                                                hover:cursor-pointer
+                                                                            `}
+                                                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                                        >
+                                                                            Cancelar
+                                                                        </DialogClose>
+                                                                        <Button
+                                                                            className={`
+                                                                                flex bg-vermelho hover:bg-vermelho
+                                                                                text-white hover:cursor-pointer
+                                                                            `}
+                                                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                                                            onClick={() => {
+                                                                                excluirRamo(ramo?.id, taxonomiaSelecionada?.id);
+                                                                            }}
+                                                                        >
+                                                                            Excluir
+                                                                        </Button>
                                                                     </div>
-                                                                    <div>
-                                                                        <h3 className="text-xl font-semibold">Descrição</h3>
-                                                                        <p className="text-gray-700 ml-2 text-lg">{ramo.description}</p>
-                                                                    </div>
-                                                                </div>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        </div>
+                                                    </li>
 
-                                                                <DialogFooter>
-                                                                    <DialogClose
-                                                                        className={`
-                                                                            transition ease-in-out text-white
-                                                                            rounded-md px-4 py-2 bg-vermelho
-                                                                            hover:cursor-pointer text-sm
-                                                                        `}
-                                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                                    >
-                                                                        Fechar
-                                                                    </DialogClose>
-                                                                </DialogFooter>
-                                                            </DialogContent>
-                                                        </Dialog>
+                                                    {
+                                                        index !== ramosDaTaxonomia.length - 1 &&
+                                                        <hr className="border-gray-300 mb-4" />
+                                                    }
+                                        
+                                                </div>
+                                            ))}
+                                        </ul>
+                                        
+                                        <div className="border border-gray-300 rounded-md w-1/2 p-4">
 
-                                                        <EditarRamo flagHook={flagHook} divRefs={divRefs} atualizarRamos={atualizarTaxonomiaDepoisDeAdicionarRamo} idTaxonomia={taxonomiaSelecionada.id} ramo={ramo} />
+                                            {
+                                                ramoParaVisualizar ? (
 
-                                                        <Dialog open={openDialogIdRamoExcluir === ramo.id} onOpenChange={(open) => { setOpenDialogIdRamoExcluir(open ? ramo.id : null) }}>
-                                                            <DialogTrigger onClick={() => { flagHook.current = true} } asChild>
-                                                                <button
-                                                                    title="Excluir ramo"
-                                                                    className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer"
-                                                                >
-                                                                    <Trash className="h-4 w-4" strokeWidth={1.5} />
-                                                                </button>
-                                                            </DialogTrigger>
+                                                    <div className="flex flex-col gap-2">
+                                                        <div className="flex flex-col gap-1">
+                                                            <h3 className="text-lg font-semibold">Título do ramo</h3>
+                                                            <p className="ml-4">{ramoParaVisualizar?.title}</p>
+                                                        </div>
 
-                                                            <DialogContent
-                                                                ref={(e) => { divRefs.current["excluir_" + index] = e }}
-                                                                onCloseAutoFocus={() => { flagHook.current = false }}
-                                                            >
-
-                                                                <DialogHeader>
-                                                                    <DialogTitle>
-                                                                        Excluir ramo
-                                                                    </DialogTitle>
-
-                                                                    <DialogDescription>
-                                                                        Tem certeza que deseja excluir o ramo <strong>{ramo.title}</strong>?
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-
-                                                                <div className="flex justify-end gap-4 mt-4">
-                                                                    <DialogClose
-                                                                        className={`
-                                                                            transition ease-in-out text-black
-                                                                            rounded-md px-3
-                                                                            hover:cursor-pointer
-                                                                        `}
-                                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                                    >
-                                                                        Cancelar
-                                                                    </DialogClose>
-
-                                                                    <Button
-                                                                        className={`
-                                                                            flex bg-vermelho hover:bg-vermelho
-                                                                            text-white hover:cursor-pointer
-                                                                        `}
-                                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                                        onClick={() => {
-                                                                            excluirRamo(ramo?.id, taxonomiaSelecionada?.id);
-                                                                        }}
-                                                                    >
-                                                                        Excluir
-                                                                    </Button>
-                                                                </div>
-                                                            </DialogContent>
-                                                        </Dialog>
+                                                        <div className="flex flex-col gap-1">
+                                                            <h3 className="text-lg font-semibold">Descrição do ramo</h3>
+                                                            <p className="ml-4">{ramoParaVisualizar?.description}</p>
+                                                        </div>
                                                     </div>
-                                                </li>
 
-                                                {
-                                                    index !== ramosDaTaxonomia.length - 1 &&
-                                                    <hr className="border-gray-300 mb-4" />
-                                                }
+                                                ) : (
+                                                    <p className="text-xl font-semibold mb-4">Selecione um ramo para ver detalhes</p>
+                                                )
+                                            }
 
-                                            </div>
-                                        ))}
-                                    </ul>
+                                        </div>
+                                    </div>
                                 ) : (
                                     <p className="ml-3 animate-pulse">Nenhum ramo disponível para a taxonomia selecionada.</p>
                                 )

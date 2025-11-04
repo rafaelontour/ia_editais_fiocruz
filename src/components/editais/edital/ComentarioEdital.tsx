@@ -231,6 +231,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                                 >
                                                     <DialogTrigger asChild>
                                                         <Button
+                                                            title="Remover comentário"
                                                             size={"icon"}
                                                             className="
                                                                 h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer

@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Edital } from "@/core";
+import { IconNotes } from "@tabler/icons-react";
+import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 interface Props {
@@ -16,14 +18,30 @@ export default function Linha01 ({ edital }: Props) {
             </div>
             
             <div className="flex flex-row gap-2 items-center">
-                <div className="bg-gray-200 flex gap-0.5 p-1 rounded-md"> 
-                    <Button variant={"outline"} className="text-xs py-0.5 px-2" size="sm">
-                        Resultado do edital
+                <div className=" flex gap-4 p-2 rounded-md"> 
+                    <Button
+                        variant={"destructive"}
+                        className="text-md px-3 py-2 hover:cursor-pointer text-white bg-verde hover:bg-green-800"
+                        size="sm"
+                        style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }}
+                    >
+                        <span className="flex gap-[6px] items-center">
+                            <p>Resultado do edital</p>
+                            <CheckCircle2 className="w-4 h-4" />
+                        </span>
                     </Button>
 
-                    <Link href={`/adm/editais/${edital?.id}/comentarios`}>
-                        <Button variant={"outline"} className="text-xs py-0.5 px-2" size="sm">
-                            Comentários
+                    <Link  href={`/adm/editais/${edital?.id}/comentarios`}>
+                        <Button
+                            variant={"destructive"}
+                            className="text-md px-3 py-2 hover:cursor-pointer bg-red-500 text-white"
+                            size="sm"
+                            style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }}
+                        >
+                            <span className="flex gap-[6px] items-center">
+                                <p>Comentários</p>
+                                <IconNotes className="w-4 h-4" />
+                            </span>
                         </Button>
                     </Link>
                 </div>

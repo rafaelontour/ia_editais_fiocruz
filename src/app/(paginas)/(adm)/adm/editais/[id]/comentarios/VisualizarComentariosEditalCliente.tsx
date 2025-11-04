@@ -95,7 +95,7 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
                 direction="horizontal"
                 className="flex h-full gap-6 mb-10"
             >
-                <ResizablePanel className="mt-3" minSize={35} defaultSize={50}>
+                <ResizablePanel className="mt-4" minSize={35} defaultSize={50}>
                     <div className="flex h-full w-full justify-center items-center">
                     {
                         !buscandoEdital ? (
@@ -114,7 +114,7 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
                     </div>
                 </ResizablePanel>
 
-                <div className="flex flex-col items-center gap-4 mt-3">
+                <div className="flex flex-col items-center gap-4 mt-4">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <InfoIcon color="green" size={15} />

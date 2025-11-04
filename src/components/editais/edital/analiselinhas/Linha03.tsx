@@ -87,7 +87,7 @@ export default function Linha03({ edital, resumoIA }: Props) {
                             <div className="flex items-center justify-between">
                                 <h3 className="text-2xl font-semibold text-black flex items-center gap-2">Resumo gerado por IA <Stars color="blue" size={18}/></h3>
                                 <div>
-                                    <p className={`text-sm font-semibold px-3 py-1 rounded-md text-white ${media && media < 5 ? "bg-red-500" : media && media < 7 ? "bg-yellow-600" : "bg-green-600"}`}>Média de todos os ramos: {media?.toFixed(2)}</p>
+                                    <p style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }} className={`text-sm font-semibold px-3 py-1 rounded-md text-white ${media && media < 5 ? "bg-red-500" : media && media < 7 ? "bg-yellow-600" : "bg-green-600"}`}>Média de todos os ramos: {media?.toFixed(2)}</p>
                                 </div>
                             </div>
                             <div className={style.resumoIA} dangerouslySetInnerHTML={{ __html: htmlSeguro }} />
