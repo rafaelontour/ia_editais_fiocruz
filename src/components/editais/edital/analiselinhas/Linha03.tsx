@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, ChevronRight, Stars } from "lucide-react";
 import { useEffect, useRef, useState } from "react";

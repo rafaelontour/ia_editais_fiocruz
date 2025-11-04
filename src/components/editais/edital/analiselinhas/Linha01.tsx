@@ -1,8 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Edital } from "@/core";
 import Link from "next/link";
 
-export default function Linha01 () {
+interface Props {
+    edital: Edital | undefined
+}
+
+export default function Linha01 ({ edital }: Props) {
+
     return(
         <div className="flex w-full flex-row justify-between">
             <div className=" flex flex-col">
@@ -16,7 +21,7 @@ export default function Linha01 () {
                         Resultado do edital
                     </Button>
 
-                    <Link href={"/editais/edital/comentarios"}>
+                    <Link href={`/adm/editais/${edital?.id}/comentarios`}>
                         <Button variant={"outline"} className="text-xs py-0.5 px-2" size="sm">
                             Comentários
                         </Button>
