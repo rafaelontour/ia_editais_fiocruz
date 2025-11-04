@@ -11,6 +11,8 @@ import { ParamValue } from "next/dist/server/request/params";
 import { getEditalArquivoService } from "@/service/editalArquivo";
 import { getEditalPorIdService } from "@/service/edital";
 import { buscarComentariosPorIdEditalService } from "@/service/comentarioEdital";
+import { getStatusColor, iconeParaStatusDoEdital, verificarStatusEdital } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface VisualizarComentariosEdital {
     idEdital: ParamValue
@@ -19,49 +21,82 @@ interface VisualizarComentariosEdital {
 
 export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }: VisualizarComentariosEdital) {
 
-    const [editalArquivo, setEditalArquivo] = useState<EditalArquivo | undefined>(undefined);
     const [comentariosEdital, setComentariosEdital] = useState<Comentario[] | undefined>(undefined);
     const [enderecoArquivo, setEnderecoArquivo] = useState<string | undefined>(undefined);
     const [buscandoEdital, setBuscandoEdital] = useState<boolean>(true);
+    const [edital, setEdital] = useState<Edital | undefined>(undefined);
     const idEditalString = idEdital?.toString();
-
+    
+    async function buscarEditalPeloId() {
+        const edital = await getEditalPorIdService(idEdital?.toString());
+        setEdital(edital);  
+    }
+    
     async function buscarEditalArquivo() {
         const editalArquivo = await getEditalArquivoService(idEditalString);
         setEnderecoArquivo(urlBase + editalArquivo.releases[0].file_path);
-        setEditalArquivo(editalArquivo);
-        setBuscandoEdital(false);
     }
 
     async function buscarComentariosEdital() {
         const edital = await buscarComentariosPorIdEditalService(idEditalString!);
-        console.log("edital: ", edital);
         setComentariosEdital(edital?.messages);
     }
 
+    async function carregarDados() {
+        await Promise.all([
+            buscarEditalPeloId(),
+            buscarComentariosEdital(),
+            buscarEditalArquivo()
+        ])
+
+        setBuscandoEdital(false);
+    }
+
     useEffect(() => {
-        buscarComentariosEdital();
-        buscarEditalArquivo();
+        carregarDados();
     }, []);
 
     return (
         <div className="flex flex-col h-full">  
-            <div className="flex flex-row gap-7">
+            <div className="flex flex-row gap-7 pb-6">
                 <Button
                     className="hover:cursor-pointer"
                     variant={"outline"}
                     size={"icon"}
+                    title="Voltar para página de análise do edital"
+                    onClick={() => window.history.go(-1)}
                 >
-                    <ChevronLeft onClick={() => window.history.go(-1)}/>
+                    <ChevronLeft />
                 </Button>
-                <Label className="text-2xl font-bold">Edital Fiocruz 2025/1</Label>
+
+                <Label className="text-2xl font-bold"><strong>Edital</strong>: {edital?.name}</Label>
+                {
+                    buscandoEdital ? (
+                        <p className="flex items-center">
+                            <span>Carregando..</span>
+                            <LoaderCircle className="animate-spin text-gray-600" />
+                        </p>
+                    ) : (
+                        <div
+                            className="pointer-events-none flex items-center gap-2 px-3 py-1 rounded-md text-white font-semibold"
+                            style={{
+                                backgroundColor: getStatusColor(edital?.history ? edital.history[0].status : "PENDING"),
+                                boxShadow: "0 0 3px rgba(0, 0, 0, .5)"
+                            }}
+                        >
+                            <span>{edital?.history && verificarStatusEdital(edital?.history[0].status)}</span>
+                            {iconeParaStatusDoEdital(edital?.history ? edital.history[0].status : "PENDING")}
+                        </div>
+                    )
+                }
             </div>
 
             <ResizablePanelGroup
                 direction="horizontal"
                 className="flex h-full gap-6 mb-10"
             >
-                <ResizablePanel minSize={35} defaultSize={50}>
-                    <div className="flex h-full w-full justify-center items-center pt-6">
+                <ResizablePanel className="mt-3" minSize={35} defaultSize={50}>
+                    <div className="flex h-full w-full justify-center items-center">
                     {
                         !buscandoEdital ? (
                             <iframe
@@ -79,11 +114,24 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
                     </div>
                 </ResizablePanel>
 
-                <ResizableHandle />
+                <div className="flex flex-col items-center gap-4 mt-3">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <InfoIcon color="green" size={15} />
+                        </TooltipTrigger>
+                        <TooltipContent className="italic">Clique sobre a linha abaixo, segure e puxe para os lados para alterar a vizualização</TooltipContent>
+                    </Tooltip>
+
+                    <ResizableHandle className="w-[1px] h-full" />
+                </div>
 
                 <ResizablePanel className="h-full" minSize={35} defaultSize={50}>
                     <div className="w-full h-full">
-                        <ComentarioEdital buscarComentariosEdital={buscarComentariosEdital} idEdital={idEditalString} comentarios={comentariosEdital} />
+                        <ComentarioEdital
+                            edital={edital}
+                            buscarComentariosEdital={buscarComentariosEdital}
+                            comentarios={comentariosEdital}
+                        />
                     </div>
                 </ResizablePanel>
             </ResizablePanelGroup>

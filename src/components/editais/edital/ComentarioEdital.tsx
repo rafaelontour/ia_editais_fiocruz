@@ -1,22 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Comentario } from "@/core/edital/Edital";
+import { Comentario, Edital } from "@/core/edital/Edital";
 import useUsuario from "@/data/hooks/useUsuario";
 import { formatarData } from "@/lib/utils";
 import { excluirComentarioEditalService, fazerComentarioEditalService } from "@/service/comentarioEdital";
+import { getEditalPorIdService } from "@/service/edital";
 import { IconLoader2 } from "@tabler/icons-react";
 import { PencilLine, Plus, Send, Trash, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
-    idEdital: string | undefined;
+    edital: Edital | undefined;
     comentarios: Comentario[] | undefined;
     buscarComentariosEdital: () => void;
 }
 
-export default function ComentarioEdital({ comentarios, idEdital, buscarComentariosEdital }: Props) {
+export default function ComentarioEdital({ edital, comentarios, buscarComentariosEdital }: Props) {
     const [mostrarFormulario, setMostrarFormulario] = useState<boolean>(false);
     const [novoComentario, setNovoComentario] = useState<string>("");
     const [carregando, setCarregando] = useState<boolean>(false);
@@ -25,7 +26,6 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
     const [abrirDialogAdicionar, setAbrirDialogAdicionar] = useState(false);
 
     const { usuario } = useUsuario();
-
 
     useEffect(() => {
         if (comentarios?.length === 0) {
@@ -45,7 +45,7 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
             return;
         }
 
-        const resposta = await fazerComentarioEditalService(idEdital, { content: novoComentario });
+        const resposta = await fazerComentarioEditalService(edital?.id, { content: novoComentario });
 
         if (resposta != 201) {
             toast.error("Erro ao fazer comentário!");
@@ -74,59 +74,63 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
         montado &&
         <div className="flex flex-col gap-10 h-full">
             <div className="bg-white sticky top-0 z-10">
-                <div className="flex items-center justify-between border bg-white border-gray-300 rounded-md p-3">
-                    <h2 className="text-xl font-bold">Comentários</h2>
+                <div className="flex items-center justify-between rounded-md p-3">
+                    <h2 className="text-3xl font-bold">Comentários</h2>
 
                     {
                         temComentarios && (
-                            <Dialog open={abrirDialogAdicionar} onOpenChange={setAbrirDialogAdicionar}>
-                                <DialogTrigger asChild>
-                                    <Button
-                                        type="button"
-                                        className="bg-vermelho hover:cursor-pointer"
-                                        variant="destructive"
-                                        style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
-                                        onClick={() => setMostrarFormulario(true)}
-                                    >
-                                        <Plus className="mr-2" />
-                                        <span>Adicionar comentário</span>
-                                    </Button>
-                                </DialogTrigger>
-
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle>Adicionar comentário</DialogTitle>
-                                        <DialogDescription>
-                                            <p>Digite o comentário abaixo:</p>
-                                        </DialogDescription>
-                                    </DialogHeader>
-
-                                    <Textarea
-                                        placeholder="Escreva um comentário"
-                                        className="w-full"
-                                        value={novoComentario}
-                                        onChange={(e) => setNovoComentario(e.target.value)}
-                                    />
-
-                                    <DialogFooter>
-                                        <DialogClose>
-                                            <Button variant={"outline"} className="hover:cursor-pointer">
-                                                Cancelar
-                                            </Button>
-                                        </DialogClose>
-
+                            ((edital?.history?.[0]?.status === "PENDING" || edital?.history?.[0]?.status === "UNDER_CONSTRUCTION") && usuario?.access_level === "ANALYST") ||
+                            ((edital?.history?.[0]?.status === "WAITING_FOR_REVIEW" || edital?.history?.[0]?.status === "COMPLETED") && usuario?.access_level === "AUDITOR")||
+                            usuario?.access_level === "ADMIN" && (
+                                <Dialog open={abrirDialogAdicionar} onOpenChange={setAbrirDialogAdicionar}>
+                                    <DialogTrigger asChild>
                                         <Button
                                             type="button"
-                                            variant="destructive"
                                             className="bg-vermelho hover:cursor-pointer"
-                                            onClick={enviarComentario}
+                                            variant="destructive"
+                                            style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                                            onClick={() => setMostrarFormulario(true)}
                                         >
-                                            <Send size={17} className="mr-2" />
-                                            Enviar comentário
+                                            <Plus className="mr-2" />
+                                            <span>Adicionar comentário</span>
                                         </Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
+                                    </DialogTrigger>
+
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Adicionar comentário</DialogTitle>
+                                            <DialogDescription>
+                                                <p>Digite o comentário abaixo:</p>
+                                            </DialogDescription>
+                                        </DialogHeader>
+
+                                        <Textarea
+                                            placeholder="Escreva um comentário"
+                                            className="w-full"
+                                            value={novoComentario}
+                                            onChange={(e) => setNovoComentario(e.target.value)}
+                                        />
+
+                                        <DialogFooter>
+                                            <DialogClose>
+                                                <Button variant={"outline"} className="hover:cursor-pointer">
+                                                    Cancelar
+                                                </Button>
+                                            </DialogClose>
+
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                className="bg-vermelho hover:cursor-pointer"
+                                                onClick={enviarComentario}
+                                            >
+                                                <Send size={17} className="mr-2" />
+                                                Enviar comentário
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            )
                         )
                     }
                 </div>
@@ -166,22 +170,28 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
                                     <p className="text-lg animate-pulse text-gray-400">
                                         Nenhum comentário ainda para este edital
                                     </p>
-                                    <Button
-                                        type="button"
-                                        className="bg-vermelho hover:cursor-pointer"
-                                        variant="destructive"
-                                        style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
-                                        onClick={() => setMostrarFormulario(true)}
-                                    >
-                                        <Plus className="mr-2" />
-                                        <span>Adicionar comentário</span>
-                                    </Button>
+
+                                    {
+                                        ((edital?.history?.[0]?.status === "PENDING" || edital?.history?.[0]?.status === "UNDER_CONSTRUCTION") && usuario?.access_level === "ANALYST") ||
+                                        ((edital?.history?.[0]?.status === "WAITING_FOR_REVIEW" || edital?.history?.[0]?.status === "COMPLETED") && usuario?.access_level === "AUDITOR") ||
+                                        usuario?.access_level === "ADMIN" && (
+                                
+                                        <Button
+                                            type="button"
+                                            className="bg-vermelho hover:cursor-pointer"
+                                            variant="destructive"
+                                            style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                                            onClick={() => setMostrarFormulario(true)}
+                                        >
+                                            <Plus className="mr-2" />
+                                            <span>Adicionar comentário</span>
+                                        </Button>
+                                        )
+                                    }
                                 </>
                             )}
                         </div>
                     )
-
-
                 ) : (
                     <div className="flex flex-col gap-6 pr-5">
                         {comentarios.map((item) => (

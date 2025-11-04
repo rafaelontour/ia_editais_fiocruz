@@ -94,7 +94,7 @@ export default function Editais() {
         try {
             const resposta = await getEditaisService(usuario?.unit_id);
             
-            if (!resposta) throw new Error();
+            if (!resposta) toast.error("Erro ao buscar editais!");
 
             const dados = resposta || [];
 
