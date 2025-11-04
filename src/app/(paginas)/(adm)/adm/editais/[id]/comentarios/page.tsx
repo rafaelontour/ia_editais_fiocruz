@@ -1,10 +1,10 @@
 import { useParams } from "next/navigation";
 import VisualizarComentariosEditalCliente from "./VisualizarComentariosEditalCliente";
 
-export default async function Comentarios({ params }: { params: { id: string } }) {
+export default function Comentarios({ params }: { params: { id: string } }) {
 
     const urlBase = process.env.NEXT_PUBLIC_URL_BASE;
-    const { id } = await params;
+    const { id } = params;
 
     return (
         <VisualizarComentariosEditalCliente idEdital={id} urlBase={urlBase} />
