@@ -183,7 +183,7 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
 
 
                 ) : (
-                    <div className="flex flex-col gap-10 pr-5">
+                    <div className="flex flex-col gap-6 pr-5">
                         {comentarios.map((item) => (
                             <div key={item.id} className="flex flex-row gap-5 bg-slate-50 rounded-xl p-5 border border-gray-10">
                                 <div>
