@@ -1,12 +1,9 @@
-import { useParams } from "next/navigation";
 import VisualizarComentariosEditalCliente from "./VisualizarComentariosEditalCliente";
 
-export default function Comentarios({ params }: { params: { id: string } }) {
+export default async function Comentarios({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // ✅ aguarda resolver a Promise
 
-    const urlBase = process.env.NEXT_PUBLIC_URL_BASE;
-    const { id } = params;
+  const urlBase = process.env.NEXT_PUBLIC_URL_BASE;
 
-    return (
-        <VisualizarComentariosEditalCliente idEdital={id} urlBase={urlBase} />
-    );
+  return <VisualizarComentariosEditalCliente idEdital={id} urlBase={urlBase} />;
 }
