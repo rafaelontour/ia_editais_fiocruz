@@ -20,6 +20,8 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
     const [novoComentario, setNovoComentario] = useState<string>("");
     const [carregando, setCarregando] = useState<boolean>(false);
     const [montado, setMontado] = useState<boolean>(false);
+    const [dialogComentario, setDialogComentario] = useState<string | null>(null);
+    const [abrirDialogAdicionar, setAbrirDialogAdicionar] = useState(false);
     
 
     useEffect(() => {
@@ -36,7 +38,7 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
 
     async function enviarComentario() {
         if (!novoComentario.trim()) {
-            toast.error("Digite um comentário antes de enviar.");
+            toast.warning("Digite um comentário antes de enviar.");
             return;
         }
 
@@ -48,6 +50,7 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
         }
 
         toast.success("Comentário enviado com sucesso!");
+        setAbrirDialogAdicionar(false);
         setNovoComentario("");
         buscarComentariosEdital();
     }
@@ -68,8 +71,61 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
         montado &&
         <div className="flex flex-col gap-10 h-full">
             <div className="bg-white sticky top-0 z-10">
-                <div className="border bg-white border-gray-300 rounded-md p-3">
+                <div className="flex items-center justify-between border bg-white border-gray-300 rounded-md p-3">
                     <h2 className="text-xl font-bold">Comentários</h2>
+
+                    {
+                        temComentarios && (
+                            <Dialog open={abrirDialogAdicionar} onOpenChange={setAbrirDialogAdicionar}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                            type="button"
+                                            className="bg-vermelho hover:cursor-pointer"
+                                            variant="destructive"
+                                            style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                                            onClick={() => setMostrarFormulario(true)}
+                                    >
+                                        <Plus className="mr-2" />
+                                        <span>Adicionar comentário</span>
+                                    </Button>
+                                </DialogTrigger>
+
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Adicionar comentário</DialogTitle>
+                                        <DialogDescription>
+                                            <p>Digite o comentário abaixo:</p>
+                                        </DialogDescription>
+                                    </DialogHeader>
+
+                                    <Textarea
+                                        placeholder="Escreva um comentário"
+                                        className="w-full"
+                                        value={novoComentario}
+                                        onChange={(e) => setNovoComentario(e.target.value)}
+                                    />
+
+                                    <DialogFooter>
+                                        <DialogClose>
+                                            <Button variant={"outline"} className="hover:cursor-pointer">
+                                                Cancelar
+                                            </Button>
+                                        </DialogClose>
+
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            className="bg-vermelho hover:cursor-pointer"
+                                            onClick={enviarComentario}
+                                        >
+                                            <Send size={17} className="mr-2" />
+                                            Enviar comentário
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        )
+                    }
                 </div>
             </div>
 
@@ -153,32 +209,47 @@ export default function ComentarioEdital({ comentarios, idEdital, buscarComentar
                                             <PencilLine />
                                         </Button>
 
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button
-                                                    size={"icon"}
-                                                    className="
-                                                        h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
-                                                        text-white transition-all rounded-sm p-[14px]
-                                                    ">
-                                                    <Trash />
-                                                </Button>
-                                            </DialogTrigger>
+                                        <Dialog
+    open={dialogComentario === item.id}
+    onOpenChange={(open) => setDialogComentario(open ? item.id! : null)}
+>
+    <DialogTrigger asChild>
+        <Button
+            size={"icon"}
+            className="
+                h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
+                text-white transition-all rounded-sm p-[14px]
+            ">
+            <Trash />
+        </Button>
+    </DialogTrigger>
 
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>Excluir comentário</DialogTitle>
-                                                    <DialogDescription>
-                                                        Tem certeza que deseja excluir este comentário?
-                                                    </DialogDescription>
-                                                </DialogHeader>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Excluir comentário</DialogTitle>
+            <DialogDescription>
+                Tem certeza que deseja excluir este comentário?
+            </DialogDescription>
+        </DialogHeader>
 
-                                                <DialogFooter>
-                                                    <DialogClose>Cancelar</DialogClose>
-                                                    <Button variant="destructive" className="hover:cursor-pointer bg-vermelho" onClick={() => excluirComentario(item.id)}>Excluir</Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
+        <DialogFooter>
+            <DialogClose asChild>
+                <Button variant="outline">Cancelar</Button>
+            </DialogClose>
+
+            <Button
+                variant="destructive"
+                className="hover:cursor-pointer bg-vermelho"
+                onClick={async () => {
+                    await excluirComentario(item.id);
+                    setDialogComentario(null); // fecha só o atual
+                }}
+            >
+                Excluir
+            </Button>
+        </DialogFooter>
+    </DialogContent>
+</Dialog>
                                     </div>
                                 </div>
                             </div>
