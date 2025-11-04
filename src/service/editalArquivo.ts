@@ -1,6 +1,6 @@
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-async function getEditalArquivoService(id: string): Promise<any> {
+async function getEditalArquivoService(id: string | null | undefined): Promise<any> {
     try {
         const resposta = await fetch(`${urlBase}/doc/${id}/release/`, {
             method: "GET",

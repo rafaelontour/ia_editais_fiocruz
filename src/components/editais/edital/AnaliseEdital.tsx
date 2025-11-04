@@ -14,7 +14,7 @@ export default function AnaliseEdital ({ edital, editalArquivo, resumoIA }: Prop
     
     return (
         <div className="flex max-w-fit flex-col gap-4">
-            <Linha01 />
+            <Linha01 edital={edital} />
 
             <div className="flex flex-col gap-4 overflow-y-auto">
                 <Linha02 edital={edital} editalArquivo={editalArquivo} />

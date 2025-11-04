@@ -5,7 +5,6 @@ import { useDroppable } from "@dnd-kit/core";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
 import CardEdital from "./CardEdital";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 export interface Categoria {
   nome: string;

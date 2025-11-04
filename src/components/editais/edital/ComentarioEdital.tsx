@@ -1,46 +1,191 @@
-import { User } from "lucide-react";
-import Linha01 from "./analiselinhas/Linha01";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Comentario } from "@/core/edital/Edital";
+import { formatarData } from "@/lib/utils";
+import { excluirComentarioEditalService, fazerComentarioEditalService } from "@/service/comentarioEdital";
+import { IconLoader2 } from "@tabler/icons-react";
+import { PencilLine, Plus, Send, Trash, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-export interface Comentario {
-    id: string;
-    nome: string;
-    data: string;
-    comentario: string;
+interface Props {
+    idEdital: string | undefined;
+    comentarios: Comentario[] | undefined;
+    buscarComentariosEdital: () => void;
 }
 
-export default function ComentarioEdital () {
+export default function ComentarioEdital({ comentarios, idEdital, buscarComentariosEdital }: Props) {
+    const [mostrarFormulario, setMostrarFormulario] = useState<boolean>(false);
+    const [novoComentario, setNovoComentario] = useState<string>("");
+    const [carregando, setCarregando] = useState<boolean>(false);
+    const [montado, setMontado] = useState<boolean>(false);
+    
 
-    const comentarios: Comentario[] = [
-        { id: "1", nome:"Eduardo Manuel", data:"07/03/2025 - 09h32", comentario: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab unde similique dolore labore esse eveniet beatae laudantium, illum itaque voluptates totam sint quidem ullam laboriosam libero neque, temporibus illo a." },
-        { id: "2", nome:"Gustavo Pereira", data:"08/03/2025 - 10h53", comentario: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab unde similique dolore labore esse eveniet beatae laudantium, illum itaque voluptates totam sint quidem ullam laboriosam libero neque, temporibus illo a." }
-    ]
+    useEffect(() => {
+        if (comentarios?.length === 0) {
+            setCarregando(false);
+        } else {
+            setCarregando(true);
+        }
 
-    return(
-        <div className="flex flex-col gap-10">
-            <Linha01/>
-            <div className="flex flex-col gap-6">
-                <div className="border-2 border-gray-300 rounded-md p-2">
-                    <h2 className="text-lg font-bold">Comentários</h2>
-                </div>
-                <div className="flex flex-col gap-10">
-                    {comentarios.map((item) => (
-                        <div key={item.id} className="flex flex-row gap-5">
-                            <div>
-                                <div className="flex rounded-xl w-14 h-14 bg-gray-300 justify-center items-center"><User/></div>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <div>
-                                    <h2 className="text-lg font-bold">{item.nome}</h2>
-                                    <p className="text-sm font-semibold text-gray-400">{item.data}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-400">{item.comentario}</p>
-                                </div>
-                            </div>                 
-                        </div>
-                    ))}    
+        setMontado(true);
+    }, [comentarios]);
+
+    const temComentarios = comentarios && comentarios.length > 0;
+
+    async function enviarComentario() {
+        if (!novoComentario.trim()) {
+            toast.error("Digite um comentário antes de enviar.");
+            return;
+        }
+
+        const resposta = await fazerComentarioEditalService(idEdital, { content: novoComentario });
+
+        if (resposta != 201) {
+            toast.error("Erro ao fazer comentário!");
+            return;
+        }
+
+        toast.success("Comentário enviado com sucesso!");
+        setNovoComentario("");
+        buscarComentariosEdital();
+    }
+
+    async function excluirComentario(id: string | undefined) {
+        const resposta = await excluirComentarioEditalService(id);
+        
+        if (resposta != 204) {
+            toast.error("Erro ao excluir comentário!");
+            return;
+        }
+
+        toast.success("Comentário excluido com sucesso!");
+        buscarComentariosEdital();
+    }
+
+    return (
+        montado &&
+        <div className="flex flex-col gap-10 h-full">
+            <div className="bg-white sticky top-0 z-10">
+                <div className="border bg-white border-gray-300 rounded-md p-3">
+                    <h2 className="text-xl font-bold">Comentários</h2>
                 </div>
             </div>
+
+            <div className="flex-1 flex flex-col gap-6 overflow-y-auto tela-comentario">
+                {!temComentarios ? (
+                    
+                    carregando ? (
+                        <div className="flex flex-col items-center">
+                            <p>Carregando comentarios..</p>
+                            <IconLoader2 className="animate-spin" />
+                        </div>
+                    ) : (
+                        <div className="flex flex-col justify-between items-center gap-10">
+                        {mostrarFormulario ? (
+                            <div className="flex flex-col gap-4 w-full px-4">
+                                <Textarea
+                                    placeholder="Escreva um comentário"
+                                    className="w-full"
+                                    value={novoComentario}
+                                    onChange={(e) => setNovoComentario(e.target.value)}
+                                />
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    className="bg-vermelho hover:cursor-pointer"
+                                    style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                                    onClick={enviarComentario}
+                                >
+                                    <Send size={17} className="mr-2" />
+                                    Enviar comentário
+                                </Button>
+                            </div>
+                        ) : (
+                            <>
+                                <p className="text-lg animate-pulse text-gray-400">
+                                    Nenhum comentário ainda para este edital
+                                </p>
+                                <Button
+                                    type="button"
+                                    className="bg-vermelho hover:cursor-pointer"
+                                    variant="destructive"
+                                    style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                                    onClick={() => setMostrarFormulario(true)}
+                                >
+                                    <Plus className="mr-2" />
+                                    <span>Adicionar comentário</span>
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                    )
+                    
+                    
+                ) : (
+                    <div className="flex flex-col gap-10 pr-5">
+                        {comentarios.map((item) => (
+                            <div key={item.id} className="flex flex-row gap-5 bg-slate-50 rounded-xl p-5 border border-gray-10">
+                                <div>
+                                    <div className="flex rounded-xl w-14 h-14 bg-gray-300 justify-center items-center">
+                                        <User />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-3 relative w-full">
+                                    <div>
+                                        <h2 className="text-lg font-bold">{item.author?.username}</h2>
+                                        <p className="text-sm font-semibold text-gray-400">
+                                            {formatarData(item.created_at)}
+                                        </p>
+                                    </div>
+                                    <p className="text-sm font-semibold text-gray-400 max-h-24 overflow-y-auto">
+                                        {item.content}
+                                    </p>
+
+                                    <div className="flex items-center gap-2 absolute right-0 top-0">
+                                        <Button
+                                            title="Editar comentário"
+                                            variant={"outline"}
+                                            size={"icon"}
+                                            className="h-6 w-6 p-[14px] border-gray-300 rounded-sm hover:cursor-pointer"
+                                        >
+                                            <PencilLine />
+                                        </Button>
+
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    size={"icon"}
+                                                    className="
+                                                        h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
+                                                        text-white transition-all rounded-sm p-[14px]
+                                                    ">
+                                                    <Trash />
+                                                </Button>
+                                            </DialogTrigger>
+
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle>Excluir comentário</DialogTitle>
+                                                    <DialogDescription>
+                                                        Tem certeza que deseja excluir este comentário?
+                                                    </DialogDescription>
+                                                </DialogHeader>
+
+                                                <DialogFooter>
+                                                    <DialogClose>Cancelar</DialogClose>
+                                                    <Button variant="destructive" className="hover:cursor-pointer bg-vermelho" onClick={() => excluirComentario(item.id)}>Excluir</Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
-    )
+    );
 }
