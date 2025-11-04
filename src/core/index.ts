@@ -4,6 +4,7 @@ import { Ramo } from "./ramo/Ramo";
 import { Taxonomia } from "./taxonomia/Taxonomia";
 import { Edital, ListaEditais } from "./edital/Edital"
 import { Usuario } from "./usuario/Usuario";
+import { KpiStats, DocumentCountByUnitList, TypificationUsageList, IInfoBarItem, IChartData } from "./stats/Stats"
 
 export type {
     Fonte,
@@ -12,5 +13,10 @@ export type {
     Taxonomia,
     Edital,
     Usuario,
-    ListaEditais
+    ListaEditais,
+    KpiStats,
+    DocumentCountByUnitList,
+    TypificationUsageList,
+    IInfoBarItem,
+    IChartData,
 };
