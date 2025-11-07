@@ -177,217 +177,206 @@ export default function Tipificacoes() {
 
     return (
         <div>
-            <div className="flex flex-col gap-7">
-                <div className="flex justify-between w-full top-0 items-center bg-white">
-                    <p className="text-4xl font-bold">Gestão de tipificações</p>
-
-                    <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant={"destructive"}
-                                style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
-                                className={`
-                                    flex rounded-md gap-2 items-center px-4 py-2
-                                    transition duration-100
-                                    bg-vermelho text-white
-                                    hover:cursor-pointer
-                                `}
-                            >
-                                <Plus size={18} />
-                                <p className="text-white text-sm">Adicionar tipificação</p>
-                            </Button>
-                        </DialogTrigger>
-
-                        <DialogContent onCloseAutoFocus={limparCampos}>
-                            <DialogHeader>
-                                <DialogTitle className="text-3xl font-bold">
-                                    Adicionar tipificação
-                                </DialogTitle>
-
-                                <DialogDescription className="text-md pb-4">
-                                    Preencha os campos abaixo para adicionar uma nova tipificação
-                                </DialogDescription>
-                            </DialogHeader>
-
-                            <form onSubmit={handleSubmit(adicionarTipificacao)} className="flex text-lg flex-col gap-4">
-                                <p className="flex flex-col gap-2">
-                                    <Label htmlFor="nome" className="text-lg">Nome da tipificação</Label>
-                                    <Input
-                                        {...register("nome")}
-                                        type="text"
-                                        className="border-2 border-gray-300 rounded-md p-2 w-full"
-                                    />
-                                    {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
-                                </p>
-
-                                <p className="flex flex-col gap-2">
-                                    <Label className="text-lg">Fontes</Label>
-                                    <Controller 
-                                        name="fontesSelecionadas"
-                                        control={control}
-                                        render={({ field }) => (   
-                                            <Select
-                                                value=""
-                                                onValueChange={(value) => {
-                                                    field.onChange([...field.value, value]);
-                                                    const fonteEncontrada = fontes.find(fonte => fonte.id === value);
-                                                    // setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
-                                                    // const novaFonteId = e.target.value;
-                                                    // const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
-// 
-                                                    // if (!fonteJaSelecionada) {
-                                                    //     const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
-                                                    //     setValue("fontesSelecionadas", novasFontes);
-                                                    //     setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
-                                                    // }
-
-                                                    if (fonteEncontrada) {
-                                                        setFontesSelecionadas([...fontesSelecionadas, fonteEncontrada]);
-                                                    }
-                                                }}
-                                            >
-                                                <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Selecione uma ou mais fontes" />
-                                                </SelectTrigger>
-
-                                                <SelectContent>
-                                                    <SelectGroup>
-                                                    
-                                                    <SelectLabel>Fontes</SelectLabel>
-                                                    {fontes && fontes.filter(fonte => !fontesSelecionadas.some(fonte => fonte.id === fonte.id)).map((fonte, index) => (
-                                                        <SelectItem
-                                                            key={index}
-                                                            value={fonte.id}
-                                                            className="p-2 rounded-sm"
-                                                        >
-                                                            {fonte.name}
-                                                        </SelectItem>
-                                                    ))}
-
-                                                    {
-                                                        fontes?.length === fontesSelecionadas.length && (
-                                                            <SelectItem
-                                                                value="Todos"
-                                                                className="hover:cursor-pointer"
-                                                                disabled
-                                                            >
-                                                                Nenhuma fonte para selecionar
-                                                            </SelectItem>
-                                                        )
-                                                    }
-                                                    </SelectGroup>
-                                                </SelectContent>
-                                            </Select>
-                                        )}
-                                    />
-                                    {errors.fontesSelecionadas && (
-                                        <span className="text-red-500 text-sm italic">{errors.fontesSelecionadas.message}</span>
-                                    )}
-                                </p>
-
-                                {
-                                    fontesSelecionadas.length > 0 && (
-                                        <div className="flex flex-col gap-3 w-full">
-                                            <Label htmlFor="tipe" className="text-lg">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
-                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
-                                                {
-                                                    fontesSelecionadas.map((fonte: Fonte) => (
-                                                        <div key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                            <button onClick={() => {
-                                                                const novaLista = fontesSelecionadas.filter((f) => f.id !== fonte.id)
-                                                                setFontesSelecionadas(novaLista);
-                                                                setValue("fontesSelecionadas", [""]);
-                                                            }}>
-                                                                <div className="flex items-center" title="Remover usuário">
-                                                                    <span
-                                                                        className="
-                                                                            bg-red-200 p-[10px]
-                                                                            hover:bg-red-400 hover:cursor-pointer hover:text-white
-                                                                            transition-all duration-200 ease-in-out
-                                                                        "
-                                                                    >
-                                                                        <X className="w-4 h-4" />
-                                                                    </span>
-                                                                </div>
-                                                            </button>
-                                                            <p className=" w-full text-sm">{fonte.name}</p>
-                                                        </div>
-                                                    ))
-                                                }
-                                            </div>
-                                        </div>
-                                    )
-                                }
-
-                                <DialogFooter>
-                                    <DialogClose
-                                        className={`
-                                                transition ease-in-out text-white
-                                                rounded-md px-3 bg-vermelho
-                                                hover:cursor-pointer text-sm
-                                            `}
-                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                    >
-                                        Cancelar
-                                    </DialogClose>
-
-                                    <Button
-                                        type="submit"
-                                        className={`
-                                            flex bg-verde hover:bg-verde
-                                            text-white hover:cursor-pointer
-                                            active:scale-100
-                                        `}
-                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                    >
-                                        Salvar
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-
-                        </DialogContent>
-
-                    </Dialog>
-                </div>
-
-                <div className="flex w-1/2 relative">
-                                            
-                    <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
-
-                    { 
-                        termoBusca.current !== "" && (
-                            <span
-                                onClick={() => {
-                                    setTipificacoesFiltradas(tipificacoes);
-                                    termoBusca.current = "";
-                                    const tipsFiltradas = filtrarTipificacao();
-                                    setTipificacoesFiltradas(tipsFiltradas || []); 
-                                }}
-                                className="hover:cursor-pointer"
-                                title="Limpar pesquisa"
-                            >
-                                <X className="absolute mt-1 translate-y-1/2 right-2" size={17} />
-                            </span>
-                        )
-                    }
+            <div className="flex flex-col gap-5 pb-10">
+                <div className="flex flex-col gap-2 sticky top-0 z-10 bg-white pb-4 justify-between w-full items-center">
+                    <div className="flex items-center justify-between w-full">
+                        <p className="text-4xl font-bold">Gestão de tipificações</p>
+                        <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant={"destructive"}
+                                    style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
+                                    className={`
+                                        flex rounded-md gap-2 items-center px-4 py-2
+                                        transition duration-100
+                                        bg-vermelho text-white
+                                        hover:cursor-pointer
+                                    `}
+                                >
+                                    <Plus size={18} />
+                                    <p className="text-white text-sm">Adicionar tipificação</p>
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent onCloseAutoFocus={limparCampos}>
+                                <DialogHeader>
+                                    <DialogTitle className="text-3xl font-bold">
+                                        Adicionar tipificação
+                                    </DialogTitle>
+                                    <DialogDescription className="text-md pb-4">
+                                        Preencha os campos abaixo para adicionar uma nova tipificação
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={handleSubmit(adicionarTipificacao)} className="flex text-lg flex-col gap-4">
+                                    <p className="flex flex-col gap-2">
+                                        <Label htmlFor="nome" className="text-lg">Nome da tipificação</Label>
+                                        <Input
+                                            {...register("nome")}
+                                            type="text"
+                                            className="border-2 border-gray-300 rounded-md p-2 w-full"
+                                        />
+                                        {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
+                                    </p>
+                                    <p className="flex flex-col gap-2">
+                                        <Label className="text-lg">Fontes</Label>
+                                        <Controller
+                                            name="fontesSelecionadas"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Select
+                                                    value=""
+                                                    onValueChange={(value) => {
+                                                        field.onChange([...field.value, value]);
+                                                        const fonteEncontrada = fontes.find(fonte => fonte.id === value);
+                                                        // setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
+                                                        // const novaFonteId = e.target.value;
+                                                        // const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
+                                                        // if (!fonteJaSelecionada) {
+                                                        //     const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
+                                                        //     setValue("fontesSelecionadas", novasFontes);
+                                                        //     setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
+                                                        // }
+                                                        if (fonteEncontrada) {
+                                                            setFontesSelecionadas([...fontesSelecionadas, fonteEncontrada]);
+                                                        }
+                                                    }}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Selecione uma ou mais fontes" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
                         
-                    <Input
-                        type="text"
-                        value={termoBusca.current}
-                        placeholder="Pesquisar"
-                        className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                        onChange={(e) => { 
-                            termoBusca.current = e.target.value;
-                            const tipsFiltradas = filtrarTipificacao();
-                            setTipificacoesFiltradas(tipsFiltradas || []);
-                        }}
-                    />
+                                                        <SelectLabel>Fontes</SelectLabel>
+                                                        {fontes && fontes.filter(fonte => !fontesSelecionadas.some(fonte => fonte.id === fonte.id)).map((fonte, index) => (
+                                                            <SelectItem
+                                                                key={index}
+                                                                value={fonte.id}
+                                                                className="p-2 rounded-sm"
+                                                            >
+                                                                {fonte.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                        {
+                                                            fontes?.length === fontesSelecionadas.length && (
+                                                                <SelectItem
+                                                                    value="Todos"
+                                                                    className="hover:cursor-pointer"
+                                                                    disabled
+                                                                >
+                                                                    Nenhuma fonte para selecionar
+                                                                </SelectItem>
+                                                            )
+                                                        }
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
+                                        {errors.fontesSelecionadas && (
+                                            <span className="text-red-500 text-sm italic">{errors.fontesSelecionadas.message}</span>
+                                        )}
+                                    </p>
+                                    {
+                                        fontesSelecionadas.length > 0 && (
+                                            <div className="flex flex-col gap-3 w-full">
+                                                <Label htmlFor="tipe" className="text-lg">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
+                                                <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                                    {
+                                                        fontesSelecionadas.map((fonte: Fonte) => (
+                                                            <div key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                                <button onClick={() => {
+                                                                    const novaLista = fontesSelecionadas.filter((f) => f.id !== fonte.id)
+                                                                    setFontesSelecionadas(novaLista);
+                                                                    setValue("fontesSelecionadas", [""]);
+                                                                }}>
+                                                                    <div className="flex items-center" title="Remover usuário">
+                                                                        <span
+                                                                            className="
+                                                                                bg-red-200 p-[10px]
+                                                                                hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                                transition-all duration-200 ease-in-out
+                                                                            "
+                                                                        >
+                                                                            <X className="w-4 h-4" />
+                                                                        </span>
+                                                                    </div>
+                                                                </button>
+                                                                <p className=" w-full text-sm">{fonte.name}</p>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                    <DialogFooter>
+                                        <DialogClose
+                                            className={`
+                                                    transition ease-in-out text-white
+                                                    rounded-md px-3 bg-vermelho
+                                                    hover:cursor-pointer text-sm
+                                                `}
+                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                        >
+                                            Cancelar
+                                        </DialogClose>
+                                        <Button
+                                            type="submit"
+                                            className={`
+                                                flex bg-verde hover:bg-verde
+                                                text-white hover:cursor-pointer
+                                                active:scale-100
+                                            `}
+                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                                        >
+                                            Salvar
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+
+                    <div className="flex w-full relative top-0">
+                                            
+                        <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
+                        {
+                            termoBusca.current !== "" && (
+                                <span
+                                    onClick={() => {
+                                        setTipificacoesFiltradas(tipificacoes);
+                                        termoBusca.current = "";
+                                        const tipsFiltradas = filtrarTipificacao();
+                                        setTipificacoesFiltradas(tipsFiltradas || []);
+                                    }}
+                                    className="hover:cursor-pointer"
+                                    title="Limpar pesquisa"
+                                >
+                                    <X className="absolute mt-1 translate-y-1/2 right-2" size={17} />
+                                </span>
+                            )
+                        }
+                        
+                        <Input
+                            type="text"
+                            value={termoBusca.current}
+                            placeholder="Pesquisar"
+                            className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                            onChange={(e) => {
+                                termoBusca.current = e.target.value;
+                                const tipsFiltradas = filtrarTipificacao();
+                                setTipificacoesFiltradas(tipsFiltradas || []);
+                            }}
+                        />
+                    </div>
                 </div>
+
+                
 
                 <Masonry
                     breakpointCols={breakpointColumns}
-                    className="flex relative gap-5 mb-10"
+                    className="flex relative gap-5 mb-10 px-1"
                 >
                     {tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? tipificacoesFiltradas.map((tipificacao, index) => (
                         <div
