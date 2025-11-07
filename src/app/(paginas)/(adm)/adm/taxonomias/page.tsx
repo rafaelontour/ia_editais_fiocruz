@@ -157,7 +157,6 @@ export default function Taxonomias() {
                 if (flagHook.current === true) return
                 setTaxonomiaSelecionada(null);
                 setIdSelecionado("");
-                setRamoParaVisualizar(null);
                 return
             }
 
@@ -165,7 +164,6 @@ export default function Taxonomias() {
                 if (flagHook.current === true) return
                 setTaxonomiaSelecionada(null);
                 setIdSelecionado("");
-                setRamoParaVisualizar(null);
                 return
             }
 
@@ -173,7 +171,6 @@ export default function Taxonomias() {
                 if (flagHook.current === true) return
                 setTaxonomiaSelecionada(null);
                 setIdSelecionado("");
-                setRamoParaVisualizar(null);
                 return
             }
         };
@@ -364,7 +361,6 @@ export default function Taxonomias() {
 
             const ramos = await buscarRamosDaTaxonomiaService(taxonomiaSelecionada?.id);
             setRamosOriginais(ramos || []);
-            setOpenDialogIdRamo(null);
         } catch (e) {
             return
         }
