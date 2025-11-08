@@ -96,7 +96,7 @@ export default function Taxonomias() {
     const [taxFiltradas, setTaxFiltradas] = useState<Taxonomia[] | undefined>([]);
 
     let termoBusca = useRef<string>("");
-    let tipificacaoFiltro = useRef<string>("");
+    let tipificacaoFiltro = useRef<string>("Todas");
 
     // async function getTaxonomias() {
     //     const taxs = await getTaxonomiasService()
@@ -126,8 +126,6 @@ export default function Taxonomias() {
         setTax(taxs || []);
     }
 
-    console.log("VALOR DO FILTRO: ", tipificacaoFiltro.current);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -152,9 +150,14 @@ export default function Taxonomias() {
     }, [openTaxonomiaId, fontes, setValue]);
 
     useEffect(() => {
+        setCarregandoTax(true)
         const t = filtrarTaxonomiasPorTipificacao();
         setTaxFiltradas(t);
-        setCarregandoTax(false);
+
+        if (tax.length) {
+           setCarregandoTax(false); 
+        }
+        
     }, [tax, termoBusca.current, tipificacaoFiltro.current]);
 
     // Função para verificar clique fora de uma taxonomia para atualizar os ramos e melhorar usabilidade
@@ -331,7 +334,7 @@ export default function Taxonomias() {
     const filtrarTaxonomiasPorTipificacao = () => {
         if (termoBusca.current === "") {
             // Se a pesquisa for só por nome da tipificação (Termo de busca é vazio)
-            if (tipificacaoFiltro.current === "" || tipificacaoFiltro.current === "Todas") {
+            if (tipificacaoFiltro.current === "Todas") {
                 return tax
             }
 
