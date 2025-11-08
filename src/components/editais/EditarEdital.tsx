@@ -18,9 +18,9 @@ import { UsuarioUnidade } from "@/core/usuario";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { toast } from "sonner";
-import { atualizarEditalService } from "@/service/edital";
+import { adicionarEditalService, atualizarEditalService } from "@/service/edital";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { getEditalArquivoService } from "@/service/editalArquivo";
+import { enviarArquivoService, getEditalArquivoService } from "@/service/editalArquivo";
 import { EditalArquivo } from "@/core/edital/Edital";
 import { IconFile } from "@tabler/icons-react";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "../ui/dialog";
@@ -110,9 +110,25 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     }
 
     async function atualizarEdital(data: formData) {
-        const resposta = await atualizarEditalService(edital.id, data);
 
-        if (resposta !== 200) {
+        const dados = {
+            name: data.nome,
+            identifier: data.identificador,
+            description: data.descricao,
+            typification_ids: data.tipificacoes,
+            editors_ids: responsaveisEdital.map(usuario => usuario.id)
+        }
+
+        const [r, idEdital] = (await adicionarEditalService(dados)) ?? [];
+
+        if (r !== 201) {
+            toast.error("Erro ao atualizar os dados do edital!", { description: "O documento/arquivo do edital só é substituído se as informações do edital também forem substituídas!" });
+            return
+        }
+
+        const resposta = await enviarArquivoService(edital.id, data.arquivo);
+
+        if (resposta !== 201) {
             toast.error("Erro ao atualizar edital!");
             return
         }

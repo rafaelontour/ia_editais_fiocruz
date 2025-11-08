@@ -226,15 +226,7 @@ export default function Tipificacoes() {
                                                     value=""
                                                     onValueChange={(value) => {
                                                         field.onChange([...field.value, value]);
-                                                        const fonteEncontrada = fontes.find(fonte => fonte.id === value);
-                                                        // setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
-                                                        // const novaFonteId = e.target.value;
-                                                        // const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
-                                                        // if (!fonteJaSelecionada) {
-                                                        //     const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
-                                                        //     setValue("fontesSelecionadas", novasFontes);
-                                                        //     setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
-                                                        // }
+                                                        const fonteEncontrada = fontes.find(fonte => fonte.id != value);
                                                         if (fonteEncontrada) {
                                                             setFontesSelecionadas([...fontesSelecionadas, fonteEncontrada]);
                                                         }
@@ -247,7 +239,7 @@ export default function Tipificacoes() {
                                                         <SelectGroup>
                         
                                                         <SelectLabel>Fontes</SelectLabel>
-                                                        {fontes && fontes.filter(fonte => !fontesSelecionadas.some(fonte => fonte.id === fonte.id)).map((fonte, index) => (
+                                                        {fontes && fontes.filter(fonte => !fontesSelecionadas.some(f => f.id === fonte.id)).map((fonte, index) => (
                                                             <SelectItem
                                                                 key={index}
                                                                 value={fonte.id}
@@ -461,15 +453,6 @@ export default function Tipificacoes() {
                                                                 onValueChange={(value) => {
                                                                     field.onChange([...field.value, value]);
                                                                     const fonteEncontrada = fontes.find(fonte => fonte.id === value);
-                                                                    // setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
-                                                                    // const novaFonteId = e.target.value;
-                                                                    // const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
-                // 
-                                                                    // if (!fonteJaSelecionada) {
-                                                                    //     const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
-                                                                    //     setValue("fontesSelecionadas", novasFontes);
-                                                                    //     setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
-                                                                    // }
 
                                                                     if (fonteEncontrada) {
                                                                         setFontesSelecionadas([...fontesSelecionadas, fonteEncontrada]);
@@ -484,7 +467,7 @@ export default function Tipificacoes() {
                                                                     <SelectGroup>
                                                                     
                                                                     <SelectLabel>Fontes</SelectLabel>
-                                                                    {fontes && fontes.filter(fonte => !fontesSelecionadas.some(fonte => fonte.id === fonte.id)).map((fonte, index) => (
+                                                                    {fontes && fontes.filter(fonte => !fontesSelecionadas.some(f => f.id === fonte.id)).map((fonte, index) => (
                                                                         <SelectItem
                                                                             key={index}
                                                                             value={fonte.id}

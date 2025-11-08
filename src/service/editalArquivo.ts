@@ -22,10 +22,11 @@ async function getEditalArquivoService(id: string | null | undefined): Promise<a
 }
 
 
-async function enviarArquivoService(idEdital: string | undefined, arquivo: File): Promise<number | undefined> {
+async function enviarArquivoService(idEdital: string | undefined, arquivo: File | undefined | null): Promise<number | undefined> {
     try {
         const formData = new FormData();
-        formData.append('file', arquivo);
+        formData.append('file', arquivo!);
+
 
         const res = await fetch(`${urlBase}/doc/${idEdital}/release/`, {
             method: "POST",

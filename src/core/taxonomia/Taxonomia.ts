@@ -11,6 +11,7 @@ export interface Taxonomia {
     sources?: Fonte[];
     branches?: Ramo[];
     tip_assoc?: string;
+    tip_assoc_id?: string;
     created_at?: string;
     updated_at?: string;
 }
