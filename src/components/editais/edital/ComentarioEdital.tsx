@@ -24,6 +24,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
     const [montado, setMontado] = useState<boolean>(false);
     const [dialogComentario, setDialogComentario] = useState<string | null>(null);
     const [abrirDialogAdicionar, setAbrirDialogAdicionar] = useState(false);
+     const [enviandoComentario, setEnviandoComentario] = useState<boolean>(false);
 
     const { usuario } = useUsuario();
 
@@ -40,22 +41,28 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
     const temComentarios = comentarios && comentarios.length > 0;
 
     async function enviarComentario() {
+        setEnviandoComentario(true);
         if (!novoComentario.trim()) {
             toast.warning("Digite um comentário antes de enviar.");
+            setEnviandoComentario(false);
             return;
         }
 
         const resposta = await fazerComentarioEditalService(edital?.id, { content: novoComentario });
-
+        
         if (resposta != 201) {
             toast.error("Erro ao fazer comentário!");
             return;
         }
-
         toast.success("Comentário enviado com sucesso!");
         setAbrirDialogAdicionar(false);
         setNovoComentario("");
         buscarComentariosEdital();
+        
+        setTimeout(() => {
+            setEnviandoComentario(false);
+        }, 500)
+
     }
 
     async function excluirComentario(id: string | undefined) {
@@ -113,19 +120,33 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
 
                                         <DialogFooter>
                                             <DialogClose>
-                                                <Button variant={"outline"} className="hover:cursor-pointer">
-                                                    Cancelar
-                                                </Button>
+                                                {
+                                                    !enviandoComentario && (
+                                                        <Button variant={"outline"} className="hover:cursor-pointer">
+                                                            Cancelar
+                                                        </Button>
+                                                    )
+                                                }
                                             </DialogClose>
 
                                             <Button
+                                                title={enviandoComentario ? "Enviando comentário..." : "Enviar comentário"}
                                                 type="button"
+                                                disabled={enviandoComentario}
                                                 variant="destructive"
-                                                className="bg-vermelho hover:cursor-pointer"
+                                                className={`bg-vermelho hover:cursor-pointer ${enviandoComentario && "cursor-not-allowed bg-red-400"}`} 
                                                 onClick={enviarComentario}
                                             >
-                                                <Send size={17} className="mr-2" />
-                                                Enviar comentário
+                                                {
+                                                    enviandoComentario ? (
+                                                        <IconLoader2 className="animate-spin" />
+                                                    ) : (
+                                                        <div className="flex items-center gap-2">
+                                                            <Send size={17} className="mr-2" />
+                                                            <p>Enviar comentário</p>
+                                                        </div>
+                                                    )
+                                                }
                                             </Button>
                                         </DialogFooter>
                                     </DialogContent>

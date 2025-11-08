@@ -5,15 +5,14 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
 import { getTipificacoesService, adicionarTipificacaoService, excluirTipificacaoService, atualizarTipificacaoService } from "@/service/tipificacao";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, ChevronRightIcon, PencilLine, Plus, Search, Trash, X } from "lucide-react";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Calendar, PencilLine, Plus, Search, Trash, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
 import { formatarData } from "@/lib/utils";
@@ -23,7 +22,7 @@ import { Input } from "@/components/ui/input";
 const schemaTipificacao = z.object({
     nome: z.string().min(1, "O nome da tipificação é obrigatório"),
     fontesSelecionadas: z
-        .array(z.string().min(1)).min(1, "Selecione pelo menos uma fonte")
+        .array(z.string().min(0)).min(0, "Selecione pelo menos uma fonte")
 })
 
 export default function Tipificacoes() {
@@ -217,7 +216,15 @@ export default function Tipificacoes() {
                                         {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
                                     </p>
                                     <p className="flex flex-col gap-2">
-                                        <Label className="text-lg">Fontes</Label>
+                                        <Label className="text-lg">
+                                            Fontes
+                                            <span
+                                                style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .5)" }}
+                                                className="text-xs px-2 py-1 rounded-md bg-yellow-400 italic"
+                                            >
+                                                opcional
+                                            </span>
+                                        </Label>
                                         <Controller
                                             name="fontesSelecionadas"
                                             control={control}
@@ -226,10 +233,14 @@ export default function Tipificacoes() {
                                                     value=""
                                                     onValueChange={(value) => {
                                                         field.onChange([...field.value, value]);
-                                                        const fonteEncontrada = fontes.find(fonte => fonte.id != value);
+                                                        const fonteEncontrada = fontes.find(fonte => fonte.id === value);
+
+                                                        console.log("fonte encontrada pra dcolocar na lsita de ja selecionado: ", fonteEncontrada)
                                                         if (fonteEncontrada) {
                                                             setFontesSelecionadas([...fontesSelecionadas, fonteEncontrada]);
                                                         }
+
+                                                        console.log("fontes ja selec8i0onada: ", fontesSelecionadas)
                                                     }}
                                                 >
                                                     <SelectTrigger className="w-full">
@@ -239,7 +250,7 @@ export default function Tipificacoes() {
                                                         <SelectGroup>
                         
                                                         <SelectLabel>Fontes</SelectLabel>
-                                                        {fontes && fontes.filter(fonte => !fontesSelecionadas.some(f => f.id === fonte.id)).map((fonte, index) => (
+                                                        {fontes && fontes.filter(f => !fontesSelecionadas.some(fonte => fonte.id === f.id)).map((fonte, index) =>(
                                                             <SelectItem
                                                                 key={index}
                                                                 value={fonte.id}
@@ -381,12 +392,10 @@ export default function Tipificacoes() {
                         >
                             <div className="flex flex-col gap-2">
                                 <h2 className="text-2xl font-semibold">{tipificacao.name}</h2>
-                                <p className={`bg-zinc-400 py-1 px-2 text-white rounded-md border-1 border-gray-300 w-fit text-sm`}>
-                                    Lei: {tipificacao.name}
-                                </p>
-                                <p className={`bg-zinc-400 py-1 px-2 text-white rounded-md border-1 border-gray-300 w-fit text-sm`}>
-                                    Lei Complementar: {tipificacao.name}
-                                </p>
+
+                                {/* <p className={`bg-zinc-400 py-1 px-2 text-white rounded-md border-1 border-gray-300 w-fit text-sm`}>
+                                    Lei Complementar: {tipificacao.}
+                                </p> */}
                             </div>
 
                             <div className="flex justify-between items-center mt-3">
@@ -443,7 +452,15 @@ export default function Tipificacoes() {
                                                 </p>
 
                                                 <p className="flex flex-col gap-2">
-                                                    <Label className="text-lg">Fontes</Label>
+                                                    <Label className="text-lg">
+                                                        Fontes
+                                                        <span
+                                                            style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .5)" }}
+                                                            className="text-xs px-2 py-1 rounded-md bg-yellow-400 italic"
+                                                        >
+                                                            opcional
+                                                        </span>
+                                                    </Label>
                                                     <Controller 
                                                         name="fontesSelecionadas"
                                                         control={control}

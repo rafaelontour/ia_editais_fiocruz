@@ -15,7 +15,6 @@ import { formatarData } from "@/lib/utils";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
-import { EditalArquivo } from "@/core/edital/Edital";
 
 
 interface Props {
@@ -117,13 +116,18 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                         )
                     }
                 </div>
+                
+                <hr className="my-1" />
 
                 <div
                     className="
-                        flex justify-between items-center
+                        flex flex-col items-start 
                     "
                 >
-                    <div className="flex flex-col-reverse text-md justify-between mt-2">
+                    <p><strong>Número do edital</strong>: {edital.identifier}</p>
+
+                    <div className="flex text-md justify-between">
+                        <span className="font-semibold">Criado em: &nbsp;</span>
                         <span>{formatarData(edital.created_at)}</span>
                     </div>
 
@@ -192,28 +196,28 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
                         </div>
                     </div>
-                </div>
+                    <div>
 
-                <div>
-
-                    <h4 className="font-semibold">
-                    {
-                        edital.editors && edital.editors?.length > 1 ? (
-                            "Responsáveis: "
-                        ) : (
-                            "Responsável: "
-                        )
-                    }
-                    </h4>
-
-                    <ul>
+                        <h4 className="font-semibold">
                         {
-                            edital.editors?.map((editor, index) => (
-                                <li key={index} className="list-disc text-md ml-4">{editor.username}</li>
-                            ))
+                            edital.editors && edital.editors?.length > 1 ? (
+                                "Responsáveis: "
+                            ) : (
+                                "Responsável: "
+                            )
                         }
-                    </ul>
+                        </h4>
+
+                        <ul>
+                            {
+                                edital.editors?.map((editor, index) => (
+                                    <li key={index} className="list-disc text-md ml-4">{editor.username}</li>
+                                ))
+                            }
+                        </ul>
+                    </div>
                 </div>
+
             </div>
         </div>
     );

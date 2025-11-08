@@ -16,10 +16,6 @@ export default function SuperiorEditais ({ funcaoAtualizarEditais, flagEdital } 
 
     const { usuario } = useUsuario();
 
-    const status = [
-        { nome:"Retrabalhando", color:"green" },
-        { nome:"Retrabalhar", color:"red" }
-    ]
 
     return(
         <div className="flex felx-row justify-between items-center gap-5 px-2 h-12">

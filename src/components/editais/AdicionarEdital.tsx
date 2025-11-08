@@ -96,6 +96,11 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         const [resposta, idEdital] = (await adicionarEditalService(dados)) ?? [];
 
         if (resposta !== 201) {
+            if (resposta === 409) {
+                toast.error("Erro ao enviar edital!", { description: "Ja existe um edital com esse identificador!" });
+                return
+            }
+
             toast.error("Erro ao enviar edital!");
             return
         }

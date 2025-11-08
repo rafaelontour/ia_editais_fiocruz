@@ -44,7 +44,7 @@ async function getTipificacaoPorIdService(id: string | undefined): Promise<Tipif
     }
 }
 
-async function adicionarTipificacaoService(nome: string, fontesSelecionadas: Fonte[]): Promise<Tipificacao> {
+async function adicionarTipificacaoService(nome: string, fontesSelecionadas: Fonte[]): Promise<Tipificacao | null> {
     const url = `${urlBase}/typification/`
 
     try {
@@ -61,14 +61,15 @@ async function adicionarTipificacaoService(nome: string, fontesSelecionadas: Fon
             })
         })
 
+
         if (dados.status !== 201) {
-            throw new Error('Erro ao adicionar tipificacao no try/catch')
+            return null
         }
 
         const tipificacao = await dados.json()
         return tipificacao
     } catch (error) {
-        throw new Error("Erro ao adicionar tipificacao: " + error)
+        return null
     }
 }
 
