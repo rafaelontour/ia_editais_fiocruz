@@ -120,7 +120,7 @@ export default function RootLayout({
 
               <SidebarFooter>
                 <div className="flex items-center gap-4">
-                  <Image className="rounded-md" src="https://picsum.photos/100" alt="Logo" width={32} height={32} />
+                  <img className="w-fit" src="/logo_ia_editais.png" alt="Logo IAEditais" />
                   <h1 className="text-lg font-semibold">
                   </h1>
                 </div>
