@@ -53,9 +53,19 @@ function iconeParaStatusDoEdital(status: StatusEdital): React.ReactNode {
   }
 }
 
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function simularAtraso(intervalo: number) {
+    await sleep(intervalo);
+}
+
+
 export {
   formatarData,
   getStatusColor,
   verificarStatusEdital,
-  iconeParaStatusDoEdital
+  iconeParaStatusDoEdital,
+  simularAtraso
 };

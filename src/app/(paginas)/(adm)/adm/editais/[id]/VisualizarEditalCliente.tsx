@@ -75,7 +75,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
                         className="pointer-events-none flex items-center gap-2 px-3 py-1 rounded-md text-white font-semibold"
                         style={{
                             backgroundColor: getStatusColor(edital?.history ? edital.history[0].status : "PENDING"),
-                            boxShadow: "0 0 3px rgba(0, 0, 0, .5)"
+                            // boxShadow: "0 0 3px rgba(0, 0, 0, .5)"
                         }}
                     >
                         <span>{edital?.history && verificarStatusEdital(edital?.history[0].status)}</span>
@@ -85,7 +85,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
                 
                 <div className={`flex items-center gap-2 ${enviouAnaliseOuConcluido && "cursor-not-allowed"}`}>
                     {
-                        (usuario?.access_level !== "AUDITOR" && edital?.history && edital?.history[0].status === "UNDER_CONSTRUCTION") && (
+                        /* (usuario?.access_level !== "AUDITOR" && edital?.history && edital?.history[0].status === "UNDER_CONSTRUCTION") && (
                             <Button
                                 disabled={enviouAnaliseOuConcluido}
                                 className="hover:cursor-pointer flex items-center bg-red-500 hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
@@ -93,7 +93,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
                                 <Play size={30} />
                                 <span className="text-[16px]">Analisar nova versão</span>
                             </Button>
-                        )
+                        ) */
                     }
 
                     {

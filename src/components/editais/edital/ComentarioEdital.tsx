@@ -3,10 +3,11 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Textarea } from "@/components/ui/textarea";
 import { Comentario, Edital } from "@/core/edital/Edital";
 import useUsuario from "@/data/hooks/useUsuario";
-import { formatarData } from "@/lib/utils";
+import { formatarData, simularAtraso } from "@/lib/utils";
 import { excluirComentarioEditalService, fazerComentarioEditalService } from "@/service/comentarioEdital";
 import { getEditalPorIdService } from "@/service/edital";
 import { IconLoader2 } from "@tabler/icons-react";
+import { time } from "console";
 import { PencilLine, Plus, Send, Trash, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -41,12 +42,13 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
     const temComentarios = comentarios && comentarios.length > 0;
 
     async function enviarComentario() {
-        setEnviandoComentario(true);
         if (!novoComentario.trim()) {
             toast.warning("Digite um comentário antes de enviar.");
             setEnviandoComentario(false);
             return;
         }
+        
+        setEnviandoComentario(true);
 
         const resposta = await fazerComentarioEditalService(edital?.id, { content: novoComentario });
         
@@ -174,17 +176,27 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                         className="w-full"
                                         value={novoComentario}
                                         onChange={(e) => setNovoComentario(e.target.value)}
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        className="bg-vermelho hover:cursor-pointer"
-                                        style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
-                                        onClick={enviarComentario}
-                                    >
-                                        <Send size={17} className="mr-2" />
-                                        Enviar comentário
+                                    /> 
+
+                                    {
+                                    enviandoComentario ? (
+                                        <div className={`flex w-full justify-center items-center rounded-md py-2 bg-vermelho ${enviandoComentario && "cursor-not-allowed bg-red-400"}`} >
+                                            <IconLoader2 color="white" className="animate-spin" />
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            className="bg-vermelho hover:cursor-pointer"
+                                            style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                                            onClick={enviarComentario}
+                                        >
+                                            <Send size={17} className="mr-2" />
+                                            Enviar comentário
                                     </Button>
+                                    )
+                                }
+                                    
                                 </div>
                             ) : (
                                 <>

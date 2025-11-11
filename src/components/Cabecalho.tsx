@@ -17,7 +17,7 @@ export default function Cabecalho() {
 
     const [unidade, setUnidade] = useState<Unidade | null>(null);
     const [cargo, setCargo] = useState<string | null>(null);
-    const [carregandoInfo, setCarregandoInfo] = useState<boolean>(true);
+    const versaoPlataforma: string | undefined = process.env.NEXT_PUBLIC_VERSAO_PLATAFORMA;
 
     // Função para buscar dados da unidade e definir cargo
     async function carregarInfoUsuario() {
@@ -66,7 +66,7 @@ export default function Cabecalho() {
                             text-white px-3 py-2 text-sm italic select-none
                             ${unidade ? "transiotion-all duration-500 ease-in-out delay-100" : "opacity-0"}
                             `}
-                            >
+                    >
                         <UserCog2Icon size={16} />
                         <p className="flex items-center">
                             <span className="font-semibold">{cargo}</span>
@@ -82,7 +82,7 @@ export default function Cabecalho() {
                 initial={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
             >
-                Versão da plataforma: 1.0.0
+                Versão da plataforma: { versaoPlataforma }
             </motion.div>
 
             {/* Botão login/logout */}
