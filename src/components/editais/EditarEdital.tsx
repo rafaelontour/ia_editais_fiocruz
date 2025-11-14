@@ -112,6 +112,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     async function atualizarEdital(data: formData) {
 
         const dados = {
+            id: edital.id,
             name: data.nome,
             identifier: data.identificador,
             description: data.descricao,
@@ -119,9 +120,14 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             editors_ids: responsaveisEdital.map(usuario => usuario.id)
         }
 
-        const [r, idEdital] = (await adicionarEditalService(dados)) ?? [];
+        console.log("dados pra entviar: ", dados);
 
-        if (r !== 201) {
+        const r = await atualizarEditalService(dados);
+
+        console.log("r: ", r);
+
+
+        if (r !== 200) {
             toast.error("Erro ao atualizar os dados do edital!", { description: "O documento/arquivo do edital só é substituído se as informações do edital também forem substituídas!" });
             return
         }
