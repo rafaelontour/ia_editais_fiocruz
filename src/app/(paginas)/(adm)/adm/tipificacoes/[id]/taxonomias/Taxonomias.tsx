@@ -37,9 +37,10 @@ import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import { _undefined } from "zod/v4/core";
 
 const schemaTaxonomia = z.object({
-    id_tipificacao: z.array(z.string().min(1)),
+    id_tipificacao: z.string().min(1),
     titulo: z.string().min(1, "O título da taxonomia é obrigatório!"),
     descricao: z.string().min(6, "A descrição da taxonomia é obrigatória!"),
     fontesSelecionadas: z.array(z.string().min(1)).min(1, "Selecione pelo menos uma fonte"),
@@ -58,7 +59,7 @@ export default function Taxonomias({ id }: { id: string }) {
     const { register, handleSubmit, control, formState: { errors }, setValue, reset } = useForm<FormData>({
         resolver: zodResolver(schemaTaxonomia),
         defaultValues: {
-            fontesSelecionadas: []
+            fontesSelecionadas: [],
         }
     })
 
@@ -94,17 +95,10 @@ export default function Taxonomias({ id }: { id: string }) {
     const [ramoSelecionado, setRamoSelecionado] = useState<Ramo | null | undefined>(null);
 
     const divRefs = useRef<Record<string, HTMLDivElement | HTMLButtonElement | null>>({});
-    const [taxFiltradas, setTaxFiltradas] = useState<Taxonomia[] | undefined>([]);
+    const [taxFiltradas, setTaxFiltradas] = useState<any[]>([]);
 
     let termoBusca = useRef<string>("");
-    let tipificacaoFiltro = useRef<string>("Todas");
 
-    // async function getTaxonomias() {
-    //     const taxs = await getTaxonomiasService()
-
-    //     setTax(taxs || []);
-    //     setTaxFiltradas(taxs || []);
-    // }
 
     async function getFontes() {
         const fnts = await getFontesService()
@@ -118,18 +112,28 @@ export default function Taxonomias({ id }: { id: string }) {
     }
 
     async function getTipificacaoPorId() {
+        setCarregandoTax(true);
         const tip = await getTipificacaoPorIdService(id);
         const taxsDaTip = tip?.taxonomies || [];
         setTax(taxsDaTip || []);
+        setCarregandoTax(false);
 
     }
 
     useEffect(() => {
         setIdTipificacao(id);
-        getFontes();
         getTipificacoes();
+        setValue("id_tipificacao", id);
+        getFontes();
         getTipificacaoPorId();
     }, []);
+
+    useEffect(() => {
+        const termo = termoBusca.current || "";
+
+        const filtradas = filtrarTaxonomiasPorNome(termo);
+        setTaxFiltradas(filtradas || []);
+    }, [tax]);
     
 
     useEffect(() => {
@@ -141,17 +145,6 @@ export default function Taxonomias({ id }: { id: string }) {
             }
         }
     }, [openTaxonomiaId, fontes, setValue]);
-
-    useEffect(() => {
-        // setCarregandoTax(true)
-        // const t = filtrarTaxonomiasPorTipificacao();
-        // setTaxFiltradas(t);
-
-        // if (tax.length) {
-        //    setCarregandoTax(false); 
-        // }
-        
-    }, [tax, termoBusca.current]);
 
     // Função para verificar clique fora de uma taxonomia para atualizar os ramos e melhorar usabilidade
     useEffect(() => {
@@ -224,7 +217,7 @@ export default function Taxonomias({ id }: { id: string }) {
             setTaxonomiaSelecionada(null);
             setRamosOriginais([]);
 
-            await getTipificacoes();
+            await getTipificacaoPorId();
 
         } catch (error) {
             toast.error('Erro ao excluir taxonomia!');
@@ -257,7 +250,7 @@ export default function Taxonomias({ id }: { id: string }) {
         setCarregandoTax(true);
         try {
             const novaTaxonomia: Taxonomia = {
-                typification_id: idTipificacao,
+                typification_id: idTipificacao ? idTipificacao : id,
                 title: tituloTaxonomia,
 
                 description: descricaoTaxonomia,
@@ -272,7 +265,7 @@ export default function Taxonomias({ id }: { id: string }) {
             }
 
             toast.success("Taxonomia adicionada com sucesso!");
-            getTipificacoes();
+            await getTipificacaoPorId();
         } catch (e) {
             toast.error("Erro ao adicionar taxonomia");
         }
@@ -302,7 +295,7 @@ export default function Taxonomias({ id }: { id: string }) {
         toast.success("Taxonomia atualizada com sucesso!");
 
         limparCampos();
-        await getTipificacoes();
+        await getTipificacaoPorId();
 
         setOpenTaxonomiaId(null);
     }
@@ -315,8 +308,8 @@ export default function Taxonomias({ id }: { id: string }) {
 
     const filtrarTaxonomiasPorNome = (nome: string) => {
         // Se for uma busca vazia, retorna todas as taxonomias
-        if (nome.trim() === "") {
-            return; // Retorna todas as taxonomias originais
+        if (nome.trim() === "" || nome === undefined) {
+            return tax
         }
 
         // Caso contrário, filtra as taxonomias com base no nome fornecido
@@ -374,12 +367,16 @@ export default function Taxonomias({ id }: { id: string }) {
 
     function limparCampos() {
         refIdAux.current = undefined;
-        setTaxonomiaSelecionada(null);
+        // setTaxonomiaSelecionada(null);
         setTituloTaxonomia("");
         setDescricaoTaxonomia("");
         setFontesSelecionadas([]);
         setIdTipificacao("");
-        reset()
+        reset({
+            fontesSelecionadas: [],
+            titulo: "",
+            descricao: ""
+        })
     }
 
     function limparCamposRamo() {
@@ -397,10 +394,29 @@ export default function Taxonomias({ id }: { id: string }) {
     return (
         <div className="flex flex-col flex-1">
             <div className="flex items-center gap-2 mb-2 justify-between overflow-hidden">
-                <p className="font-semibold text-4xl">Gestão de taxonomia e ramos</p>
+                <div className="flex flex-col gap-2 mb-1">
+                    <p className="font-semibold text-4xl">Gestão de taxonomia e ramos</p>
+                    <p className="max-w-[500px] truncate py-2 flex items-center gap-2">
+                    <span className="italic">para a tipificação:</span>
+
+                    {
+                        !tipificacoes.find(t => t.id === id) ? (
+                            <p><Loader2 className="animate-spin" /></p>
+                        ) : (
+                            <span title={tipificacoes.find(t => t.id === id)?.name} className="bg-vermelho text-white rounded-md px-3 py-1 inline-flex max-w-[450px] overflow-hidden text-ellipsis whitespace-nowrap">
+                                <strong className="truncate">
+                                    {tipificacoes.find(t => t.id === id)?.name}
+                                </strong>
+                            </span>
+                        )
+                    }
+                    
+
+                </p>
+                </div>
 
                 <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
-                    <DialogTrigger asChild>
+                    <DialogTrigger onClick={() => setValue("id_tipificacao", id)} asChild>
                         <Button
                             variant={"destructive"}
                             className=" flex items-center gap-2 bg-vermelho cursor-pointer hover:shadow-md text-white py-2 px-4 rounded-sm"
@@ -430,7 +446,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                     defaultValue={id}
                                     onValueChange={(e) => {
                                         setIdTipificacao(e)
-                                        setValue("id_tipificacao", [e])
+                                        setValue("id_tipificacao", e)
                                     }}
                                 >
                                     <SelectTrigger className="max-w-[400px] bg-white">
@@ -493,14 +509,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                             onValueChange={(value) => {
                                                 field.onChange([...field.value, value]);
                                                 const fonteEncontrada = fontes.find(fonte => fonte.id === value);
-                                                // setFontesSelecionadas([...fontesSelecionadas, fontes.find(fonte => fonte.id === e.target.value)!])
-                                                // const novaFonteId = e.target.value;
-                                                // const fonteJaSelecionada = watch("fontesSelecionadas").includes(novaFonteId);
-                                                // if (!fonteJaSelecionada) {
-                                                //     const novasFontes = [...watch("fontesSelecionadas"), novaFonteId];
-                                                //     setValue("fontesSelecionadas", novasFontes);
-                                                //     setFontesSelecionadas([...fontesSelecionadas, fontes.find(f => f.id === novaFonteId)!]);
-                                                // }
+
                                                 if (fonteEncontrada) {
                                                     setFontesSelecionadas([...fontesSelecionadas!, fonteEncontrada]);
                                                 }
@@ -622,8 +631,6 @@ export default function Taxonomias({ id }: { id: string }) {
                                             onClick={() => {
                                                 setTaxFiltradas(tax);
                                                 termoBusca.current = "";
-                                                // const taxsFiltradas = filtrarTaxonomiasPorTipificacao();
-                                                // setTaxFiltradas(taxsFiltradas || []);
                                             }}
                                             className="hover:cursor-pointer"
                                             title="Limpar pesquisa"
@@ -641,8 +648,13 @@ export default function Taxonomias({ id }: { id: string }) {
                                     style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                     onChange={(e) => {
                                         termoBusca.current = e.target.value;
-                                        // const taxsFiltradas = filtrarTaxonomiasPorTipificacao();
-                                        // setTaxFiltradas(taxsFiltradas || []);
+                                        const taxsFiltradas = filtrarTaxonomiasPorNome(e.target.value);
+
+                                        if (taxsFiltradas !== undefined) {
+                                            setTaxFiltradas(taxsFiltradas);
+                                        } else {
+                                            setTaxFiltradas(tax);
+                                        }
                                     }}
                                 />
                             </div>
@@ -706,7 +718,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                 <Loader2 className="animate-spin" />
                             </div>
                         ) : (
-                            tax && tax.length > 0 ? tax.map((item, index) => (
+                            taxFiltradas && taxFiltradas.length > 0 ? taxFiltradas.map((item, index) => (
                                 <Card
                                     ref={(e) => { divRefs.current["divtax_" + index] = e }}
                                     key={index}
@@ -757,7 +769,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                                             setDescricaoTaxonomia(item.description)
                                                             setValue("fontesSelecionadas", (fontesDaTaxonomia ?? []).map((f: any) => f.id))
                                                             setTaxonomiaSelecionada(item)
-                                                            setValue("id_tipificacao", [refIdAux.current as string])
+                                                            setValue("id_tipificacao", refIdAux.current as string)
                                                             setValue("titulo", item.title!)
                                                             setValue("descricao", item.description!)
                                                         }}
@@ -790,6 +802,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                                                 control={control}
                                                                 render={({ field }) => (
                                                                     <Select
+                                                                        disabled
                                                                         defaultValue={id}
                                                                         value={idTipificacao}
                                                                         onValueChange={(value) => {

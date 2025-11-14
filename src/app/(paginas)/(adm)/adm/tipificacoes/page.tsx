@@ -68,7 +68,7 @@ export default function Tipificacoes() {
     async function buscarDados() {
         getFontes();
         getTipificacoes();
-        await simularAtraso(1000)
+        // await simularAtraso(1000)
     }
 
     useEffect(() => {
@@ -177,7 +177,6 @@ export default function Tipificacoes() {
     }
 
     function filtrarTipificacao() {
-        console.log("termoBusca.current: ", termoBusca.current);
         if (termoBusca.current.trim() === "") {
             return tipificacoes;
         }
