@@ -34,7 +34,6 @@ export default function Tipificacoes() {
         formState: { errors },
         control,
         setValue,
-        watch,
         reset 
     } = useForm<FormData>({
         resolver: zodResolver(schemaTipificacao),
@@ -65,25 +64,15 @@ export default function Tipificacoes() {
         500: 1
     };
 
-    async function buscarDados() {
-        getFontes();
-        getTipificacoes();
-        // await simularAtraso(1000)
-    }
-
     useEffect(() => {
-    async function carregarTudo() {
-        try {
-            await buscarDados();
-        } catch (erro) {
-            console.error("Erro ao buscar tipificacoes ou fontes", erro);
-        } finally {
-            setCarregandoTipificacoes(false);
+        async function carregarTudo() {
+            await getFontes();
+            await getTipificacoes();
+            setCarregandoTipificacoes(false);  // ✔ agora faz sentido
         }
-    }
 
-    carregarTudo();
-}, []);
+        carregarTudo();
+    }, []);
 
 
     const getTipificacoes = async () => {
@@ -95,6 +84,7 @@ export default function Tipificacoes() {
 
         setTipificacoes(dados)
         setTipificacoesFiltradas(dados)
+        setCarregandoTipificacoes(false);
     }
 
     const getFontes = async () => {
@@ -110,6 +100,7 @@ export default function Tipificacoes() {
 
 
     const adicionarTipificacao = async (data: FormData) => {
+        setCarregandoTipificacoes(true);
         const dados = await adicionarTipificacaoService(data.nome, fontesSelecionadas);
 
         if (dados == null) {
@@ -119,13 +110,14 @@ export default function Tipificacoes() {
 
         toast.success("Tipificacao adicionada com sucesso!")
 
-        getTipificacoes();
+        await getTipificacoes();
         limparCampos();
         setDialogTipificacao(false);
     }
 
 
     const atualizarTipificacao = async (data: FormData) => {
+        setCarregandoTipificacoes(true);
         const tip: Tipificacao = {
             id: idDialogEditar as string,
             name: data.nome,
@@ -141,13 +133,14 @@ export default function Tipificacoes() {
 
         toast.success("Tipificacao atualizada com sucesso!")
 
-        getTipificacoes();
+        await getTipificacoes();
         limparCampos();
         setIdDialogEditar(null);
 
     }
 
     const excluirTipificacao = async (id: string) => {
+        setCarregandoTipificacoes(true);
         setIdDialogExcluir(id);
 
         try {
@@ -160,9 +153,9 @@ export default function Tipificacoes() {
 
             toast.success("Tipificacao excluida com sucesso!");
 
-            getTipificacoes();
+            await getTipificacoes();
         } catch (erro) {
-            console.error(erro)
+            toast.error("Erro ao excluir tipificação!")
         }
     }
 
