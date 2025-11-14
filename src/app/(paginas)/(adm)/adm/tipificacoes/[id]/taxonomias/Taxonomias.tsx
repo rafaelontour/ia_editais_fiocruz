@@ -317,54 +317,6 @@ export default function Taxonomias({ id }: { id: string }) {
         return resultadoFiltrado;
     }
 
-    // const filtrarTaxonomiasPorTipificacao = () => {
-    //     if (termoBusca.current === "") {
-    //         // Se a pesquisa for só por nome da tipificação (Termo de busca é vazio)
-    //         if (tipificacaoFiltro.current === "Todas") {
-    //             return tax
-    //         }
-
-    //         // Filtra taxonomias só por tipificação
-    //         const taxFiltradasSoPorTipificacao = tax.filter(taxonomia => taxonomia.tip_assoc?.toLowerCase() === tipificacaoFiltro.current.toLowerCase());
-    //         return taxFiltradasSoPorTipificacao
-    //     }
-
-    //     // Se tiver termo de busca e tipificação para filtrar
-    //     const taxFiltradasPorNome = filtrarTaxonomiasPorNome(termoBusca.current);
-
-    //     if (tipificacaoFiltro.current === "Todas") {
-    //         return taxFiltradasPorNome
-    //     }
-
-    //     const taxFiltradasPorTipificacao = taxFiltradasPorNome?.filter(taxonomia => taxonomia.tip_assoc?.toLowerCase() === tipificacaoFiltro.current.toLowerCase());
-    //     return taxFiltradasPorTipificacao
-    // }
-
-    // const atualizarRamoDaTaxonomia = async (data: FormDataRamo) => {
-    //     try {
-    //         const dado: Ramo = {
-    //             id: ramoSelecionado?.id,
-    //             taxonomy_id: taxonomiaSelecionada?.id,
-    //             title: data.tituloRamo,
-    //             description: data.descricaoRamo
-    //         }
-
-    //         const resposta = await atualizarRamoService(dado);
-
-    //         if (resposta !== 200) {
-    //             toast.error("Erro ao atualizar ramo!");
-    //             return
-    //         }
-
-    //         toast.success("Ramo atualizado com sucesso!");
-
-    //         const ramos = await buscarRamosDaTaxonomiaService(taxonomiaSelecionada?.id);
-    //         setRamosOriginais(ramos || []);
-    //     } catch (e) {
-    //         return
-    //     }
-    // }
-
     function limparCampos() {
         refIdAux.current = undefined;
         // setTaxonomiaSelecionada(null);
@@ -401,7 +353,7 @@ export default function Taxonomias({ id }: { id: string }) {
 
                     {
                         !tipificacoes.find(t => t.id === id) ? (
-                            <p><Loader2 className="animate-spin" /></p>
+                            <span><Loader2 className="animate-spin" /></span>
                         ) : (
                             <span title={tipificacoes.find(t => t.id === id)?.name} className="bg-vermelho text-white rounded-md px-3 py-1 inline-flex max-w-[450px] overflow-hidden text-ellipsis whitespace-nowrap">
                                 <strong className="truncate">
