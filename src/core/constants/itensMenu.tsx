@@ -22,11 +22,11 @@ const itemsAdm = [
     url: "/adm/tipificacoes",
     icon: Type,
   },
-  {
-    title: "Taxonomias",
-    url: "/adm/taxonomias",
-    icon: TypeOutline,
-  },
+  // {
+  //   title: "Taxonomias",
+  //   url: "/adm/taxonomias",
+  //   icon: TypeOutline,
+  // },
   {
     title: "Fontes",
     url: "/adm/fontes",

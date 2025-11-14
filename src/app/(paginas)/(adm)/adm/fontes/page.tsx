@@ -112,7 +112,7 @@ export default function Fontes() {
             setOpenDialogFontes(false)
             fetchData();
         } catch (error) {
-            console.error("Erro ao atualizar fonte", error)
+            toast.error("Erro ao atualizar fonte!")
         }
 
     }
@@ -222,7 +222,15 @@ export default function Fontes() {
                                 {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
                             </p>
 
-                            <p>Upload do documento (opcional)</p>
+                            <Label className="text-lg">
+                                Upload de documento
+                                <span
+                                    style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .5)" }}
+                                    className="text-xs px-2 py-1 rounded-md bg-yellow-400 italic"
+                                >
+                                    opcional
+                                </span>
+                            </Label>
 
                             <FileUpload />
 
@@ -380,11 +388,16 @@ export default function Fontes() {
                                                 {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
                                             </p>
 
-                                            <p className="flex flex-col gap-2 text-lg">
-                                                Upload do documento (opcional)
-                                                <FileUpload />
-                                                
-                                            </p>
+                                            <Label className="text-lg">
+                                                Fontes
+                                                <span
+                                                    style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .5)" }}
+                                                    className="text-xs px-2 py-1 rounded-md bg-yellow-400 italic"
+                                                >
+                                                    opcional
+                                                </span>
+                                            </Label>
+                                            <FileUpload />
 
                                             <div className="flex justify-end gap-2 mt-4">
                                                 <DialogClose

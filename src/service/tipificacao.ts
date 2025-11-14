@@ -34,13 +34,15 @@ async function getTipificacaoPorIdService(id: string | undefined): Promise<Tipif
                 "Content-Type": "application/json"
             }
         });
+
         if (!response.ok) {
-            throw new Error("Erro ao buscar tipificacao");
+            return null
         }
+
         const json = await response.json();
-        return json.typification;
+        return json
     } catch (error) {
-        throw new Error("Erro ao buscar tipificacao: " + (error instanceof Error ? error.message : String(error)));
+        return null
     }
 }
 

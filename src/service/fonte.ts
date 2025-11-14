@@ -60,7 +60,7 @@ async function atualizarFonteService(id: string, nome: string, descricao: string
 
         return resposta.status
     } catch (error) {
-        console.error('Erro ao atualizar fonte:', error);
+        return
     }
 }
 
