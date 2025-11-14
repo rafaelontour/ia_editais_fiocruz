@@ -128,7 +128,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
 
         if (r !== 200) {
-            toast.error("Erro ao atualizar os dados do edital!", { description: "O documento/arquivo do edital só é substituído se as informações do edital também forem substituídas!" });
+            toast.error("Erro ao atualizar os dados do edital!", { description: "O arquivo não foi atualizado, pois ocorreu um erro ao atualizar as informações do edital!!" });
             return
         }
 
