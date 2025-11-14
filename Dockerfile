@@ -1,13 +1,13 @@
-# Etapa 1: build da aplicação
+# Etapa 1: Build da aplicação
 FROM node:20-alpine AS builder
 
-# Define diretório de trabalho
+# Diretório de trabalho
 WORKDIR /app
 
 # Copia arquivos de dependência
 COPY package*.json ./
 
-# Instala dependências (modo produção já remove devDeps depois)
+# Instala todas dependências (dev + prod) apenas para build
 RUN npm install
 
 # Copia o restante da aplicação
@@ -16,21 +16,22 @@ COPY . .
 # Faz o build da aplicação Next.js
 RUN npm run build
 
-# Etapa 2: imagem final
+# Etapa 2: Imagem final para rodar a aplicação
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Copia arquivos essenciais da build
+# Copia apenas os arquivos necessários da build
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
 
-RUN npm install pm2 -g
+# Instala somente dependências de produção
+RUN npm install --omit=dev
 
-# Expõe a porta padrão do Next
+# Expondo a porta que a aplicação vai rodar
 EXPOSE 4000
 
-# Comando para rodar a aplicação com PM2 em produção
-CMD ["pm2-runtime", "start", "npm", "--name", "app", "--", "start"]
+# Comando para rodar a aplicação
+CMD ["npx", "pm2-runtime", "npm", "--name", "app", "--", "start"]
