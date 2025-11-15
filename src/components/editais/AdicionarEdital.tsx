@@ -105,7 +105,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
 
         if (resposta !== 201) {
             if (resposta === 409) {
-                toast.error("Erro ao enviar edital!", { description: "Ja existe um edital com esse identificador!" });
+                toast.error("Erro ao enviar edital!", { description: "Ja existe um edital cadastrado esse número!" });
                 return;
             }
             toast.error("Erro ao enviar edital!");
@@ -125,7 +125,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         }
 
         // ---------- WebSocket ----------
-        const ws = new WebSocket(`ws://localhost:8000/ws/${usuario?.id}`);
+        const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario?.id}`);
 
         ws.onopen = () => {
             
