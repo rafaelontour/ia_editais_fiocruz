@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { Textarea } from "../ui/textarea";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Unidade } from "@/core/unidade";
 import { toast } from "sonner";
 import { getTodasUnidades } from "@/service/unidade";
@@ -69,7 +69,9 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
     const [carregandoEditais, setCarregandoEditais] = useState<boolean>(true);
     const { usuario } = useUsuario();
-    const { editalProcessado, setEditalProcessado, setNovoEdital } = useEditalProc();
+    const { editalProcessado, setEditalProcessado, setNovoEdital, setIdEditalAtivo } = useEditalProc();
+
+    const a = useRef<number>(0);
 
     async function buscarUnidades() {
         const unidades = await getTodasUnidades();
@@ -82,11 +84,10 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     }
     
     async function buscarUsuariosPorUnidade() {
+        a.current = 0;
         const usuarios = await getUsuariosPorUnidade(usuario?.unit_id);
         setUsuarios(usuarios);
     }
-
-    let a = 0;
 
     async function enviarEdital(data: formData) {
 
@@ -100,6 +101,8 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         
         const [resposta, idEdital] = (await adicionarEditalService(dados)) ?? [];
 
+        setIdEditalAtivo(idEdital);
+
         if (resposta !== 201) {
             if (resposta === 409) {
                 toast.error("Erro ao enviar edital!", { description: "Ja existe um edital com esse identificador!" });
@@ -110,7 +113,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         }
 
         atualizarEditais(!flagEdital);
-        toast.success("Edital enviado com sucesso!");
         limparDados();
         setOpenSheet(false);
 
@@ -127,17 +129,20 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         const ws = new WebSocket(`ws://localhost:8000/ws/${usuario?.id}`);
 
         ws.onopen = () => {
-            toast.info("Aguarde o processamento do edital...");
+            
         };
 
         ws.onmessage = (event) => {
             const dados = JSON.parse(event.data);
 
             if (dados.event === "doc.release.update") {
-                if (dados.message === "complete" && a === 0) {
+                if (dados.message === "complete" && a.current === 0) {
                     setEditalProcessado(false);
                     setNovoEdital(false);
+                    setIdEditalAtivo("");
                     toast.success("Edital processado! ✅", { description: "Agora você já pode visualizar o resultado!" });
+                    a.current = 1;
+                    ws.close();
                 }
             }
 
@@ -154,7 +159,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
             console.log("WebSocket fechado");
         };
 
-        toast.success("Arquivo enviado com sucesso!");
+        toast.info("Edital enviado!", { description: "Aguarde o processamento do edital..." });
     }
 
 

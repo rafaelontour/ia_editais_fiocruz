@@ -27,7 +27,7 @@ interface Props {
 
 export default function CardEdital({ edital, containerId, funcaoAtualizarEditais, flagEdital }: Props) {
     const { usuario } = useUsuario();
-    const { editalProcessado, novoEdital } = useEditalProc();
+    const { editalProcessado, novoEdital, idEditalAtivo } = useEditalProc();
 
     // passa data.containerId para o hook
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -71,17 +71,17 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     return (
         <div
             ref={setNodeRef}
-            title={!editalProcessado ? "Aguarde o processamento do edital para ver o resultado" : ""}
+            title={!editalProcessado && idEditalAtivo === edital.id ? "Aguarde o processamento do edital para ver o resultado" : ""}
             style={style}
             className={`
                 bg-white rounded-md shadow-sm
-                ${!editalProcessado && novoEdital && "cursor-progress"}
+                ${!editalProcessado && idEditalAtivo === edital.id && "cursor-progress"}
                 ${isDragging ? "opacity-30" : "opacity-100"}
             `}
         >
 
             {/* drag handle: aplicamos attributes & listeners aqui (evita conflitos com botões dentro do card) */}
-            <div {...attributes} {...listeners} className={`${!editalProcessado && novoEdital && "hidden"} h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
+            <div {...attributes} {...listeners} className={`${!editalProcessado && idEditalAtivo === edital.id && "hidden"} h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
                 <span className={`text-md  text-white pointer-events-none italic`}>Segure nesta área para arrastar</span>
             </div>
 
@@ -160,7 +160,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                     </div>
 
                     {
-                        !editalProcessado && novoEdital ? (
+                        !editalProcessado && idEditalAtivo === edital.id ? (
                             <div className="h-12 w-full flex items-center bg-zinc-300 p-2 rounded-md justify-center  mt-2">
                                 <span className="text-md pointer-events-none italic">Processando edital...</span>
                                 <IconLoaderQuarter className="animate-spin ml-2" size={20} />
