@@ -4,8 +4,6 @@ import { createContext, useState, ReactNode, Dispatch, SetStateAction } from "re
 export interface ProcEditalProps {
     editalProcessado: boolean,
     setEditalProcessado: Dispatch<SetStateAction<boolean>>
-    novoEdital: boolean,
-    setNovoEdital: Dispatch<SetStateAction<boolean>>
     idEditalAtivo: string | undefined,
     setIdEditalAtivo: Dispatch<SetStateAction<string | undefined>>
 }
@@ -16,7 +14,6 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
 
     const [idEditalAtivo, setIdEditalAtivo] = useState<string | undefined>("");
     const [editalProcessado, setEditalProcessado] = useState<boolean>(false);
-    const [novoEdital, setNovoEdital] = useState<boolean>(false);
 
     return (
         <ProcEditalContexto.Provider
@@ -24,8 +21,6 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
                 {
                     editalProcessado,
                     setEditalProcessado,
-                    novoEdital,
-                    setNovoEdital,
                     idEditalAtivo,
                     setIdEditalAtivo
                 }

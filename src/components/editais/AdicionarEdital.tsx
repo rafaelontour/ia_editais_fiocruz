@@ -153,6 +153,9 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
 
         ws.onerror = (error) => {
             toast.error("Erro no WebSocket!", { description: "Ocorreu um erro ao acompanhar o arquivo. Erro: " + error });
+            ws.close();
+            setIdEditalAtivo("");
+            return;
         };
 
         ws.onclose = () => {
