@@ -1,4 +1,13 @@
-import { FilePen, Home, IdCard, Sheet, Type, TypeOutline, University } from "lucide-react";
+import {
+  FilePen,
+  Home,
+  IdCard,
+  Sheet,
+  Type,
+  TypeOutline,
+  University,
+  Wrench,
+} from "lucide-react";
 
 export interface MenuItem {
   title: string;
@@ -39,10 +48,15 @@ const itemsAdm = [
   },
   {
     title: "Atribuição de cargo",
-    url:"/adm/cargos",
+    url: "/adm/cargos",
     icon: IdCard,
   },
-]
+  {
+    title: "Coleção de testes",
+    url: "/adm/testes",
+    icon: Wrench,
+  },
+];
 
 const itemsAuditorAnalista = [
   {
@@ -55,7 +69,7 @@ const itemsAuditorAnalista = [
     url: "/adm/editais",
     icon: Sheet,
   },
-]
+];
 
 const itemsUsuarioComum = [
   {
@@ -68,10 +82,6 @@ const itemsUsuarioComum = [
     url: "/unidades_fiocruz",
     icon: University,
   },
-]
+];
 
-export {
-  itemsAdm,
-  itemsUsuarioComum,
-  itemsAuditorAnalista,
-};
+export { itemsAdm, itemsUsuarioComum, itemsAuditorAnalista };
