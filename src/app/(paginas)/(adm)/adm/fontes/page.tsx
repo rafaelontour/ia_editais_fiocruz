@@ -16,6 +16,7 @@ import { formatarData } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import Calendario from '@/components/Calendario';
 
 const schemaFonte = z.object({
     nome: z.string().min(1, "O nome da fonte é obrigatório"),
@@ -317,13 +318,7 @@ export default function Fontes() {
                         </div>
 
                         <div className="flex justify-between items-center mt-3">
-                            <p className="flex items-center gap-2 text-sm text-gray-400">
-                                <Calendar size={18} />
-                                <span className="flex justify-center flex-col">
-                                    <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
-                                    <span>{formatarData(fonte.created_at)}</span>
-                                </span>
-                            </p>
+                            <Calendario data={fonte.created_at} />
                             <div className="flex gap-3">
                                 <Dialog open={openDialogIdEditar === fonte.id} onOpenChange={(open) => setOpenDialogIdEditar(open ? fonte.id : null)}>
                                     <DialogTrigger asChild>
