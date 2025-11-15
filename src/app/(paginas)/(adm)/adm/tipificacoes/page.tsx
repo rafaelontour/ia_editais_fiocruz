@@ -181,7 +181,7 @@ export default function Tipificacoes() {
     }
 
     return (
-        <div>
+        <div className="">
             <div className="flex flex-col gap-5 pb-10">
                 <div className="flex flex-col gap-2 sticky top-0 z-10 bg-white pb-4 justify-between w-full items-center">
                     <div className="flex items-center justify-between w-full">
@@ -349,7 +349,7 @@ export default function Tipificacoes() {
                         </Dialog>
                     </div>
 
-                    <div className="flex w-full relative top-0">
+                    <div className="flex w-1/2 relative top-0 mt-2 self-start">
                                             
                         <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
                         {

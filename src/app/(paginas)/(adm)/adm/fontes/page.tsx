@@ -264,7 +264,7 @@ export default function Fontes() {
                 </Dialog>
             </div>
 
-            <div className="flex w-1/2 relative">
+            <div className="flex w-1/2 relative -mt-1 mb-3">
                                                         
                 <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
 
