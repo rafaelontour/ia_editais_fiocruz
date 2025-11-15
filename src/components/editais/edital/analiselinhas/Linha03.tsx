@@ -52,7 +52,7 @@ export default function Linha03({ edital, resumoIA }: Props) {
         .map((ramo: any) => ramo.evaluation.score ))))
         .flat(Infinity)
 
-    const media = ((): number | undefined => {
+    const media: number | undefined = ((): number | undefined => {
         if (!notas || notas.length === 0) return undefined;
         const sum = notas.reduce((a, b) => a + (b ?? 0), 0);
         return sum / notas.length;
@@ -91,7 +91,12 @@ export default function Linha03({ edital, resumoIA }: Props) {
                                         style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }}
                                         className={`
                                             text-sm font-semibold px-3 py-1 rounded-md text-white
-                                            ${media && media < 5 ? "bg-red-500" : media && media < 7 ? "bg-yellow-600" : media && media < 8 ? "bg-green-600" : "bg-green-800"}
+                                            ${typeof media === "number" 
+                                            ? media < 5 ? "bg-red-500" 
+                                            : media < 7 ? "bg-yellow-600" 
+                                            : media < 8 ? "bg-green-600" 
+                                            : "bg-green-800"
+                                            : "bg-gray-200"}
                                         `}
                                     >
                                             Média de todos os ramos: {media?.toFixed(2)}

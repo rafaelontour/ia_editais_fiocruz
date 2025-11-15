@@ -11,6 +11,7 @@ import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
+import { ProcEditalProvider } from "@/data/context/ProcEdital";
 
 export default function RootLayout({
   children,
@@ -177,7 +178,7 @@ export default function RootLayout({
               }}
             >
               <div className="h-full overflow-y-auto px-1">
-                  {children}
+                    {children}
               </div>
             </div>
           </div>

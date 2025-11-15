@@ -14,7 +14,8 @@ import Link from "next/link";
 import { formatarData } from "@/lib/utils";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
+import { IconLoaderQuarter, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
+import useEditalProc from "@/data/hooks/useProcEdital";
 
 
 interface Props {
@@ -26,7 +27,8 @@ interface Props {
 
 export default function CardEdital({ edital, containerId, funcaoAtualizarEditais, flagEdital }: Props) {
     const { usuario } = useUsuario();
-    
+    const { editalProcessado, novoEdital } = useEditalProc();
+
     // passa data.containerId para o hook
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: edital.id,
@@ -52,7 +54,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
     const cor = () => {
         if (!edital.history) return "white";
-        
+
         const status = edital.history && edital.history[0].status;
         switch (status) {
             case "PENDING":
@@ -69,13 +71,18 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     return (
         <div
             ref={setNodeRef}
+            title={!editalProcessado ? "Aguarde o processamento do edital para ver o resultado" : ""}
             style={style}
-            // se quiser esconder o original enquanto usa overlay: opacity reduzida
-            className={`bg-white rounded-md shadow-sm ${isDragging ? "opacity-30" : "opacity-100"}`}
+            className={`
+                bg-white rounded-md shadow-sm
+                ${!editalProcessado && novoEdital && "cursor-progress"}
+                ${isDragging ? "opacity-30" : "opacity-100"}
+            `}
         >
+
             {/* drag handle: aplicamos attributes & listeners aqui (evita conflitos com botões dentro do card) */}
-            <div {...attributes} {...listeners} className={`h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
-                <span className="text-md text-white pointer-events-none italic">Segure nesta área para arrastar</span>
+            <div {...attributes} {...listeners} className={`${!editalProcessado && novoEdital && "hidden"} h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
+                <span className={`text-md  text-white pointer-events-none italic`}>Segure nesta área para arrastar</span>
             </div>
 
             <div className="relative p-3">
@@ -116,12 +123,12 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                         )
                     }
                 </div>
-                
+
                 <hr className="my-1" />
 
                 <div
                     className="
-                        flex flex-col items-start 
+                        flex flex-col items-start gap-1 mt-2
                     "
                 >
                     <p><strong>Número do edital</strong>: {edital.identifier}</p>
@@ -131,81 +138,16 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                         <span>{formatarData(edital.created_at)}</span>
                     </div>
 
-                    <div className="self-end flex gap-2">
-                        <div className="flex gap-2 absolute bottom-3 right-3">
-                            {
-                                edital.status !== "COMPLETED" && (
-                                    <Link href={`/adm/editais/${edital.id}`}>
-                                        <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
-                                            <View  />
-                                        </Button>
-                                    </Link>
-                                )
-                            }
-
-                            {
-                                edital.status === "COMPLETED" &&
-                                <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
-                                    <View  />
-                                </Button>
-                            }
-
-                            {
-                                usuario?.access_level !== "AUDITOR" && (
-                                    <div className="flex items-center gap-2">
-                                        {
-                                            (edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && (
-                                                <EditarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} edital={edital} />
-                                            )
-                                        }
-
-                                        {
-                                            ((usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (edital.history && (edital.history[0].status === "PENDING" || edital.history[0].status === "UNDER_CONSTRUCTION"))) && (
-                                                <Dialog>
-                                                    <DialogTrigger asChild>
-                                                        <Button
-                                                            size={"icon"}
-                                                            className="
-                                                            h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
-                                                            text-white transition-all rounded-sm p-[14px]
-                                                            ">
-                                                                <Trash />
-                                                        </Button>
-                                                    </DialogTrigger>
-
-                                                    <DialogContent className="rounded-2xl">
-                                                        <DialogHeader>
-                                                            <DialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital Edital Fiocruz 2025/1?</DialogTitle>
-                                                            <DialogDescription className="text-[14px] text-vermelho">
-                                                                Após a exclusão, não será possível recuperar os dados desse edital e análise realizada
-                                                            </DialogDescription>
-                                                        </DialogHeader>
-
-                                                        <DialogFooter>
-                                                            <DialogClose className="border bg-slate-300 px-3 py-1 rounded-sm hover:cursor-pointer">Cancelar</DialogClose>
-
-                                                            <Button onClick={excluirEdital} variant={"destructive"} className="bg-vermelho hover:cursor-pointer"><Trash /><p>Excluir edital</p></Button>
-                                                        </DialogFooter>
-                                                    </DialogContent>
-                                                </Dialog>
-                                            )
-                                        }
-                                    </div>
-                                )
-                            }
-
-                        </div>
-                    </div>
                     <div>
 
                         <h4 className="font-semibold">
-                        {
-                            edital.editors && edital.editors?.length > 1 ? (
-                                "Responsáveis: "
-                            ) : (
-                                "Responsável: "
-                            )
-                        }
+                            {
+                                edital.editors && edital.editors?.length > 1 ? (
+                                    "Responsáveis: "
+                                ) : (
+                                    "Responsável: "
+                                )
+                            }
                         </h4>
 
                         <ul>
@@ -216,6 +158,83 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                             }
                         </ul>
                     </div>
+
+                    {
+                        !editalProcessado && novoEdital ? (
+                            <div className="h-12 w-full flex items-center bg-zinc-300 p-2 rounded-md justify-center  mt-2">
+                                <span className="text-md pointer-events-none italic">Processando edital...</span>
+                                <IconLoaderQuarter className="animate-spin ml-2" size={20} />
+                            </div>
+                        ) : (
+                            <>
+                                <div className="self-end flex gap-2">
+                                    <div className="flex gap-2 absolute bottom-3 right-3">
+                                        {
+                                            edital.status !== "COMPLETED" && (
+                                                <Link href={`/adm/editais/${edital.id}`}>
+                                                    <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
+                                                        <View />
+                                                    </Button>
+                                                </Link>
+                                            )
+                                        }
+
+                                        {
+                                            edital.status === "COMPLETED" &&
+                                            <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
+                                                <View />
+                                            </Button>
+                                        }
+
+                                        {
+                                            usuario?.access_level !== "AUDITOR" && (
+                                                <div className="flex items-center gap-2">
+                                                    {
+                                                        (edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && (
+                                                            <EditarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} edital={edital} />
+                                                        )
+                                                    }
+
+                                                    {
+                                                        ((usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (edital.history && (edital.history[0].status === "PENDING" || edital.history[0].status === "UNDER_CONSTRUCTION"))) && (
+                                                            <Dialog>
+                                                                <DialogTrigger asChild>
+                                                                    <Button
+                                                                        size={"icon"}
+                                                                        className="
+                                                            h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
+                                                            text-white transition-all rounded-sm p-[14px]
+                                                            ">
+                                                                        <Trash />
+                                                                    </Button>
+                                                                </DialogTrigger>
+
+                                                                <DialogContent className="rounded-2xl">
+                                                                    <DialogHeader>
+                                                                        <DialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital Edital Fiocruz 2025/1?</DialogTitle>
+                                                                        <DialogDescription className="text-[14px] text-vermelho">
+                                                                            Após a exclusão, não será possível recuperar os dados desse edital e análise realizada
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+
+                                                                    <DialogFooter>
+                                                                        <DialogClose className="border bg-slate-300 px-3 py-1 rounded-sm hover:cursor-pointer">Cancelar</DialogClose>
+
+                                                                        <Button onClick={excluirEdital} variant={"destructive"} className="bg-vermelho hover:cursor-pointer"><Trash /><p>Excluir edital</p></Button>
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        )
+                                                    }
+                                                </div>
+                                            )
+                                        }
+
+                                    </div>
+                                </div>
+                            </>
+                        )
+                    }
                 </div>
 
             </div>

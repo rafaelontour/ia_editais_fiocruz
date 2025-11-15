@@ -22,6 +22,7 @@ import { getUsuariosPorUnidade } from "@/service/usuario";
 import { adicionarEditalService } from "@/service/edital";
 import { enviarArquivoService } from "@/service/editalArquivo";
 import useUsuario from "@/data/hooks/useUsuario";
+import useEditalProc from "@/data/hooks/useProcEdital";
 
 const schemaEdital = z.object({
     nome: z.string().min(5, "O nome do edital é obrigatório"),
@@ -66,7 +67,9 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [tipificacoesSelecionadas, setTipificacoesSelecionadas] = useState<Tipificacao[] | []>([]);
     const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
+    const [carregandoEditais, setCarregandoEditais] = useState<boolean>(true);
     const { usuario } = useUsuario();
+    const { editalProcessado, setEditalProcessado, setNovoEdital } = useEditalProc();
 
     async function buscarUnidades() {
         const unidades = await getTodasUnidades();
@@ -83,6 +86,8 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         setUsuarios(usuarios);
     }
 
+    let a = 0;
+
     async function enviarEdital(data: formData) {
 
         const dados = {
@@ -98,11 +103,10 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         if (resposta !== 201) {
             if (resposta === 409) {
                 toast.error("Erro ao enviar edital!", { description: "Ja existe um edital com esse identificador!" });
-                return
+                return;
             }
-
             toast.error("Erro ao enviar edital!");
-            return
+            return;
         }
 
         atualizarEditais(!flagEdital);
@@ -110,15 +114,49 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         limparDados();
         setOpenSheet(false);
 
+        // Chama a função que envia o arquivo (service intacto)
         const respostaArquivo = await enviarArquivoService(idEdital, data.arquivo);
-
+    
         if (respostaArquivo !== 201) {
             toast.error("Erro ao enviar arquivo!");
-            return
+            return;
         }
+
+        // ---------- WebSocket ----------
+        setNovoEdital(true)
+        const ws = new WebSocket(`ws://localhost:8000/ws/${usuario?.id}`);
+
+        ws.onopen = () => {
+            toast.info("Aguarde o processamento do edital...");
+        };
+
+        ws.onmessage = (event) => {
+            const dados = JSON.parse(event.data);
+
+            if (dados.event === "doc.release.update") {
+                if (dados.message === "complete" && a === 0) {
+                    setEditalProcessado(false);
+                    setNovoEdital(false);
+                    toast.success("Edital processado! ✅", { description: "Agora você já pode visualizar o resultado!" });
+                }
+            }
+
+            if (dados.event === "doc.kanban.update") {
+                // Mudar depois
+            }
+        };
+
+        ws.onerror = (error) => {
+            toast.error("Erro no WebSocket!", { description: "Ocorreu um erro ao acompanhar o arquivo. Erro: " + error });
+        };
+
+        ws.onclose = () => {
+            console.log("WebSocket fechado");
+        };
 
         toast.success("Arquivo enviado com sucesso!");
     }
+
 
     useEffect(() => {
         try {
@@ -134,7 +172,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         setTipificacoesSelecionadas([]);
         setResponsaveisEdital([]);
     }
-
 
     return(
         <div>

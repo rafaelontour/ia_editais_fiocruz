@@ -120,11 +120,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             editors_ids: responsaveisEdital.map(usuario => usuario.id)
         }
 
-        console.log("dados pra entviar: ", dados);
-
         const r = await atualizarEditalService(dados);
-
-        console.log("r: ", r);
 
 
         if (r !== 200) {
