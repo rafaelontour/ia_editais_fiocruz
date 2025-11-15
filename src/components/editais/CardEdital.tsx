@@ -27,7 +27,7 @@ interface Props {
 
 export default function CardEdital({ edital, containerId, funcaoAtualizarEditais, flagEdital }: Props) {
     const { usuario } = useUsuario();
-    const { editalProcessado, novoEdital, idEditalAtivo } = useEditalProc();
+    const { editalProcessado, idEditalAtivo } = useEditalProc();
 
     // passa data.containerId para o hook
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({

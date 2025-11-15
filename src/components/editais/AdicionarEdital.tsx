@@ -69,7 +69,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
     const [carregandoEditais, setCarregandoEditais] = useState<boolean>(true);
     const { usuario } = useUsuario();
-    const { editalProcessado, setEditalProcessado, setNovoEdital, setIdEditalAtivo } = useEditalProc();
+    const { editalProcessado, setEditalProcessado, setIdEditalAtivo } = useEditalProc();
 
     const a = useRef<number>(0);
 
