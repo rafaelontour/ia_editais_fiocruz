@@ -12,7 +12,6 @@ import { Fonte } from '@/core/fonte';
 import z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { watch } from 'fs';
 import { formatarData } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
@@ -25,10 +24,15 @@ const schemaFonte = z.object({
 
 export default function Fontes() {
 
-    type FormData = z.infer<typeof schemaFonte>
-    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<FormData>({
-        resolver: zodResolver(schemaFonte)
+    type FormDataFonte = z.infer<typeof schemaFonte>
+    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<FormDataFonte>({
+        resolver: zodResolver(schemaFonte),
+        defaultValues: {
+            nome: "",
+            descricao: ""
+        }
     })
+
     const breakpointColumnsObj = {
         default: 3,
         1500: 3,
@@ -40,13 +44,9 @@ export default function Fontes() {
     const [fontes, setFontes] = useState<Fonte[]>([])
     const [openDialogIdExcluir, setOpenDialogIdExcluir] = useState<string | null>(null);
     const [openDialogIdEditar, setOpenDialogIdEditar] = useState<string | null>(null);
-    const [nomeFonte, setNomeFonte] = useState<string>("");
-    const [descricaoFonte, setDescricaoFonte] = useState<string>("");
+    const [fontesFiltradas, setFontesFiltradas] = useState<Fonte[]>([]);
     
     const termoBusca = useRef<string>("");
-
-    const [fontesFiltradas, setFontesFiltradas] = useState<Fonte[]>([]);
-
 
     const fetchData = async () => {
         try {
@@ -78,9 +78,9 @@ export default function Fontes() {
         }
     }, [openDialogIdEditar, fontes, setValue]);
 
-    const adicionarFonte = async () => {
+    const adicionarFonte = async (formData: FormDataFonte) => {
         try {
-            const resposta = await adicionarFonteService(nomeFonte, descricaoFonte);
+            const resposta = await adicionarFonteService(formData.nome, formData.descricao);
 
             if (resposta !== 201) {
                 toast.error("Erro ao adicionar fonte!")
@@ -97,9 +97,9 @@ export default function Fontes() {
         }
     }
 
-    const atualizarFonte = async (dados: { nome: string, descricao: string }) => {
+    const atualizarFonte = async (formData: FormDataFonte) => {
         try {
-            const resposta = await atualizarFonteService(openDialogIdEditar as string, dados.nome, dados.descricao);
+            const resposta = await atualizarFonteService(openDialogIdEditar as string, formData.nome, formData.descricao);
 
             if (resposta !== 200) {
                 toast.error("Erro ao atualizar fonte")
@@ -110,6 +110,7 @@ export default function Fontes() {
 
             setOpenDialogIdEditar(null);
             setOpenDialogFontes(false)
+            limparCampos();
             fetchData();
         } catch (error) {
             toast.error("Erro ao atualizar fonte!")
@@ -137,7 +138,6 @@ export default function Fontes() {
 
 
     function filtrarFontes() {
-        console.log("termoBusca.current: ", termoBusca.current);
         if (termoBusca.current.trim() === "") {
             return fontes;
         }
@@ -199,10 +199,6 @@ export default function Fontes() {
                                         border-2 border-gray-300
                                         rounded-md p-2 w-full
                                     "
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                        setNomeFonte(e.target.value)
-                                        setValue("nome", e.target.value)
-                                    }}
                                 />
                                 {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
                             </p>
@@ -217,7 +213,6 @@ export default function Fontes() {
                                         border-2 border-gray-300
                                         rounded-md p-2 w-full
                                     "
-                                    onChange={(e) => setDescricaoFonte(e.target.value)}
                                 />
                                 {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
                             </p>
@@ -368,7 +363,6 @@ export default function Fontes() {
                                                         border-2 border-gray-300
                                                         rounded-md p-2 w-full
                                                     "
-                                                    onChange={(e) => setNomeFonte(e.target.value)}
                                                 />
                                                 {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
                                             </p>
@@ -383,7 +377,6 @@ export default function Fontes() {
                                                         border-2 border-gray-300
                                                         rounded-md p-2 w-full
                                                     "
-                                                    onChange={(e) => setDescricaoFonte(e.target.value)}
                                                 />
                                                 {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
                                             </p>
@@ -451,6 +444,7 @@ export default function Fontes() {
                                                 Tem certeza que deseja excluir a fonte <strong>{fonte.name}</strong>?
                                             </DialogDescription>
                                         </DialogHeader>
+
                                         <div className="flex justify-end gap-4 mt-4">
                                             <DialogClose
                                                 className={`
