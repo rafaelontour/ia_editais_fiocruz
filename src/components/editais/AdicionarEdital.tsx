@@ -125,7 +125,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         }
 
         // ---------- WebSocket ----------
-        setNovoEdital(true)
         const ws = new WebSocket(`ws://localhost:8000/ws/${usuario?.id}`);
 
         ws.onopen = () => {
@@ -138,7 +137,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
             if (dados.event === "doc.release.update") {
                 if (dados.message === "complete" && a.current === 0) {
                     setEditalProcessado(false);
-                    setNovoEdital(false);
                     setIdEditalAtivo("");
                     toast.success("Edital processado! ✅", { description: "Agora você já pode visualizar o resultado!" });
                     a.current = 1;
