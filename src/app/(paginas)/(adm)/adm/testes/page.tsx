@@ -36,11 +36,13 @@ export default function testes() {
       id: 1,
       nome: "Teste de Exemplo 1",
       descricao: "Descrição do Teste de Exemplo 1",
+      created_at: "12/11/2023, 12:23:20",
     },
     {
       id: 2,
       nome: "Teste de Exemplo 2",
       descricao: "Descrição do Teste de Exemplo 2",
+      created_at: "12/11/2023, 12:23:20",
     },
   ]);
 
@@ -53,6 +55,7 @@ export default function testes() {
       id: mockTestes.length + 1,
       nome: data.nome,
       descricao: data.descricao,
+      created_at: new Date().toLocaleString(),
     };
     setMockTestes([...mockTestes, novoTeste]);
   }
@@ -157,7 +160,7 @@ export default function testes() {
             <p>{mockTeste.descricao}</p>
 
             <div className="flex justify-between items-center mt-3">
-              <Calendario />
+              <Calendario data={mockTeste.created_at} />
 
               <div className="flex gap-3">
                 <BotaoEditar
