@@ -1,6 +1,9 @@
 # Etapa 1: Build da aplicação
 FROM node:20-alpine AS builder
 
+ARG NEXT_PUBLIC_VERSAO_PLATAFORMA
+ENV NEXT_PUBLIC_VERSAO_PLATAFORMA=$NEXT_PUBLIC_VERSAO_PLATAFORMA
+
 # Diretório de trabalho
 WORKDIR /app
 
