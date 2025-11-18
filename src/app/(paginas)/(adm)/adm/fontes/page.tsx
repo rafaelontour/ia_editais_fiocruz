@@ -59,6 +59,7 @@ export default function Fontes() {
 
             if (!fnts) {
                 toast.error("Erro ao buscar fontes")
+                setCarregando(false);
                 return
             }
 
@@ -92,6 +93,7 @@ export default function Fontes() {
 
             if (resposta !== 201) {
                 toast.error("Erro ao adicionar fonte!")
+                setCarregando(false);
                 return
             }
 
@@ -106,7 +108,6 @@ export default function Fontes() {
     }
 
     const atualizarFonte = async (formData: FormDataFonte) => {
-        setCarregando(true);
         try {
             const resposta = await atualizarFonteService(openDialogIdEditar as string, formData.nome, formData.descricao);
 
@@ -115,6 +116,7 @@ export default function Fontes() {
                 return
             }
 
+            setCarregando(true);
             toast.success("Fonte atualizada com sucesso!");
 
             setOpenDialogIdEditar(null);
@@ -134,6 +136,7 @@ export default function Fontes() {
 
             if (resposta !== 204) {
                 toast.error("Erro ao excluir fonte!")
+                setCarregando(false);
                 return
             }
 
@@ -293,9 +296,9 @@ export default function Fontes() {
                                                     <Button
                                                         title="Editar fonte"
                                                         className={`
-                                                    h-8 w-8 hover:cursor-pointer border border-gray-300 rounded-sm
-                                                    bg-branco hover:bg-branco
-                                                    `}
+                                                            h-8 w-8 hover:cursor-pointer border border-gray-300 rounded-sm
+                                                            bg-branco hover:bg-branco
+                                                        `}
                                                         size={"icon"}
                                                     >
                                                         <PencilLine color="black" />
@@ -323,9 +326,9 @@ export default function Fontes() {
                                                                 type="text"
                                                                 id="nomeFonte"
                                                                 className="
-                                                            border-2 border-gray-300
-                                                            rounded-md p-2 w-full
-                                                        "
+                                                                    border-2 border-gray-300
+                                                                    rounded-md p-2 w-full
+                                                                "
                                                             />
                                                             {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
                                                         </p>
@@ -337,9 +340,9 @@ export default function Fontes() {
                                                                 type="text"
                                                                 id="descricaoFonte"
                                                                 className="
-                                                            border-2 border-gray-300
-                                                            rounded-md p-2 w-full
-                                                        "
+                                                                    border-2 border-gray-300
+                                                                    rounded-md p-2 w-full
+                                                                "
                                                             />
                                                             {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
                                                         </p>
@@ -353,10 +356,10 @@ export default function Fontes() {
                                                         <div className="flex justify-end gap-2 mt-4">
                                                             <DialogClose
                                                                 className={`
-                                                            transition ease-in-out text-white
-                                                            rounded-md px-3 bg-vermelho
-                                                            hover:cursor-pointer text-sm
-                                                        `}
+                                                                    transition ease-in-out text-white
+                                                                    rounded-md px-3 bg-vermelho
+                                                                    hover:cursor-pointer text-sm
+                                                                `}
                                                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                             >
                                                                 Cancelar
@@ -365,9 +368,9 @@ export default function Fontes() {
                                                             <Button
                                                                 type="submit"
                                                                 className={`
-                                                            flex bg-verde hover:bg-verde
-                                                            text-white hover:cursor-pointer
-                                                        `}
+                                                                flex bg-verde hover:bg-verde
+                                                                text-white hover:cursor-pointer
+                                                            `}
                                                                 style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                                                             >
                                                                 Salvar
