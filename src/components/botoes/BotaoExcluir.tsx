@@ -1,6 +1,6 @@
 "use client";
 import { Trash } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogClose,
@@ -9,13 +9,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
+} from "../ui/dialog";
 import { useState } from "react";
-import { Fonte, Tipificacao } from "@/core";
+import { Fonte } from "@/core";
 
 interface BotaoExcluirProps {
   tipo: string;
-  item: Fonte | Tipificacao
+  item: Fonte
   funcExcluir: (id: string) => void;
 }
 
@@ -43,7 +43,7 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
 
           <DialogDescription>
             Tem certeza que deseja excluir a {dados.tipo}{" "}
-            <strong>{dados.item.name ?? dados.item.name}</strong>
+            <strong>{dados.item.name ?? dados.item}</strong>
           </DialogDescription>
         </DialogHeader>
 

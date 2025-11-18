@@ -19,6 +19,7 @@ import { formatarData, simularAtraso } from "@/lib/utils";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import BotaoExcluir from "@/components/BotaoExcluir";
 
 const schemaTipificacao = z.object({
     nome: z.string().min(1, "O nome da tipificação é obrigatório"),
@@ -608,50 +609,7 @@ export default function Tipificacoes() {
                                             </DialogContent>
                                         </Dialog>
 
-                                        <Dialog open={idDialogExcluir === tipificacao.id} onOpenChange={(open) => setIdDialogExcluir(open ? tipificacao.id : null)}>
-                                            <DialogTrigger asChild>
-                                                <Button
-                                                    title="Excluir tipificação"
-                                                    className={`
-                                                            h-8 w-8 bg-vermelho hover:bg-vermelho
-                                                            hover:cursor-pointer rounded-sm
-                                                        `}
-                                                    size={"icon"}
-                                                >
-                                                    <Trash />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>Excluir Tipificação</DialogTitle>
-                                                    <DialogDescription>
-                                                        Tem certeza que deseja excluir a tipificação <strong>{tipificacao.name}</strong>?
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <div className="flex justify-end gap-4 mt-4">
-                                                    <DialogClose
-                                                        className={`
-                                                                transition ease-in-out
-                                                                rounded-md px-3
-                                                                hover:cursor-pointer
-                                                            `}
-                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                    >
-                                                        Cancelar
-                                                    </DialogClose>
-                                                    <Button
-                                                        className={`
-                                                                flex bg-vermelho hover:bg-vermelho
-                                                                text-white hover:cursor-pointer
-                                                            `}
-                                                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                        onClick={() => excluirTipificacao(tipificacao.id)}
-                                                    >
-                                                        Excluir
-                                                    </Button>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
+                                        <BotaoExcluir funcExcluir={excluirTipificacao} item={tipificacao} tipo="tipificação" />
                                     </div>
                                 </div>
                             </div>
