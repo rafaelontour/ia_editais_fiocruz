@@ -7,7 +7,7 @@ interface BotaoAdicionarProps
   texto: string;
 }
 
-const BotaoAdicionar = forwardRef<HTMLButtonElement, BotaoAdicionarProps>(
+const Botao = forwardRef<HTMLButtonElement, BotaoAdicionarProps>(
   ({ texto, className, ...props }, ref) => {
     return (
       <Button
@@ -29,6 +29,6 @@ const BotaoAdicionar = forwardRef<HTMLButtonElement, BotaoAdicionarProps>(
   }
 );
 
-BotaoAdicionar.displayName = "BotaoAdicionar";
+Botao.displayName = "Botao";
 
-export default BotaoAdicionar;
+export default Botao;

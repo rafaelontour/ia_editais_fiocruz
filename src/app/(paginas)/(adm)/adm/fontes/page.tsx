@@ -18,6 +18,8 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import Calendario from '@/components/Calendario';
 import BarraDePesquisa from '@/components/BarraDePesquisa';
+import Botao from '@/components/BotaoAdicionar';
+import BotaoExcluir from '@/components/BotaoExcluir';
 
 const schemaFonte = z.object({
     nome: z.string().min(1, "O nome da fonte é obrigatório"),
@@ -62,7 +64,7 @@ export default function Fontes() {
             setFontes([...fnts])
             setFontesFiltradas([...fnts])
         } catch (error) {
-            console.error("Erro ao buscar fontes", error)
+            toast.error("Erro ao buscar fontes")
         }
     }
 
@@ -95,7 +97,7 @@ export default function Fontes() {
             limparCampos();
             fetchData();
         } catch (error) {
-            console.error("Erro ao adicionar fonte", error)
+            toast.error("Erro ao adicionar fonte")
         }
     }
 
@@ -134,7 +136,7 @@ export default function Fontes() {
             setOpenDialogIdExcluir(null)
             fetchData();
         } catch (error) {
-            console.error("Erro ao excluir fonte", error)
+            toast.error("Erro ao excluir fonte")
         }
     }
 
@@ -163,18 +165,7 @@ export default function Fontes() {
 
                 <Dialog open={openDialogFontes} onOpenChange={setOpenDialogFontes}>
                     <DialogTrigger asChild>
-                        <Button
-                        variant={"destructive"}
-                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                            className={`
-                                flex rounded-md gap-2 items-center px-4 py-2
-                                bg-vermelho  text-white
-                                hover:cursor-pointer
-                            `}
-                        >
-                            <Plus size={18}/>
-                            <p className="text-white text-sm">Adicionar fonte</p>
-                        </Button>
+                        <Botao texto="Adicionar fonte" />
                     </DialogTrigger>
 
                     <DialogContent onCloseAutoFocus={limparCampos}>
@@ -384,57 +375,7 @@ export default function Fontes() {
                                     </DialogContent>
                                 </Dialog>
 
-                                <Dialog open={openDialogIdExcluir === fonte.id} onOpenChange={(open) => setOpenDialogIdExcluir(open ? fonte.id : null)}>
-                                    <DialogTrigger asChild>
-                                        <Button
-                                            title="Excluir fonte"
-                                            className={`
-                                                h-8 w-8 bg-vermelho hover:bg-vermelho
-                                                hover:cursor-pointer rounded-sm
-                                            `}
-                                            size={"icon"}
-                                        >
-                                            <Trash />
-                                        </Button>
-                                    </DialogTrigger>
-
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>
-                                                Excluir fonte
-                                            </DialogTitle>
-                                            <DialogDescription>
-                                                Tem certeza que deseja excluir a fonte <strong>{fonte.name}</strong>?
-                                            </DialogDescription>
-                                        </DialogHeader>
-
-                                        <div className="flex justify-end gap-4 mt-4">
-                                            <DialogClose
-                                                className={`
-                                                        transition ease-in-out text-black
-                                                        rounded-md px-3
-                                                        hover:cursor-pointer
-                                                    `}
-                                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                            >
-                                                Cancelar
-                                            </DialogClose>
-
-                                            <Button
-                                                className={`
-                                                        flex bg-vermelho hover:bg-vermelho
-                                                        text-white hover:cursor-pointer
-                                                    `}
-                                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                onClick={() => {
-                                                    excluirFonte(fonte.id)
-                                                }}
-                                            >
-                                                Excluir
-                                            </Button>
-                                        </div>
-                                    </DialogContent>
-                                </Dialog>
+                                <BotaoExcluir tipo="fonte" item={fonte} funcExcluir={excluirFonte} />
 
                             </div>
                         </div>
