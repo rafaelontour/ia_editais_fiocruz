@@ -119,7 +119,7 @@ export default function testes() {
       </div>
 
       {/* Barra de pesquisa */}
-      <BarraDePesquisa value={pesquisa} onChange={setPesquisa} />
+      {/* <BarraDePesquisa value={pesquisa} onChange={setPesquisa} /> */}
 
       {/* Modal de edição do form*/}
       <Dialog open={openDialogEditar} onOpenChange={setOpenDialogEditar}>
@@ -170,11 +170,11 @@ export default function testes() {
                   }}
                 />
 
-                <BotaoExcluir
+                {/* <BotaoExcluir
                   titulo="Excluir Teste"
                   descricao="Tem certeza que deseja excluir o teste"
                   onClick={() => excluirTeste(mockTeste.id)}
-                />
+                /> */}
               </div>
             </div>
           </div>
