@@ -388,12 +388,12 @@ export default function Tipificacoes() {
 
                 <Masonry
                     breakpointCols={breakpointColumns}
-                    className="flex relative gap-5 mb-10 px-1"
+                    className="flex relative gap-5 mb-10 px-1 h-full"
                 >
                     {
                         carregandoTipificacoes ? (
-                            <div className="flex flex-col justify-center items-center gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-                                <p className="animate-pulse">Carregando tipificações</p>
+                            <div className="flex justify-center items-center gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2">
+                                <p className="animate-pulse">Carregando tipificações...</p>
                                 <Loader2 className="animate-spin" />
                             </div>
                         ) : (
