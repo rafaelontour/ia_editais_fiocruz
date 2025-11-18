@@ -156,11 +156,11 @@ export default function metricas() {
 
               <div className="flex gap-3">
                 <BotaoEditar onClick={() => setOpenDialogEditar(true)} />
-                <BotaoExcluir
+                {/* <BotaoExcluir
                   titulo="Excluir Métrica"
                   descricao="Tem certeza que deseja escluir a métrica"
                   onClick={() => excluirMetrica()}
-                />
+                /> */}
               </div>
             </div>
           </div>
