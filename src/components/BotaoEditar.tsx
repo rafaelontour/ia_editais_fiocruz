@@ -2,11 +2,6 @@
 import { PencilLine } from "lucide-react";
 import { Button } from "./ui/button";
 
-interface BotaoEditarProps {
-  titulo: string;
-  descricao: string;
-}
-
 export default function BotaoEditar({ onClick }: { onClick: () => void }) {
   return (
     <Button

@@ -1,5 +1,6 @@
 import {
   FilePen,
+  Gauge,
   Home,
   IdCard,
   Sheet,
@@ -55,6 +56,11 @@ const itemsAdm = [
     title: "Coleção de testes",
     url: "/adm/testes",
     icon: Wrench,
+  },
+  {
+    title: "Métricas",
+    url: "/adm/metricas",
+    icon: Gauge,
   },
 ];
 

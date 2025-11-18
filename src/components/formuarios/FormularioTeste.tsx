@@ -60,7 +60,7 @@ export default function FormularioTeste({
         <Button
           variant="outline"
           type="button"
-          className="lex bg-vermelho hover:bg-vermelho text-white hover:cursor-pointer"
+          className="flex bg-vermelho hover:bg-vermelho text-white hover:cursor-pointer"
         >
           Cancelar
         </Button>
