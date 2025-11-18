@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import Calendario from '@/components/Calendario';
+import BarraDePesquisa from '@/components/BarraDePesquisa';
 
 const schemaFonte = z.object({
     nome: z.string().min(1, "O nome da fonte é obrigatório"),
@@ -140,13 +141,13 @@ export default function Fontes() {
 
     function filtrarFontes() {
         if (termoBusca.current.trim() === "") {
-            return fontes;
+            setFontesFiltradas(fontes);
         }
 
         const ff = fontes.filter(
             f => f.name && f.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
         )
-        return ff
+        setFontesFiltradas(ff);
     }
 
     const limparCampos = () => {
@@ -260,40 +261,7 @@ export default function Fontes() {
                 </Dialog>
             </div>
 
-            <div className="flex w-1/2 relative -mt-1 mb-3">
-                                                        
-                <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
-
-                { 
-                    termoBusca.current !== "" && (
-                        <span
-                            onClick={() => {
-                                setFontesFiltradas(fontes);
-                                termoBusca.current = "";
-                                const fFiltradas = filtrarFontes();
-                                setFontesFiltradas(fFiltradas || []); 
-                            }}
-                            className="hover:cursor-pointer"
-                            title="Limpar pesquisa"
-                        >
-                            <X className="absolute mt-1 translate-y-1/2 right-2" size={17} />
-                        </span>
-                    )
-                }
-                    
-                <input
-                    type="text"
-                    value={termoBusca.current}
-                    placeholder="Pesquisar"
-                    className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                    onChange={(e) => { 
-                        termoBusca.current = e.target.value;
-                        const fFiltradas = filtrarFontes();
-                        setFontesFiltradas(fFiltradas || []);
-                    }}
-                />
-            </div>
+            <BarraDePesquisa ref={termoBusca} funcFiltrar={filtrarFontes} />
 
             <Masonry
                 breakpointCols={breakpointColumnsObj}
