@@ -3,23 +3,22 @@
 import Masonry from 'react-masonry-css'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, Loader2, PencilLine, Plus, Search, Trash, X } from "lucide-react";
+import { Loader2, PencilLine } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from '@/components/ui/button';
-import { FileUpload } from '@/components/ui/file-upload';
 import { adicionarFonteService, atualizarFonteService, excluirFonteService, getFontesService } from '@/service/fonte';
 import { Fonte } from '@/core/fonte';
 import z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import Calendario from '@/components/Calendario';
 import BarraDePesquisa from '@/components/BarraDePesquisa';
 import Botao from '@/components/BotaoAdicionar';
 import BotaoExcluir from '@/components/BotaoExcluir';
-import RotuloOpcional from '@/components/RotuloOpcional';
+import BotaoCancelar from '@/components/botoes/BotaoCancelar';
+import BotaoSalvar from '@/components/botoes/BotaoSalvar';
+import Formulario from './Formulario';
 
 const schemaFonte = z.object({
     nome: z.string().min(1, "O nome da fonte é obrigatório"),
@@ -46,7 +45,6 @@ export default function Fontes() {
 
     const [openDialogFontes, setOpenDialogFontes] = useState(false);
     const [fontes, setFontes] = useState<Fonte[]>([])
-    const [openDialogIdExcluir, setOpenDialogIdExcluir] = useState<string | null>(null);
     const [openDialogIdEditar, setOpenDialogIdEditar] = useState<string | null>(null);
     const [fontesFiltradas, setFontesFiltradas] = useState<Fonte[]>([]);
     const [carregando, setCarregando] = useState<boolean>(true);
@@ -54,20 +52,16 @@ export default function Fontes() {
     const termoBusca = useRef<string>("");
 
     const fetchData = async () => {
-        try {
-            const fnts = await getFontesService()
+        const fnts = await getFontesService();
 
-            if (!fnts) {
-                toast.error("Erro ao buscar fontes")
-                setCarregando(false);
-                return
-            }
-
-            setFontes([...fnts])
-            setFontesFiltradas([...fnts])
-        } catch (error) {
+        if (!fnts) {
             toast.error("Erro ao buscar fontes")
+            setCarregando(false);
+            return
         }
+
+        setFontes([...fnts])
+        setFontesFiltradas([...fnts]);
 
         setCarregando(false);
     }
@@ -88,86 +82,72 @@ export default function Fontes() {
 
     const adicionarFonte = async (formData: FormDataFonte) => {
         setCarregando(true);
-        try {
-            const resposta = await adicionarFonteService(formData.nome, formData.descricao);
+        
+        const resposta = await adicionarFonteService(formData.nome, formData.descricao);
 
-            if (resposta !== 201) {
-                toast.error("Erro ao adicionar fonte!")
-                setCarregando(false);
-                return
-            }
-
-            toast.success("Fonte adicionada com sucesso!");
-
-            setOpenDialogFontes(false);
-            limparCampos();
-            fetchData();
-        } catch (error) {
-            toast.error("Erro ao adicionar fonte")
+        if (resposta !== 201) {
+            toast.error("Erro ao adicionar fonte!")
+            setCarregando(false);
+            return
         }
+
+        toast.success("Fonte adicionada com sucesso!");
+
+        setOpenDialogFontes(false);
+        reset();
+        fetchData();
     }
 
     const atualizarFonte = async (formData: FormDataFonte) => {
-        try {
-            const resposta = await atualizarFonteService(openDialogIdEditar as string, formData.nome, formData.descricao);
+        
+        const resposta = await atualizarFonteService(openDialogIdEditar as string, formData.nome, formData.descricao);
 
-            if (resposta !== 200) {
-                toast.error("Erro ao atualizar fonte")
-                return
-            }
-
-            setCarregando(true);
-            toast.success("Fonte atualizada com sucesso!");
-
-            setOpenDialogIdEditar(null);
-            setOpenDialogFontes(false)
-            limparCampos();
-            fetchData();
-        } catch (error) {
-            toast.error("Erro ao atualizar fonte!")
+        if (resposta !== 200) {
+            toast.error("Erro ao atualizar fonte")
+            return
         }
 
+        setCarregando(true);
+        toast.success("Fonte atualizada com sucesso!");
+
+        setOpenDialogIdEditar(null);
+        setOpenDialogFontes(false)
+        reset();
+        fetchData();
     }
 
     const excluirFonte = async (id: string) => {
         setCarregando(true);
-        try {
-            const resposta = await excluirFonteService(id);
+    
+        const resposta = await excluirFonteService(id);
 
-            if (resposta !== 204) {
-                toast.error("Erro ao excluir fonte!")
-                setCarregando(false);
-                return
-            }
-
-            toast.success("Fonte excluida com sucesso!");
-
-            setOpenDialogIdExcluir(null)
-            fetchData();
-        } catch (error) {
-            toast.error("Erro ao excluir fonte")
+        if (resposta !== 204) {
+            toast.error("Erro ao excluir fonte!")
+            setCarregando(false);
+            return
         }
-    }
 
+        toast.success("Fonte excluida com sucesso!");
+
+        fetchData();
+    }
 
     function filtrarFontes() {
         if (termoBusca.current.trim() === "") {
             setFontesFiltradas(fontes);
+            return;
         }
 
         const ff = fontes.filter(
             f => f.name && f.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
         )
+    
         setFontesFiltradas(ff);
-    }
-
-    const limparCampos = () => {
-        reset();
     }
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between relative">
                 <h2 className="text-4xl font-bold">
                     Fontes
                 </h2>
@@ -177,8 +157,7 @@ export default function Fontes() {
                         <Botao texto="Adicionar fonte" />
                     </DialogTrigger>
 
-                    <DialogContent onCloseAutoFocus={limparCampos}>
-
+                    <DialogContent onCloseAutoFocus={() => reset()}>
                         <DialogHeader>
                             <DialogTitle className="text-3xl font-bold">
                                 Adicionar fonte à base de dados
@@ -187,71 +166,20 @@ export default function Fontes() {
                             <DialogDescription className="text-md pb-2">
                                 Preencha os campos abaixo para adicionar uma nova fonte
                             </DialogDescription>
-
                         </DialogHeader>
 
-                        <form onSubmit={handleSubmit(adicionarFonte)} className="flex text-lg flex-col gap-4">
-                            <p className="flex flex-col gap-2">
-                                <Label htmlFor="nomeFonte" className="text-lg">Nome da fonte</Label>
-                                <Input
-                                    {...register("nome")}
-                                    type="text"
-                                    id="nomeFonte"
-                                    className="
-                                        border-2 border-gray-300
-                                        rounded-md p-2 w-full
-                                    "
-                                />
-                                {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
-                            </p>
+                        <Formulario
+                            register={register}
+                            errors={errors}
+                        />
 
-                            <p className="flex flex-col gap-2">
-                                <Label htmlFor="descricaoFonte" className="text-lg">Descrição da fonte</Label>
-                                <Input
-                                    {...register("descricao")}
-                                    type="text"
-                                    id="descricaoFonte"
-                                    className="
-                                        border-2 border-gray-300
-                                        rounded-md p-2 w-full
-                                    "
-                                />
-                                {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
-                            </p>
+                        <DialogFooter>
+                            <DialogClose>
+                                <BotaoCancelar />
+                            </DialogClose>
 
-                            <Label className="text-lg">
-                                Upload de documento
-                                <RotuloOpcional />
-                            </Label>
-
-                            <FileUpload />
-
-                            <DialogFooter>
-                                <DialogClose
-                                    className={`
-                                        transition ease-in-out text-white
-                                        rounded-md px-3 bg-vermelho
-                                        hover:cursor-pointer text-sm
-                                    `}
-                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                >
-                                    Cancelar
-                                </DialogClose>
-
-                                <Button
-                                    type="submit"
-                                    className={`
-                                        flex bg-verde hover:bg-verde
-                                        text-white hover:cursor-pointer
-                                    `}
-                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                >
-                                    Salvar
-                                </Button>
-                            </DialogFooter>
-                        </form>
-
-
+                             <BotaoSalvar onClick={handleSubmit(adicionarFonte)} />
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>
@@ -305,7 +233,7 @@ export default function Fontes() {
                                                     </Button>
                                                 </DialogTrigger>
 
-                                                <DialogContent onCloseAutoFocus={limparCampos}>
+                                                <DialogContent onCloseAutoFocus={() => reset()}>
 
                                                     <DialogHeader>
                                                         <DialogTitle className="text-3xl font-bold">
@@ -318,66 +246,18 @@ export default function Fontes() {
 
                                                     </DialogHeader>
 
-                                                    <form onSubmit={handleSubmit(atualizarFonte)} className="flex text-lg flex-col gap-4">
-                                                        <p className="flex flex-col gap-2">
-                                                            <Label htmlFor="nomeFonte" className="text-lg">Nome da fonte</Label>
-                                                            <Input
-                                                                {...register("nome")}
-                                                                type="text"
-                                                                id="nomeFonte"
-                                                                className="
-                                                                    border-2 border-gray-300
-                                                                    rounded-md p-2 w-full
-                                                                "
-                                                            />
-                                                            {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
-                                                        </p>
+                                                    <Formulario
+                                                        register={register}
+                                                        errors={errors}
+                                                    />
 
-                                                        <p className="flex flex-col gap-2">
-                                                            <Label htmlFor="descricaoFonte" className="text-lg">Descrição da fonte</Label>
-                                                            <Input
-                                                                {...register("descricao")}
-                                                                type="text"
-                                                                id="descricaoFonte"
-                                                                className="
-                                                                    border-2 border-gray-300
-                                                                    rounded-md p-2 w-full
-                                                                "
-                                                            />
-                                                            {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
-                                                        </p>
+                                                    <DialogFooter>
+                                                        <DialogClose>
+                                                            <BotaoCancelar />
+                                                        </DialogClose>
 
-                                                        <Label className="text-lg">
-                                                            Fontes
-                                                            <RotuloOpcional />
-                                                        </Label>
-                                                        <FileUpload />
-
-                                                        <div className="flex justify-end gap-2 mt-4">
-                                                            <DialogClose
-                                                                className={`
-                                                                    transition ease-in-out text-white
-                                                                    rounded-md px-3 bg-vermelho
-                                                                    hover:cursor-pointer text-sm
-                                                                `}
-                                                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                            >
-                                                                Cancelar
-                                                            </DialogClose>
-
-                                                            <Button
-                                                                type="submit"
-                                                                className={`
-                                                                flex bg-verde hover:bg-verde
-                                                                text-white hover:cursor-pointer
-                                                            `}
-                                                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                            >
-                                                                Salvar
-                                                            </Button>
-                                                        </div>
-                                                    </form>
-
+                                                        <BotaoSalvar onClick={handleSubmit(atualizarFonte)} />
+                                                    </DialogFooter>
 
                                                 </DialogContent>
                                             </Dialog>
@@ -389,20 +269,18 @@ export default function Fontes() {
                                 </div>
                             ))
                         }
-                    
                     </Masonry>
                 ) : (
                     <p
                         className="
-                            absolute left-1/2 top-10 translate-x-[-50%] text-gray-400
+                            text-gray-400
                             text-2xl text-center animate-pulse
                         "
                     >
-                        Nenhuma fonte cadastrada.
+                        Nenhuma fonte encontrada.
                     </p>
                 )
             }
-
         </div>
     )
 }
