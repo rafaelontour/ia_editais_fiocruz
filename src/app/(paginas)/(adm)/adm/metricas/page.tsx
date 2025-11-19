@@ -1,10 +1,9 @@
 "use client";
 import BarraDePesquisa from "@/components/BarraDePesquisa";
 import BotaoAdicionar from "@/components/BotaoAdicionar";
-import BotaoEditar from "@/components/BotaoEditar";
-import BotaoExcluir from "@/components/BotaoExcluir";
-import Calendario from "@/components/Calendario";
 import FormularioMetrica from "@/components/formuarios/FormularioMetrica";
+import DetalheMetrica from "@/components/metricas/DetalheMetrica";
+import ListaMetricas from "@/components/metricas/ListaMetricas";
 import {
   Dialog,
   DialogContent,
@@ -13,20 +12,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Maximize, Maximize2 } from "lucide-react";
+import { Metrica } from "@/core/metrica";
 import { useState } from "react";
-import Masonry from "react-masonry-css";
 
 export default function metricas() {
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
   const [openDialogAdd, setOpenDialogAdd] = useState(false);
-
-  const breakpointColumns = {
-    default: 3,
-    1100: 3,
-    700: 2,
-    500: 1,
-  };
+  const [editandoForm, setEditandoForm] = useState<any>(null);
+  const [pesquisa, setPesquisa] = useState("");
+  const [metricaSelecionada, setMetricaSelecionada] = useState<Metrica | null>(
+    null
+  );
 
   const [mockMetricas, setMockMetricas] = useState([
     {
@@ -35,7 +31,7 @@ export default function metricas() {
       modelo: "GPT-5",
       notaCorte: 5,
       criterio: "critério da métrica",
-      passosAvalicao: "passo a passo para a avaliação da métrica",
+      passosAvaliacao: "passo a passo para a avaliação da métrica",
       created_at: "17/11/2025, 15:56:39",
     },
     {
@@ -44,7 +40,7 @@ export default function metricas() {
       modelo: "GPT-5",
       notaCorte: 5,
       criterio: "critério da métrica",
-      passosAvalicao: "passo a passo para a avaliação da métrica",
+      passosAvaliacao: "passo a passo para a avaliação da métrica",
       created_at: "17/11/2025, 15:56:39",
     },
     {
@@ -53,19 +49,46 @@ export default function metricas() {
       modelo: "GPT-5",
       notaCorte: 5,
       criterio: "critério da métrica",
-      passosAvalicao: "passo a passo para a avaliação da métrica",
+      passosAvaliacao: "passo a passo para a avaliação da métrica",
       created_at: "17/11/2025, 15:56:39",
     },
   ]);
 
-  function excluirMetrica() {}
+  function salvarEdicao(data: {
+    nome: string;
+    modelo: string;
+    notaCorte: number;
+    criterio: string;
+    passosAvaliacao: string;
+  }) {
+    const novasMetricas = mockMetricas.map((t) =>
+      t.id === editandoForm.id ? { ...t, ...data } : t
+    );
+
+    setMockMetricas(novasMetricas);
+
+    // se tiver expandido, atualizar a métrica selecionada também ou seja o endpoind vai ser pelo id da métrica
+    if (metricaSelecionada && metricaSelecionada.id === editandoForm.id) {
+      const metricaAtualizada = novasMetricas.find(
+        (m) => m.id === editandoForm.id
+      );
+
+      if (metricaAtualizada) {
+        setMetricaSelecionada(metricaAtualizada);
+      }
+    }
+  }
+
+  function excluirMetrica(id: number) {
+    setMockMetricas(mockMetricas.filter((t) => t.id !== id));
+  }
 
   function adicionarMetrica(data: {
     nome: string;
     modelo: string;
     notaCorte: number;
     criterio: string;
-    passosAvalicao: string;
+    passosAvaliacao: string;
   }) {
     const novaMetrica = {
       id: mockMetricas.length + 1,
@@ -73,99 +96,108 @@ export default function metricas() {
       modelo: data.modelo,
       notaCorte: data.notaCorte,
       criterio: data.criterio,
-      passosAvalicao: data.passosAvalicao,
+      passosAvaliacao: data.passosAvaliacao,
       created_at: new Date().toLocaleString(),
     };
     setMockMetricas([...mockMetricas, novaMetrica]);
   }
 
   return (
-    <div className="flex flex-col gap-5 pd-10">
-      <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-bold">Gestão de métricas</h2>
-        {/* Modal do Form */}
-        <Dialog>
-          <DialogTrigger asChild>
-            <BotaoAdicionar texto="Adicionar métrica" />
-          </DialogTrigger>
+    <>
+      <div className="flex flex-col gap-5 ">
+        <div className="flex items-center justify-between">
+          <h2 className="text-4xl font-bold">Gestão de métricas</h2>
+          {/* Modal do Form */}
+          <Dialog open={openDialogAdd} onOpenChange={setOpenDialogAdd}>
+            <DialogTrigger asChild>
+              <BotaoAdicionar texto="Adicionar métrica" />
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="text-3xl font-bold">
+                  Adicionar métrica
+                </DialogTitle>
+                <DialogDescription>
+                  Preencha os campos abaixo para adicionar uma nova métrica
+                </DialogDescription>
+              </DialogHeader>
+
+              <FormularioMetrica
+                mode="create"
+                onSubmit={(data) => {
+                  adicionarMetrica(data);
+                  setOpenDialogAdd(false);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {!metricaSelecionada && (
+          <>
+            {/* Barra de pesquisa */}
+            <BarraDePesquisa value={pesquisa} onChange={setPesquisa} />
+
+            {/* Cards de Métrica */}
+
+            <ListaMetricas
+              metricas={mockMetricas.filter((m) =>
+                m.nome.toLowerCase().includes(pesquisa.toLowerCase())
+              )}
+              onOpen={(m) => setMetricaSelecionada(m)} // maxima
+              onEditar={(m) => {
+                setEditandoForm(m);
+                setOpenDialogEditar(true);
+              }}
+              onExcluir={(id) => excluirMetrica(id)}
+            />
+          </>
+        )}
+
+        {/* Métrica expandida */}
+        {metricaSelecionada && (
+          <DetalheMetrica
+            metrica={metricaSelecionada}
+            onVoltar={() => setMetricaSelecionada(null)}
+            onEditar={() => {
+              setEditandoForm(metricaSelecionada);
+              setOpenDialogEditar(true);
+            }}
+            onExcluir={() => {
+              excluirMetrica(metricaSelecionada.id);
+              setMetricaSelecionada(null);
+            }}
+          />
+        )}
+      </div>
+
+      {/* Modal de edição do form*/}
+      {openDialogEditar && (
+        <Dialog open={openDialogEditar} onOpenChange={setOpenDialogEditar}>
+          <DialogTrigger></DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="text-3xl font-bold">
-                Adicionar métrica
+                Editar Métrica
               </DialogTitle>
               <DialogDescription>
-                Preencha os campos abaixo para adicionar uma nova métrica
+                Atualize os dados da métrica selecionada
               </DialogDescription>
             </DialogHeader>
 
-            <FormularioMetrica
-              mode="create"
-              onSubmit={(data) => {
-                adicionarMetrica(data);
-                setOpenDialogAdd(false);
-              }}
-            />
+            {editandoForm && (
+              <FormularioMetrica
+                mode="edit"
+                initialData={editandoForm}
+                onSubmit={(data) => {
+                  salvarEdicao(data);
+                  setOpenDialogEditar(false);
+                }}
+              />
+            )}
           </DialogContent>
         </Dialog>
-      </div>
-
-      {/* Barra de pesquisa */}
-      <BarraDePesquisa />
-
-      {/* Modal de edição do form*/}
-      <Dialog>
-        <DialogTrigger></DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle></DialogTitle>
-            <DialogDescription></DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-
-      {/* Cards de Teste*/}
-      <Masonry
-        breakpointCols={breakpointColumns}
-        className="flex relative gap-5 mb-10 px-1"
-      >
-        {mockMetricas.map((metrica) => (
-          <div
-            className="relative flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
-            key={metrica.id}
-            style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
-          >
-            <Maximize2
-              className="absolute top-2 right-2 cursor-pointer"
-              size={19}
-            />
-
-            <h2 className="text-2xl font-semibold">{metrica.nome}</h2>
-            <div className="flex flex-row gap-3">
-              <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2 ">
-                Modelo ia: {metrica.modelo}
-              </p>
-
-              <p className="w-fit py-1 px-2 ">
-                <span className="font-semibold">Nota de corte: </span>
-                {metrica.notaCorte}
-              </p>
-            </div>
-
-            <div className="flex justify-between items-center mt-3">
-              <Calendario data={metrica.created_at} />
-
-              <div className="flex gap-3">
-                <BotaoEditar onClick={() => setOpenDialogEditar(true)} />
-                <BotaoExcluir
-                  titulo="Excluir Métrica"
-                  descricao="Tem certeza que deseja escluir a métrica"
-                  onClick={() => excluirMetrica()}
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-      </Masonry>
-    </div>
+      )}
+    </>
   );
 }
