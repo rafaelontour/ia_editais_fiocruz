@@ -1,8 +1,10 @@
 import { Button } from "../ui/button";
 
-export default function BotaoSalvar() {
+
+export default function BotaoSalvar({ onClick }: { onClick?: () => void }) {
     return (
         <Button
+            onClick={onClick}
             type="submit"
             className={`
                 flex bg-verde hover:bg-verde
