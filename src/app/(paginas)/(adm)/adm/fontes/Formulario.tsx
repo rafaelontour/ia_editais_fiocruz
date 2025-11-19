@@ -2,6 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FileUpload } from "@/components/ui/file-upload";
 import { Fonte } from "@/core";
+import RotuloOpcional from "@/components/RotuloOpcional";
 
 interface FormularioFonteProps {
     register: any;
@@ -44,9 +45,12 @@ export default function Formulario({ register, errors }: FormularioFonteProps) {
                 )}
             </p>
 
-            <Label className="text-lg">
-                Upload de documento
-            </Label>
+            <p className="flex items-center gap-2">
+                <Label className="text-lg">
+                    Upload de documento
+                </Label>
+                <RotuloOpcional />
+            </p>
 
             <FileUpload />
         </form>
