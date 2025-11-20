@@ -7,7 +7,7 @@ import { Loader2, PencilLine } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { adicionarFonteService, atualizarFonteService, excluirFonteService, getFontesService } from '@/service/fonte';
-import { Fonte } from '@/core/fonte';
+import type { Fonte } from '@/core/fonte';
 import z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

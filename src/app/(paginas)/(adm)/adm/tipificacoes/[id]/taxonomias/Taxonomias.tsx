@@ -23,9 +23,9 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Fonte, Tipificacao } from "@/core";
-import { Ramo } from "@/core/ramo";
-import { Taxonomia } from "@/core/taxonomia";
+import type { Fonte, Tipificacao } from "@/core";
+import type { Ramo } from "@/core/ramo";
+import type { Taxonomia } from "@/core/taxonomia";
 import { formatarData } from "@/lib/utils";
 import { getFontesService } from "@/service/fonte";
 import { adicionarRamoService, buscarRamosDaTaxonomiaService, excluirRamoService } from "@/service/ramo";
@@ -37,7 +37,6 @@ import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-import { _undefined } from "zod/v4/core";
 
 const schemaTaxonomia = z.object({
     id_tipificacao: z.string().min(1),
@@ -191,6 +190,7 @@ export default function Taxonomias({ id }: { id: string }) {
 
         if (resposta !== 201) {
             toast.error("Erro ao adicionar ramo");
+            return
         }
 
         toast.success("Ramo adicionado com sucesso!");

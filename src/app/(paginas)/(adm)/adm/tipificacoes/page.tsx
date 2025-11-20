@@ -1,13 +1,12 @@
 "use client"
 
 import { z } from "zod";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Fonte, Tipificacao } from "@/core";
+import type { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
 import { getTipificacoesService, adicionarTipificacaoService, excluirTipificacaoService, atualizarTipificacaoService } from "@/service/tipificacao";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -15,9 +14,7 @@ import { Calendar, Loader2, PencilLine, Plus, Search, Share2, Trash, X } from "l
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
-import { formatarData, simularAtraso } from "@/lib/utils";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { formatarData } from "@/lib/utils";
 import Link from "next/link";
 import BotaoExcluir from "@/components/BotaoExcluir";
 import BotaoCancelar from "@/components/botoes/BotaoCancelar";
