@@ -72,14 +72,14 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const { editalProcessado, setEditalProcessado, setIdEditalAtivo } = useEditalProc();
 
     const a = useRef<number>(0);
-
-    async function buscarUnidades() {
-        const unidades = await getTodasUnidades();
-        setUnidades(unidades);
-    }
     
     async function buscarTipificacoes() {
         const tipificacoes = await getTipificacoesService();
+
+        if (!tipificacoes) {
+            toast.error("Erro ao buscar tipificações!");
+            return;
+        }
         setTipificacoes(tipificacoes);
     }
     
@@ -164,13 +164,8 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     }
 
 
-    useEffect(() => {
-        try {
-            buscarUnidades();
-            buscarTipificacoes();
-        } catch(e: any) {
-            toast.error("Erro", e.message);
-        }
+    useEffect(() => {  
+        buscarTipificacoes();
     }, [])
 
     function limparDados() {

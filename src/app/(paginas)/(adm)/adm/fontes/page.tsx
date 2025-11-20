@@ -184,7 +184,7 @@ export default function Fontes() {
                 </Dialog>
             </div>
 
-            <BarraDePesquisa ref={termoBusca} funcFiltrar={filtrarFontes} />
+            <BarraDePesquisa refInput={termoBusca} funcFiltrar={filtrarFontes} />
 
             {
                 carregando ? (
