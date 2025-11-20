@@ -67,19 +67,19 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [tipificacoesSelecionadas, setTipificacoesSelecionadas] = useState<Tipificacao[] | []>([]);
     const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
-    const [carregandoEditais, setCarregandoEditais] = useState<boolean>(true);
     const { usuario } = useUsuario();
     const { editalProcessado, setEditalProcessado, setIdEditalAtivo } = useEditalProc();
 
     const a = useRef<number>(0);
-
-    async function buscarUnidades() {
-        const unidades = await getTodasUnidades();
-        setUnidades(unidades);
-    }
     
     async function buscarTipificacoes() {
         const tipificacoes = await getTipificacoesService();
+
+        if (!tipificacoes) {
+            toast.error("Erro ao buscar tipificações!");
+            return;
+        }
+
         setTipificacoes(tipificacoes);
     }
     
@@ -105,7 +105,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
 
         if (resposta !== 201) {
             if (resposta === 409) {
-                toast.error("Erro ao enviar edital!", { description: "Ja existe um edital cadastrado esse número!" });
+                toast.error("Erro ao enviar edital!", { description: "Ja existe um edital cadastrado esse nome ou número!" });
                 return;
             }
             toast.error("Erro ao enviar edital!");
@@ -128,7 +128,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario?.id}`);
 
         ws.onopen = () => {
-            
+            return;
         };
 
         ws.onmessage = (event) => {
@@ -157,7 +157,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         };
 
         ws.onclose = () => {
-            console.log("WebSocket fechado");
+            return;
         };
 
         toast.info("Edital enviado!", { description: "Aguarde o processamento do edital..." });
@@ -166,7 +166,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
 
     useEffect(() => {
         try {
-            buscarUnidades();
             buscarTipificacoes();
         } catch(e: any) {
             toast.error("Erro", e.message);
