@@ -11,16 +11,17 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { useState } from "react";
-import { Fonte } from "@/core";
+import type { Fonte, Tipificacao } from "@/core";
+import type { Taxonomia } from "@/core/tipificacao/Tipificacao";
 
 interface BotaoExcluirProps {
   tipo: string;
-  item: Fonte
+  item: Fonte | Tipificacao | Taxonomia
   funcExcluir: (id: string) => void;
 }
 
 export default function BotaoExcluir(dados: BotaoExcluirProps) {
-  const [dialogOpen, setDialogOpen] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<string | null | undefined>(null);
 
   return (
     <Dialog
@@ -42,8 +43,10 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
           <DialogTitle>Excluir {dados.tipo}</DialogTitle>
 
           <DialogDescription>
-            Tem certeza que deseja excluir a {dados.tipo}{" "}
-            <strong>{dados.item.name ?? dados.item}</strong>
+            Tem certeza que deseja excluir { dados.tipo !== "ramo" ? "a " : "o "} {dados.tipo} {" "}
+            <strong>
+              {"title" in dados.item ? dados.item.title : "name" in dados.item && dados.item.name}
+            </strong>
           </DialogDescription>
         </DialogHeader>
 

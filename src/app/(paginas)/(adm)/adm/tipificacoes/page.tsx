@@ -1,16 +1,15 @@
 "use client"
 
 import { z } from "zod";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
-import type { Fonte, Tipificacao } from "@/core";
+import { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
 import { getTipificacoesService, adicionarTipificacaoService, excluirTipificacaoService, atualizarTipificacaoService } from "@/service/tipificacao";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, Loader2, PencilLine, Plus, Search, Share2, Trash, X } from "lucide-react";
+import { Calendar, Loader2, PencilLine, Plus, Share2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
@@ -21,6 +20,7 @@ import BotaoCancelar from "@/components/botoes/BotaoCancelar";
 import BotaoSalvar from "@/components/botoes/BotaoSalvar";
 import Formulario from "./Formulario";
 import BarraDePesquisa from "@/components/BarraDePesquisa";
+import { useForm } from "react-hook-form";
 
 const schemaTipificacao = z.object({
     nome: z.string().min(1, "O nome da tipificação é obrigatório"),
