@@ -1,5 +1,6 @@
 "use client";
 
+import BarraDePesquisa from "@/components/BarraDePesquisa";
 import EditarRamo from "@/components/ramos/EditarRamo";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,23 +22,25 @@ import {
     DialogClose,
 } from "@/components/ui/dialog";
 
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Fonte, Tipificacao } from "@/core";
-import { Ramo } from "@/core/ramo";
-import { Taxonomia } from "@/core/taxonomia";
+import type { Fonte, Tipificacao } from "@/core";
+import type { Ramo } from "@/core/ramo";
+import type { Taxonomia } from "@/core/taxonomia";
 import { formatarData } from "@/lib/utils";
 import { getFontesService } from "@/service/fonte";
 import { adicionarRamoService, buscarRamosDaTaxonomiaService, excluirRamoService } from "@/service/ramo";
 import { adicionarTaxonomiaService, atualizarTaxonomiaService, excluirTaxonomiaService } from "@/service/taxonomia";
 import { getTipificacaoPorIdService, getTipificacoesService } from "@/service/tipificacao";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowUpDown, Calendar, Loader2, PencilLine, Plus, Search, Trash, X } from "lucide-react";
+import { ArrowUpDown, Calendar, Loader2, PencilLine, Plus, Trash, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import { _undefined } from "zod/v4/core";
+import Formulario from "./Formulario";
+import BotaoCancelar from "@/components/botoes/BotaoCancelar";
+import BotaoSalvar from "@/components/botoes/BotaoSalvar";
+import BotaoExcluir from "@/components/botoes/BotaoExcluir";
 
 const schemaTaxonomia = z.object({
     id_tipificacao: z.string().min(1),
@@ -72,8 +75,6 @@ export default function Taxonomias({ id }: { id: string }) {
 
     const [idSelecionado, setIdSelecionado] = useState<string | undefined>("");
     const [taxonomiaSelecionada, setTaxonomiaSelecionada] = useState<Taxonomia | null | undefined>(null);
-    const [tituloTaxonomia, setTituloTaxonomia] = useState<string | undefined>("");
-    const [descricaoTaxonomia, setDescricaoTaxonomia] = useState<string | undefined>("");
     const [descricaoRamo, setDescricaoRamo] = useState<string>("");
     const [tituloRamo, setTituloRamo] = useState<string>("");
     const [tax, setTax] = useState<any[]>([]);
@@ -84,7 +85,7 @@ export default function Taxonomias({ id }: { id: string }) {
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [idTipificacao, setIdTipificacao] = useState<string>("");
 
-    const [openDialogExcluirTax, setOpenDialogExcluirTax] = useState<string | null>();
+    
     const [openTaxonomia, setOpenTaxonomia] = useState<boolean>(false);
     const [openTaxonomiaId, setOpenTaxonomiaId] = useState<string | null | undefined>(null);
     const [openDialogRamo, setOpenDialogRamo] = useState<boolean>(false);
@@ -131,8 +132,9 @@ export default function Taxonomias({ id }: { id: string }) {
     useEffect(() => {
         const termo = termoBusca.current || "";
 
-        const filtradas = filtrarTaxonomiasPorNome(termo);
-        setTaxFiltradas(filtradas || []);
+        console.log("TERMO BUSCA NO USEEFFECT DE TAXONOMIAS:", termo);
+
+        filtrarTaxonomiasPorNome();
     }, [tax]);
     
 
@@ -212,7 +214,6 @@ export default function Taxonomias({ id }: { id: string }) {
             }
 
             toast.success("Taxonomia excluida com sucesso!");
-            setOpenDialogExcluirTax(null);
             setIdSelecionado("");
             setTaxonomiaSelecionada(null);
             setRamosOriginais([]);
@@ -246,31 +247,30 @@ export default function Taxonomias({ id }: { id: string }) {
         setRamosDaTaxonomia(ramos || []);
     }
 
-    const adicionarTaxonomia = async () => {
+    const adicionarTaxonomia = async (dados: FormData) => {
+
         setCarregandoTax(true);
-        try {
-            const novaTaxonomia: Taxonomia = {
-                typification_id: idTipificacao ? idTipificacao : id,
-                title: tituloTaxonomia,
-
-                description: descricaoTaxonomia,
-                source_ids: fontesSelecionadas && fontesSelecionadas.map(fonte => fonte.id),
-            }
-
-            const resposta = await adicionarTaxonomiaService(novaTaxonomia);
-
-            if (resposta !== 201) {
-                toast.error("Erro ao adicionar taxonomia");
-                return
-            }
-
-            toast.success("Taxonomia adicionada com sucesso!");
-            await getTipificacaoPorId();
-        } catch (e) {
-            toast.error("Erro ao adicionar taxonomia");
+        
+        const novaTaxonomia: Taxonomia = {
+            typification_id: idTipificacao ? idTipificacao : id,
+            title: dados.titulo,
+            description: dados.descricao,
+            source_ids: dados.fontesSelecionadas
         }
+        console.log("Dados do form de taxonomia:", novaTaxonomia);
+
+        const resposta = await adicionarTaxonomiaService(novaTaxonomia);
+
+        if (resposta !== 201) {
+            toast.error("Erro ao adicionar taxonomia");
+            return
+        }
+
+        toast.success("Taxonomia adicionada com sucesso!");
+        await getTipificacaoPorId();
+        
         setOpenTaxonomia(false);
-        limparCampos();
+        limparCamposTaxonomia();
     }
 
     const atualizarTaxonomia = async (data: FormData) => {
@@ -280,7 +280,7 @@ export default function Taxonomias({ id }: { id: string }) {
             id: taxonomiaSelecionada?.id,
             typification_id: idTipificacao ? idTipificacao : id,
             title: data.titulo,
-            source_ids: fontesSelecionadas && fontesSelecionadas.map(fonte => fonte.id),
+            source_ids: data.fontesSelecionadas,
             description: data.descricao,
         }
 
@@ -294,10 +294,10 @@ export default function Taxonomias({ id }: { id: string }) {
 
         toast.success("Taxonomia atualizada com sucesso!");
 
-        limparCampos();
+        limparCamposTaxonomia();
+        setOpenTaxonomiaId(null);
         await getTipificacaoPorId();
 
-        setOpenTaxonomiaId(null);
     }
 
     const buscarRamos = async (idTaxonomia: string | undefined) => {
@@ -306,23 +306,18 @@ export default function Taxonomias({ id }: { id: string }) {
         setRamosDaTaxonomia(ramos || []);
     }
 
-    const filtrarTaxonomiasPorNome = (nome: string) => {
+    const filtrarTaxonomiasPorNome = () => {
         // Se for uma busca vazia, retorna todas as taxonomias
-        if (nome.trim() === "" || nome === undefined) {
-            return tax
+        if ((termoBusca.current?.trim() === "" || termoBusca.current === undefined)) {
+            setTaxFiltradas(tax);
         }
 
         // Caso contrário, filtra as taxonomias com base no nome fornecido
-        const resultadoFiltrado = tax.filter(taxonomia => taxonomia.title?.toLowerCase().startsWith(nome.toLowerCase()));
-        return resultadoFiltrado;
+        const resultadoFiltrado = tax.filter(taxonomia => taxonomia.title?.toLowerCase().startsWith(termoBusca.current.toLowerCase()));
+        setTaxFiltradas(resultadoFiltrado);
     }
 
-    function limparCampos() {
-        refIdAux.current = undefined;
-        // setTaxonomiaSelecionada(null);
-        setTituloTaxonomia("");
-        setDescricaoTaxonomia("");
-        setFontesSelecionadas([]);
+    function limparCamposTaxonomia() {
         setIdTipificacao("");
         reset({
             fontesSelecionadas: [],
@@ -332,7 +327,6 @@ export default function Taxonomias({ id }: { id: string }) {
     }
 
     function limparCamposRamo() {
-        setTituloRamo("");
         setDescricaoRamo("");
         setRamoSelecionado(null);
         flagHook.current = false;
@@ -349,22 +343,22 @@ export default function Taxonomias({ id }: { id: string }) {
                 <div className="flex flex-col gap-2 mb-1">
                     <p className="font-semibold text-4xl">Gestão de taxonomia e ramos</p>
                     <p className="max-w-[500px] truncate py-2 flex items-center gap-2">
-                    <span className="italic">para a tipificação:</span>
+                        <span className="italic">para a tipificação:</span>
 
-                    {
-                        !tipificacoes.find(t => t.id === id) ? (
-                            <span><Loader2 className="animate-spin" /></span>
-                        ) : (
-                            <span title={tipificacoes.find(t => t.id === id)?.name} className="bg-vermelho text-white rounded-md px-3 py-1 inline-flex max-w-[450px] overflow-hidden text-ellipsis whitespace-nowrap">
-                                <strong className="truncate">
-                                    {tipificacoes.find(t => t.id === id)?.name}
-                                </strong>
-                            </span>
-                        )
-                    }
-                    
+                        {
+                            !tipificacoes.find(t => t.id === id) ? (
+                                <span><Loader2 className="animate-spin" /></span>
+                            ) : (
+                                <span title={tipificacoes.find(t => t.id === id)?.name} className="bg-vermelho text-white rounded-md px-3 py-1 inline-flex max-w-[450px] overflow-hidden text-ellipsis whitespace-nowrap">
+                                    <strong className="truncate">
+                                        {tipificacoes.find(t => t.id === id)?.name}
+                                    </strong>
+                                </span>
+                            )
+                        }
+                        
 
-                </p>
+                    </p>
                 </div>
 
                 <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
@@ -379,7 +373,7 @@ export default function Taxonomias({ id }: { id: string }) {
                         </Button>
                     </DialogTrigger>
 
-                    <DialogContent onCloseAutoFocus={limparCampos}>
+                    <DialogContent onCloseAutoFocus={limparCamposTaxonomia}>
                         <DialogHeader>
                             <DialogTitle>Adicionar taxonomia</DialogTitle>
                             <DialogDescription>
@@ -387,281 +381,37 @@ export default function Taxonomias({ id }: { id: string }) {
                             </DialogDescription>
                         </DialogHeader>
 
-                        <form onSubmit={handleSubmit(adicionarTaxonomia)} className="space-y-4">
-                            <div className="flex p-3 gap-2 bg-gray-300 rounded-sm items-center">
-                                <Label className="block text-md text-gray-700">
-                                    Tipificação:
-                                </Label>
+                        <Formulario
+                            register={register}
+                            errors={errors}
+                            control={control}
+                            setValue={setValue}
+                            idTipificacao={id}
+                            fontes={fontes}
+                            fontesSelecionadas={fontesSelecionadas}
+                            setFontesSelecionadas={setFontesSelecionadas}
+                            tipificacoes={tipificacoes}
+                            divRefs={divRefs}
+                        />
 
-                                <Select
-                                    disabled
-                                    defaultValue={id}
-                                    onValueChange={(e) => {
-                                        setIdTipificacao(e)
-                                        setValue("id_tipificacao", e)
-                                    }}
-                                >
-                                    <SelectTrigger className="max-w-[400px] bg-white">
-                                        <SelectValue className="w-full" placeholder="Selecione uma tipificação" />
-                                    </SelectTrigger>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <BotaoCancelar />
+                            </DialogClose>
 
-                                    <SelectContent className="bg-white">
-
-                                        {
-                                            tipificacoes && tipificacoes.map((item, index) => (
-                                                <SelectItem title={item.name} key={index} value={item.id}>{item.name}</SelectItem>
-                                            ))
-                                        }
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            {errors.id_tipificacao && <p className="text-red-500 text-xs italic mt-1">Selecionar uma tipificação é obrigatório!</p>}
-
-                            <div>
-                                <label htmlFor="titleRamo" className="block text-sm font-medium text-gray-700">
-                                    Título
-                                </label>
-
-                                <input
-                                    {...register("titulo", { required: true })}
-                                    onChange={(e) => setTituloTaxonomia(e.target.value)}
-                                    type="text"
-                                    id="titleTaxonomia"
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                />
-                                {errors.titulo && <p className="text-red-500 text-xs italic mt-1">{errors.titulo.message}</p>}
-                            </div>
-
-                            <div
-                                ref={(e) => { divRefs.current["descricao_tax"] = e }}
-                            >
-                                <label htmlFor="descriptionRamo" className="block text-sm font-medium text-gray-700">
-                                    Descrição da Taxonomia
-                                </label>
-
-                                <textarea
-                                    {...register("descricao", { required: true })}
-                                    onChange={(e) => setDescricaoTaxonomia(e.target.value)}
-                                    id="descriptionTaxonomia"
-                                    placeholder="Digite uma descrição para a taxonomia"
-                                    rows={4}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                />
-                                {errors.descricao && <p className="text-red-500 text-xs italic mt-1">{errors.descricao.message}</p>}
-                            </div>
-
-                            <p className="flex flex-col gap-2">
-                                <Label className="text-lg">Fontes</Label>
-                                <Controller
-                                    name="fontesSelecionadas"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            value=""
-                                            onValueChange={(value) => {
-                                                field.onChange([...field.value, value]);
-                                                const fonteEncontrada = fontes.find(fonte => fonte.id === value);
-
-                                                if (fonteEncontrada) {
-                                                    setFontesSelecionadas([...fontesSelecionadas!, fonteEncontrada]);
-                                                }
-                                            }}
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Selecione uma ou mais fontes" />
-                                            </SelectTrigger>
-
-                                            <SelectContent ref={(e) => { divRefs.current["select_fontes_tax"] = e }}>
-                                                <SelectGroup>
-
-                                                    <SelectLabel>Fontes</SelectLabel>
-                                                    {fontes && fontes.filter(fonte => !fontesSelecionadas!.some(f => f.id === fonte.id)).map((fonte, index) => (
-                                                        <SelectItem
-                                                            key={index}
-                                                            value={fonte.id}
-                                                            className="p-2 rounded-sm"
-                                                        >
-                                                            {fonte.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                    {
-                                                        fontes?.length === fontesSelecionadas!.length && (
-                                                            <SelectItem
-                                                                value="Todos"
-                                                                className="hover:cursor-pointer"
-                                                                disabled
-                                                            >
-                                                                Nenhuma fonte para selecionar
-                                                            </SelectItem>
-                                                        )
-                                                    }
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-                                />
-                                {errors.fontesSelecionadas && (
-                                    <span className="text-red-500 mb-5 text-sm italic">{errors.fontesSelecionadas.message}</span>
-                                )}
-                            </p>
-                            {
-                                fontesSelecionadas && fontesSelecionadas.length > 0 && (
-                                    <div className="flex flex-col gap-3 w-full">
-                                        <Label htmlFor="tipe" className="text-lg">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
-                                        <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
-                                            {
-                                                fontesSelecionadas.map((fonte: Fonte, index) => (
-                                                    <div ref={(e) => { divRefs.current["divFonteSelecionada_" + index] = e } } key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                        <button onClick={() => {
-                                                            const novaLista = fontesSelecionadas.filter((f) => f.id !== fonte.id)
-                                                            setFontesSelecionadas(novaLista);
-                                                            setValue("fontesSelecionadas", [""]);
-                                                        }}>
-                                                            <div className="flex items-center" title="Remover fonte">
-                                                                <span
-                                                                    className="
-                                                                        bg-red-200 p-[10px]
-                                                                        hover:bg-red-400 hover:cursor-pointer hover:text-white
-                                                                        transition-all duration-200 ease-in-out
-                                                                    "
-                                                                >
-                                                                    <X className="w-4 h-4" />
-                                                                </span>
-                                                            </div>
-                                                        </button>
-                                                        <p className=" w-full text-sm">{fonte.name}</p>
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
-                                    </div>
-                                )
-                            }
-
-                            <DialogFooter>
-                                <DialogClose
-                                    className={`
-                                            transition ease-in-out text-white
-                                            rounded-md px-3 bg-vermelho
-                                            hover:cursor-pointer text-sm
-                                        `}
-                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                >
-                                    Cancelar
-                                </DialogClose>
-
-                                <Button
-                                    type="submit"
-                                    className={`
-                                            flex bg-verde hover:bg-verde
-                                            text-white hover:cursor-pointer
-                                            active:scale-100
-                                        `}
-                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                >
-                                    Salvar
-                                </Button>
-                            </DialogFooter>
-                        </form>
+                            <BotaoSalvar onClick={handleSubmit(adicionarTaxonomia)} />
+                            
+                        </DialogFooter>
 
                     </DialogContent>
                 </Dialog>
             </div>
 
             <div className="flex h-[70vh] gap-3 relative pb-10">
-                <div className="flex flex-col w-1/2 overflow-y-auto">
-
-                    {/* Barra de busca e filtro de tipificação */}
-
-                                        
-                    <div className="flex sticky bg-white top-0 items-center gap-5 w-full px-0.5 pb-4">
-                        <div className="flex w-full relative">
-                                <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
-                                {
-                                    termoBusca.current !== "" && (
-                                        <span
-                                            onClick={() => {
-                                                setTaxFiltradas(tax);
-                                                termoBusca.current = "";
-                                            }}
-                                            className="hover:cursor-pointer"
-                                            title="Limpar pesquisa"
-                                        >
-                                            <X className="absolute mt-1 translate-y-1/2 right-2" size={17} />
-                                        </span>
-                                    )
-                                }
-
-                                <input
-                                    type="text"
-                                    value={termoBusca.current}
-                                    placeholder="Pesquisar"
-                                    className="mt-1 block w-full pl-8 pr-3 py-2  rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                    onChange={(e) => {
-                                        termoBusca.current = e.target.value;
-                                        const taxsFiltradas = filtrarTaxonomiasPorNome(e.target.value);
-
-                                        if (taxsFiltradas !== undefined) {
-                                            setTaxFiltradas(taxsFiltradas);
-                                        } else {
-                                            setTaxFiltradas(tax);
-                                        }
-                                    }}
-                                />
-                            </div>
+                <div className="flex flex-col w-1/2 overflow-y-auto">                     
+                    <div className="flex sticky bg-white top-0 items-center gap-5 w-full px-0.5 pt-1 pb-4">
+                        <BarraDePesquisa refInput={termoBusca} funcFiltrar={filtrarTaxonomiasPorNome} />
                     </div>
-
-                    {/* <div className="flex sticky bg-white top-0 items-center gap-5 w-full px-0.5 pb-4">
-                        
-
-                        <div className="flex items-center gap-2 w-fit">
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Filter size={17} />
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                    Filtre pela tipificação associada a cada taxonomia
-                                </TooltipContent>
-                            </Tooltip>
-
-                            :
-                            <Select
-                                onValueChange={(e) => {
-                                    tipificacaoFiltro.current = e;
-                                    const taxsFiltradas = filtrarTaxonomiasPorTipificacao()
-                                    setTaxFiltradas(taxsFiltradas || []);
-                                }}
-                            >
-                                <SelectTrigger className="max-w-[400px]">
-                                    <SelectValue className="w-full" placeholder="Selecionhe uma tipificação" />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                    <SelectGroup>
-
-                                        <SelectLabel>Tipificações</SelectLabel>
-
-                                        <SelectItem value="Todas">
-                                            Todas
-                                        </SelectItem>
-
-                                        {
-                                            tipificacoes.map((item, index) => (
-                                                <SelectItem
-                                                    key={index}
-                                                    value={item.name ?? ""}
-                                                >
-                                                    {item.name}
-                                                </SelectItem>
-                                            ))
-                                        }
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div> 
-                    </div>*/}
 
                     {
                         carregandoTax ? (
@@ -679,7 +429,6 @@ export default function Taxonomias({ id }: { id: string }) {
                                         ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}
                                     `}
                                     onMouseDown={() => {
-                                        // setTaxonomiaSelecionada(item)
                                         setIdSelecionado(index.toString())
                                     }}
                                     onClick={() => {
@@ -687,10 +436,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                         setIdSelecionado(index.toString())
                                         buscarRamos(item.id)
                                     }}
-                                // onMouseUp={() => setTaxonomiaSelecionada(item)}
                                 >
-                                    
-
                                     <CardHeader>
                                         <CardTitle className="text-2xl">{item.title}</CardTitle>
                                     </CardHeader>
@@ -717,8 +463,6 @@ export default function Taxonomias({ id }: { id: string }) {
                                                             const fontesDaTaxonomia = item.sources 
                                                             setFontesSelecionadas(fontesDaTaxonomia)
                                                             setIdTipificacao(item.tip_assoc_id as string)
-                                                            setTituloTaxonomia(item.title)
-                                                            setDescricaoTaxonomia(item.description)
                                                             setValue("fontesSelecionadas", (fontesDaTaxonomia ?? []).map((f: any) => f.id))
                                                             setTaxonomiaSelecionada(item)
                                                             setValue("id_tipificacao", refIdAux.current as string)
@@ -734,7 +478,7 @@ export default function Taxonomias({ id }: { id: string }) {
 
                                                 <DialogContent
                                                     ref={(e) => { divRefs.current["editartax_" + index] = e }}
-                                                    onCloseAutoFocus={limparCampos}
+                                                    onCloseAutoFocus={limparCamposTaxonomia}
                                                 >
                                                     <DialogHeader>
                                                         <DialogTitle>Editar taxonomia</DialogTitle>
@@ -743,251 +487,35 @@ export default function Taxonomias({ id }: { id: string }) {
                                                         </DialogDescription>
                                                     </DialogHeader>
 
-                                                    <form onSubmit={handleSubmit(atualizarTaxonomia)} className="space-y-4">
-                                                        <div className="flex p-3 gap-2 bg-gray-300 rounded-sm items-center">
-                                                            <Label className="block text-md text-gray-700">
-                                                                Tipificação:
-                                                            </Label>
+                                                    <Formulario
+                                                        register={register}
+                                                        errors={errors}
+                                                        control={control}
+                                                        setValue={setValue}
+                                                        idTipificacao={id}
+                                                        fontes={fontes}
+                                                        fontesSelecionadas={fontesSelecionadas}
+                                                        setFontesSelecionadas={setFontesSelecionadas}
+                                                        tipificacoes={tipificacoes}
+                                                        divRefs={divRefs}
+                                                    />
 
-                                                            <Controller
-                                                                name="id_tipificacao"
-                                                                control={control}
-                                                                render={({ field }) => (
-                                                                    <Select
-                                                                        disabled
-                                                                        defaultValue={id}
-                                                                        value={idTipificacao}
-                                                                        onValueChange={(value) => {
-                                                                            field.onChange([value]); // Atualiza o RHF
-                                                                            setIdTipificacao(value);
-                                                                            setTaxonomiaSelecionada((prev) => ({
-                                                                            ...prev!,
-                                                                            tip_assoc_id: value
-                                                                            }));
-                                                                        }}
-                                                                    >
-                                                                    <SelectTrigger className="max-w-[400px] bg-white">
-                                                                        <SelectValue placeholder="Selecione uma tipificação" />
-                                                                    </SelectTrigger>
-
-                                                                    <SelectContent>
-                                                                        {tipificacoes?.map((tip) => (
-                                                                        <SelectItem key={tip.id} value={tip.id}>
-                                                                            {tip.name}
-                                                                        </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                    </Select>
-                                                                )}
-                                                                />
-                                                        </div>
-                                                        {errors.id_tipificacao && <span className="text-red-500 text-sm italic">{errors.id_tipificacao.message}</span>}
-
-                                                        <div>
-                                                            <label htmlFor="titleRamo" className="block text-sm font-medium text-gray-700">
-                                                                Título
-                                                            </label>
-
-                                                            <input
-                                                                {...register("titulo")}
-                                                                defaultValue={taxonomiaSelecionada?.title}
-                                                                onChange={(e) => setTituloTaxonomia(e.target.value)}
-                                                                type="text"
-                                                                id="titleTaxonomia"
-                                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                                            />
-                                                            {errors.titulo && <span className="text-red-500 text-sm italic">{errors.titulo.message}</span>}
-                                                        </div>
-
-                                                        <div>
-                                                            <label htmlFor="descriptionRamo" className="block text-sm font-medium text-gray-700">
-                                                                Descrição da Taxonomia
-                                                            </label>
-
-                                                            <textarea
-
-                                                                {...register("descricao")}
-                                                                defaultValue={taxonomiaSelecionada?.description}
-                                                                onChange={(e) => setDescricaoTaxonomia(e.target.value)}
-                                                                id="descriptionTaxonomia"
-                                                                placeholder="Digite uma descrição para a taxonomia"
-                                                                rows={4}
-                                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                                            />
-                                                            {errors.descricao && <span className="text-red-500 text-sm italic">{errors.descricao.message}</span>}
-                                                        </div>
-
-                                                        <p className="flex flex-col gap-2">
-                                                            <Label className="text-sm">Fontes</Label>
-                                                            <Controller
-                                                                name="fontesSelecionadas"
-                                                                control={control}
-                                                                render={({ field }) => (
-                                                                    <Select
-                                                                        value=""
-                                                                        onValueChange={(value) => {
-                                                                            field.onChange([...field.value, value]);
-                                                                            const fonteEncontrada = fontes.find(fonte => fonte.id === value);
-                                                                            if (fonteEncontrada) {
-                                                                                setFontesSelecionadas([...fontesSelecionadas!, fonteEncontrada]);
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        <SelectTrigger className="w-full">
-                                                                            <SelectValue placeholder="Selecione uma ou mais fontes" />
-                                                                        </SelectTrigger>
-
-                                                                        <SelectContent>
-                                                                            <SelectGroup>
-
-                                                                                <SelectLabel>Fontes</SelectLabel>
-                                                                                {fontes && fontes.filter(fonte => !fontesSelecionadas!.some(f => f.id === fonte.id)).map((fonte, index) => (
-                                                                                    <SelectItem
-                                                                                        key={index}
-                                                                                        ref={(e) => { divRefs.current["item_selec_font_edit_tax" + index] = e }}
-                                                                                        value={fonte.id}
-                                                                                        className="p-2 rounded-sm"
-                                                                                    >
-                                                                                        {fonte.name}
-                                                                                    </SelectItem>
-                                                                                ))}
-                                                                                {
-                                                                                    fontes?.length === fontesSelecionadas!.length && (
-                                                                                        <SelectItem
-                                                                                            value="Todos"
-                                                                                            className="hover:cursor-pointer"
-                                                                                            disabled
-                                                                                        >
-                                                                                            Nenhuma fonte para selecionar
-                                                                                        </SelectItem>
-                                                                                    )
-                                                                                }
-                                                                            </SelectGroup>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                )}
-                                                            />
-                                                            {errors.fontesSelecionadas && (
-                                                                <span className="text-red-500 text-sm italic">{errors.fontesSelecionadas.message}</span>
-                                                            )}
-                                                        </p>
-                                                        {
-                                                            fontesSelecionadas && fontesSelecionadas.length > 0 && (
-                                                                <div className="flex flex-col gap-3 w-full">
-                                                                    <Label htmlFor="tipe" className="text-sm">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
-                                                                    <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
-                                                                        {
-                                                                            fontesSelecionadas.map((fonte: Fonte) => (
-                                                                                <div key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                                                    <button onClick={() => {
-                                                                                        const novaLista = fontesSelecionadas.filter((f) => f.id !== fonte.id)
-                                                                                        setFontesSelecionadas(novaLista);
-                                                                                        setValue("fontesSelecionadas", novaLista.map((f) => f.id));
-                                                                                    }}>
-                                                                                        <div className="flex items-center" title="Remover usuário">
-                                                                                            <span
-                                                                                                className="
-                                                                                                    bg-red-200 p-[10px]
-                                                                                                    hover:bg-red-400 hover:cursor-pointer hover:text-white
-                                                                                                    transition-all duration-200 ease-in-out
-                                                                                                "
-                                                                                            >
-                                                                                                <X className="w-4 h-4" />
-                                                                                            </span>
-                                                                                        </div>
-                                                                                    </button>
-                                                                                    <p className=" w-full text-sm">{fonte.name}</p>
-                                                                                </div>
-                                                                            ))
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                            )
-                                                        }
-
-                                                        <DialogFooter>
-                                                            <DialogClose
-                                                                className={`
-                                                                    transition ease-in-out text-white
-                                                                    rounded-md px-3 bg-vermelho
-                                                                    hover:cursor-pointer text-sm
-                                                                `}
-                                                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                            >
-                                                                Cancelar
-                                                            </DialogClose>
-
-                                                            <Button
-                                                                type="submit"
-                                                                className={`
-                                                                    flex bg-verde hover:bg-verde
-                                                                    text-white hover:cursor-pointer
-                                                                `}
-                                                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                            
-                                                            >
-                                                                Salvar
-                                                            </Button>
-                                                        </DialogFooter>
-                                                    </form>
-
-                                                </DialogContent>
-                                            </Dialog>
-
-                                            <Dialog
-                                                key={index}
-                                                open={openDialogExcluirTax === item.id}
-                                                    onOpenChange={(open) =>
-                                                    setOpenDialogExcluirTax(open ? item.id : null)
-                                                }
-                                            >
-                                                <DialogTrigger asChild>
-                                                    <button
-                                                        title="Excluir taxonomia"
-                                                        className="flex items-center justify-center h-8 w-8 bg-red-700 text-white rounded-sm border border-gray-300 hover:cursor-pointer"
-                                                    >
-                                                        <Trash className="h-4 w-4" strokeWidth={1.5} />
-                                                    </button>
-                                                </DialogTrigger>
-
-                                                <DialogContent>
-                                                    <DialogHeader>
-                                                        <DialogTitle>
-                                                            Excluir taxonomia
-                                                        </DialogTitle>
-
-                                                        <DialogDescription>
-                                                            Tem certeza que deseja excluir a taxonomia <strong>{item.title}</strong>?
-                                                        </DialogDescription>
-                                                    </DialogHeader>
-
-                                                    <div className="flex justify-end gap-4 mt-4">
-                                                        <DialogClose
-                                                            className={`
-                                                        transition ease-in-out text-black
-                                                        rounded-md px-3
-                                                        hover:cursor-pointer
-                                                    `}
-                                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                        >
-                                                            Cancelar
+                                                    <DialogFooter>
+                                                        <DialogClose asChild>
+                                                            <BotaoCancelar />
                                                         </DialogClose>
 
-                                                        <Button
-                                                            className={`
-                                                        flex bg-vermelho hover:bg-vermelho
-                                                        text-white hover:cursor-pointer
-                                                    `}
-                                                            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                                                            onClick={() => {
-                                                                excluirTaxonomia(item.id)
-                                                            }}
-                                                        >
-                                                            Excluir
-                                                        </Button>
-                                                    </div>
+                                                        <BotaoSalvar onClick={handleSubmit(atualizarTaxonomia)} /> 
+                                                    </DialogFooter>
+
                                                 </DialogContent>
                                             </Dialog>
+
+                                            <BotaoExcluir
+                                                item={item}
+                                                tipo="taxonomia"
+                                                funcExcluir={excluirTaxonomia}
+                                            />
                                         </div>
                                     </CardFooter>
                                 </Card>
@@ -1038,7 +566,6 @@ export default function Taxonomias({ id }: { id: string }) {
 
                                                 <input
                                                     {...registerRamo("tituloRamo")}
-                                                    onChange={(e) => setTituloRamo(e.target.value)}
                                                     type="text"
                                                     id="titleRamo"
                                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
