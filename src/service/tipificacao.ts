@@ -13,12 +13,14 @@ async function getTipificacoesService(): Promise<Tipificacao[] | undefined> {
                 "Content-Type": "application/json"
             }
         });
+
         if (!response.ok) {
             return
         }
+
         const json = await response.json();
         return json.typifications;
-    } catch (error) {
+    } catch(e) {
         return
     }
 }

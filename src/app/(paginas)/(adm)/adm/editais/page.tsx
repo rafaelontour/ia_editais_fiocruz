@@ -297,7 +297,8 @@ export default function Editais() {
                             <Loader2 className="animate-spin mr-2 h-6 w-6 text-gray-600" />
                         </div>
                     ) : (
-                        (columns["PENDING"].length === 0 &&
+                        (
+                            columns["PENDING"].length === 0 &&
                             columns["UNDER_CONSTRUCTION"].length === 0 &&
                             columns["WAITING_FOR_REVIEW"].length === 0 &&
                             columns["COMPLETED"].length === 0) ? (

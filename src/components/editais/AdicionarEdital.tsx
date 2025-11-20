@@ -79,7 +79,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
             toast.error("Erro ao buscar tipificações!");
             return;
         }
-
         setTipificacoes(tipificacoes);
     }
     
@@ -164,12 +163,8 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     }
 
 
-    useEffect(() => {
-        try {
-            buscarTipificacoes();
-        } catch(e: any) {
-            toast.error("Erro", e.message);
-        }
+    useEffect(() => {  
+        buscarTipificacoes();
     }, [])
 
     function limparDados() {

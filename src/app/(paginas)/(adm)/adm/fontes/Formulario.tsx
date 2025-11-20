@@ -1,8 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FileUpload } from "@/components/ui/file-upload";
-import { Fonte } from "@/core";
-import RotuloOpcional from "@/components/RotuloOpcional";
+
 
 interface FormularioFonteProps {
     register: any;
