@@ -104,19 +104,24 @@ export default function Formulario({
                 fontesSelecionadas.length > 0 && (
                     <div className="flex flex-col gap-3 w-full">
                         <Label htmlFor="tipe" className="text-lg">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
-                        <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                        <div
+                            className={`
+                                grid ${fontesSelecionadas.length === 1 ? "grid-cols-1" : fontesSelecionadas.length === 2 ? "grid-cols-2" : "grid-cols-3" } 
+                                gap-3 border-gray-200 rounded-md border-1 p-3
+                            `}
+                        >
                             {
                                 fontesSelecionadas.map((fonte: Fonte) => (
                                     <div key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                        <div role="button" onClick={() => {
+                                        <div role="button" className="flex h-full" onClick={() => {
                                             const novaLista = fontesSelecionadas.filter((f: Fonte) => f.id !== fonte.id);
                                             setFontesSelecionadas(novaLista);
                                             setValue("fontesSelecionadas", novaLista.map(f => f.id));
                                         }}>
-                                            <div className="flex items-center" title="Remover usuário">
+                                            <div className="flex items-center h-full" title="Remover usuário">
                                                 <span
                                                     className="
-                                                        bg-red-200 p-[10px] h-10
+                                                        bg-red-200 p-[10px] h-full flex items-center justify-center
                                                         hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                         transition-all duration-200 ease-in-out
                                                     "

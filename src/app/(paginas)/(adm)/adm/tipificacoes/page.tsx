@@ -307,9 +307,9 @@ export default function Tipificacoes() {
                                                     }}
                                                     title="Editar tipificação"
                                                     className={`
-                                                            h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
-                                                            bg-branco hover:bg-branco
-                                                        `}
+                                                        h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
+                                                        bg-branco hover:bg-branco
+                                                    `}
                                                     size={"icon"}
                                                 >
                                                     <PencilLine color="black" />
