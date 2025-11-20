@@ -143,7 +143,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
     useEffect(() => {
         buscarUsuariosPorUnidade(usuario?.unit_id);
-        getTipificacoesService().then(tipificacoes => setTipificacoes(tipificacoes));
+        getTipificacoesService().then(tipificacoes => setTipificacoes(tipificacoes ?? []));
     }, [])
 
     function limparCampos() {
