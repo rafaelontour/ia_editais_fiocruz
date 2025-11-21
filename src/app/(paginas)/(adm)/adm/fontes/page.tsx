@@ -147,44 +147,43 @@ export default function Fontes() {
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="flex items-center justify-between relative">
-                <h2 className="text-4xl font-bold">
-                    Fontes
-                </h2>
+            <div className="flex flex-col gap-5 sticky top-0 z-10 bg-white justify-between w-full items-center">
+                <div className="flex w-full justify-between relative">
+                    <div className="w-full flex justify-between items-center">
+                        <h2 className="text-4xl font-bold">
+                            Fontes
+                        </h2>
+                        
+                        <Dialog open={openDialogFontes} onOpenChange={setOpenDialogFontes}>
+                            <DialogTrigger asChild>
+                                <Botao texto="Adicionar fonte" />
+                            </DialogTrigger>
+                            <DialogContent onCloseAutoFocus={() => reset()}>
+                                <DialogHeader>
+                                    <DialogTitle className="text-3xl font-bold">
+                                        Adicionar fonte à base de dados
+                                    </DialogTitle>
+                                    <DialogDescription className="text-md pb-2">
+                                        Preencha os campos abaixo para adicionar uma nova fonte
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <Formulario
+                                    register={register}
+                                    errors={errors}
+                                />
+                                <DialogFooter>
+                                    <DialogClose>
+                                        <BotaoCancelar />
+                                    </DialogClose>
+                                     <BotaoSalvar onClick={handleSubmit(adicionarFonte)} />
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                                        </div>
+                    </div>
 
-                <Dialog open={openDialogFontes} onOpenChange={setOpenDialogFontes}>
-                    <DialogTrigger asChild>
-                        <Botao texto="Adicionar fonte" />
-                    </DialogTrigger>
-
-                    <DialogContent onCloseAutoFocus={() => reset()}>
-                        <DialogHeader>
-                            <DialogTitle className="text-3xl font-bold">
-                                Adicionar fonte à base de dados
-                            </DialogTitle>
-
-                            <DialogDescription className="text-md pb-2">
-                                Preencha os campos abaixo para adicionar uma nova fonte
-                            </DialogDescription>
-                        </DialogHeader>
-
-                        <Formulario
-                            register={register}
-                            errors={errors}
-                        />
-
-                        <DialogFooter>
-                            <DialogClose>
-                                <BotaoCancelar />
-                            </DialogClose>
-
-                             <BotaoSalvar onClick={handleSubmit(adicionarFonte)} />
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                <BarraDePesquisa refInput={termoBusca} funcFiltrar={filtrarFontes} />
             </div>
-
-            <BarraDePesquisa refInput={termoBusca} funcFiltrar={filtrarFontes} />
 
             {
                 carregando ? (
@@ -196,7 +195,7 @@ export default function Fontes() {
                     <Masonry
                         breakpointCols={breakpointColumnsObj}
                         columnClassName="pl-4"
-                        className={'flex -ml-4 w-auto relative'}
+                        className={'flex -ml-4 px-1 w-auto relative'}
                     >
                         {
                             fontesFiltradas.map((fonte, index) => (
