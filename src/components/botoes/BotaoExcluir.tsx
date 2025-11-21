@@ -11,13 +11,16 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { useState } from "react";
-import type { Fonte, Tipificacao } from "@/core";
+import type { Fonte, Ramo, Tipificacao } from "@/core";
 import type { Taxonomia } from "@/core/tipificacao/Tipificacao";
 
 interface BotaoExcluirProps {
+  onClick?: () => void;
+  divRefs?: React.RefObject<Record<string, HTMLFormElement | HTMLDivElement | HTMLButtonElement | HTMLSpanElement | null>>
+  flagHook?: React.RefObject<boolean>
   tipo: string;
-  item: Fonte | Tipificacao | Taxonomia
-  funcExcluir: (id: string) => void;
+  item: Fonte | Tipificacao | Taxonomia | Ramo
+  funcExcluir: (id: string | undefined) => void;
 }
 
 export default function BotaoExcluir(dados: BotaoExcluirProps) {
@@ -28,7 +31,11 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
       open={dialogOpen === dados.item.id}
       onOpenChange={(open) => setDialogOpen(open ? dados.item.id : null)}
     >
-      <DialogTrigger asChild>
+      <DialogTrigger
+        onClick={() => {
+          if (dados.flagHook) dados.flagHook.current = true
+        }} asChild
+      >
         <Button
           title={`Excluir ${dados.item}`}
           className="h-8 w-8 bg-vermelho hover:bg-vermelho hover:cursor-pointer rounded-sm"
@@ -38,7 +45,13 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent
+        onCloseAutoFocus={() => {
+          if (dados.flagHook) dados.flagHook.current = false
+        }}
+        ref={(e) => {
+          dados.divRefs?.current && (dados.divRefs.current["botao_excluir"] = e)
+        }}>
         <DialogHeader>
           <DialogTitle>Excluir {dados.tipo}</DialogTitle>
 
@@ -61,7 +74,7 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
           <Button
             className="flex bg-vermelho hover:bg-vermelho text-white hover:cursor-pointer"
             style={{ boxShadow: "0 0 3px rgba(0, 0, 0, 0.5)" }}
-            onClick={() => dados.funcExcluir(dados.item.id)}
+            onClick={() => dados.funcExcluir(dados.item.id!)}
           >
             Excluir
           </Button>
