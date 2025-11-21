@@ -1,4 +1,5 @@
 import {
+  CircleCheckBig,
   FilePen,
   Gauge,
   Home,
@@ -61,6 +62,11 @@ const itemsAdm = [
     title: "Métricas",
     url: "/adm/metricas",
     icon: Gauge,
+  },
+  {
+    title: "Resultados",
+    url: "/adm/resultados",
+    icon: CircleCheckBig,
   },
 ];
 
