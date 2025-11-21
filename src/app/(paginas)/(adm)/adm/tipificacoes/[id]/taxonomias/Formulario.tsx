@@ -2,12 +2,13 @@ import { Label } from "@/components/ui/label";
 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Fonte, Tipificacao } from "@/core";
+import { Item } from "@radix-ui/react-select";
 import { X } from "lucide-react";
 import { RefObject } from "react";
 import { Controller } from "react-hook-form";
 
 interface FormularioTaxProps {
-    divRefs: RefObject<Record<string, HTMLDivElement | HTMLButtonElement | null>>;
+    divRefs: RefObject<Record<string, HTMLFormElement | HTMLSpanElement | HTMLDivElement | HTMLButtonElement | null>>;
     register: any;
     errors: any;
     control: any;
@@ -17,7 +18,6 @@ interface FormularioTaxProps {
     fontesSelecionadas: Fonte[] | undefined;
     tipificacoes: Tipificacao[]
     setFontesSelecionadas: (fontes: any[]) => void;
-
 }
 
 export default function Formulario({
@@ -33,7 +33,7 @@ export default function Formulario({
     divRefs
 }: FormularioTaxProps) {
     return (
-        <form className="space-y-4">
+        <form ref={(e) => { divRefs.current["formulario_tax"] = e }} className="space-y-4">
             <div className="flex p-3 gap-2 bg-gray-300 rounded-sm items-center">
                 <Label className="block text-md text-gray-700">
                     Tipificação:
@@ -43,15 +43,15 @@ export default function Formulario({
                     disabled
                     defaultValue={idTipificacao}
                 >
-                    <SelectTrigger className="max-w-[400px] bg-white">
-                        <SelectValue className="w-full" placeholder="Selecione uma tipificação" />
+                    <SelectTrigger ref={(e) => { divRefs.current["select_trigger"] = e; }} className="max-w-[400px] bg-white">
+                        <SelectValue ref={(e) => { divRefs.current["select_value"] = e; }} className="w-full" placeholder="Selecione uma tipificação" />
                     </SelectTrigger>
 
                     <SelectContent className="bg-white">
 
                         {
                             tipificacoes && tipificacoes.map((item, index) => (
-                                <SelectItem title={item.name} key={index} value={item.id}>{item.name}</SelectItem>
+                                <SelectItem ref={(e) => { divRefs.current["item_lista_tip_" + item.id] = e; }} title={item.name} key={index} value={item.id}>{item.name}</SelectItem>
                             ))
                         }
                     </SelectContent>
@@ -155,7 +155,7 @@ export default function Formulario({
                                         <button onClick={() => {
                                             const novaLista = fontesSelecionadas.filter((f) => f.id !== fonte.id)
                                             setFontesSelecionadas(novaLista);
-                                            setValue("fontesSelecionadas", [""]);
+                                            setValue("fontesSelecionadas", [...novaLista.map((f) => f.id)]);
                                         }}>
                                             <div className="flex items-center" title="Remover fonte">
                                                 <span

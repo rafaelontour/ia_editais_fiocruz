@@ -1,6 +1,5 @@
-import { Fonte } from "../fonte";
-import { Ramo } from "../ramo/Ramo";
-import { Branch } from "../tipificacao/Tipificacao";
+import type { Fonte } from "../fonte";
+import type { Branch } from "../tipificacao/Tipificacao";
 
 export interface Taxonomia {
     typification_id?: string | undefined;
