@@ -673,5 +673,4 @@ export default function Taxonomias({ id }: { id: string }) {
             </div>
         </div>
     );
-
 }
