@@ -30,27 +30,33 @@ export default function metricas() {
       nome: "Precisão de Feedback",
       modelo: "GPT-5",
       notaCorte: 5,
-      criterio: "critério da métrica",
-      passosAvaliacao: "passo a passo para a avaliação da métrica",
-      created_at: "17/11/2025, 15:56:39",
+      criterio:
+        "A métrica deve avaliar se o feedback retornado pela IA identifica corretamente a presença ou ausência do critério jurídico analisado, sem adicionar informações inexistentes no edital. A resposta deve ser objetiva, coerente, e manter alinhamento semântico com o critério esperado.",
+      passosAvaliacao:
+        "Comparar o expected_feedback com o actual_feedback retornado pelo modelo. Verificar se o modelo identificou corretamente se o critério está presente no documento (expected_fulfilled). Calcular similaridade semântica entre expected e actual. Gerar score final entre 0 e 1 baseado nessa similaridade. Considerar o teste aprovado caso score >= threshold.",
+      created_at: "2025-11-17T15:56:39",
     },
     {
       id: 2,
       nome: "Precisão de Feedback",
       modelo: "GPT-5",
       notaCorte: 5,
-      criterio: "critério da métrica",
-      passosAvaliacao: "passo a passo para a avaliação da métrica",
-      created_at: "17/11/2025, 15:56:39",
+      criterio:
+        "A métrica deve avaliar se o feedback retornado pela IA identifica corretamente a presença ou ausência do critério jurídico analisado, sem adicionar informações inexistentes no edital. A resposta deve ser objetiva, coerente, e manter alinhamento semântico com o critério esperado.",
+      passosAvaliacao:
+        "Comparar o expected_feedback com o actual_feedback retornado pelo modelo. Verificar se o modelo identificou corretamente se o critério está presente no documento (expected_fulfilled). Calcular similaridade semântica entre expected e actual. Gerar score final entre 0 e 1 baseado nessa similaridade. Considerar o teste aprovado caso score >= threshold.",
+      created_at: "12/11/2023, 12:23:20",
     },
     {
       id: 3,
       nome: "Precisão de Feedback",
       modelo: "GPT-5",
       notaCorte: 5,
-      criterio: "critério da métrica",
-      passosAvaliacao: "passo a passo para a avaliação da métrica",
-      created_at: "17/11/2025, 15:56:39",
+      criterio:
+        "A métrica deve avaliar se o feedback retornado pela IA identifica corretamente a presença ou ausência do critério jurídico analisado, sem adicionar informações inexistentes no edital. A resposta deve ser objetiva, coerente, e manter alinhamento semântico com o critério esperado.",
+      passosAvaliacao:
+        "Comparar o expected_feedback com o actual_feedback retornado pelo modelo. Verificar se o modelo identificou corretamente se o critério está presente no documento (expected_fulfilled). Calcular similaridade semântica entre expected e actual. Gerar score final entre 0 e 1 baseado nessa similaridade. Considerar o teste aprovado caso score >= threshold.",
+      created_at: "12/11/2023, 12:23:20",
     },
   ]);
 

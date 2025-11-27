@@ -4,6 +4,7 @@ import {
   Gauge,
   Home,
   IdCard,
+  ListChecks,
   Sheet,
   Type,
   TypeOutline,
@@ -62,6 +63,11 @@ const itemsAdm = [
     title: "Métricas",
     url: "/adm/metricas",
     icon: Gauge,
+  },
+  {
+    title: "Casos de Testes",
+    url: "/adm/casos",
+    icon: ListChecks,
   },
   {
     title: "Resultados",

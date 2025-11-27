@@ -1,10 +1,15 @@
 "use client";
 import BarraDePesquisa from "@/components/BarraDePesquisa";
 import Masonry from "react-masonry-css";
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export default function resultados() {
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+
   const mockResultados = [
     {
+      id: 1,
       nome: "Caso de teste de não conformidades para SIFAC",
       modeloIa: "GPT-5",
       notaCorte: "0.7",
@@ -16,6 +21,7 @@ export default function resultados() {
       tag: "Aprovado",
     },
     {
+      id: 2,
       nome: "Caso de teste de não conformidades para SIFAC",
       modeloIa: "GPT-5",
       notaCorte: "0.7",
@@ -44,33 +50,83 @@ export default function resultados() {
       >
         {mockResultados.map((mockResultado) => (
           <div
-            className="flex  gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-3 pb-8 justify-between"
+            key={mockResultado.id}
+            className="flex flex-col gap-4 rounded-md p-4 w-full transition-all duration-300 mb-3 pb-4"
             style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
           >
-            <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-bold">{mockResultado.nome}</h2>
-              <div className="flex flex-row gap-3">
-                <p>
-                  <span className="font-semibold">Modelo ia:</span>{" "}
-                  {mockResultado.modeloIa}
-                </p>
-                <p>
-                  <span className="font-semibold">Nota de corte:</span>{" "}
-                  {mockResultado.notaCorte}
-                </p>
-                <p>
-                  <span className="font-semibold">Score feedback:</span>{" "}
-                  {mockResultado.scoreFeedback}
-                </p>
+            <div className="flex justify-between">
+              <div className="flex flex-col gap-2">
+                <h2 className="text-2xl font-bold">{mockResultado.nome}</h2>
+
+                <div className="flex flex-row gap-3">
+                  <p>
+                    <span className="font-semibold">Modelo ia:</span>{" "}
+                    {mockResultado.modeloIa}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Nota de corte:</span>{" "}
+                    {mockResultado.notaCorte}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Score feedback:</span>{" "}
+                    {mockResultado.scoreFeedback}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-center items-center">
+                <button
+                  className={`
+                        flex items-center justify-center
+                        rounded-md px-4 py-2 w-fit h-fit text-white
+                        hover:cursor-pointer
+                        ${
+                          mockResultado.tag === "Aprovado"
+                            ? "bg-verde"
+                            : "bg-vermelho"
+                        }
+                    `}
+                  style={{ minHeight: "40px" }}
+                >
+                  {mockResultado.tag}
+                </button>
               </div>
             </div>
+
+            {/* Botão para expandir */}
             <button
-              className=" flex rounded-md gap-2 items-center px-4 py-2
-                bg-vermelho  text-white
-                hover:cursor-pointer w-fit h-fit"
+              className="text-sm underline w-fit cursor-pointer flex items-center gap-1"
+              onClick={() =>
+                setExpandedCard((prev) =>
+                  prev === mockResultado.id ? null : mockResultado.id
+                )
+              }
             >
-              {mockResultado.tag}
+              {expandedCard === mockResultado.id ? (
+                <>
+                  <ChevronUp /> Ocultar detalhes
+                </>
+              ) : (
+                <>
+                  <ChevronDown /> Ver detalhes
+                </>
+              )}
             </button>
+
+            {/* Conteudo do botão de expandir */}
+            {expandedCard === mockResultado.id && (
+              <div className="transition-all duration-300 mt-3 p-3 rounded bg-gray-100">
+                <h3 className="font-semibold">Feedback atual</h3>
+                <p className="text-sm text-gray-700">
+                  {mockResultado.atualFeedback}
+                </p>
+
+                <h3 className="font-semibold mt-3">Reason feedback</h3>
+                <p className="text-sm text-gray-700">
+                  {mockResultado.reasonFeedback}
+                </p>
+              </div>
+            )}
           </div>
         ))}
       </Masonry>

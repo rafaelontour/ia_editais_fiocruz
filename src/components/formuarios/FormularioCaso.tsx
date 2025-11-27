@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "../ui/select";
 
-interface FormularioMetricaProps {
+interface FormularioCasoProps {
   initialData?: {
     id: number;
     nome: string;
@@ -24,11 +24,11 @@ interface FormularioMetricaProps {
   mode?: "create" | "edit";
 }
 
-export default function FormularioMetrica({
+export default function FormularioCaso({
   initialData,
   onSubmit,
   mode = "create",
-}: FormularioMetricaProps) {
+}: FormularioCasoProps) {
   const [formState, setFormState] = useState({
     nome: "",
     modelo: "",
