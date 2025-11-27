@@ -5,7 +5,7 @@ import { DialogFooter } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 
 interface FormularioTesteProps {
-  initialData?: { id: number; nome: string; descricao: string } | null;
+  initialData?: { id: number; name: string; descricao: string } | null;
   onSubmit: (data: any) => void;
   mode?: "create" | "edit";
 }
@@ -16,7 +16,7 @@ export default function FormularioTeste({
   mode = "create",
 }: FormularioTesteProps) {
   const [formState, setFormState] = useState({
-    nome: "",
+    name: "",
     descricao: "",
   });
 
@@ -24,7 +24,7 @@ export default function FormularioTeste({
   useEffect(() => {
     if (initialData) {
       setFormState({
-        nome: initialData.nome,
+        name: initialData.name,
         descricao: initialData.descricao,
       });
     }
@@ -40,8 +40,8 @@ export default function FormularioTeste({
       <div className="flex flex-col gap-2">
         <Label>Nome do Teste</Label>
         <Input
-          value={formState.nome}
-          onChange={(e) => setFormState({ ...formState, nome: e.target.value })}
+          value={formState.name}
+          onChange={(e) => setFormState({ ...formState, name: e.target.value })}
         />
       </div>
 

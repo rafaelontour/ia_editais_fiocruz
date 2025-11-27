@@ -14,8 +14,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Teste } from "@/core/teste";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 
 export default function testes() {
@@ -23,6 +24,12 @@ export default function testes() {
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
   const [editandoForm, setEditandoForm] = useState<any>(null);
   const [pesquisa, setPesquisa] = useState("");
+  const termoBusca = useRef<string>("");
+  const [testeFiltrado, setTesteFiltrado] = useState<Teste[]>([]);
+
+  useEffect(() => {
+    setTesteFiltrado(mockTestes);
+  }, []);
 
   const breakpointColumns = {
     default: 3,
@@ -31,44 +38,65 @@ export default function testes() {
     500: 1,
   };
 
-  const [mockTestes, setMockTestes] = useState([
+  const [mockTestes, setMockTestes] = useState<Teste[]>([
     {
-      id: 1,
-      nome: "Teste de Exemplo 1",
+      id: "1",
+      name: "Teste de Exemplo 1",
       descricao: "Descrição do Teste de Exemplo 1",
       created_at: "12/11/2023, 12:23:20",
     },
     {
-      id: 2,
-      nome: "Teste de Exemplo 2",
+      id: "2",
+      name: "Teste de Exemplo 2",
       descricao: "Descrição do Teste de Exemplo 2",
       created_at: "12/11/2023, 12:23:20",
     },
   ]);
 
-  const testesFiltrados = mockTestes.filter((t) =>
-    t.nome.toLowerCase().includes(pesquisa.toLowerCase())
-  );
+  function filtrarTeste() {
+    if (termoBusca.current.trim() === "") {
+      setTesteFiltrado(mockTestes);
+      return;
+    }
 
-  function adicionarTeste(data: { nome: string; descricao: string }) {
+    const cc = mockTestes.filter(
+      (c) =>
+        c.name &&
+        c.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+    );
+
+    setTesteFiltrado(cc);
+  }
+
+  function adicionarTeste(data: { name: string; descricao: string }) {
+    let id = crypto.randomUUID();
     const novoTeste = {
-      id: mockTestes.length + 1,
-      nome: data.nome,
+      id: id,
+      name: data.name,
       descricao: data.descricao,
       created_at: new Date().toLocaleString(),
     };
     setMockTestes([...mockTestes, novoTeste]);
+    setTesteFiltrado([...mockTestes, novoTeste]);
   }
 
-  function excluirTeste(id: number) {
-    setMockTestes(mockTestes.filter((t) => t.id !== id));
+  function excluirTeste(id: string) {
+    setMockTestes(testeFiltrado.filter((t) => t.id !== id));
+    setTesteFiltrado(testeFiltrado.filter((t) => t.id !== id));
   }
 
-  function salvarEdicao(data: { nome: string; descricao: string }) {
+  function salvarEdicao(data: { name: string; descricao: string }) {
     setMockTestes(
-      mockTestes.map((t) =>
+      testeFiltrado.map((t) =>
         t.id === editandoForm.id
-          ? { ...t, nome: data.nome, descricao: data.descricao }
+          ? { ...t, name: data.name, descricao: data.descricao }
+          : t
+      )
+    );
+    setTesteFiltrado(
+      testeFiltrado.map((t) =>
+        t.id === editandoForm.id
+          ? { ...t, name: data.name, descricao: data.descricao }
           : t
       )
     );
@@ -119,7 +147,7 @@ export default function testes() {
       </div>
 
       {/* Barra de pesquisa */}
-      {/* <BarraDePesquisa value={pesquisa} onChange={setPesquisa} /> */}
+      <BarraDePesquisa funcFiltrar={filtrarTeste} refInput={termoBusca} />
 
       {/* Modal de edição do form*/}
       <Dialog open={openDialogEditar} onOpenChange={setOpenDialogEditar}>
@@ -150,13 +178,13 @@ export default function testes() {
         breakpointCols={breakpointColumns}
         className="flex relative gap-5 mb-10 px-1"
       >
-        {testesFiltrados.map((mockTeste) => (
+        {testeFiltrado.map((mockTeste) => (
           <div
             style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
             key={mockTeste.id}
             className="flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
           >
-            <h2 className="text-2xl font-semibold">{mockTeste.nome}</h2>
+            <h2 className="text-2xl font-semibold">{mockTeste.name}</h2>
             <p>{mockTeste.descricao}</p>
 
             <div className="flex justify-between items-center mt-3">
@@ -170,11 +198,11 @@ export default function testes() {
                   }}
                 />
 
-                {/* <BotaoExcluir
-                  titulo="Excluir Teste"
-                  descricao="Tem certeza que deseja excluir o teste"
-                  onClick={() => excluirTeste(mockTeste.id)}
-                /> */}
+                <BotaoExcluir
+                  funcExcluir={excluirTeste}
+                  item={mockTeste}
+                  tipo="teste"
+                />
               </div>
             </div>
           </div>

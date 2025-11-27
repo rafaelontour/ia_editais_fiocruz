@@ -8,7 +8,7 @@ interface ListaCasoProps {
   casos: Caso[];
   onOpen: (caso: Caso) => void;
   onEditar: (caso: Caso) => void;
-  onExcluir: (id: number) => void;
+  onExcluir: (id: string) => void;
 }
 
 export default function ListaCaso({

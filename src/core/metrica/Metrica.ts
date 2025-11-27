@@ -1,6 +1,6 @@
 export interface Metrica {
-  id: number;
-  nome: string;
+  id: string;
+  name: string;
   modelo: string;
   criterio: string;
   notaCorte: number;

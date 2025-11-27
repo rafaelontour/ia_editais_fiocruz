@@ -1,9 +1,6 @@
 "use client";
 import BarraDePesquisa from "@/components/BarraDePesquisa";
 import BotaoAdicionar from "@/components/BotaoAdicionar";
-import BotaoEditar from "@/components/BotaoEditar";
-import BotaoExcluir from "@/components/BotaoExcluir";
-import Calendario from "@/components/Calendario";
 import DetalheCaso from "@/components/casos/DetalheCaso";
 import ListaCaso from "@/components/casos/ListaCaso";
 import FormularioCaso from "@/components/formuarios/FormularioCaso";
@@ -16,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Caso } from "@/core/caso";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function casos() {
   const [openDialogAdd, setOpenDialogAdd] = useState(false);
@@ -24,11 +21,28 @@ export default function casos() {
   const [pesquisa, setPesquisa] = useState("");
   const [editandoForm, setEditandoForm] = useState<any>(null);
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
+  const termoBusca = useRef<string>("");
+  const [casoFiltrado, setCasoFiltrado] = useState<Caso[]>([]);
+
+  function filtrarCaso() {
+    if (termoBusca.current.trim() === "") {
+      setCasoFiltrado(mockCasos);
+      return;
+    }
+
+    const cc = mockCasos.filter(
+      (c) =>
+        c.name &&
+        c.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+    );
+
+    setCasoFiltrado(cc);
+  }
 
   const [mockCasos, setMockCasos] = useState([
     {
-      id: 1,
-      nome: "Caso de teste de não conformidades para SIFAC",
+      id: "1",
+      name: "Caso de teste de não conformidades para SIFAC",
       taxonomia:
         "TAX-Contratação de prestação de serviços de coleta e análise de efluentes",
       ramo: "Validar que o licitante enviou simultaneamente a proposta e os documentos de habilitação proposta e os documentos de habilitação.",
@@ -41,8 +55,8 @@ export default function casos() {
       created_at: "12/11/2023, 12:23:20",
     },
     {
-      id: 2,
-      nome: "Caso de teste de não conformidades para SIFAC",
+      id: "2",
+      name: "Caso de teste de não conformidades para SIFAC",
       taxonomia:
         "TAX-Contratação de prestação de serviços de coleta e análise de efluentes",
       ramo: "Validar que o licitante enviou simultaneamente a proposta e os documentos de habilitação.",
@@ -56,7 +70,7 @@ export default function casos() {
   ]);
 
   function salvarEdicao(data: {
-    nome: string;
+    name: string;
     taxonomia: string;
     ramo: string;
     teste: string;
@@ -83,7 +97,7 @@ export default function casos() {
   }
 
   function adicionarCaso(data: {
-    nome: string;
+    name: string;
     taxonomia: string;
     ramo: string;
     teste: string;
@@ -92,9 +106,10 @@ export default function casos() {
     textoEntrada: string;
     created_at?: string;
   }) {
+    let id = crypto.randomUUID();
     const novosCasos = {
-      id: mockCasos.length + 1,
-      nome: data.nome,
+      id: id,
+      name: data.name,
       taxonomia: data.taxonomia,
       ramo: data.ramo,
       teste: data.teste,
@@ -106,7 +121,7 @@ export default function casos() {
     setMockCasos([...mockCasos, novosCasos]);
   }
 
-  function excluirCaso(id: number) {
+  function excluirCaso(id: string) {
     setMockCasos(mockCasos.filter((t) => t.id !== id));
   }
   return (
@@ -136,11 +151,11 @@ export default function casos() {
         {!casoSelecionado && (
           <>
             {/* Barra de pesquisa */}
-            <BarraDePesquisa value={pesquisa} onChange={setPesquisa} />
+            <BarraDePesquisa funcFiltrar={filtrarCaso} refInput={termoBusca} />
 
             {/* Cards dos Casos */}
             <ListaCaso
-              casos={mockCasos.filter((c) => c.nome.toLowerCase())}
+              casos={mockCasos.filter((c) => c.name.toLowerCase())}
               onOpen={(c) => setCasoSelecionado(c)}
               onEditar={(c) => {
                 setEditandoForm(c);

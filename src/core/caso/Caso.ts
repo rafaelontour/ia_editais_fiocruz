@@ -1,6 +1,6 @@
 export interface Caso {
-  id: number;
-  nome: string;
+  id: string;
+  name: string;
   taxonomia: string;
   ramo: string;
   teste: string;

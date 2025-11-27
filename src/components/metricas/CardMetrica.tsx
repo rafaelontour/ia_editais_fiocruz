@@ -3,8 +3,8 @@
 import { Maximize2 } from "lucide-react";
 import Calendario from "../Calendario";
 import BotaoEditar from "../BotaoEditar";
-import BotaoExcluir from "../BotaoExcluir";
 import { Metrica } from "@/core/metrica";
+import BotaoExcluir from "../botoes/BotaoExcluir";
 
 interface CardMetricaProps {
   metrica: Metrica;
@@ -31,7 +31,7 @@ export default function CardMetrica({
         onClick={onOpen}
       />
 
-      <h2 className="text-2xl font-semibold">{metrica.nome}</h2>
+      <h2 className="text-2xl font-semibold">{metrica.name}</h2>
       <div className="flex flex-row gap-3">
         <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2 ">
           Modelo ia: {metrica.modelo}
@@ -48,11 +48,7 @@ export default function CardMetrica({
 
         <div className="flex gap-3">
           <BotaoEditar onClick={onEditar} />
-          <BotaoExcluir
-            titulo="Excluir Métrica"
-            descricao="Tem certeza que deseja escluir a métrica"
-            onClick={onExcluir}
-          />
+          <BotaoExcluir funcExcluir={onExcluir} item={metrica} tipo="Métrica" />
         </div>
       </div>
     </div>

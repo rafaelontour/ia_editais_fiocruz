@@ -13,8 +13,8 @@ import {
 
 interface FormularioMetricaProps {
   initialData?: {
-    id: number;
-    nome: string;
+    id: string;
+    name: string;
     modelo: string;
     notaCorte: number;
     criterio: string;
@@ -30,7 +30,7 @@ export default function FormularioMetrica({
   mode = "create",
 }: FormularioMetricaProps) {
   const [formState, setFormState] = useState({
-    nome: "",
+    name: "",
     modelo: "",
     notaCorte: 0,
     criterio: "",
@@ -40,7 +40,7 @@ export default function FormularioMetrica({
   useEffect(() => {
     if (initialData) {
       setFormState({
-        nome: initialData.nome,
+        name: initialData.name,
         modelo: initialData.modelo,
         notaCorte: initialData.notaCorte,
         criterio: initialData.criterio,
@@ -58,8 +58,8 @@ export default function FormularioMetrica({
       <div className="flex flex-col gap-2">
         <Label>Nome da métrica</Label>
         <Input
-          value={formState.nome}
-          onChange={(e) => setFormState({ ...formState, nome: e.target.value })}
+          value={formState.name}
+          onChange={(e) => setFormState({ ...formState, name: e.target.value })}
         />
       </div>
 
@@ -106,6 +106,7 @@ export default function FormularioMetrica({
           onChange={(e) =>
             setFormState({ ...formState, criterio: e.target.value })
           }
+          rows={2.5}
         />
       </div>
 
@@ -117,6 +118,7 @@ export default function FormularioMetrica({
           onChange={(e) =>
             setFormState({ ...formState, passosAvaliacao: e.target.value })
           }
+          rows={2.5}
         />
       </div>
 

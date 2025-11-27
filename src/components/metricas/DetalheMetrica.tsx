@@ -3,9 +3,9 @@
 import { Metrica } from "@/core/metrica";
 import Calendario from "../Calendario";
 import BotaoEditar from "../BotaoEditar";
-import BotaoExcluir from "../BotaoExcluir";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../ui/button";
+import BotaoExcluir from "../botoes/BotaoExcluir";
 
 interface CardDetalheMetricaProps {
   metrica: Metrica;
@@ -32,7 +32,7 @@ export default function DetalheMetrica({
         >
           <ArrowLeft size={18} color="black" />
         </Button>
-        <h2 className="text-2xl font-semibold">{metrica.nome}</h2>
+        <h2 className="text-2xl font-semibold">{metrica.name}</h2>
       </div>
       <div className="flex flex-row gap-3">
         <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2 ">
@@ -62,11 +62,7 @@ export default function DetalheMetrica({
 
         <div className="flex gap-3">
           <BotaoEditar onClick={onEditar} />
-          <BotaoExcluir
-            titulo="Excluir Métrica"
-            descricao="Tem certeza que deseja escluir a métrica"
-            onClick={onExcluir}
-          />
+          <BotaoExcluir funcExcluir={onExcluir} item={metrica} tipo="métrica" />
         </div>
       </div>
     </div>

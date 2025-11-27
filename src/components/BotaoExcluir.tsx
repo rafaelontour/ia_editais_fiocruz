@@ -11,21 +11,24 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { useState } from "react";
-import { Fonte, Tipificacao } from "@/core";
+import { Fonte, Ramo, Taxonomia, Tipificacao } from "@/core";
+import { Teste } from "@/core/teste";
+import { Metrica } from "@/core/metrica";
+import { Caso } from "@/core/caso";
 
 interface BotaoExcluirProps {
   tipo: string;
-  item: Fonte | Tipificacao
+  item: Fonte | Tipificacao | Taxonomia | Ramo | Teste | Metrica | Caso;
   funcExcluir: (id: string) => void;
 }
 
 export default function BotaoExcluir(dados: BotaoExcluirProps) {
-  const [dialogOpen, setDialogOpen] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<string | undefined>("");
 
   return (
     <Dialog
       open={dialogOpen === dados.item.id}
-      onOpenChange={(open) => setDialogOpen(open ? dados.item.id : null)}
+      onOpenChange={(open) => setDialogOpen(open ? dados.item.id : undefined)}
     >
       <DialogTrigger asChild>
         <Button
@@ -58,7 +61,7 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
           <Button
             className="flex bg-vermelho hover:bg-vermelho text-white hover:cursor-pointer"
             style={{ boxShadow: "0 0 3px rgba(0, 0, 0, 0.5)" }}
-            onClick={() => dados.funcExcluir(dados.item.id)}
+            onClick={() => dados.funcExcluir(dados.item.id!)}
           >
             Excluir
           </Button>

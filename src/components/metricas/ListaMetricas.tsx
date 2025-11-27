@@ -8,7 +8,7 @@ interface ListaMetricasProps {
   metricas: Metrica[];
   onOpen: (metrica: Metrica) => void; // para o maximize
   onEditar: (metrica: Metrica) => void;
-  onExcluir: (id: number) => void;
+  onExcluir: (id: string) => void;
 }
 
 export default function ListaMetricas({

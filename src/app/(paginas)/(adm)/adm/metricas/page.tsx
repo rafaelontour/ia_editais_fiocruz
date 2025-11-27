@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Metrica } from "@/core/metrica";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function metricas() {
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
@@ -23,11 +23,17 @@ export default function metricas() {
   const [metricaSelecionada, setMetricaSelecionada] = useState<Metrica | null>(
     null
   );
+  const termoBusca = useRef<string>("");
 
-  const [mockMetricas, setMockMetricas] = useState([
+  useEffect(() => {
+    setMetricaFiltrada(mockMetricas);
+  }, []);
+
+  const [metricaFiltrada, setMetricaFiltrada] = useState<Metrica[]>([]);
+  const [mockMetricas, setMockMetricas] = useState<Metrica[]>([
     {
-      id: 1,
-      nome: "Precisão de Feedback",
+      id: "1",
+      name: "Precisão de Feedback 1",
       modelo: "GPT-5",
       notaCorte: 5,
       criterio:
@@ -37,8 +43,8 @@ export default function metricas() {
       created_at: "2025-11-17T15:56:39",
     },
     {
-      id: 2,
-      nome: "Precisão de Feedback",
+      id: "2",
+      name: "Precisão de Feedback",
       modelo: "GPT-5",
       notaCorte: 5,
       criterio:
@@ -48,8 +54,8 @@ export default function metricas() {
       created_at: "12/11/2023, 12:23:20",
     },
     {
-      id: 3,
-      nome: "Precisão de Feedback",
+      id: "3",
+      name: "Precisão de Feedback",
       modelo: "GPT-5",
       notaCorte: 5,
       criterio:
@@ -60,8 +66,23 @@ export default function metricas() {
     },
   ]);
 
+  function filtrarMetricas() {
+    if (termoBusca.current.trim() === "") {
+      setMetricaFiltrada(mockMetricas);
+      return;
+    }
+
+    const mm = mockMetricas.filter(
+      (m) =>
+        m.name &&
+        m.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+    );
+
+    setMetricaFiltrada(mm);
+  }
+
   function salvarEdicao(data: {
-    nome: string;
+    name: string;
     modelo: string;
     notaCorte: number;
     criterio: string;
@@ -72,6 +93,7 @@ export default function metricas() {
     );
 
     setMockMetricas(novasMetricas);
+    setMetricaFiltrada(novasMetricas);
 
     // se tiver expandido, atualizar a métrica selecionada também ou seja o endpoind vai ser pelo id da métrica
     if (metricaSelecionada && metricaSelecionada.id === editandoForm.id) {
@@ -85,27 +107,31 @@ export default function metricas() {
     }
   }
 
-  function excluirMetrica(id: number) {
+  function excluirMetrica(id: string) {
     setMockMetricas(mockMetricas.filter((t) => t.id !== id));
+    setMetricaFiltrada(mockMetricas.filter((t) => t.id !== id));
   }
 
   function adicionarMetrica(data: {
-    nome: string;
+    name: string;
     modelo: string;
     notaCorte: number;
     criterio: string;
     passosAvaliacao: string;
   }) {
+    let id = crypto.randomUUID();
     const novaMetrica = {
-      id: mockMetricas.length + 1,
-      nome: data.nome,
+      id: id,
+      name: data.name,
       modelo: data.modelo,
       notaCorte: data.notaCorte,
       criterio: data.criterio,
       passosAvaliacao: data.passosAvaliacao,
       created_at: new Date().toLocaleString(),
     };
+
     setMockMetricas([...mockMetricas, novaMetrica]);
+    setMetricaFiltrada([...mockMetricas, novaMetrica]);
   }
 
   return (
@@ -142,13 +168,16 @@ export default function metricas() {
         {!metricaSelecionada && (
           <>
             {/* Barra de pesquisa */}
-            <BarraDePesquisa value={pesquisa} onChange={setPesquisa} />
+            <BarraDePesquisa
+              refInput={termoBusca}
+              funcFiltrar={filtrarMetricas}
+            />
 
             {/* Cards de Métrica */}
 
             <ListaMetricas
-              metricas={mockMetricas.filter((m) =>
-                m.nome.toLowerCase().includes(pesquisa.toLowerCase())
+              metricas={metricaFiltrada.filter((m) =>
+                m.name.toLowerCase().includes(pesquisa.toLowerCase())
               )}
               onOpen={(m) => setMetricaSelecionada(m)} // maxima
               onEditar={(m) => {

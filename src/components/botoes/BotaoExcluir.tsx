@@ -13,13 +13,25 @@ import {
 import { useState } from "react";
 import type { Fonte, Ramo, Tipificacao } from "@/core";
 import type { Taxonomia } from "@/core/tipificacao/Tipificacao";
+import { Teste } from "@/core/teste";
+import { Caso } from "@/core/caso";
+import { Metrica } from "@/core/metrica";
 
 interface BotaoExcluirProps {
   onClick?: () => void;
-  divRefs?: React.RefObject<Record<string, HTMLFormElement | HTMLDivElement | HTMLButtonElement | HTMLSpanElement | null>>
-  flagHook?: React.RefObject<boolean>
+  divRefs?: React.RefObject<
+    Record<
+      string,
+      | HTMLFormElement
+      | HTMLDivElement
+      | HTMLButtonElement
+      | HTMLSpanElement
+      | null
+    >
+  >;
+  flagHook?: React.RefObject<boolean>;
   tipo: string;
-  item: Fonte | Tipificacao | Taxonomia | Ramo
+  item: Fonte | Tipificacao | Taxonomia | Ramo | Teste | Metrica | Caso;
   funcExcluir: (id: string | undefined) => void;
 }
 
@@ -33,8 +45,9 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
     >
       <DialogTrigger
         onClick={() => {
-          if (dados.flagHook) dados.flagHook.current = true
-        }} asChild
+          if (dados.flagHook) dados.flagHook.current = true;
+        }}
+        asChild
       >
         <Button
           title={`Excluir ${dados.item}`}
@@ -47,18 +60,23 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
 
       <DialogContent
         onCloseAutoFocus={() => {
-          if (dados.flagHook) dados.flagHook.current = false
+          if (dados.flagHook) dados.flagHook.current = false;
         }}
         ref={(e) => {
-          dados.divRefs?.current && (dados.divRefs.current["botao_excluir"] = e)
-        }}>
+          dados.divRefs?.current &&
+            (dados.divRefs.current["botao_excluir"] = e);
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Excluir {dados.tipo}</DialogTitle>
 
           <DialogDescription>
-            Tem certeza que deseja excluir { dados.tipo !== "ramo" ? "a " : "o "} {dados.tipo} {" "}
+            Tem certeza que deseja excluir {dados.tipo !== "ramo" ? "a " : "o "}{" "}
+            {dados.tipo}{" "}
             <strong>
-              {"title" in dados.item ? dados.item.title : "name" in dados.item && dados.item.name}
+              {"title" in dados.item
+                ? dados.item.title
+                : "name" in dados.item && dados.item.name}
             </strong>
           </DialogDescription>
         </DialogHeader>
