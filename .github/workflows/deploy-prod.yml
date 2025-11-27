@@ -32,28 +32,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy no servidor via SSH
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} << 'EOF'
-            set -e
 
-            echo "🚀 Iniciando deploy via docker-compose..."
+    - name: Checkout do código
+      uses: actions/checkout@v4
 
-            cd /home/ubuntu
+    - name: Configurar chave SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.IA_EDITAIS_SSH }}
 
-            if [ ! -d "iaEditais-prod" ]; then
-              git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-prod
-              cd iaEditais-prod
-            else
-              cd iaEditais-prod
-              git fetch origin main
-              git reset --hard origin/main
-            fi
+    - name: Deploy no servidor via SSH
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} << 'EOF'
+          set -e
 
-            export DOCKER_BUILDKIT=1
+          echo "🚀 Iniciando deploy via docker-compose..."
 
-            docker compose down --rmi all --remove-orphans || true
-            docker compose up -d --build
+          cd /home/ubuntu
 
-            echo "✅ Deploy concluído com sucesso!"
-          EOF
+          if [ ! -d "iaEditais-prod" ]; then
+            git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-prod
+            cd iaEditais-prod
+          else
+            cd iaEditais-prod
+            git fetch origin main
+            git reset --hard origin/main
+          fi
+
+          export DOCKER_BUILDKIT=1
+
+          docker compose down --rmi all --remove-orphans || true
+          docker compose up -d --build
+
+          echo "✅ Deploy concluído com sucesso!"
+        EOF
