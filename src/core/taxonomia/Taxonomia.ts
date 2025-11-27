@@ -1,17 +1,16 @@
-import { Fonte } from "../fonte";
-import { Ramo } from "../ramo/Ramo";
-import { Tipificacao } from "../tipificacao";
+import type { Fonte } from "../fonte";
+import type { Branch } from "../tipificacao/Tipificacao";
 
 export interface Taxonomia {
-    typification_id: string | undefined;
+    typification_id?: string | undefined;
     id?: string;
-    title: string;
-    description: string;
+    title?: string;
+    description?: string;
     source_ids?: string[];
     sources?: Fonte[];
-    branches?: Ramo[];
+    branches?: Branch[] | string[];
     tip_assoc?: string;
     tip_assoc_id?: string;
     created_at?: string;
-    updated_at?: string;
+    updated_at?: string | undefined;
 }

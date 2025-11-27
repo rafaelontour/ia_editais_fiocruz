@@ -1,7 +1,13 @@
 services:
   fiotec-front: 
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_VERSAO_PLATAFORMA: "1.1.0"
     container_name: fiotec-front
+    environment:
+      NEXT_PUBLIC_VERSAO_PLATAFORMA: "1.1.0"
     ports:
       - "3000:4000"
     restart: unless-stopped

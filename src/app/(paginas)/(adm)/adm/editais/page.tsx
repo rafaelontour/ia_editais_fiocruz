@@ -21,11 +21,13 @@ import CardLista from "@/components/editais/CardLista";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import useUsuario from "@/data/hooks/useUsuario";
-import { formatarData } from "@/lib/utils";
+import { formatarData, simularAtraso } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 export default function Editais() {
     const [montado, setMontado] = useState<boolean>(false);
     const [adicionouNovoEdital, setAdicionouNovoEdital] = useState<boolean>(false);
+    const [carregandoEditais, setCarregandoEditais] = useState<boolean>(true);
     const statuses: StatusEdital[] = ["PENDING", "UNDER_CONSTRUCTION", "WAITING_FOR_REVIEW", "COMPLETED"];
     const { usuario } = useUsuario();
 
@@ -93,7 +95,7 @@ export default function Editais() {
     const getEditais = async () => {
         try {
             const resposta = await getEditaisService(usuario?.unit_id);
-            
+
             if (!resposta) toast.error("Erro ao buscar editais!");
 
             const dados = resposta || [];
@@ -106,17 +108,19 @@ export default function Editais() {
             };
 
             dados.forEach((edital) => {
-            const status = edital.history?.[0]?.status as StatusEdital;
-            if (status && statuses.includes(status)) {
-                // insere no topo
-                novasColunas[status].unshift(edital);
-            }
-        });
+                const status = edital.history?.[0]?.status as StatusEdital;
+                if (status && statuses.includes(status)) {
+                    // insere no topo
+                    novasColunas[status].unshift(edital);
+                }
+            });
 
             setColumns(novasColunas);
         } catch (e) {
             toast.error("Erro ao buscar editais!");
         }
+
+        setCarregandoEditais(false);
     };
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -135,7 +139,7 @@ export default function Editais() {
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
-        
+
         const { active, over } = event;
         setActiveId(null);
 
@@ -193,7 +197,7 @@ export default function Editais() {
             const source = columns[activeContainer];
             const oldIndex = source.findIndex(i => i.id === activeId);
             if (oldIndex === -1) return;
-            
+
             const movedItem = source[oldIndex];
 
             // guarda a movimentação pendente e abre o diálogo
@@ -287,19 +291,39 @@ export default function Editais() {
                 onDragEnd={handleDragEnd}
             >
                 <div className="flex justify-between h-[85%] relative gap-3">
-                    {statuses.map((status) => (
-                        <div className="w-full" key={status}>
-                            <SortableContext items={columns[status].map((c) => c.id)} strategy={verticalListSortingStrategy}>
-                                <CardLista
-                                    funcaoAtualizarEditais={setAdicionouNovoEdital}
-                                    flagEdital={adicionouNovoEdital}
-                                    status={status}
-                                    categoria={[{ nome: formatStatus(status), color: getStatusColor(status) }]}
-                                    editais={columns[status]}
-                                />
-                            </SortableContext>
+                    {carregandoEditais ? (
+                        <div className="flex items-center gap-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <p className="text-xl animate-pulse">Buscando editais...</p>
+                            <Loader2 className="animate-spin mr-2 h-6 w-6 text-gray-600" />
                         </div>
-                    ))}
+                    ) : (
+                        (
+                            columns["PENDING"].length === 0 &&
+                            columns["UNDER_CONSTRUCTION"].length === 0 &&
+                            columns["WAITING_FOR_REVIEW"].length === 0 &&
+                            columns["COMPLETED"].length === 0) ? (
+                            <div className="flex justify-center items-center h-80 w-full">
+                                <p className="text-xl animate-pulse">Nenhum edital cadastrado</p>
+                            </div>
+                        ) : (
+                            
+                                statuses.map((status) => (
+                                    <div className="w-full" key={status}>
+                                        <SortableContext items={columns[status].map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                                            <CardLista
+                                                funcaoAtualizarEditais={setAdicionouNovoEdital}
+                                                flagEdital={adicionouNovoEdital}
+                                                status={status}
+                                                categoria={[{ nome: formatStatus(status), color: getStatusColor(status) }]}
+                                                editais={columns[status]}
+                                            />
+                                        </SortableContext>
+                                    </div>
+                                )
+                            )
+                        )
+                    )}
+                    
                 </div>
 
                 <DragOverlay>
@@ -342,15 +366,7 @@ export default function Editais() {
                 </DialogContent>
             </Dialog>
 
-            {
-                columns["PENDING"].length === 0 &&
-                columns["UNDER_CONSTRUCTION"].length === 0 &&
-                columns["WAITING_FOR_REVIEW"].length === 0 &&
-                columns["COMPLETED"].length === 0 &&
-                <div className="flex justify-center items-center h-80">
-                    <p className="text-xl animate-pulse">Nenhum edital cadastrado</p>
-                </div>
-            }
+
         </div>
     );
 }

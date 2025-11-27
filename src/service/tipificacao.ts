@@ -2,7 +2,7 @@ import { Fonte, Tipificacao } from "@/core";
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-async function getTipificacoesService(): Promise<Tipificacao[]> {
+async function getTipificacoesService(): Promise<Tipificacao[] | undefined> {
     const url = `${urlBase}/typification/`;
 
     try {
@@ -13,13 +13,15 @@ async function getTipificacoesService(): Promise<Tipificacao[]> {
                 "Content-Type": "application/json"
             }
         });
+
         if (!response.ok) {
-            throw new Error("Erro ao buscar tipificações");
+            return
         }
+
         const json = await response.json();
         return json.typifications;
-    } catch (error) {
-        throw new Error("Erro ao buscar tipificações: " + (error instanceof Error ? error.message : String(error)));
+    } catch(e) {
+        return
     }
 }
 
@@ -34,13 +36,15 @@ async function getTipificacaoPorIdService(id: string | undefined): Promise<Tipif
                 "Content-Type": "application/json"
             }
         });
+
         if (!response.ok) {
-            throw new Error("Erro ao buscar tipificacao");
+            return null
         }
+
         const json = await response.json();
-        return json.typification;
+        return json
     } catch (error) {
-        throw new Error("Erro ao buscar tipificacao: " + (error instanceof Error ? error.message : String(error)));
+        return null
     }
 }
 

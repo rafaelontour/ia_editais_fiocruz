@@ -62,7 +62,7 @@ async function adicionarEditalService(dados: any): Promise<[number, string] | un
     }
 }
 
-async function atualizarEditalService(idEdital: string, dados: any): Promise<number | undefined> {
+async function atualizarEditalService(dados: any): Promise<number | undefined> {
     try {
         const resposta = await fetch(`${urlBase}/doc/`, {
             method: "PUT",
@@ -71,13 +71,12 @@ async function atualizarEditalService(idEdital: string, dados: any): Promise<num
                 "Content-type": "application/json"
             },
             body: JSON.stringify({
-                id: idEdital,
-                name: dados.nome,
-                identifier: dados.identificador,
-                description: dados.descricao,
-                editors_ids: dados.responsavel,
-                typification_ids: dados.tipificacoes,
-                updated_at: new Date().toISOString()
+                id: dados.id,
+                name: dados.name,
+                identifier: dados.identifier,
+                description: dados.description,
+                editors_ids: dados.editors_ids,
+                typification_ids: dados.typification_ids,
             })
         })
 

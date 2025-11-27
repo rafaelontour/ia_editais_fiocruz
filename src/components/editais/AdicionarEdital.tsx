@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { Textarea } from "../ui/textarea";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Unidade } from "@/core/unidade";
 import { toast } from "sonner";
 import { getTodasUnidades } from "@/service/unidade";
@@ -22,6 +22,7 @@ import { getUsuariosPorUnidade } from "@/service/usuario";
 import { adicionarEditalService } from "@/service/edital";
 import { enviarArquivoService } from "@/service/editalArquivo";
 import useUsuario from "@/data/hooks/useUsuario";
+import useEditalProc from "@/data/hooks/useProcEdital";
 
 const schemaEdital = z.object({
     nome: z.string().min(5, "O nome do edital é obrigatório"),
@@ -67,18 +68,22 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const [tipificacoesSelecionadas, setTipificacoesSelecionadas] = useState<Tipificacao[] | []>([]);
     const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
     const { usuario } = useUsuario();
+    const { editalProcessado, setEditalProcessado, setIdEditalAtivo } = useEditalProc();
 
-    async function buscarUnidades() {
-        const unidades = await getTodasUnidades();
-        setUnidades(unidades);
-    }
+    const a = useRef<number>(0);
     
     async function buscarTipificacoes() {
         const tipificacoes = await getTipificacoesService();
+
+        if (!tipificacoes) {
+            toast.error("Erro ao buscar tipificações!");
+            return;
+        }
         setTipificacoes(tipificacoes);
     }
     
     async function buscarUsuariosPorUnidade() {
+        a.current = 0;
         const usuarios = await getUsuariosPorUnidade(usuario?.unit_id);
         setUsuarios(usuarios);
     }
@@ -95,38 +100,71 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         
         const [resposta, idEdital] = (await adicionarEditalService(dados)) ?? [];
 
+        setIdEditalAtivo(idEdital);
+
         if (resposta !== 201) {
             if (resposta === 409) {
-                toast.error("Erro ao enviar edital!", { description: "Ja existe um edital com esse identificador!" });
-                return
+                toast.error("Erro ao enviar edital!", { description: "Ja existe um edital cadastrado esse nome ou número!" });
+                return;
             }
-
             toast.error("Erro ao enviar edital!");
-            return
+            return;
         }
 
         atualizarEditais(!flagEdital);
-        toast.success("Edital enviado com sucesso!");
         limparDados();
         setOpenSheet(false);
 
+        // Chama a função que envia o arquivo (service intacto)
         const respostaArquivo = await enviarArquivoService(idEdital, data.arquivo);
-
+    
         if (respostaArquivo !== 201) {
             toast.error("Erro ao enviar arquivo!");
-            return
+            return;
         }
 
-        toast.success("Arquivo enviado com sucesso!");
+        // ---------- WebSocket ----------
+        const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario?.id}`);
+
+        ws.onopen = () => {
+            return;
+        };
+
+        ws.onmessage = (event) => {
+            const dados = JSON.parse(event.data);
+
+            if (dados.event === "doc.release.update") {
+                if (dados.message === "complete" && a.current === 0) {
+                    setEditalProcessado(false);
+                    setIdEditalAtivo("");
+                    toast.success("Edital processado! ✅", { description: "Agora você já pode visualizar o resultado!" });
+                    a.current = 1;
+                    ws.close();
+                }
+            }
+
+            if (dados.event === "doc.kanban.update") {
+                // Mudar depois
+            }
+        };
+
+        ws.onerror = (error) => {
+            toast.error("Erro no WebSocket!", { description: "Ocorreu um erro ao acompanhar o arquivo. Erro: " + error });
+            ws.close();
+            setIdEditalAtivo("");
+            return;
+        };
+
+        ws.onclose = () => {
+            return;
+        };
+
+        toast.info("Edital enviado!", { description: "Aguarde o processamento do edital..." });
     }
 
-    useEffect(() => {
-        try {
-            buscarUnidades();
-            buscarTipificacoes();
-        } catch(e: any) {
-            toast.error("Erro", e.message);
-        }
+
+    useEffect(() => {  
+        buscarTipificacoes();
     }, [])
 
     function limparDados() {
@@ -134,7 +172,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         setTipificacoesSelecionadas([]);
         setResponsaveisEdital([]);
     }
-
 
     return(
         <div>
@@ -245,11 +282,16 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                     tipificacoesSelecionadas.length > 0 && (
                                         <div className="flex flex-col gap-3 w-full">
                                             <Label htmlFor="tipe" className="text-lg">Tipificações selecionadas</Label>
-                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                            <div 
+                                                className={`
+                                                    grid ${tipificacoesSelecionadas.length === 1 ? "grid-cols-1" : tipificacoesSelecionadas.length === 2 ? "grid-cols-2" : "grid-cols-3" } 
+                                                    gap-3 border-gray-200 rounded-md border-1 p-3
+                                                `}
+                                            >
                                                 {
                                                     tipificacoesSelecionadas.filter((t) => tipificacoes.find((tp) => tp.id === t.id)).map((t: Tipificacao) => (
                                                         <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                            <button className="h-full" onClick={() => {
+                                                            <div role="button" className="flex h-full" onClick={() => {
                                                                 const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
                                                                 setTipificacoesSelecionadas(novaLista);
                                                                 setValue("tipificacoes", novaLista.map((tp) => tp.id));
@@ -257,7 +299,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                 <div className="flex items-center h-full" title="Remover tipificação">
                                                                     <span
                                                                         className="
-                                                                            bg-red-200 p-[10px] h-full flex items-center
+                                                                            bg-red-200 p-[10px] h-full flex items-center justify-center
                                                                             hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                                             transition-all duration-200 ease-in-out
                                                                         "
@@ -265,7 +307,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                         <X className="w-4 h-4" />
                                                                     </span>
                                                                 </div>
-                                                            </button>
+                                                            </div>
                                                             <p className="w-full text-sm py-1">{t.name}</p>
                                                         </div>
                                                     ))

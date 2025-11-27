@@ -112,6 +112,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     async function atualizarEdital(data: formData) {
 
         const dados = {
+            id: edital.id,
             name: data.nome,
             identifier: data.identificador,
             description: data.descricao,
@@ -119,10 +120,11 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             editors_ids: responsaveisEdital.map(usuario => usuario.id)
         }
 
-        const [r, idEdital] = (await adicionarEditalService(dados)) ?? [];
+        const r = await atualizarEditalService(dados);
 
-        if (r !== 201) {
-            toast.error("Erro ao atualizar os dados do edital!", { description: "O documento/arquivo do edital só é substituído se as informações do edital também forem substituídas!" });
+
+        if (r !== 200) {
+            toast.error("Erro ao atualizar os dados do edital!", { description: "O arquivo não foi atualizado, pois ocorreu um erro ao atualizar as informações do edital!!" });
             return
         }
 
@@ -141,7 +143,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
     useEffect(() => {
         buscarUsuariosPorUnidade(usuario?.unit_id);
-        getTipificacoesService().then(tipificacoes => setTipificacoes(tipificacoes));
+        getTipificacoesService().then(tipificacoes => setTipificacoes(tipificacoes ?? []));
     }, [])
 
     function limparCampos() {

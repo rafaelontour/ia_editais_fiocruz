@@ -11,6 +11,7 @@ export interface Tipificacao {
 }
 
 export interface Taxonomia {
+    typification_id?: string
     id: string
     title?: string
     description?: string
@@ -29,5 +30,5 @@ export interface Branch {
         score: number
     }
     created_at?: string
-    updated_at?: string | null
+    updated_at?: string | undefined
 }

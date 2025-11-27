@@ -19,16 +19,6 @@ interface Props {
   flagEdital: boolean
 }
 
-const getStatusColor = (status: StatusEdital): string => {
-  switch (status) {
-      case "PENDING": return "#99A1AF";
-      case "UNDER_CONSTRUCTION": return "red";
-      case "WAITING_FOR_REVIEW": return "#656149";
-      case "COMPLETED": return "darkgreen";
-  }
-};
-
-
 export default function CardLista({ status, categoria, editais, funcaoAtualizarEditais, flagEdital }: Props) {
   // Droppable container com data.containerId = status
   const { setNodeRef } = useDroppable({

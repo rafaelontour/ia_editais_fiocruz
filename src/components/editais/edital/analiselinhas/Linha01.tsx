@@ -19,7 +19,7 @@ export default function Linha01 ({ edital }: Props) {
             
             <div className="flex flex-row gap-2 items-center">
                 <div className=" flex gap-4 p-2 rounded-md"> 
-                    <Button
+                    {/* <Button
                         variant={"destructive"}
                         className="text-md px-3 py-2 hover:cursor-pointer text-white bg-verde hover:bg-green-800"
                         size="sm"
@@ -29,7 +29,7 @@ export default function Linha01 ({ edital }: Props) {
                             <p>Resultado do edital</p>
                             <CheckCircle2 className="w-4 h-4" />
                         </span>
-                    </Button>
+                    </Button> */}
 
                     <Link  href={`/adm/editais/${edital?.id}/comentarios`}>
                         <Button
