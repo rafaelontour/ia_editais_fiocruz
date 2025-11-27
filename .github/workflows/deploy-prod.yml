@@ -1,0 +1,59 @@
+name: CI/CD - IaEditais
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+
+  # ==============================
+  # 🚦 CI — testa o projeto
+  # ==============================
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Rodar build para validar
+        run: npm run build
+
+      # Se quiser adicionar testes depois:
+      # - name: Rodar testes
+      #   run: npm run test
+
+  # ==============================
+  # 🚀 CD — só roda SE o CI PASSAR
+  # ==============================
+  cd:
+    needs: ci  # 👈 obrigatório: só continua se o job 'ci' passar
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy no servidor via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} << 'EOF'
+            set -e
+
+            echo "🚀 Iniciando deploy via docker-compose..."
+
+            cd /home/ubuntu
+
+            if [ ! -d "iaEditais-prod" ]; then
+              git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-prod
+              cd iaEditais-prod
+            else
+              cd iaEditais-prod
+              git fetch origin main
+              git reset --hard origin/main
+            fi
+
+            export DOCKER_BUILDKIT=1
+
+            docker compose down --rmi all --remove-orphans || true
+            docker compose up -d --build
+
+            echo "✅ Deploy concluído com sucesso!"
+          EOF
