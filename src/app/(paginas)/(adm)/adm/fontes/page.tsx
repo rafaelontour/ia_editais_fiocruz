@@ -82,7 +82,7 @@ export default function Fontes() {
 
     const adicionarFonte = async (formData: FormDataFonte) => {
         setCarregando(true);
-        
+
         const resposta = await adicionarFonteService(formData.nome, formData.descricao);
 
         if (resposta !== 201) {
@@ -99,7 +99,7 @@ export default function Fontes() {
     }
 
     const atualizarFonte = async (formData: FormDataFonte) => {
-        
+
         const resposta = await atualizarFonteService(openDialogIdEditar as string, formData.nome, formData.descricao);
 
         if (resposta !== 200) {
@@ -118,7 +118,7 @@ export default function Fontes() {
 
     const excluirFonte = async (id: string) => {
         setCarregando(true);
-    
+
         const resposta = await excluirFonteService(id);
 
         if (resposta !== 204) {
@@ -141,7 +141,7 @@ export default function Fontes() {
         const ff = fontes.filter(
             f => f.name && f.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
         )
-    
+
         setFontesFiltradas(ff);
     }
 
@@ -153,7 +153,7 @@ export default function Fontes() {
                         <h2 className="text-4xl font-bold">
                             Fontes
                         </h2>
-                        
+
                         <Dialog open={openDialogFontes} onOpenChange={setOpenDialogFontes}>
                             <DialogTrigger asChild>
                                 <Botao texto="Adicionar fonte" />
@@ -175,12 +175,12 @@ export default function Fontes() {
                                     <DialogClose>
                                         <BotaoCancelar />
                                     </DialogClose>
-                                     <BotaoSalvar onClick={handleSubmit(adicionarFonte)} />
+                                    <BotaoSalvar onClick={handleSubmit(adicionarFonte)} />
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
-                                        </div>
                     </div>
+                </div>
 
                 <BarraDePesquisa refInput={termoBusca} funcFiltrar={filtrarFontes} />
             </div>

@@ -266,6 +266,7 @@ export default function Tipificacoes() {
                                     flex flex-col gap-2 rounded-md p-4 w-full
                                     transition ease-in-out duration-100 mb-5
                                 "
+                                data-cy="item-tipificacao"
                             >
                                 <div className="flex flex-col gap-2">
                                     <h2 className="text-2xl font-semibold">{tipificacao.name}</h2>
