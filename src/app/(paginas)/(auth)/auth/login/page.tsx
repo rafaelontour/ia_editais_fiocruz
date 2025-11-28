@@ -131,6 +131,7 @@ export default function Login() {
           </div>
 
           <button
+            id="login"
             type="submit"
             className="bg-vermelho hover:bg-red-800 text-branco rounded-md cursor-pointer py-2 px-4"
           >

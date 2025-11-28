@@ -201,6 +201,7 @@ export default function Fontes() {
                             fontesFiltradas.map((fonte, index) => (
                                 <div
                                     style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
+                                    data-cy="item-fonte"
                                     key={index}
                                     className="
                                         flex flex-col gap-2 rounded-md p-4 mb-4

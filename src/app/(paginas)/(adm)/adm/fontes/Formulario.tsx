@@ -20,6 +20,7 @@ export default function Formulario({ register, errors }: FormularioFonteProps) {
                     {...register("nome")}
                     type="text"
                     className="border-2 border-gray-300 rounded-md p-2 w-full"
+                    data-cy="input-nome-fonte"
                 />
 
                 {errors.nome && (
@@ -36,6 +37,7 @@ export default function Formulario({ register, errors }: FormularioFonteProps) {
                     {...register("descricao")}
                     type="text"
                     className="border-2 border-gray-300 rounded-md p-2 w-full"
+                    data-cy="input-descricao-fonte"
                 />
 
                 {errors.descricao && (
