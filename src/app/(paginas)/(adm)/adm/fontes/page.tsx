@@ -183,7 +183,7 @@ export default function Fontes() {
                                         </div>
                     </div>
 
-                <BarraDePesquisa refInput={termoBusca} funcFiltrar={filtrarFontes} />
+                <BarraDePesquisa className='w-full' refInput={termoBusca} funcFiltrar={filtrarFontes} />
             </div>
 
             {

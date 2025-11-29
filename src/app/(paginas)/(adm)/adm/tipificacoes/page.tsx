@@ -246,7 +246,7 @@ export default function Tipificacoes() {
                         </Dialog>
                     </div>
 
-                    <BarraDePesquisa refInput={termoBusca} funcFiltrar={filtrarTipificacao} />
+                    <BarraDePesquisa className="w-full" refInput={termoBusca} funcFiltrar={filtrarTipificacao} />
                 </div>
 
                 <Masonry
