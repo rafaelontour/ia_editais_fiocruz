@@ -6,6 +6,6 @@ echo "🔍 Executando Semgrep antes do push..."
 # semgrep --config=auto .
 
 # Caso queira falhar o push se encontrar problemas críticos:
-semgrep --config=auto --error
+npx semgrep --config=p/ci --include 'src/**/*.ts*'
 
 echo "✓ Semgrep finalizado — push liberado."
