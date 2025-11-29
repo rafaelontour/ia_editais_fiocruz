@@ -19,6 +19,7 @@ import BotaoExcluir from '@/components/BotaoExcluir';
 import BotaoCancelar from '@/components/botoes/BotaoCancelar';
 import BotaoSalvar from '@/components/botoes/BotaoSalvar';
 import Formulario from './Formulario';
+import Div from '@/components/Div';
 
 const schemaFonte = z.object({
     nome: z.string().min(1, "O nome da fonte é obrigatório"),
@@ -199,15 +200,7 @@ export default function Fontes() {
                     >
                         {
                             fontesFiltradas.map((fonte, index) => (
-                                <div
-                                    style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
-                                    key={index}
-                                    className="
-                                        flex flex-col gap-2 rounded-md p-4 mb-4
-                                        transition ease-in-out duration-100
-                                        min-w-[250px]
-                                    "
-                                >
+                                <Div key={index}>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-2xl font-semibold">{fonte.name}</h2>
                                         <p className={`py-1 w-fit break-words text-md`}>
@@ -265,7 +258,7 @@ export default function Fontes() {
 
                                         </div>
                                     </div>
-                                </div>
+                                </Div>
                             ))
                         }
                     </Masonry>
