@@ -21,6 +21,8 @@ import BotaoSalvar from "@/components/botoes/BotaoSalvar";
 import Formulario from "./Formulario";
 import BarraDePesquisa from "@/components/BarraDePesquisa";
 import { useForm } from "react-hook-form";
+import { IconHierarchy2 } from "@tabler/icons-react";
+import Div from "@/components/Div";
 
 const schemaTipificacao = z.object({
     nome: z.string().min(1, "O nome da tipificação é obrigatório"),
@@ -259,14 +261,7 @@ export default function Tipificacoes() {
                             </div>
                         ) : (
                             tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? tipificacoesFiltradas.map((tipificacao, index) => (
-                            <div
-                                style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
-                                key={index}
-                                className="
-                                    flex flex-col gap-2 rounded-md p-4 w-full
-                                    transition ease-in-out duration-100 mb-5
-                                "
-                            >
+                            <Div key={index}>
                                 <div className="flex flex-col gap-2">
                                     <h2 className="text-2xl font-semibold">{tipificacao.name}</h2>
                                 </div>
@@ -289,7 +284,7 @@ export default function Tipificacoes() {
                                                 `}
                                                 title="Taxonomias desta tipificação"
                                             >
-                                                <Share2 color="black" size={20} />
+                                                <IconHierarchy2 size={20} color="black" />
                                             </Button>
                                         </Link>
 
@@ -347,7 +342,7 @@ export default function Tipificacoes() {
                                         <BotaoExcluir funcExcluir={excluirTipificacao} item={tipificacao} tipo="tipificação" />
                                     </div>
                                 </div>
-                            </div>
+                            </Div>
                         )) : <p className="absolute left-1/2 top-10 translate-x-[-50%] text-gray-400 text-2xl text-center animate-pulse">Nenhuma tipificação encontrada.</p>
                         )
                     }

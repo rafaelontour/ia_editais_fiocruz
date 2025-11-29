@@ -13,6 +13,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
 import { formatarData } from "@/lib/utils";
+import Div from "../Div";
 
 const schemaUsuario = z.object({
   username: z.string().min(1, "O nome é obrigatório"),
@@ -90,14 +91,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
   };
 
   return (
-    <div
-      style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
-      className="
-        flex flex-col justify-between gap-2 rounded-md p-4 mb-4
-        transition ease-in-out duration-100
-        min-w-[290px]
-      "
-    >
+    <Div>
       <div className="flex flex-col gap-2">
         <h2 className="text-xl font-semibold">{usuario.username}</h2>
         <p className="py-1 w-fit break-words text-sm">{usuario.email}</p>
@@ -290,6 +284,6 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
           </Dialog>
         </div>
       </div>
-    </div>
+    </Div>
   );
 };

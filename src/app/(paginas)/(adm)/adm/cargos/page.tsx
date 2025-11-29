@@ -6,11 +6,11 @@ import AdicionarUsuario from "@/components/usuarios/AdicionarUsuario";
 import { UsuarioCard } from "@/components/usuarios/UsuarioCard";
 import { Unidade } from "@/core/unidade";
 import { UsuarioUnidade } from "@/core/usuario";
-import useUsuario from "@/data/hooks/useUsuario";
 import { getTodasUnidades } from "@/service/unidade";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import { UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function AtribuirCargo () {
 
@@ -34,7 +34,7 @@ export default function AtribuirCargo () {
             try {
                 await buscarTodasUnidades();
             } catch (error) {
-                console.error("Erro ao carregar unidades:", error);
+                toast.error("Erro ao carregar unidades");
             } 
         };
 
@@ -97,14 +97,6 @@ export default function AtribuirCargo () {
                         </SelectContent>
                     </Select>
                 </div>
-
-                {/* <div className="relative flex-grow w-full items-center">
-                    <Input type={"search"} placeholder="Buscar Usuário" 
-                        className="pl-4 pr-10 py-2 w-full rounded-lg"/>
-                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 items-center">
-                        <Search size={20}/>
-                    </div>
-                </div> */}
             </div>
 
             <div className={`${idUnidadeSelecionada !== "" && (usuariosDaUnidade && usuariosDaUnidade.length > 0) ? "grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-0.5" : "flex w-full justify-center"}`}>

@@ -16,6 +16,7 @@ import { getStatusColor, iconeParaStatusDoEdital, verificarStatusEdital } from "
 import { useRouter } from "next/navigation";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import BotaoVoltar from "@/components/botoes/BotaoVoltar";
 
 interface VisualizarEditalClienteProps {
     edital: Edital | undefined
@@ -46,7 +47,6 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
         }
 
         toast.error("Erro ao concluir análise do edital!");
-        
     }
     
     async function enviarEditalParaEmContrucao() {
@@ -70,6 +70,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
         <div className="flex flex-col w-screen= h-full max-h-full gap-10">
             <div className="flex items-center justify-between">
                 <div className="flex items-center flex-row gap-7">
+                    <BotaoVoltar />
                     <Label className="text-2xl font-semibold"><strong>Edital</strong>: <span className="font-semibold">{edital?.name}</span></Label>
                     <div
                         className="pointer-events-none flex items-center gap-2 px-3 py-1 rounded-md text-white font-semibold"

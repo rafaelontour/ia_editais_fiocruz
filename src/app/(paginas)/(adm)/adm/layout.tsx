@@ -139,38 +139,29 @@ export default function RootLayout({
                 absolute left-0 top-0 
                 overflow-hidden flex w-full
               "
-              style={{
-                borderTopLeftRadius: "10px",
-                borderTopRightRadius: "10px",
-              }}
+              
             >
               <SidebarTrigger
                 onClick={() => mudarEstadoBarraLateral()}
-                className="
-                  mt-4 ml-4
+                className={`
+                  mt-4 ml-4 mb-2rounded-sm 
                   hover:cursor-pointer
-                  bg-white
-                "
+                  bg-vermelho hover:bg-vermelho text-white hover:text-white
+                  
+                `}
+                style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .3)"}}
+                title={
+                  barraLateralAberta
+                    ? "Recolher menu"
+                    : "Expandir menu"
+                }
               />
-
-              <div 
-                className="
-                  flex items-center pl-4 py-3
-                  h-16 w-[95%] bg-white sticky
-                  top-0 left-0 pointer-events-none z-10
-                "
-                style={{ 
-                  background: "linear-gradient(to bottom, rgb(202, 202, 202) 0%, white 7%)",
-                }}
-              >
-                <p></p>
-              </div>
             </div>
             
             <div
               className="
                 flex flex-1 flex-col h-[98%]
-                bg-white pt-20 px-12 overflow-y-auto scrollbar-hidde
+                bg-white p-12 overflow-y-auto scrollbar-hidde
               "
               style={{
                 boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",

@@ -132,7 +132,7 @@ export default function RootLayout({
                 className="
                 mt-4 ml-4
                 hover:cursor-pointer
-                bg-white
+                
                 "
               />
 
