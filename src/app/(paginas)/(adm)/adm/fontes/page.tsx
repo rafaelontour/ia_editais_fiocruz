@@ -200,7 +200,7 @@ export default function Fontes() {
                     >
                         {
                             fontesFiltradas.map((fonte, index) => (
-                                <Div key={index}>
+                                <Div index={index}>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-2xl font-semibold">{fonte.name}</h2>
                                         <p className={`py-1 w-fit break-words text-md`}>
