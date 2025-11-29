@@ -120,7 +120,6 @@ export default function Taxonomias({ id }: { id: string }) {
         const taxsDaTip = tip?.taxonomies || [];
         setTax(taxsDaTip || []);
         setCarregandoTax(false);
-
     }
 
     useEffect(() => {
@@ -219,7 +218,6 @@ export default function Taxonomias({ id }: { id: string }) {
         resetRamo()
         toast.success("Ramo atualizado com sucesso!");
         setOpenDialogIdRamoEditar(null);
-
     }
 
     const excluirRamo = async (idRamo: string | undefined) => {
@@ -267,6 +265,7 @@ export default function Taxonomias({ id }: { id: string }) {
 
         setOpenTaxonomia(false);
         reset()
+        setFontesSelecionadas([]);
     }
 
     const atualizarTaxonomia = async (data: FormData) => {
@@ -293,7 +292,6 @@ export default function Taxonomias({ id }: { id: string }) {
         reset();
         setOpenTaxonomiaId(null);
         await getTipificacaoPorId();
-
     }
 
     const buscarRamos = async (idTaxonomia: string | undefined) => {
@@ -361,7 +359,7 @@ export default function Taxonomias({ id }: { id: string }) {
                         </Button>
                     </DialogTrigger>
 
-                    <DialogContent ref={(e) => { divRefs.current["adicionar_tax"] = e }} onCloseAutoFocus={() => { reset(); flagHook.current = false; }}>
+                    <DialogContent ref={(e) => { divRefs.current["adicionar_tax"] = e }} onCloseAutoFocus={() => { reset(); setFontesSelecionadas([]); flagHook.current = false; }}>
                         <DialogHeader>
                             <DialogTitle>Adicionar taxonomia</DialogTitle>
                             <DialogDescription>
@@ -682,7 +680,12 @@ export default function Taxonomias({ id }: { id: string }) {
                                     </p>
                                 )
                             ) : (
-                                <p className="ml-3 animate-pulse">Selecione uma taxonomia.</p>
+                                taxFiltradas.length === 0 ? (
+                                    <p className="ml-3 animate-pulse">Nenhuma taxonomia disponível</p>
+                                ) : (
+                                    <p className="ml-3 animate-pulse">Selecione uma taxonomia.</p>
+                                )
+                                
                             )}
 
                         </CardContent>

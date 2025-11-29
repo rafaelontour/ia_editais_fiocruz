@@ -91,7 +91,7 @@ export default function Formulario({
             </div>
 
             <p className="flex flex-col gap-2">
-                <Label className="text-lg">Fontes</Label>
+                <Label className="block text-sm font-medium text-gray-700">Fontes</Label>
                 <Controller
                     name="fontesSelecionadas"
                     control={control}
@@ -147,20 +147,25 @@ export default function Formulario({
             {
                 fontesSelecionadas && fontesSelecionadas.length > 0 && (
                     <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="tipe" className="text-lg">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
-                        <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                        <Label htmlFor="tipe" className="block text-sm font-medium text-gray-700">{fontesSelecionadas.length > 1 ? "Fontes selecionadas" : "Fonte selecionada"}</Label>
+                        <div
+                            className={`
+                                grid ${fontesSelecionadas.length === 1 ? "grid-cols-1" : fontesSelecionadas.length === 2 ? "grid-cols-2" : "grid-cols-3" } 
+                                border-gray-200 rounded-md border-1 p-3
+                            `}
+                        >
                             {
                                 fontesSelecionadas.map((fonte: Fonte, index) => (
                                     <div ref={(e) => { divRefs.current["divFonteSelecionada_" + index] = e }} key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                        <button onClick={() => {
+                                        <div role="button" className="flex h-full" onClick={() => {
                                             const novaLista = fontesSelecionadas.filter((f) => f.id !== fonte.id)
                                             setFontesSelecionadas(novaLista);
                                             setValue("fontesSelecionadas", [...novaLista.map((f) => f.id)]);
                                         }}>
-                                            <div className="flex items-center" title="Remover fonte">
+                                            <div className="flex h-full items-center" title="Remover fonte">
                                                 <span
                                                     className="
-                                                        bg-red-200 p-[10px]
+                                                        bg-red-200 p-[10px] h-full flex items-center justify-center
                                                         hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                         transition-all duration-200 ease-in-out
                                                     "
@@ -168,7 +173,7 @@ export default function Formulario({
                                                     <X className="w-4 h-4" />
                                                 </span>
                                             </div>
-                                        </button>
+                                        </div>
                                         <p className=" w-full text-sm">{fonte.name}</p>
                                     </div>
                                 ))
