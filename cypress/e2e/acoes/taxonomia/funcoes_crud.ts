@@ -1,17 +1,16 @@
-export function adicionarTaxonomia(nome: string, descricao: string) {
+export function adicionarTaxonomia(nomeTip: string, nomeTax: string, descricaoTax: string) {
     // Acessa essa tipificação
-    cy.get('[data-cy="item-tipificacao"]')
-        .contains("Teste Cypress tip pra taxonomia")
-        .parents('[data-cy="item-tipificacao"]')
+    cy.contains('[data-cy="item-nome-tip"]', nomeTip)
+        .parent()
         .within(() => {
-        cy.get('button[title="Taxonomias desta tipificação"]').click()
+            cy.get('button[title="Taxonomias desta tipificação"]').click()
         })
     
     // Adiciona uma nova taxonomia pra essa tipificação
     cy.contains("Adicionar taxonomia").click();
 
-    cy.get('[data-cy="input-nome-taxonomia"').type(nome);
-    cy.get('[data-cy="input-descricao-taxonomia"]').type(descricao);
+    cy.get('[data-cy="input-nome-taxonomia"').type(nomeTax);
+    cy.get('[data-cy="input-descricao-taxonomia"]').type(descricaoTax);
     cy.get('[data-cy="trigger-fontes-tax"]').click()
     cy.get('[data-cy="item-fonte-tax"]').contains("FONTE 1 TESTE").click()
 

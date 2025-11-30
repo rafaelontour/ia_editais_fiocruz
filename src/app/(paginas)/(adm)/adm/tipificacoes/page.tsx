@@ -267,11 +267,11 @@ export default function Tipificacoes() {
                         ) : (
                             tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? tipificacoesFiltradas.map((tipificacao, index) => (
                                 <Div key={index}>
-                                    <div className="flex flex-col gap-2">
+                                    <div data-cy="item-nome-tip" className="flex flex-col gap-2">
                                         <h2 className="text-2xl font-semibold">{tipificacao.name}</h2>
                                     </div>
 
-                                    <div className="flex justify-between items-center mt-3">
+                                    <div data-cy="item-tipificacao" className="flex justify-between items-center mt-3">
                                         <p className="flex items-center gap-2 text-sm text-gray-400">
                                             <Calendar size={18} />
                                             <span className="flex justify-center flex-col">

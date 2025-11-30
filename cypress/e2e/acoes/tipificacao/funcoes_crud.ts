@@ -1,5 +1,3 @@
-import { Tipificacao } from "@/core";
-
 export function adicionarTipificacao(nome: string) {
     cy.get('[data-cy="item-tipificacao"]').should("not.contain", nome)
 
@@ -13,15 +11,17 @@ export function adicionarTipificacao(nome: string) {
 
     cy.contains("Salvar").click();
 
-    cy.contains('[data-cy="item-tipificacao"]', nome)
-        .should("contain", nome);
-
+    cy.contains('[data-cy="item-nome-tip"]', nome)
+        .find("h2").should("exist")
+        
 }
 
 export function atualizarTipificacao(nomeAntigo: string, nomeNovo: string) {
-    cy.contains('[data-cy="item-tipificacao"]', nomeAntigo)
-        .find('button[title="Editar tipificação"]')
-        .click()
+    cy.contains('[data-cy="item-nome-tip"]', nomeAntigo)
+        .parent()
+        .within(() => {
+            cy.get('button[title="Editar tipificação"]').click()
+        })
 
     cy.get('[data-cy="input-nome-tipificacao"]').clear().type(nomeNovo)
 
@@ -31,16 +31,18 @@ export function atualizarTipificacao(nomeAntigo: string, nomeNovo: string) {
 
     cy.contains("Salvar").click();
 
-    cy.contains('[data-cy="item-tipificacao"]', nomeNovo).should("exist");
+    cy.contains('[data-cy="item-nome-tip"]', nomeNovo).should("exist");
 
 }
 
 export function apagarTipificacao(nome: string) {
-    cy.contains('[data-cy="item-tipificacao"]', nome)
-        .find('[data-cy="componente-excluir"]')
-        .click()
-
-    cy.contains("button", "Excluir")
+    cy.contains('[data-cy="item-nome-tip"]', nome)
+        .parent()
+        .within(() => {
+            cy.get('[data-cy="componente-excluir"]').click()
+        })
+    
+    cy.contains("button","Excluir")
         .click()
 
     cy.contains('[data-cy="item-tipificacao"]', nome)
