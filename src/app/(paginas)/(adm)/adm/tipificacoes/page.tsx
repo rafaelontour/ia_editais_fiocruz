@@ -110,7 +110,6 @@ export default function Tipificacoes() {
         setFontes(dados)
     }
 
-
     const adicionarTipificacao = async (data: FormData) => {
         setCarregandoTipificacoes(true);
         const dados = await adicionarTipificacaoService(data.nome, fontesSelecionadas);

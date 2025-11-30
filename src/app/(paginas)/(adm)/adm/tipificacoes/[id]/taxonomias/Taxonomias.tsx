@@ -292,7 +292,6 @@ export default function Taxonomias({ id }: { id: string }) {
         reset();
         setOpenTaxonomiaId(null);
         await getTipificacaoPorId();
-
     }
 
     const buscarRamos = async (idTaxonomia: string | undefined) => {
@@ -401,6 +400,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                 <Card
                                     ref={(e) => { divRefs.current["divtax_" + index] = e }}
                                     key={index}
+                                    data-cy="item-taxonomia"
                                     className={`
                                         hover:cursor-pointer m-4 ml-0 
                                         ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}

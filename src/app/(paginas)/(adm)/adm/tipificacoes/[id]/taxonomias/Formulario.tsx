@@ -68,6 +68,7 @@ export default function Formulario({
                     {...register("titulo", { required: true })}
                     type="text"
                     id="titleTaxonomia"
+                    data-cy="input-nome-taxonomia"
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                 />
                 {errors.titulo && <p className="text-red-500 text-xs italic mt-1">{errors.titulo.message}</p>}
@@ -83,6 +84,7 @@ export default function Formulario({
                 <textarea
                     {...register("descricao", { required: true })}
                     id="descriptionTaxonomia"
+                    data-cy="input-descricao-taxonomia"
                     placeholder="Digite uma descrição para a taxonomia"
                     rows={4}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
@@ -107,7 +109,7 @@ export default function Formulario({
                                 }
                             }}
                         >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger data-cy="trigger-fontes-tax" className="w-full">
                                 <SelectValue placeholder="Selecione uma ou mais fontes" />
                             </SelectTrigger>
 
@@ -119,6 +121,7 @@ export default function Formulario({
                                         <SelectItem
                                             key={index}
                                             value={fonte.id}
+                                            data-cy="item-fonte-tax"
                                             className="p-2 rounded-sm"
                                         >
                                             {fonte.name}
