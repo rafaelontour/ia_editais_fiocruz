@@ -52,7 +52,7 @@ async function adicionarTipificacaoService(nome: string, fontesSelecionadas: Fon
     const url = `${urlBase}/typification/`
 
     try {
-        let listaIds = fontesSelecionadas.map(fonte => fonte.id)
+        const listaIds = fontesSelecionadas.map(fonte => fonte.id)
         const dados = await fetch(url, {
             method: "POST",
             credentials: "include",

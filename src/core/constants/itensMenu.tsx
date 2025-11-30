@@ -1,4 +1,5 @@
 import {
+  Building,
   FilePen,
   Gauge,
   Home,
@@ -32,11 +33,6 @@ const itemsAdm = [
     url: "/adm/tipificacoes",
     icon: Type,
   },
-  // {
-  //   title: "Taxonomias",
-  //   url: "/adm/taxonomias",
-  //   icon: TypeOutline,
-  // },
   {
     title: "Fontes",
     url: "/adm/fontes",
@@ -45,7 +41,7 @@ const itemsAdm = [
   {
     title: "Unidades",
     url: "/adm/unidades",
-    icon: University,
+    icon: Building,
   },
   {
     title: "Atribuição de cargo",
@@ -75,6 +71,11 @@ const itemsAuditorAnalista = [
     url: "/adm/editais",
     icon: Sheet,
   },
+  {
+    title: "Tipificações",
+    url: "/adm/tipificacoes",
+    icon: Type,
+  },
 ];
 
 const itemsUsuarioComum = [
@@ -86,7 +87,7 @@ const itemsUsuarioComum = [
   {
     title: "Unidades",
     url: "/unidades_fiocruz",
-    icon: University,
+    icon: Building,
   },
 ];
 

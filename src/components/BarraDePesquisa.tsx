@@ -11,7 +11,7 @@ export default function BarraDePesquisa(dados: BarraDePesquisaProps) {
   return (
 
     dados && dados.refInput && dados.funcFiltrar ? (
-      <div className={`flex w-full relative -mt-1 mb-3 ${dados.className}`}>
+      <div className={`flex relative -mt-1 mb-3 ${dados.className}`}>
         <Search className="absolute mt-1 translate-y-1/2 left-2" size={17} />
 
         { 

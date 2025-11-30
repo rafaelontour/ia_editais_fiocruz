@@ -1,10 +1,10 @@
 "use client"
 
-import { ChevronLeft, InfoIcon, LoaderCircle, Play } from "lucide-react";
+import { ChevronLeft, InfoIcon, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Label } from "@/components/ui/label";
-import { Comentario, Edital, EditalArquivo } from "@/core/edital/Edital";
+import { Comentario, Edital } from "@/core/edital/Edital";
 import { useEffect, useState } from "react";
 import ComentarioEdital from "@/components/editais/edital/ComentarioEdital";
 import { ParamValue } from "next/dist/server/request/params";
@@ -13,6 +13,7 @@ import { getEditalPorIdService } from "@/service/edital";
 import { buscarComentariosPorIdEditalService } from "@/service/comentarioEdital";
 import { getStatusColor, iconeParaStatusDoEdital, verificarStatusEdital } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import BotaoVoltar from "@/components/botoes/BotaoVoltar";
 
 interface VisualizarComentariosEdital {
     idEdital: ParamValue
@@ -59,15 +60,7 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
     return (
         <div className="flex flex-col h-full">  
             <div className="flex flex-row gap-7 pb-6">
-                <Button
-                    className="hover:cursor-pointer"
-                    variant={"outline"}
-                    size={"icon"}
-                    title="Voltar para página de análise do edital"
-                    onClick={() => window.history.go(-1)}
-                >
-                    <ChevronLeft />
-                </Button>
+                <BotaoVoltar />
 
                 <Label className="text-2xl font-bold"><strong>Edital</strong>: {edital?.name}</Label>
                 {
