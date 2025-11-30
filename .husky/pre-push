@@ -2,10 +2,7 @@
 
 echo "🔍 Executando Semgrep antes do push..."
 
-# Verifica o projeto com Semgrep usando as regras automáticas
-# semgrep --config=auto .
-
-# Caso queira falhar o push se encontrar problemas críticos:
-npx semgrep --config=p/ci --include 'src/**/*.ts*'
+# Executa Semgrep usando npx via Node
+node -e "require('child_process').execSync('npx semgrep --config=p/ci --include \"src/**/*.ts*\"', { stdio: 'inherit' })"
 
 echo "✓ Semgrep finalizado — push liberado."
