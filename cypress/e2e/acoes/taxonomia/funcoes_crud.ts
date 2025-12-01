@@ -5,6 +5,8 @@ export function adicionarTaxonomia(nomeTip: string, nomeTax: string, descricaoTa
         .within(() => {
             cy.get('button[title="Taxonomias desta tipificação"]').click()
         })
+
+    cy.wait(1000)
     
     // Adiciona uma nova taxonomia pra essa tipificação
     cy.contains("Adicionar taxonomia").click();
