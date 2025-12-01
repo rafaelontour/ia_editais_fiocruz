@@ -46,7 +46,7 @@ export const FileUpload = ({
     }
 
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-    onChange && onChange(newFiles);
+    if (onChange) onChange(newFiles);
   };
 
 

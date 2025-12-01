@@ -46,7 +46,7 @@ export default function Tipificacoes() {
         }
     });
 
-    let termoBusca = useRef<string>("");
+    const termoBusca = useRef<string>("");
 
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [fontes, setFontes] = useState<Fonte[]>([]);

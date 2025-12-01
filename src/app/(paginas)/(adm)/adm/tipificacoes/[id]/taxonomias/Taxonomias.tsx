@@ -101,7 +101,7 @@ export default function Taxonomias({ id }: { id: string }) {
     const divRefs = useRef<Record<string, HTMLFormElement | HTMLSpanElement | HTMLDivElement | HTMLButtonElement | null>>({});
     const [taxFiltradas, setTaxFiltradas] = useState<any[]>([]);
 
-    let termoBusca = useRef<string>("");
+    const termoBusca = useRef<string>("");
 
     async function getFontes() {
         const fnts = await getFontesService()
