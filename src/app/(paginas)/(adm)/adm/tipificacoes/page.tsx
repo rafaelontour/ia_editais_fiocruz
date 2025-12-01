@@ -9,7 +9,7 @@ import { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
 import { getTipificacoesService, adicionarTipificacaoService, excluirTipificacaoService, atualizarTipificacaoService } from "@/service/tipificacao";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, Loader2, PencilLine, Plus, Share2 } from "lucide-react";
+import { Calendar, Loader2, PencilLine, Plus, Share2, View } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ import BarraDePesquisa from "@/components/BarraDePesquisa";
 import { useForm } from "react-hook-form";
 import { IconHierarchy2 } from "@tabler/icons-react";
 import Div from "@/components/Div";
+import useUsuario from "@/data/hooks/useUsuario";
 
 const schemaTipificacao = z.object({
     nome: z.string().min(1, "O nome da tipificação é obrigatório"),
@@ -38,7 +39,7 @@ export default function Tipificacoes() {
         formState: { errors },
         control,
         setValue,
-        reset 
+        reset
     } = useForm<FormData>({
         resolver: zodResolver(schemaTipificacao),
         defaultValues: {
@@ -47,6 +48,8 @@ export default function Tipificacoes() {
     });
 
     const termoBusca = useRef<string>("");
+
+    const { usuario } = useUsuario();
 
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [fontes, setFontes] = useState<Fonte[]>([]);
@@ -132,7 +135,7 @@ export default function Tipificacoes() {
 
     const atualizarTipificacao = async (data: FormData) => {
         setCarregandoTipificacoes(true);
-        
+
         const tip: Tipificacao = {
             id: idDialogEditar as string,
             name: data.nome,
@@ -187,7 +190,7 @@ export default function Tipificacoes() {
         const tf = tipificacoes.filter(
             tipificacao => tipificacao.name && tipificacao.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
         )
-        
+
         setTipificacoesFiltradas(tf);
     }
 
@@ -197,53 +200,56 @@ export default function Tipificacoes() {
                 <div className="flex flex-col gap-5 sticky top-0 z-10 bg-white justify-between w-full items-center">
                     <div className="flex items-center justify-between w-full">
                         <p className="text-4xl font-bold">Gestão de tipificações</p>
-                        <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
-                            <DialogTrigger asChild>
-                                <Button
-                                    variant={"destructive"}
-                                    style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
-                                    className={`
-                                        flex rounded-md gap-2 items-center px-4 py-2
-                                        transition duration-100
-                                        bg-vermelho text-white
-                                        hover:cursor-pointer
-                                    `}
-                                >
-                                    <Plus size={18} />
-                                    <p className="text-white text-sm">Adicionar tipificação</p>
-                                </Button>
-                            </DialogTrigger>
 
-                            <DialogContent onCloseAutoFocus={limparCampos}>
-                                <DialogHeader>
-                                    <DialogTitle className="text-3xl font-bold">
-                                        Adicionar tipificação
-                                    </DialogTitle>
-                                    <DialogDescription className="text-md pb-4">
-                                        Preencha os campos abaixo para adicionar uma nova tipificação
-                                    </DialogDescription>
-                                </DialogHeader>
+                        {usuario?.access_level === "ADMIN" && (
+                            <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        variant={"destructive"}
+                                        style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
+                                        className={`
+                                    flex rounded-md gap-2 items-center px-4 py-2
+                                    transition duration-100
+                                    bg-vermelho text-white
+                                    hover:cursor-pointer
+                                `}
+                                    >
+                                        <Plus size={18} />
+                                        <p className="text-white text-sm">Adicionar tipificação</p>
+                                    </Button>
+                                </DialogTrigger>
 
-                                <Formulario
-                                    fontes={fontes}
-                                    fontesSelecionadas={fontesSelecionadas}
-                                    setFontesSelecionadas={setFontesSelecionadas}
-                                    control={control}
-                                    setValue={setValue}
-                                    register={register}
-                                    errors={errors}
-                                />
+                                <DialogContent onCloseAutoFocus={limparCampos}>
+                                    <DialogHeader>
+                                        <DialogTitle className="text-3xl font-bold">
+                                            Adicionar tipificação
+                                        </DialogTitle>
+                                        <DialogDescription className="text-md pb-4">
+                                            Preencha os campos abaixo para adicionar uma nova tipificação
+                                        </DialogDescription>
+                                    </DialogHeader>
 
-                                <DialogFooter>
-                                    <DialogClose>
-                                        <BotaoCancelar />
-                                    </DialogClose>
+                                    <Formulario
+                                        fontes={fontes}
+                                        fontesSelecionadas={fontesSelecionadas}
+                                        setFontesSelecionadas={setFontesSelecionadas}
+                                        control={control}
+                                        setValue={setValue}
+                                        register={register}
+                                        errors={errors}
+                                    />
 
-                                    <BotaoSalvar onClick={handleSubmit(adicionarTipificacao)} />
-                                </DialogFooter>
-                                
-                            </DialogContent>
-                        </Dialog>
+                                    <DialogFooter>
+                                        <DialogClose>
+                                            <BotaoCancelar />
+                                        </DialogClose>
+
+                                        <BotaoSalvar onClick={handleSubmit(adicionarTipificacao)} />
+                                    </DialogFooter>
+
+                                </DialogContent>
+                            </Dialog>
+                        )}
                     </div>
 
                     <BarraDePesquisa className="w-full" refInput={termoBusca} funcFiltrar={filtrarTipificacao} />
@@ -261,89 +267,112 @@ export default function Tipificacoes() {
                             </div>
                         ) : (
                             tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? tipificacoesFiltradas.map((tipificacao, index) => (
-                            <Div key={index}>
-                                <div className="flex flex-col gap-2">
-                                    <h2 className="text-2xl font-semibold">{tipificacao.name}</h2>
-                                </div>
-
-                                <div className="flex justify-between items-center mt-3">
-                                    <p className="flex items-center gap-2 text-sm text-gray-400">
-                                        <Calendar size={18} />
-                                        <span className="flex justify-center flex-col">
-                                            <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
-                                            <span>{formatarData(tipificacao.created_at)}</span>
-                                        </span>
-                                    </p>
-
-                                    <div className="flex gap-3">
-                                        <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
-                                            <Button
-                                                className={`
-                                                    h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
-                                                    bg-branco hover:bg-branco
-                                                `}
-                                                title="Taxonomias desta tipificação"
-                                            >
-                                                <IconHierarchy2 size={20} color="black" />
-                                            </Button>
-                                        </Link>
-
-                                        <Dialog open={idDialogEditar === tipificacao.id} onOpenChange={(open) => setIdDialogEditar(open ? tipificacao.id : null)}>
-                                            <DialogTrigger asChild>
-                                                <Button
-                                                    onClick={() => {
-                                                        const idsFontes = tipificacao.sources?.map((f: Fonte) => f.id);
-                                                        const fontesDaTaxonomia = filtrarPraEdicao(idsFontes);
-                                                        setFontesSelecionadas(fontesDaTaxonomia)
-                                                        setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))
-                                                    }}
-                                                    title="Editar tipificação"
-                                                    className={`
-                                                        h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
-                                                        bg-branco hover:bg-branco
-                                                    `}
-                                                    size={"icon"}
-                                                >
-                                                    <PencilLine color="black" />
-                                                </Button>
-                                            </DialogTrigger>
-
-                                            <DialogContent onCloseAutoFocus={limparCampos}>
-                                                <DialogHeader>
-                                                    <DialogTitle className="text-3xl font-bold">
-                                                        Editar tipificação
-                                                    </DialogTitle>
-
-                                                    <DialogDescription className="text-md pb-4">
-                                                        Atualize os dados da tipificação selecionada
-                                                    </DialogDescription>
-                                                </DialogHeader>
-
-                                                <Formulario
-                                                    fontes={fontes}
-                                                    fontesSelecionadas={fontesSelecionadas}
-                                                    setFontesSelecionadas={setFontesSelecionadas}
-                                                    control={control}
-                                                    setValue={setValue}
-                                                    register={register}
-                                                    errors={errors}
-                                                />
-
-                                                <DialogFooter>
-                                                    <DialogClose>
-                                                        <BotaoCancelar />
-                                                    </DialogClose>
-
-                                                    <BotaoSalvar onClick={handleSubmit(atualizarTipificacao)} />
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
-
-                                        <BotaoExcluir funcExcluir={excluirTipificacao} item={tipificacao} tipo="tipificação" />
+                                <Div key={index}>
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className="text-2xl font-semibold">{tipificacao.name}</h2>
                                     </div>
-                                </div>
-                            </Div>
-                        )) : <p className="absolute left-1/2 top-10 translate-x-[-50%] text-gray-400 text-2xl text-center animate-pulse">Nenhuma tipificação encontrada.</p>
+
+                                    <div className="flex justify-between items-center mt-3">
+                                        <p className="flex items-center gap-2 text-sm text-gray-400">
+                                            <Calendar size={18} />
+                                            <span className="flex justify-center flex-col">
+                                                <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
+                                                <span>{formatarData(tipificacao.created_at)}</span>
+                                            </span>
+                                        </p>
+
+                                        <div className="flex gap-3">
+                                            {
+                                                usuario?.access_level !== "ADMIN" ? (
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
+                                                                <Button
+                                                                    className={`
+                                                                        h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
+                                                                        bg-branco hover:bg-branco
+                                                                    `}
+                                                                    title="Ver dados desta tipificação"
+                                                                >
+                                                                    <View size={20} color="black" />
+                                                                </Button>
+                                                            </Link>
+                                                        </DialogTrigger>
+                                                    </Dialog>
+                                                ) : (
+                                                    <>
+                                                        <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
+                                                            <Button
+                                                                className={`
+                                                                    h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
+                                                                    bg-branco hover:bg-branco
+                                                                `}
+                                                                title="Taxonomias desta tipificação"
+                                                            >
+                                                                <IconHierarchy2 size={20} color="black" />
+                                                            </Button>
+                                                        </Link>
+
+                                                        <Dialog open={idDialogEditar === tipificacao.id} onOpenChange={(open) => setIdDialogEditar(open ? tipificacao.id : null)}>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        const idsFontes = tipificacao.sources?.map((f: Fonte) => f.id);
+                                                                        const fontesDaTaxonomia = filtrarPraEdicao(idsFontes);
+                                                                        setFontesSelecionadas(fontesDaTaxonomia)
+                                                                        setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))
+                                                                    }}
+                                                                    title="Editar tipificação"
+                                                                    className={`
+                                                                        h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
+                                                                        bg-branco hover:bg-branco
+                                                                    `}
+                                                                    size={"icon"}
+                                                                >
+                                                                    <PencilLine color="black" />
+                                                                </Button>
+                                                            </DialogTrigger>
+
+                                                            <DialogContent onCloseAutoFocus={limparCampos}>
+                                                                <DialogHeader>
+                                                                    <DialogTitle className="text-3xl font-bold">
+                                                                        Editar tipificação
+                                                                    </DialogTitle>
+
+                                                                    <DialogDescription className="text-md pb-4">
+                                                                        Atualize os dados da tipificação selecionada
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+
+                                                                <Formulario
+                                                                    fontes={fontes}
+                                                                    fontesSelecionadas={fontesSelecionadas}
+                                                                    setFontesSelecionadas={setFontesSelecionadas}
+                                                                    control={control}
+                                                                    setValue={setValue}
+                                                                    register={register}
+                                                                    errors={errors}
+                                                                />
+
+                                                                <DialogFooter>
+                                                                    <DialogClose>
+                                                                        <BotaoCancelar />
+                                                                    </DialogClose>
+
+                                                                    <BotaoSalvar onClick={handleSubmit(atualizarTipificacao)} />
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
+
+                                                        <BotaoExcluir funcExcluir={excluirTipificacao} item={tipificacao} tipo="tipificação" />
+                                                    </>
+                                                )
+                                            }
+
+                                        </div>
+                                    </div>
+                                </Div>
+                            )) : <p className="absolute left-1/2 top-10 translate-x-[-50%] text-gray-400 text-2xl text-center animate-pulse">Nenhuma tipificação encontrada.</p>
                         )
                     }
                 </Masonry>

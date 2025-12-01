@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo "🔍 Running ESLint..."
+npx eslint . --max-warnings=10 || exit 1
+
+echo "✔ ESLint ok — commit permitido."

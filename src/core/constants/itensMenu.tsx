@@ -33,11 +33,6 @@ const itemsAdm = [
     url: "/adm/tipificacoes",
     icon: Type,
   },
-  // {
-  //   title: "Taxonomias",
-  //   url: "/adm/taxonomias",
-  //   icon: TypeOutline,
-  // },
   {
     title: "Fontes",
     url: "/adm/fontes",
@@ -75,6 +70,11 @@ const itemsAuditorAnalista = [
     title: "Meus editais",
     url: "/adm/editais",
     icon: Sheet,
+  },
+  {
+    title: "Tipificações",
+    url: "/adm/tipificacoes",
+    icon: Type,
   },
 ];
 
