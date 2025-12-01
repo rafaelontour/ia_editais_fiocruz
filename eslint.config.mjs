@@ -6,6 +6,4 @@ export default [
       "node_modules/**"    // padrão, mas sempre bom garantir
     ],
   },
-
-  // restante das tuas configs aqui...
 ];
