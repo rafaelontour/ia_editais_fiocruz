@@ -8,12 +8,12 @@ describe("Salvar taxonomia", () => {
         cy.visit("http://localhost:3000/adm/tipificacoes")
         adicionarTipificacao("Teste Cypress tip pra taxonomia")
 
-        adicionarTaxonomia("Teste Cypress tip pra taxonomia", "Teste Cypress TAXTESTE 1", "Teste Cypress TAXTESTE 1 descrição")
+        adicionarTaxonomia("Teste Cypress tip pra taxonomia", "Teste Cypress taxteste", "Teste Cypress taxteste descricao")
 
-        cy.get('[data-cy="item-taxonomia"]').contains("Teste Cypress TAXTESTE 1")
+        cy.get('[data-cy="item-taxonomia"]').contains("Teste Cypress taxteste")
           .should("exist")
         
-        cy.get('[data-cy="item-taxonomia"]').contains("Teste Cypress TAXTESTE 1 descrição")
+        cy.get('[data-cy="item-taxonomia"]').contains("Teste Cypress taxteste descricao")
           .should("exist")
     })
 })
