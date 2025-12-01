@@ -2,6 +2,8 @@
 
 echo "Executando testes automatizados com Cypress... ✨"
 
+npx cypress run
+
 # echo "🔍 Executando Semgrep antes do push..."
 
 # Executa Semgrep usando npx via Node
