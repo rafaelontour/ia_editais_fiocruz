@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Circle,
-  CircleCheck,
-  CircleDot,
-  LucideIcon,
-} from "lucide-react";
+import { ArrowLeft, Circle } from "lucide-react";
 import { Button } from "../ui/button";
 import { Caso } from "@/core/caso";
 import { Label } from "../ui/label";
@@ -19,6 +13,7 @@ import {
 } from "../ui/select";
 import { FileUpload } from "../ui/file-upload";
 import Calendario from "../Calendario";
+import { useRouter } from "next/navigation";
 
 interface DetalheCasoProps {
   caso: Caso;
@@ -26,6 +21,7 @@ interface DetalheCasoProps {
 }
 
 export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
+  const router = useRouter();
   return (
     <div
       className="w-full p-6 rounded-md bg-white shadow-md flex flex-col gap-6 max-h-[65vh] overflow-y-auto"
@@ -39,7 +35,7 @@ export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
         >
           <ArrowLeft size={18} color="black" />
         </Button>
-        <h2 className="text-2xl font-semibold">{caso.nome}</h2>
+        <h2 className="text-2xl font-semibold">{caso.name}</h2>
       </div>
 
       {/* GRID 3×3 */}
@@ -108,7 +104,10 @@ export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
           <button className="rounded-md hover:cursor-pointer px-4 py-2 w-fit h-fit bg-verde text-white">
             Executar caso de teste
           </button>
-          <button className="rounded-md hover:cursor-pointer px-4 py-2 w-fit h-fit text-white bg-zinc-400">
+          <button
+            className="rounded-md hover:cursor-pointer px-4 py-2 w-fit h-fit text-white bg-zinc-400"
+            onClick={() => router.push("/adm/resultados")}
+          >
             Ver resultados
           </button>
         </div>
@@ -141,6 +140,7 @@ export function ReadOnlyBox({ label, value, icon: Icon }: ReadOnlyBoxProps) {
           max-h-32         /* altura máxima antes do scroll */
           overflow-y-auto  /* scroll só aparece quando necessário */
           whitespace-pre-wrap /* mantém quebras de linha */
+          
         "
       >
         {Icon && <Icon className="w-4 h-4 mr-2 inline" />}

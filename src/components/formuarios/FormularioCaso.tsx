@@ -14,11 +14,14 @@ import {
 interface FormularioCasoProps {
   initialData?: {
     id: number;
-    nome: string;
-    modelo: string;
-    notaCorte: number;
-    criterio: string;
-    passosAvaliacao: string;
+    name: string;
+    taxonomia: string;
+    ramo: string;
+    teste: string;
+    conformidade: string;
+    feedbackEsperado: string;
+    textoEntrada: string;
+    created_at?: string;
   };
   onSubmit: (data: any) => void;
   mode?: "create" | "edit";
@@ -30,21 +33,25 @@ export default function FormularioCaso({
   mode = "create",
 }: FormularioCasoProps) {
   const [formState, setFormState] = useState({
-    nome: "",
-    modelo: "",
-    notaCorte: 0,
-    criterio: "",
-    passosAvaliacao: "",
+    name: "",
+    taxonomia: "",
+    ramo: "",
+    teste: "",
+    conformidade: "",
+    feedbackEsperado: "",
+    textoEntrada: "",
   });
 
   useEffect(() => {
     if (initialData) {
       setFormState({
-        nome: initialData.nome,
-        modelo: initialData.modelo,
-        notaCorte: initialData.notaCorte,
-        criterio: initialData.criterio,
-        passosAvaliacao: initialData.passosAvaliacao,
+        name: initialData.name,
+        taxonomia: initialData.taxonomia,
+        ramo: initialData.ramo,
+        teste: initialData.teste,
+        conformidade: initialData.conformidade,
+        feedbackEsperado: initialData.feedbackEsperado,
+        textoEntrada: initialData.textoEntrada,
       });
     }
   }, [initialData]);
@@ -56,67 +63,96 @@ export default function FormularioCaso({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-lg">
       <div className="flex flex-col gap-2">
-        <Label>Nome da métrica</Label>
+        <Label>Nome do caso</Label>
         <Input
-          value={formState.nome}
-          onChange={(e) => setFormState({ ...formState, nome: e.target.value })}
+          value={formState.name}
+          onChange={(e) => setFormState({ ...formState, name: e.target.value })}
         />
       </div>
 
+      <div className="flex flex-col gap-2">
+        <Label>Taxonomia associada</Label>
+        <Select
+          value={formState.taxonomia}
+          onValueChange={(valor) =>
+            setFormState({ ...formState, taxonomia: valor })
+          }
+        >
+          <SelectTrigger className="w-full cursor-pointer">
+            <SelectValue placeholder="Selecione" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem className="cursor-pointer" value="teste">
+              Teste
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="teste2">
+              Teste2
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label>Ramo associada</Label>
+        <Select
+          value={formState.ramo}
+          onValueChange={(valor) => setFormState({ ...formState, ramo: valor })}
+        >
+          <SelectTrigger className="w-full cursor-pointer">
+            <SelectValue placeholder="Selecione" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem className="cursor-pointer" value="teste">
+              Teste
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="teste2">
+              Teste2
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="flex justify-between gap-2">
         <div className="flex flex-col gap-2 w-1/2">
-          <Label>Modelo de ia</Label>
-          <Select
-            value={formState.modelo}
-            onValueChange={(valor) =>
-              setFormState({ ...formState, modelo: valor })
+          <Label>Teste associado</Label>
+          <Input
+            value={formState.teste}
+            onChange={(e) =>
+              setFormState({ ...formState, teste: e.target.value })
             }
-          >
-            <SelectTrigger className="w-full cursor-pointer">
-              <SelectValue placeholder="Selecione" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem className="cursor-pointer" value="teste">
-                Teste
-              </SelectItem>
-              <SelectItem className="cursor-pointer" value="teste2">
-                Teste2
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          />
         </div>
 
         <div className="flex flex-col gap-2 w-1/2">
-          <Label>Nota de corte</Label>
+          <Label>Conformidade com o ramo?</Label>
           <Input
-            type="number"
-            value={formState.notaCorte}
+            value={formState.conformidade}
             onChange={(e) =>
-              setFormState({ ...formState, notaCorte: Number(e.target.value) })
+              setFormState({ ...formState, conformidade: e.target.value })
             }
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Critério da métrica</Label>
+        <Label>Feedback esperado</Label>
         <textarea
           className="border rounded p-2 text-sm"
-          value={formState.criterio}
+          value={formState.feedbackEsperado}
           onChange={(e) =>
-            setFormState({ ...formState, criterio: e.target.value })
+            setFormState({ ...formState, feedbackEsperado: e.target.value })
           }
+          rows={2.5}
         />
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Passos de avaliação da métrica</Label>
+        <Label>Texto de entrada</Label>
         <textarea
           className="border rounded p-2 text-sm"
-          value={formState.passosAvaliacao}
+          value={formState.textoEntrada}
           onChange={(e) =>
-            setFormState({ ...formState, passosAvaliacao: e.target.value })
+            setFormState({ ...formState, textoEntrada: e.target.value })
           }
+          rows={2.5}
         />
       </div>
 

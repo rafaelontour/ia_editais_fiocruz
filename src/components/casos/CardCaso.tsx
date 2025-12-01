@@ -3,8 +3,8 @@
 import { Caso } from "@/core/caso";
 import Calendario from "../Calendario";
 import BotaoEditar from "../BotaoEditar";
-import BotaoExcluir from "../BotaoExcluir";
 import { Maximize2 } from "lucide-react";
+import BotaoExcluir from "../botoes/BotaoExcluir";
 
 interface CardCasoProps {
   caso: Caso;
@@ -30,7 +30,7 @@ export default function CardCaso({
         size={19}
         onClick={onOpen}
       />
-      <h2 className="text-2xl font-semibold">{caso.nome}</h2>
+      <h2 className="text-2xl font-semibold">{caso.name}</h2>
       <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2">
         <span>Teste:</span> {caso.teste}
       </p>
@@ -46,9 +46,9 @@ export default function CardCaso({
           <BotaoEditar onClick={onEditar} />
 
           <BotaoExcluir
-            titulo="Excluir Teste"
-            descricao="Tem certeza que deseja excluir o teste"
-            onClick={onExcluir}
+            funcExcluir={onExcluir}
+            item={caso}
+            tipo="caso de teste"
           />
         </div>
       </div>

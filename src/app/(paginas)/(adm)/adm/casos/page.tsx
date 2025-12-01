@@ -84,6 +84,7 @@ export default function casos() {
     );
 
     setMockCasos(novosCasos);
+    setCasoFiltrado(novosCasos);
 
     if (casoSelecionado && casoSelecionado.id === editandoForm.id) {
       const metricaAtualizada = novosCasos.find(
@@ -119,10 +120,12 @@ export default function casos() {
       created_at: new Date().toLocaleString(),
     };
     setMockCasos([...mockCasos, novosCasos]);
+    setCasoFiltrado([...mockCasos, novosCasos]);
   }
 
   function excluirCaso(id: string) {
     setMockCasos(mockCasos.filter((t) => t.id !== id));
+    setCasoFiltrado(mockCasos.filter((t) => t.id !== id));
   }
   return (
     <>
@@ -136,14 +139,21 @@ export default function casos() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <FormularioCaso
-                  mode="create"
-                  onSubmit={(data) => {
-                    adicionarCaso(data);
-                    setOpenDialogAdd(false);
-                  }}
-                />
+                <DialogTitle className="text-3xl font-bold">
+                  Adicionar caso de teste
+                </DialogTitle>
+                <DialogDescription>
+                  Preencha os campos abaixo para adicionar um novo caso de teste
+                </DialogDescription>
               </DialogHeader>
+
+              <FormularioCaso
+                mode="create"
+                onSubmit={(data) => {
+                  adicionarCaso(data);
+                  setOpenDialogAdd(false);
+                }}
+              />
             </DialogContent>
           </Dialog>
         </div>
