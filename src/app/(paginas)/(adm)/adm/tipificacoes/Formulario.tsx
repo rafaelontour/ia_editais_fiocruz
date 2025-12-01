@@ -32,6 +32,7 @@ export default function Formulario({
                     {...register("nome")}
                     type="text"
                     className="border-2 border-gray-300 rounded-md p-2 w-full"
+                    data-cy="input-nome-tipificacao"
                 />
                 {errors.nome && <span className="text-red-500 text-sm italic">{errors.nome.message}</span>}
             </p>
@@ -62,7 +63,7 @@ export default function Formulario({
                                 }
                             }}
                         >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger data-cy="trigger-fontes-tip" className="w-full">
                                 <SelectValue placeholder="Selecione uma ou mais fontes" />
                             </SelectTrigger>
 
@@ -75,6 +76,7 @@ export default function Formulario({
                                             key={index}
                                             value={fonte.id}
                                             className="p-2 rounded-sm"
+                                            data-cy="item-fonte"
                                         >
                                             {fonte.name}
                                         </SelectItem>
@@ -112,13 +114,13 @@ export default function Formulario({
                         >
                             {
                                 fontesSelecionadas.map((fonte: Fonte) => (
-                                    <div key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                    <div data-cy="fonte-selecionada" key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
                                         <div role="button" className="flex h-full" onClick={() => {
                                             const novaLista = fontesSelecionadas.filter((f: Fonte) => f.id !== fonte.id);
                                             setFontesSelecionadas(novaLista);
                                             setValue("fontesSelecionadas", novaLista.map(f => f.id));
                                         }}>
-                                            <div className="flex items-center h-full" title="Remover usuário">
+                                            <div className="flex items-center h-full" title="Remover fonte">
                                                 <span
                                                     className="
                                                         bg-red-200 p-[10px] h-full flex items-center justify-center

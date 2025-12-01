@@ -11,6 +11,7 @@ export default function BotaoSalvar({ onClick }: { onClick?: () => void }) {
                 text-white hover:cursor-pointer
             `}
             style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+            data-cy="botao-salvar-generico"
         >
             Salvar
         </Button>

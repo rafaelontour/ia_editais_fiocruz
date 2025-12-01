@@ -29,6 +29,7 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
     >
       <DialogTrigger asChild>
         <Button
+          data-cy="componente-excluir"
           title={`Excluir ${dados.item}`}
           className="h-8 w-8 bg-vermelho hover:bg-vermelho hover:cursor-pointer rounded-sm"
           size={"icon"}

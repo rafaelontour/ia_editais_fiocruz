@@ -83,7 +83,7 @@ export default function Fontes() {
 
     const adicionarFonte = async (formData: FormDataFonte) => {
         setCarregando(true);
-        
+
         const resposta = await adicionarFonteService(formData.nome, formData.descricao);
 
         if (resposta !== 201) {
@@ -100,7 +100,7 @@ export default function Fontes() {
     }
 
     const atualizarFonte = async (formData: FormDataFonte) => {
-        
+
         const resposta = await atualizarFonteService(openDialogIdEditar as string, formData.nome, formData.descricao);
 
         if (resposta !== 200) {
@@ -119,7 +119,7 @@ export default function Fontes() {
 
     const excluirFonte = async (id: string) => {
         setCarregando(true);
-    
+
         const resposta = await excluirFonteService(id);
 
         if (resposta !== 204) {
@@ -142,7 +142,7 @@ export default function Fontes() {
         const ff = fontes.filter(
             f => f.name && f.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
         )
-    
+
         setFontesFiltradas(ff);
     }
 
@@ -154,7 +154,7 @@ export default function Fontes() {
                         <h2 className="text-4xl font-bold">
                             Fontes
                         </h2>
-                        
+
                         <Dialog open={openDialogFontes} onOpenChange={setOpenDialogFontes}>
                             <DialogTrigger asChild>
                                 <Botao texto="Adicionar fonte" />
@@ -176,12 +176,12 @@ export default function Fontes() {
                                     <DialogClose>
                                         <BotaoCancelar />
                                     </DialogClose>
-                                     <BotaoSalvar onClick={handleSubmit(adicionarFonte)} />
+                                    <BotaoSalvar onClick={handleSubmit(adicionarFonte)} />
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
-                                        </div>
                     </div>
+                </div>
 
                 <BarraDePesquisa className='w-full' refInput={termoBusca} funcFiltrar={filtrarFontes} />
             </div>
@@ -200,8 +200,8 @@ export default function Fontes() {
                     >
                         {
                             fontesFiltradas.map((fonte, index) => (
-                                <Div key={index}>
-                                    <div className="flex flex-col gap-2">
+                                <Div>
+                                    <div data-cy="item-fonte" className="flex flex-col gap-2">
                                         <h2 className="text-2xl font-semibold">{fonte.name}</h2>
                                         <p className={`py-1 w-fit break-words text-md`}>
                                             {fonte.description}

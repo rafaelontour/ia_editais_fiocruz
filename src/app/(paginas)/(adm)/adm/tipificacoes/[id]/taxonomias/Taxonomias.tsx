@@ -429,6 +429,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                         <Card
                                             ref={(e) => { divRefs.current["divtax_" + index] = e }}
                                             key={index}
+                                            data-cy="item-taxonomia"
                                             className={`
                                         hover:cursor-pointer m-4 ml-0 
                                         ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}
@@ -439,7 +440,6 @@ export default function Taxonomias({ id }: { id: string }) {
                                             onClick={() => {
                                                 idTaxonomiaSelecionada.current = item.id;
                                                 setTaxonomiaSelecionada(item);
-                                                // console.log("TAXONOMIA SELECIONADA:", item.id);
                                                 setIdSelecionado(index.toString())
                                                 buscarRamos(item.id)
                                             }}
