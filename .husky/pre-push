@@ -9,4 +9,4 @@ npx cypress run
 # Executa Semgrep usando npx via Node
 # node -e "require('child_process').execSync('npx semgrep --config=p/ci --include \"src/**/*.ts*\"', { stdio: 'inherit' })"
 
-# echo "✓ Semgrep finalizado — push liberado."
+echo "✓ Semgrep finalizado — push liberado."
