@@ -27,7 +27,7 @@ export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
       className="w-full p-6 rounded-md bg-white shadow-md flex flex-col gap-6 max-h-[65vh] overflow-y-auto"
       style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
     >
-      {/* HEADER */}
+      {/* Cabeçalho */}
       <div className="flex flex-row gap-3 items-center">
         <Button
           onClick={onVoltar}
@@ -38,11 +38,49 @@ export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
         <h2 className="text-2xl font-semibold">{caso.name}</h2>
       </div>
 
-      {/* GRID 3×3 */}
+      {/* GRID 4×3 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Linha 1 */}
         <div className="lg:col-span-4">
           <ReadOnlyBox label="Teste associado" value={caso.teste} />
+        </div>
+
+        <div className="lg:col-span-4">
+          <ReadOnlyBox label="Taxonomia associada" value={caso.taxonomia} />
+        </div>
+
+        {/* upload ocupa linha 1 e linha 2 */}
+        <div className="lg:col-span-4 lg:row-span-2">
+          <Label>Upload do edital *</Label>
+          <div className="mt-2 h-full ">
+            <FileUpload />
+          </div>
+        </div>
+
+        {/* Linha 2 */}
+        <div className="lg:col-span-4">
+          <ReadOnlyBox label="Tipificação associada" value={caso.tipificacao} />
+        </div>
+
+        <div className="lg:col-span-4">
+          <ReadOnlyBox label="Ramo associado" value={caso.ramo} />
+        </div>
+
+        {/* Linha 3 */}
+        <div className="lg:col-span-4 lg:row-span-2">
+          <ReadOnlyBox
+            label="Feedback esperado"
+            value={caso.feedbackEsperado}
+            minHeight="128px"
+          />
+        </div>
+
+        <div className="lg:col-span-4 lg:row-span-2">
+          <ReadOnlyBox
+            label="Texto de entrada"
+            value={caso.textoEntrada}
+            minHeight="128px"
+          />
         </div>
 
         <div className="lg:col-span-4">
@@ -59,35 +97,7 @@ export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
           </Select>
         </div>
 
-        {/* UPLOAD — ocupa linha 1 e linha 2 */}
-        <div className="lg:col-span-4 lg:row-span-2">
-          <Label>Upload do edital *</Label>
-          <div className="mt-2 h-full ">
-            <FileUpload />
-          </div>
-        </div>
-
-        {/* Linha 2 */}
-        <div className="lg:col-span-4">
-          <ReadOnlyBox label="Taxonomia associada" value={caso.taxonomia} />
-        </div>
-
-        <div className="lg:col-span-4">
-          <ReadOnlyBox label="Ramo associado" value={caso.ramo} />
-        </div>
-
-        {/* Linha 3 */}
-        <div className="lg:col-span-4">
-          <ReadOnlyBox
-            label="Feedback esperado"
-            value={caso.feedbackEsperado}
-          />
-        </div>
-
-        <div className="lg:col-span-4">
-          <ReadOnlyBox label="Texto de entrada" value={caso.textoEntrada} />
-        </div>
-
+        {/* Linha 4 */}
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Conformidade"
@@ -97,7 +107,7 @@ export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
         </div>
       </div>
 
-      {/* Botões — fora do grid */}
+      {/* Botões fora do grid */}
       <div className="flex justify-between">
         <Calendario />
         <div className="flex justify-end gap-x-2 gap-y-0 ">
@@ -120,28 +130,33 @@ interface ReadOnlyBoxProps {
   label: string;
   value: string | number | null | undefined;
   icon?: React.ElementType;
+  minHeight?: string;
 }
 
-export function ReadOnlyBox({ label, value, icon: Icon }: ReadOnlyBoxProps) {
+export function ReadOnlyBox({
+  label,
+  value,
+  icon: Icon,
+  minHeight = "42px",
+}: ReadOnlyBoxProps) {
   return (
     <div className="flex flex-col gap-2">
       <Label>{label}</Label>
 
       <div
-        className="
+        className={`
           bg-gray-100 
           text-gray-700 
           border 
           border-gray-300 
           rounded-md 
           p-2
-          text-sm
-          min-h-[42px]     /* altura mínima para parecer input */
-          max-h-32         /* altura máxima antes do scroll */
-          overflow-y-auto  /* scroll só aparece quando necessário */
+          text-sm    
+          max-h-32         
+          overflow-y-auto  
           whitespace-pre-wrap /* mantém quebras de linha */
-          
-        "
+          `}
+        style={{ minHeight }}
       >
         {Icon && <Icon className="w-4 h-4 mr-2 inline" />}
         {value ?? "---"}

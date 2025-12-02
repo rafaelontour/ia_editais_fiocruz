@@ -16,6 +16,7 @@ interface FormularioCasoProps {
     id: number;
     name: string;
     taxonomia: string;
+    tipificacao: string;
     ramo: string;
     teste: string;
     conformidade: string;
@@ -35,6 +36,7 @@ export default function FormularioCaso({
   const [formState, setFormState] = useState({
     name: "",
     taxonomia: "",
+    tipificacao: "",
     ramo: "",
     teste: "",
     conformidade: "",
@@ -47,6 +49,7 @@ export default function FormularioCaso({
       setFormState({
         name: initialData.name,
         taxonomia: initialData.taxonomia,
+        tipificacao: initialData.tipificacao,
         ramo: initialData.ramo,
         teste: initialData.teste,
         conformidade: initialData.conformidade,
@@ -76,6 +79,27 @@ export default function FormularioCaso({
           value={formState.taxonomia}
           onValueChange={(valor) =>
             setFormState({ ...formState, taxonomia: valor })
+          }
+        >
+          <SelectTrigger className="w-full cursor-pointer">
+            <SelectValue placeholder="Selecione" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem className="cursor-pointer" value="teste">
+              Teste
+            </SelectItem>
+            <SelectItem className="cursor-pointer" value="teste2">
+              Teste2
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label>Tipificação associada</Label>
+        <Select
+          value={formState.tipificacao}
+          onValueChange={(valor) =>
+            setFormState({ ...formState, tipificacao: valor })
           }
         >
           <SelectTrigger className="w-full cursor-pointer">

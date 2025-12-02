@@ -45,6 +45,7 @@ export default function casos() {
       name: "Caso de teste de não conformidades para SIFAC",
       taxonomia:
         "TAX-Contratação de prestação de serviços de coleta e análise de efluentes",
+      tipificacao: "Tipificação teste",
       ramo: "Validar que o licitante enviou simultaneamente a proposta e os documentos de habilitação proposta e os documentos de habilitação.",
       teste: "Teste de Procisão - Edital X",
       conformidade: "Sim",
@@ -59,6 +60,7 @@ export default function casos() {
       name: "Caso de teste de não conformidades para SIFAC",
       taxonomia:
         "TAX-Contratação de prestação de serviços de coleta e análise de efluentes",
+      tipificacao: "Tipificação teste",
       ramo: "Validar que o licitante enviou simultaneamente a proposta e os documentos de habilitação.",
       teste: "Teste de Procisão - Edital X",
       conformidade: "conformidade",
@@ -72,6 +74,7 @@ export default function casos() {
   function salvarEdicao(data: {
     name: string;
     taxonomia: string;
+    tipificacao: string;
     ramo: string;
     teste: string;
     conformidade: string;
@@ -100,6 +103,7 @@ export default function casos() {
   function adicionarCaso(data: {
     name: string;
     taxonomia: string;
+    tipificacao: string;
     ramo: string;
     teste: string;
     conformidade: string;
@@ -112,6 +116,7 @@ export default function casos() {
       id: id,
       name: data.name,
       taxonomia: data.taxonomia,
+      tipificacao: data.tipificacao,
       ramo: data.ramo,
       teste: data.teste,
       conformidade: data.conformidade,
