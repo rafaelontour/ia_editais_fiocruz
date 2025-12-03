@@ -3,10 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogFooter } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
+import { TesteSchema, TesteFormData } from "@/core/schemas/teste.schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface FormularioTesteProps {
-  initialData?: { id: number; name: string; descricao: string } | null;
-  onSubmit: (data: any) => void;
+  initialData?: TesteFormData | null;
+  onSubmit: (data: TesteFormData) => void;
   mode?: "create" | "edit";
 }
 
@@ -15,45 +18,52 @@ export default function FormularioTeste({
   onSubmit,
   mode = "create",
 }: FormularioTesteProps) {
-  const [formState, setFormState] = useState({
-    name: "",
-    descricao: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<TesteFormData>({
+    resolver: zodResolver(TesteSchema),
+    defaultValues: initialData || {
+      name: "",
+      descricao: "",
+    },
   });
 
   // Preenche o form quando estiver em modo EDITAR
   useEffect(() => {
     if (initialData) {
-      setFormState({
-        name: initialData.name,
-        descricao: initialData.descricao,
-      });
+      reset(initialData);
     }
-  }, [initialData]);
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    onSubmit(formState);
-  }
+  }, [initialData, reset]);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-lg">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-4 text-lg"
+    >
       <div className="flex flex-col gap-2">
         <Label>Nome do Teste</Label>
-        <Input
-          value={formState.name}
-          onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-        />
+        <Input {...register("name")} />
+        {errors.name && (
+          <span className="text-red-500 text-sm italic">
+            {errors.name.message}
+          </span>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
         <Label>Descrição</Label>
         <textarea
+          {...register("descricao")}
           className="border rounded p-2 text-sm"
-          value={formState.descricao}
-          onChange={(e) =>
-            setFormState({ ...formState, descricao: e.target.value })
-          }
         />
+        {errors.descricao && (
+          <span className="text-red-500 text-sm italic">
+            {errors.descricao.message}
+          </span>
+        )}
       </div>
 
       <DialogFooter>

@@ -10,6 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { MetricaFormData, MetricaSchema } from "@/core/schemas/metrica.schema";
 
 interface FormularioMetricaProps {
   initialData?: {
@@ -24,77 +27,100 @@ interface FormularioMetricaProps {
   mode?: "create" | "edit";
 }
 
+function toFormData(
+  data: FormularioMetricaProps["initialData"]
+): MetricaFormData {
+  return {
+    name: data?.name ?? "",
+    modelo: data?.modelo ?? "",
+    notaCorte: Number(data?.notaCorte ?? 0),
+    criterio: data?.criterio ?? "",
+    passosAvaliacao: data?.passosAvaliacao ?? "",
+  };
+}
+
 export default function FormularioMetrica({
   initialData,
   onSubmit,
   mode = "create",
 }: FormularioMetricaProps) {
-  const [formState, setFormState] = useState({
-    name: "",
-    modelo: "",
-    notaCorte: 0,
-    criterio: "",
-    passosAvaliacao: "",
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(MetricaSchema),
+    defaultValues: toFormData(initialData),
   });
 
   useEffect(() => {
     if (initialData) {
-      setFormState({
-        name: initialData.name,
-        modelo: initialData.modelo,
-        notaCorte: initialData.notaCorte,
-        criterio: initialData.criterio,
-        passosAvaliacao: initialData.passosAvaliacao,
-      });
+      reset(toFormData(initialData) as MetricaFormData);
     }
-  }, [initialData]);
+  }, [initialData, reset]);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    onSubmit(formState);
-  }
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-lg">
+    <form
+      onSubmit={handleSubmit((data) => {
+        console.log("Data final:", data);
+        console.log("Tipo de notaCorte final:", typeof data.notaCorte);
+
+        onSubmit(data);
+      })}
+      className="flex flex-col gap-4 text-lg"
+    >
       <div className="flex flex-col gap-2">
         <Label>Nome da métrica</Label>
-        <Input
-          value={formState.name}
-          onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-        />
+        <Input {...register("name")} />
+        {errors.name && (
+          <span className="text-red-500 text-sm italic">
+            {errors.name.message}
+          </span>
+        )}
       </div>
 
       <div className="flex justify-between gap-2">
         <div className="flex flex-col gap-2 w-1/2">
           <Label>Modelo de ia</Label>
-          <Select
-            value={formState.modelo}
-            onValueChange={(valor) =>
-              setFormState({ ...formState, modelo: valor })
-            }
-          >
-            <SelectTrigger className="w-full cursor-pointer">
-              <SelectValue placeholder="Selecione" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem className="cursor-pointer" value="teste">
-                Teste
-              </SelectItem>
-              <SelectItem className="cursor-pointer" value="teste2">
-                Teste2
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <Controller
+            name="modelo"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full cursor-pointer">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem className="cursor-pointer" value="teste">
+                    Teste
+                  </SelectItem>
+                  <SelectItem className="cursor-pointer" value="teste2">
+                    Teste2
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.modelo && (
+            <span className="text-red-500 text-sm italic">
+              {errors.modelo.message}
+            </span>
+          )}
         </div>
 
         <div className="flex flex-col gap-2 w-1/2">
           <Label>Nota de corte</Label>
           <Input
             type="number"
-            value={formState.notaCorte}
-            onChange={(e) =>
-              setFormState({ ...formState, notaCorte: Number(e.target.value) })
-            }
+            {...register("notaCorte", { valueAsNumber: true })}
           />
+          {errors.notaCorte && (
+            <span className="text-red-500 text-sm italic">
+              {errors.notaCorte.message}
+            </span>
+          )}
         </div>
       </div>
 
@@ -102,24 +128,28 @@ export default function FormularioMetrica({
         <Label>Critério da métrica</Label>
         <textarea
           className="border rounded p-2 text-sm"
-          value={formState.criterio}
-          onChange={(e) =>
-            setFormState({ ...formState, criterio: e.target.value })
-          }
+          {...register("criterio")}
           rows={2.5}
         />
+        {errors.criterio && (
+          <span className="text-red-500 text-sm italic">
+            {errors.criterio.message}
+          </span>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
         <Label>Passos de avaliação da métrica</Label>
         <textarea
           className="border rounded p-2 text-sm"
-          value={formState.passosAvaliacao}
-          onChange={(e) =>
-            setFormState({ ...formState, passosAvaliacao: e.target.value })
-          }
+          {...register("passosAvaliacao")}
           rows={2.5}
         />
+        {errors.passosAvaliacao && (
+          <span className="text-red-500 text-sm italic">
+            {errors.passosAvaliacao.message}
+          </span>
+        )}
       </div>
 
       <DialogFooter>
