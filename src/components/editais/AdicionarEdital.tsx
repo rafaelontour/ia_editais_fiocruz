@@ -62,7 +62,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     })
 
     const [openSheet, setOpenSheet] = useState<boolean>(false);
-    const [unidades, setUnidades] = useState<Unidade[]>([]);
     const [usuarios, setUsuarios] = useState<UsuarioUnidade[] | undefined>([]);
     const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
     const [tipificacoesSelecionadas, setTipificacoesSelecionadas] = useState<Tipificacao[] | []>([]);
@@ -408,15 +407,15 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                 {
                                                     responsaveisEdital.map((usuario: UsuarioUnidade) => (
                                                         <div key={usuario.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
-                                                            <button onClick={() => {
+                                                            <div role="button" className="flex h-full" onClick={() => {
                                                                 const novaLista = responsaveisEdital.filter((u) => u.id !== usuario.id)
                                                                 setResponsaveisEdital(novaLista);
                                                                 setValue("responsavel", "");
                                                             }}>
-                                                                <div className="flex items-center" title="Remover usuário">
+                                                                <div className="flex items-center h-full" title="Remover usuário">
                                                                     <span
                                                                         className="
-                                                                            bg-red-200 p-[10px]
+                                                                            bg-red-200 p-[10px] h-full flex items-center justify-center
                                                                             hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                                             transition-all duration-200 ease-in-out
                                                                         "
@@ -424,7 +423,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                         <X className="w-4 h-4" />
                                                                     </span>
                                                                 </div>
-                                                            </button>
+                                                            </div>
                                                             <p className=" w-full text-sm">{usuario.username}</p>
                                                         </div>
                                                     ))

@@ -63,20 +63,24 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
           if (dados.flagHook) dados.flagHook.current = false;
         }}
         ref={(e) => {
-          dados.divRefs?.current &&
-            (dados.divRefs.current["botao_excluir"] = e);
+          if (dados.divRefs) {
+            dados.divRefs.current[dados.item.id!] = e;
+          }
         }}
       >
         <DialogHeader>
           <DialogTitle>Excluir {dados.tipo}</DialogTitle>
 
           <DialogDescription>
-            Tem certeza que deseja excluir {dados.tipo !== "ramo" ? "a " : "o "}{" "}
+            Tem certeza que deseja excluir{" "}
+            {dados.tipo !== "ramo" && dados.tipo !== "teste" ? "a " : "o "}{" "}
             {dados.tipo}{" "}
             <strong>
               {"title" in dados.item
                 ? dados.item.title
-                : "name" in dados.item && dados.item.name}
+                : "name" in dados.item
+                ? dados.item.name
+                : ""}
             </strong>
           </DialogDescription>
         </DialogHeader>

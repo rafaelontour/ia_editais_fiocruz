@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo "🔍 Rodando ESLint..."
+
+npx eslint .
+
+echo "✔ ESLint ok — commit permitido."

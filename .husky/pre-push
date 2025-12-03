@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo "Executando testes automatizados com Cypress... ✨"
+
+npx cypress run
+
+# echo "🔍 Executando Semgrep antes do push..."
+
+# Executa Semgrep usando npx via Node
+# node -e "require('child_process').execSync('npx semgrep --config=p/ci --include \"src/**/*.ts*\"', { stdio: 'inherit' })"
+
+# echo "✓ Semgrep finalizado — push liberado."

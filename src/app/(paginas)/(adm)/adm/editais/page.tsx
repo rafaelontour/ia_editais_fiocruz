@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     DndContext,
     DragEndEvent,
@@ -30,7 +30,7 @@ export default function Editais() {
     const [carregandoEditais, setCarregandoEditais] = useState<boolean>(true);
     const statuses: StatusEdital[] = ["PENDING", "UNDER_CONSTRUCTION", "WAITING_FOR_REVIEW", "COMPLETED"];
     const { usuario } = useUsuario();
-
+    
     const [columns, setColumns] = useState<Record<StatusEdital, Edital[]>>({
         PENDING: [],
         UNDER_CONSTRUCTION: [],
@@ -46,17 +46,12 @@ export default function Editais() {
         overId: string | null
     } | null>(null);
 
-    const isDialogOpen = pendingMove !== null;
-
     useEffect(() => {
         getEditais();
         setMontado(true);
     }, [])
 
-    useEffect(() => {
-        getEditais();
-    }, [adicionouNovoEdital])
-
+    
     async function moverParaRascunho(editalId: string) {
         const resposta = await definirStatusRascunho(editalId);
         if (resposta !== 200) {
@@ -67,16 +62,16 @@ export default function Editais() {
 
     async function moverParaEmConstrucao(editalId: string) {
         const resposta = await definirStatusEmConstrucao(editalId);
-
+        
         if (resposta !== 200) {
             toast.error("Erro ao mover para em construção");
             return
         }
     }
-
+    
     async function moverParaEmAnalise(editalId: string) {
         const resposta = await definirStatusEmAnalise(editalId);
-
+        
         if (resposta !== 200) {
             toast.error("Erro ao mover para em análise");
             return
@@ -91,15 +86,15 @@ export default function Editais() {
             return
         }
     }
-
-    const getEditais = async () => {
+    
+    const getEditais = useCallback( async () => {
         try {
             const resposta = await getEditaisService(usuario?.unit_id);
-
+            
             if (!resposta) toast.error("Erro ao buscar editais!");
 
             const dados = resposta || [];
-
+            
             const novasColunas: Record<StatusEdital, Edital[]> = {
                 PENDING: [],
                 UNDER_CONSTRUCTION: [],
@@ -114,14 +109,18 @@ export default function Editais() {
                     novasColunas[status].unshift(edital);
                 }
             });
-
+            
             setColumns(novasColunas);
         } catch (e) {
             toast.error("Erro ao buscar editais!");
         }
-
+        
         setCarregandoEditais(false);
-    };
+    }, [usuario?.unit_id]);
+    
+    useEffect(() => {
+        getEditais();
+    }, [adicionouNovoEdital, getEditais])
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
     const [activeId, setActiveId] = useState<string | null>(null);

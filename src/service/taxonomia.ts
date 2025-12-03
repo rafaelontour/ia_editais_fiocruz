@@ -17,7 +17,7 @@ async function getTaxonomiasService(): Promise<Taxonomia[] | undefined> {
     const json = await response.json();
     const taxonomias: Taxonomia[] = json.taxonomies;
 
-    for (let taxonomia of taxonomias) {
+    for (const taxonomia of taxonomias) {
         if (taxonomia.created_at) {
             taxonomia.created_at = new Date(taxonomia.created_at).toLocaleString();
         }
