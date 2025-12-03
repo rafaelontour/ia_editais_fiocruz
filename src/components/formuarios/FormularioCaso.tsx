@@ -13,6 +13,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { CasoFormData, CasoSchema } from "@/core/schemas/caso.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Taxonomia } from "@/core";
 
 interface FormularioCasoProps {
   initialData?: {
@@ -29,12 +30,16 @@ interface FormularioCasoProps {
   };
   onSubmit: (data: any) => void;
   mode?: "create" | "edit";
+  taxonomias?: Taxonomia[];
+  carregandoTax?: boolean;
 }
 
 export default function FormularioCaso({
   initialData,
   onSubmit,
   mode = "create",
+  taxonomias = [],
+  carregandoTax = false,
 }: FormularioCasoProps) {
   const {
     register,
@@ -83,17 +88,22 @@ export default function FormularioCaso({
           name="taxonomia"
           control={control}
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select
+              value={field.value ?? ""}
+              onValueChange={field.onChange}
+              disabled={carregandoTax}
+            >
               <SelectTrigger className="w-full cursor-pointer">
-                <SelectValue placeholder="Selecione" />
+                <SelectValue
+                  placeholder={carregandoTax ? "Carregando..." : "Selecione"}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem className="cursor-pointer" value="teste">
-                  Teste
-                </SelectItem>
-                <SelectItem className="cursor-pointer" value="teste2">
-                  Teste2
-                </SelectItem>
+                {taxonomias?.map((tax: Taxonomia) => (
+                  <SelectItem key={tax.id} value={tax.id!}>
+                    {tax.title}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           )}

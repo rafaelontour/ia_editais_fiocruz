@@ -12,8 +12,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Taxonomia } from "@/core";
 import { Caso } from "@/core/caso";
-import { useRef, useState } from "react";
+
+import { getTaxonomiasService } from "@/service/taxonomia";
+import { useEffect, useRef, useState } from "react";
 
 export default function casos() {
   const [openDialogAdd, setOpenDialogAdd] = useState(false);
@@ -23,6 +26,24 @@ export default function casos() {
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
   const termoBusca = useRef<string>("");
   const [casoFiltrado, setCasoFiltrado] = useState<Caso[]>([]);
+
+  const [taxonomia, setTaxonomia] = useState<Taxonomia[]>([]);
+  const [carregandoTax, setCarregandoTax] = useState(true);
+
+  useEffect(() => {
+    async function carregar() {
+      try {
+        const resposta = await getTaxonomiasService();
+        setTaxonomia(resposta ?? []);
+      } catch (e) {
+        console.error("Erro ao carregar taxonomias", e);
+      } finally {
+        setCarregandoTax(false);
+      }
+    }
+
+    carregar();
+  }, []);
 
   function filtrarCaso() {
     if (termoBusca.current.trim() === "") {
@@ -154,6 +175,8 @@ export default function casos() {
 
               <FormularioCaso
                 mode="create"
+                taxonomias={taxonomia}
+                carregandoTax={carregandoTax}
                 onSubmit={(data) => {
                   adicionarCaso(data);
                   setOpenDialogAdd(false);
@@ -205,6 +228,8 @@ export default function casos() {
             {editandoForm && (
               <FormularioCaso
                 mode="edit"
+                taxonomias={taxonomia}
+                carregandoTax={carregandoTax}
                 initialData={editandoForm}
                 onSubmit={(data) => {
                   salvarEdicao(data);
