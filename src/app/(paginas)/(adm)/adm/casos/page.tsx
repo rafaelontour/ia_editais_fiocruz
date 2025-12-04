@@ -12,10 +12,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Taxonomia } from "@/core";
+import { Ramo, Taxonomia, Tipificacao } from "@/core";
 import { Caso } from "@/core/caso";
+import { buscarRamosDaTaxonomiaService, getRamosService } from "@/service/ramo";
 
 import { getTaxonomiasService } from "@/service/taxonomia";
+import { getTipificacoesService } from "@/service/tipificacao";
 import { useEffect, useRef, useState } from "react";
 
 export default function casos() {
@@ -27,21 +29,21 @@ export default function casos() {
   const termoBusca = useRef<string>("");
   const [casoFiltrado, setCasoFiltrado] = useState<Caso[]>([]);
 
-  const [taxonomia, setTaxonomia] = useState<Taxonomia[]>([]);
-  const [carregandoTax, setCarregandoTax] = useState(true);
+  // Tipificações
+  const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
+  const [carregandoTip, setCarregandoTip] = useState(true);
 
   useEffect(() => {
     async function carregar() {
       try {
-        const resposta = await getTaxonomiasService();
-        setTaxonomia(resposta ?? []);
+        const resposta = await getTipificacoesService();
+        setTipificacoes(resposta ?? []);
       } catch (e) {
-        console.error("Erro ao carregar taxonomias", e);
+        console.error("Erro ao carregar tipificações", e);
       } finally {
-        setCarregandoTax(false);
+        setCarregandoTip(false);
       }
     }
-
     carregar();
   }, []);
 
@@ -175,8 +177,8 @@ export default function casos() {
 
               <FormularioCaso
                 mode="create"
-                taxonomias={taxonomia}
-                carregandoTax={carregandoTax}
+                tipificacoes={tipificacoes}
+                carregandoTip={carregandoTip}
                 onSubmit={(data) => {
                   adicionarCaso(data);
                   setOpenDialogAdd(false);
@@ -228,8 +230,8 @@ export default function casos() {
             {editandoForm && (
               <FormularioCaso
                 mode="edit"
-                taxonomias={taxonomia}
-                carregandoTax={carregandoTax}
+                tipificacoes={tipificacoes}
+                carregandoTip={carregandoTip}
                 initialData={editandoForm}
                 onSubmit={(data) => {
                   salvarEdicao(data);

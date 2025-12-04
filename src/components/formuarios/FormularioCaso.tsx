@@ -13,7 +13,9 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { CasoFormData, CasoSchema } from "@/core/schemas/caso.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Taxonomia } from "@/core";
+import { Ramo, Taxonomia, Tipificacao } from "@/core";
+import { buscarRamosDaTaxonomiaService } from "@/service/ramo";
+import { set } from "zod";
 
 interface FormularioCasoProps {
   initialData?: {
@@ -30,16 +32,16 @@ interface FormularioCasoProps {
   };
   onSubmit: (data: any) => void;
   mode?: "create" | "edit";
-  taxonomias?: Taxonomia[];
-  carregandoTax?: boolean;
+  tipificacoes?: Tipificacao[];
+  carregandoTip?: boolean;
 }
 
 export default function FormularioCaso({
   initialData,
   onSubmit,
   mode = "create",
-  taxonomias = [],
-  carregandoTax = false,
+  tipificacoes = [],
+  carregandoTip = false,
 }: FormularioCasoProps) {
   const {
     register,
@@ -47,6 +49,7 @@ export default function FormularioCaso({
     control,
     formState: { errors },
     reset,
+    watch,
   } = useForm<CasoFormData>({
     resolver: zodResolver(CasoSchema),
     defaultValues: {
@@ -67,6 +70,17 @@ export default function FormularioCaso({
     }
   }, [initialData, reset]);
 
+  const tipificacaoSelecionada = watch("tipificacao");
+
+  const taxonomiasFiltradas =
+    tipificacoes.find((t) => t.id === tipificacaoSelecionada)?.taxonomies ?? [];
+
+  const taxonomiaSelecionada = watch("taxonomia");
+
+  const ramosFiltrados =
+    taxonomiasFiltradas.find((tax) => tax.id === taxonomiaSelecionada)
+      ?.branches ?? [];
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -83,6 +97,32 @@ export default function FormularioCaso({
       </div>
 
       <div className="flex flex-col gap-2">
+        <Label>Tipificação associada</Label>
+        <Controller
+          name="tipificacao"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className="w-full cursor-pointer">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {tipificacoes?.map((tip: Tipificacao) => (
+                  <SelectItem key={tip.id} value={tip.id!}>
+                    {tip.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.tipificacao && (
+          <span className="text-red-500 text-sm italic">
+            {errors.tipificacao.message}
+          </span>
+        )}
+      </div>
+      <div className="flex flex-col gap-2">
         <Label>Taxonomia associada</Label>
         <Controller
           name="taxonomia"
@@ -91,15 +131,19 @@ export default function FormularioCaso({
             <Select
               value={field.value ?? ""}
               onValueChange={field.onChange}
-              disabled={carregandoTax}
+              disabled={!tipificacaoSelecionada}
             >
               <SelectTrigger className="w-full cursor-pointer">
                 <SelectValue
-                  placeholder={carregandoTax ? "Carregando..." : "Selecione"}
+                  placeholder={
+                    !tipificacaoSelecionada
+                      ? "Selecione uma tipificação primeiro"
+                      : "Selecione"
+                  }
                 />
               </SelectTrigger>
               <SelectContent>
-                {taxonomias?.map((tax: Taxonomia) => (
+                {taxonomiasFiltradas.map((tax) => (
                   <SelectItem key={tax.id} value={tax.id!}>
                     {tax.title}
                   </SelectItem>
@@ -115,49 +159,31 @@ export default function FormularioCaso({
         )}
       </div>
       <div className="flex flex-col gap-2">
-        <Label>Tipificação associada</Label>
-        <Controller
-          name="tipificacao"
-          control={control}
-          render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger className="w-full cursor-pointer">
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem className="cursor-pointer" value="teste">
-                  Teste
-                </SelectItem>
-                <SelectItem className="cursor-pointer" value="teste2">
-                  Teste2
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
-        {errors.tipificacao && (
-          <span className="text-red-500 text-sm italic">
-            {errors.tipificacao.message}
-          </span>
-        )}
-      </div>
-      <div className="flex flex-col gap-2">
         <Label>Ramo associada</Label>
         <Controller
           name="ramo"
           control={control}
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select
+              value={field.value}
+              onValueChange={field.onChange}
+              disabled={!taxonomiaSelecionada}
+            >
               <SelectTrigger className="w-full cursor-pointer">
-                <SelectValue placeholder="Selecione" />
+                <SelectValue
+                  placeholder={
+                    !taxonomiaSelecionada
+                      ? "Selecione uma taxonomia primeiro"
+                      : "Selecione"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem className="cursor-pointer" value="teste">
-                  Teste
-                </SelectItem>
-                <SelectItem className="cursor-pointer" value="teste2">
-                  Teste2
-                </SelectItem>
+                {ramosFiltrados?.map((ram) => (
+                  <SelectItem key={ram.id} value={ram.id!}>
+                    {ram.title}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           )}
