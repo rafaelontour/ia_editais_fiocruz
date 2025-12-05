@@ -203,7 +203,7 @@ export default function Fontes() {
                                 <Div>
                                     <div data-cy="item-fonte" className="flex flex-col gap-2">
                                         <h2 className="text-2xl font-semibold">{fonte.name}</h2>
-                                        <p className={`py-1 w-fit break-words text-md`}>
+                                        <p className={`py-1 w-fit wrrap-break-words text-md`}>
                                             {fonte.description}
                                         </p>
                                     </div>
