@@ -1,9 +1,8 @@
 export interface Metrica {
   id: string;
   name: string;
-  modelo: string;
-  criterio: string;
-  notaCorte: number;
-  passosAvaliacao: string;
+  criteria: string;
+  evaluation_steps: string;
+  threshold: number;
   created_at?: string;
 }

@@ -13,6 +13,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Metrica } from "@/core/metrica";
+import {
+  adicionarMetricaService,
+  atualizarMetricaService,
+  excluirMetricaService,
+  getMetricasService,
+} from "@/service/metrica";
 import { useEffect, useRef, useState } from "react";
 
 export default function metricas() {
@@ -26,53 +32,26 @@ export default function metricas() {
   const termoBusca = useRef<string>("");
 
   useEffect(() => {
-    setMetricaFiltrada(mockMetricas);
+    async function carregar() {
+      const resultado = await getMetricasService();
+      if (resultado) {
+        setMetricas(resultado);
+        setMetricaFiltrada(resultado);
+      }
+    }
+    carregar();
   }, []);
 
   const [metricaFiltrada, setMetricaFiltrada] = useState<Metrica[]>([]);
-  const [mockMetricas, setMockMetricas] = useState<Metrica[]>([
-    {
-      id: "1",
-      name: "Precisão de Feedback 1",
-      modelo: "GPT-5",
-      notaCorte: 5,
-      criterio:
-        "A métrica deve avaliar se o feedback retornado pela IA identifica corretamente a presença ou ausência do critério jurídico analisado, sem adicionar informações inexistentes no edital. A resposta deve ser objetiva, coerente, e manter alinhamento semântico com o critério esperado.",
-      passosAvaliacao:
-        "Comparar o expected_feedback com o actual_feedback retornado pelo modelo. Verificar se o modelo identificou corretamente se o critério está presente no documento (expected_fulfilled). Calcular similaridade semântica entre expected e actual. Gerar score final entre 0 e 1 baseado nessa similaridade. Considerar o teste aprovado caso score >= threshold.",
-      created_at: "2025-11-17T15:56:39",
-    },
-    {
-      id: "2",
-      name: "Precisão de Feedback",
-      modelo: "GPT-5",
-      notaCorte: 5,
-      criterio:
-        "A métrica deve avaliar se o feedback retornado pela IA identifica corretamente a presença ou ausência do critério jurídico analisado, sem adicionar informações inexistentes no edital. A resposta deve ser objetiva, coerente, e manter alinhamento semântico com o critério esperado.",
-      passosAvaliacao:
-        "Comparar o expected_feedback com o actual_feedback retornado pelo modelo. Verificar se o modelo identificou corretamente se o critério está presente no documento (expected_fulfilled). Calcular similaridade semântica entre expected e actual. Gerar score final entre 0 e 1 baseado nessa similaridade. Considerar o teste aprovado caso score >= threshold.",
-      created_at: "12/11/2023, 12:23:20",
-    },
-    {
-      id: "3",
-      name: "Precisão de Feedback",
-      modelo: "GPT-5",
-      notaCorte: 5,
-      criterio:
-        "A métrica deve avaliar se o feedback retornado pela IA identifica corretamente a presença ou ausência do critério jurídico analisado, sem adicionar informações inexistentes no edital. A resposta deve ser objetiva, coerente, e manter alinhamento semântico com o critério esperado.",
-      passosAvaliacao:
-        "Comparar o expected_feedback com o actual_feedback retornado pelo modelo. Verificar se o modelo identificou corretamente se o critério está presente no documento (expected_fulfilled). Calcular similaridade semântica entre expected e actual. Gerar score final entre 0 e 1 baseado nessa similaridade. Considerar o teste aprovado caso score >= threshold.",
-      created_at: "12/11/2023, 12:23:20",
-    },
-  ]);
+  const [metricas, setMetricas] = useState<Metrica[]>([]);
 
   function filtrarMetricas() {
     if (termoBusca.current.trim() === "") {
-      setMetricaFiltrada(mockMetricas);
+      setMetricaFiltrada(metricas);
       return;
     }
 
-    const mm = mockMetricas.filter(
+    const mm = metricas.filter(
       (m) =>
         m.name &&
         m.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
@@ -81,18 +60,23 @@ export default function metricas() {
     setMetricaFiltrada(mm);
   }
 
-  function salvarEdicao(data: {
+  async function salvarEdicao(data: {
     name: string;
-    modelo: string;
-    notaCorte: number;
-    criterio: string;
-    passosAvaliacao: string;
+    threshold: number;
+    criteria: string;
+    evaluation_steps: string;
   }) {
-    const novasMetricas = mockMetricas.map((t) =>
+    const sucesso = await atualizarMetricaService(editandoForm.id, data);
+    if (!sucesso) {
+      console.error("Erro ao atualizar métrica");
+      return;
+    }
+
+    const novasMetricas = metricas.map((t) =>
       t.id === editandoForm.id ? { ...t, ...data } : t
     );
 
-    setMockMetricas(novasMetricas);
+    setMetricas(novasMetricas);
     setMetricaFiltrada(novasMetricas);
 
     // se tiver expandido, atualizar a métrica selecionada também ou seja o endpoind vai ser pelo id da métrica
@@ -107,31 +91,17 @@ export default function metricas() {
     }
   }
 
-  function excluirMetrica(id: string) {
-    setMockMetricas(mockMetricas.filter((t) => t.id !== id));
-    setMetricaFiltrada(mockMetricas.filter((t) => t.id !== id));
-  }
+  async function excluirMetrica(id: string) {
+    const sucesso = await excluirMetricaService(id);
+    if (!sucesso) {
+      console.error("Erro ao excluir métrica");
+      return;
+    }
 
-  function adicionarMetrica(data: {
-    name: string;
-    modelo: string;
-    notaCorte: number;
-    criterio: string;
-    passosAvaliacao: string;
-  }) {
-    let id = crypto.randomUUID();
-    const novaMetrica = {
-      id: id,
-      name: data.name,
-      modelo: data.modelo,
-      notaCorte: data.notaCorte,
-      criterio: data.criterio,
-      passosAvaliacao: data.passosAvaliacao,
-      created_at: new Date().toLocaleString(),
-    };
+    const filtradas = metricas.filter((t) => t.id !== id);
 
-    setMockMetricas([...mockMetricas, novaMetrica]);
-    setMetricaFiltrada([...mockMetricas, novaMetrica]);
+    setMetricas(filtradas);
+    setMetricaFiltrada(filtradas);
   }
 
   return (
@@ -156,8 +126,18 @@ export default function metricas() {
 
               <FormularioMetrica
                 mode="create"
-                onSubmit={(data) => {
-                  adicionarMetrica(data);
+                onSubmit={async (data) => {
+                  const novaMetrica = await adicionarMetricaService({
+                    name: data.name,
+                    threshold: data.threshold,
+                    criteria: data.criteria,
+                    evaluation_steps: data.evaluation_steps,
+                  });
+
+                  if (novaMetrica) {
+                    setMetricas((prev) => [...prev, novaMetrica]);
+                    setMetricaFiltrada((prev) => [...prev, novaMetrica]);
+                  }
                   setOpenDialogAdd(false);
                 }}
               />

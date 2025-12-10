@@ -11,6 +11,9 @@ interface CardCasoProps {
   onOpen: () => void;
   onEditar: () => void;
   onExcluir: () => void;
+  getNomeTeste: (id: string) => string;
+  getNomeRamo: (id: string) => string;
+  getNomeEdital: (id: string) => string;
 }
 
 export default function CardCaso({
@@ -18,6 +21,9 @@ export default function CardCaso({
   onOpen,
   onEditar,
   onExcluir,
+  getNomeTeste,
+  getNomeRamo,
+  getNomeEdital,
 }: CardCasoProps) {
   return (
     <div
@@ -32,11 +38,11 @@ export default function CardCaso({
       />
       <h2 className="text-2xl font-semibold">{caso.name}</h2>
       <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2">
-        <span>Teste:</span> {caso.teste}
+        <span>Teste:</span> {getNomeTeste(caso.test_collection_id)}
       </p>
 
       <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2">
-        <span>Ramo:</span> {caso.ramo}
+        <span>Ramo:</span> {getNomeRamo(caso.branch_id)}
       </p>
 
       <div className="flex justify-between items-center mt-3">

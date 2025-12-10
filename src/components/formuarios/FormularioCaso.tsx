@@ -13,9 +13,8 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { CasoFormData, CasoSchema } from "@/core/schemas/caso.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Ramo, Taxonomia, Tipificacao } from "@/core";
-import { buscarRamosDaTaxonomiaService } from "@/service/ramo";
-import { set } from "zod";
+import { Edital, Tipificacao } from "@/core";
+import { Teste } from "@/core/teste";
 
 interface FormularioCasoProps {
   initialData?: {
@@ -23,16 +22,21 @@ interface FormularioCasoProps {
     name: string;
     taxonomia: string;
     tipificacao: string;
-    ramo: string;
-    teste: string;
-    conformidade: string;
-    feedbackEsperado: string;
-    textoEntrada: string;
+    branch_id: string;
+    test_collection_id: string;
+    doc_id: string;
+    expected_fulfilled: boolean;
+    expected_feedback: string;
+    input: string;
     created_at?: string;
   };
   onSubmit: (data: any) => void;
   mode?: "create" | "edit";
   tipificacoes?: Tipificacao[];
+  testes?: Teste[];
+  editais?: Edital[];
+  carregandoEdital?: boolean;
+  carregandoTeste?: boolean;
   carregandoTip?: boolean;
 }
 
@@ -41,6 +45,10 @@ export default function FormularioCaso({
   onSubmit,
   mode = "create",
   tipificacoes = [],
+  testes = [],
+  editais = [],
+  carregandoEdital = false,
+  carregandoTeste = false,
   carregandoTip = false,
 }: FormularioCasoProps) {
   const {
@@ -54,28 +62,36 @@ export default function FormularioCaso({
     resolver: zodResolver(CasoSchema),
     defaultValues: {
       name: initialData?.name ?? "",
-      taxonomia: initialData?.taxonomia ?? "",
-      tipificacao: initialData?.tipificacao ?? "",
-      ramo: initialData?.ramo ?? "",
-      teste: initialData?.teste ?? "",
-      conformidade: initialData?.conformidade ?? "",
-      feedbackEsperado: initialData?.feedbackEsperado ?? "",
-      textoEntrada: initialData?.textoEntrada ?? "",
+      taxonomy_id: initialData?.taxonomia ?? "",
+      typification_id: initialData?.tipificacao ?? "",
+      branch_id: initialData?.branch_id ?? "",
+      test_collection_id: initialData?.test_collection_id ?? "",
+      doc_id: initialData?.doc_id ?? "",
+      expected_fulfilled: initialData
+        ? initialData.expected_fulfilled
+          ? "true"
+          : "false"
+        : "",
+      expected_feedback: initialData?.expected_feedback ?? "",
+      input: initialData?.input ?? "",
     },
   });
 
   useEffect(() => {
     if (initialData) {
-      reset(initialData);
+      reset({
+        ...initialData,
+        expected_fulfilled: initialData.expected_fulfilled ? "true" : "false",
+      } as any);
     }
   }, [initialData, reset]);
 
-  const tipificacaoSelecionada = watch("tipificacao");
+  const tipificacaoSelecionada = watch("typification_id");
 
   const taxonomiasFiltradas =
     tipificacoes.find((t) => t.id === tipificacaoSelecionada)?.taxonomies ?? [];
 
-  const taxonomiaSelecionada = watch("taxonomia");
+  const taxonomiaSelecionada = watch("taxonomy_id");
 
   const ramosFiltrados =
     taxonomiasFiltradas.find((tax) => tax.id === taxonomiaSelecionada)
@@ -84,7 +100,7 @@ export default function FormularioCaso({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 text-lg"
+      className="flex flex-col gap-4 text-lg max-h-[450px] overflow-y-auto pr-4"
     >
       <div className="flex flex-col gap-2">
         <Label>Nome do caso</Label>
@@ -97,9 +113,36 @@ export default function FormularioCaso({
       </div>
 
       <div className="flex flex-col gap-2">
+        <Label>Edital associado</Label>
+        <Controller
+          name="doc_id"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className="w-full cursor-pointer">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {editais?.map((doc: Edital) => (
+                  <SelectItem key={doc.id} value={doc.id!}>
+                    {doc.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.doc_id && (
+          <span className="text-red-500 text-sm italic">
+            {errors.doc_id.message}
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
         <Label>Tipificação associada</Label>
         <Controller
-          name="tipificacao"
+          name="typification_id"
           control={control}
           render={({ field }) => (
             <Select value={field.value} onValueChange={field.onChange}>
@@ -116,16 +159,16 @@ export default function FormularioCaso({
             </Select>
           )}
         />
-        {errors.tipificacao && (
+        {errors.typification_id && (
           <span className="text-red-500 text-sm italic">
-            {errors.tipificacao.message}
+            {errors.typification_id.message}
           </span>
         )}
       </div>
       <div className="flex flex-col gap-2">
         <Label>Taxonomia associada</Label>
         <Controller
-          name="taxonomia"
+          name="taxonomy_id"
           control={control}
           render={({ field }) => (
             <Select
@@ -152,16 +195,16 @@ export default function FormularioCaso({
             </Select>
           )}
         />
-        {errors.taxonomia && (
+        {errors.taxonomy_id && (
           <span className="text-red-500 text-sm italic">
-            {errors.taxonomia.message}
+            {errors.taxonomy_id.message}
           </span>
         )}
       </div>
       <div className="flex flex-col gap-2">
         <Label>Ramo associada</Label>
         <Controller
-          name="ramo"
+          name="branch_id"
           control={control}
           render={({ field }) => (
             <Select
@@ -188,31 +231,67 @@ export default function FormularioCaso({
             </Select>
           )}
         />
-        {errors.ramo && (
+        {errors.branch_id && (
           <span className="text-red-500 text-sm italic">
-            {errors.ramo.message}
+            {errors.branch_id.message}
           </span>
         )}
       </div>
       <div className="flex justify-between gap-2">
         <div className="flex flex-col gap-2 w-1/2">
           <Label>Teste associado</Label>
-          <Input {...register("teste")} />
-          {errors.teste && (
+          <Controller
+            name="test_collection_id"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full cursor-pointer">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {testes?.map((test: Teste) => (
+                    <SelectItem key={test.id} value={test.id!}>
+                      {test.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.test_collection_id && (
             <span className="text-red-500 text-sm italic">
-              {errors.teste.message}
+              {errors.test_collection_id.message}
             </span>
           )}
         </div>
 
         <div className="flex flex-col gap-2 w-1/2">
           <Label>Conformidade com o ramo?</Label>
-          <Input {...register("conformidade")} />
-          {errors.conformidade && (
-            <span className="text-red-500 text-sm italic">
-              {errors.conformidade.message}
-            </span>
-          )}
+          <div className="flex items-center gap-4 ">
+            <label className="flex items-center gap-1 cursor-pointer text-sm">
+              <Input
+                type="radio"
+                value="true"
+                {...register("expected_fulfilled")}
+                className="cursor-pointer"
+              />
+              Sim
+            </label>
+            <label className="flex items-center gap-1 cursor-pointer text-sm">
+              <Input
+                type="radio"
+                value="false"
+                className="cursor-pointer"
+                {...register("expected_fulfilled")}
+              />
+              Não
+            </label>
+            {errors.expected_fulfilled && (
+              <span className="text-red-500 text-sm italic">
+                {errors.expected_fulfilled.message}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -220,12 +299,12 @@ export default function FormularioCaso({
         <Label>Feedback esperado</Label>
         <textarea
           className="border rounded p-2 text-sm"
-          {...register("feedbackEsperado")}
+          {...register("expected_feedback")}
           rows={2.5}
         />
-        {errors.feedbackEsperado && (
+        {errors.expected_feedback && (
           <span className="text-red-500 text-sm italic">
-            {errors.feedbackEsperado.message}
+            {errors.expected_feedback.message}
           </span>
         )}
       </div>
@@ -234,12 +313,12 @@ export default function FormularioCaso({
         <Label>Texto de entrada</Label>
         <textarea
           className="border rounded p-2 text-sm"
-          {...register("textoEntrada")}
+          {...register("input")}
           rows={2.5}
         />
-        {errors.textoEntrada && (
+        {errors.input && (
           <span className="text-red-500 text-sm italic">
-            {errors.textoEntrada.message}
+            {errors.input.message}
           </span>
         )}
       </div>

@@ -1,6 +1,7 @@
 export interface Teste {
   id: string;
   name: string;
-  descricao: string;
+  description: string;
   created_at?: string;
+  updated_at?: string;
 }

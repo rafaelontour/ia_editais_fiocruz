@@ -34,27 +34,27 @@ export default function DetalheMetrica({
         </Button>
         <h2 className="text-2xl font-semibold">{metrica.name}</h2>
       </div>
-      <div className="flex flex-row gap-3">
+      {/* <div className="flex flex-row ">
         <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2 ">
           Modelo ia: {metrica.modelo}
         </p>
+      </div> */}
 
-        <p className="w-fit py-1 px-2 ">
-          <span className="font-semibold">Nota de corte: </span>
-          {metrica.notaCorte}
-        </p>
-      </div>
+      <p>
+        <span className="font-semibold">Nota de corte: </span>
+        {metrica.threshold}
+      </p>
 
       <p>
         <span className="font-semibold">Critérios: </span>
         <br />
-        {metrica.criterio}
+        {metrica.criteria}
       </p>
 
       <p>
         <span className="font-semibold">Passos: </span>
         <br />
-        {metrica.passosAvaliacao}
+        {metrica.evaluation_steps}
       </p>
 
       <div className="flex justify-between items-center mt-3">

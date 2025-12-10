@@ -27,7 +27,7 @@ export default function FormularioTeste({
     resolver: zodResolver(TesteSchema),
     defaultValues: initialData || {
       name: "",
-      descricao: "",
+      description: "",
     },
   });
 
@@ -56,12 +56,12 @@ export default function FormularioTeste({
       <div className="flex flex-col gap-2">
         <Label>Descrição</Label>
         <textarea
-          {...register("descricao")}
+          {...register("description")}
           className="border rounded p-2 text-sm"
         />
-        {errors.descricao && (
+        {errors.description && (
           <span className="text-red-500 text-sm italic">
-            {errors.descricao.message}
+            {errors.description.message}
           </span>
         )}
       </div>

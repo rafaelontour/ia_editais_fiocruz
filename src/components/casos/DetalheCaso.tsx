@@ -18,9 +18,22 @@ import { useRouter } from "next/navigation";
 interface DetalheCasoProps {
   caso: Caso;
   onVoltar: () => void;
+  getNomeTeste: (id: string) => string;
+  getNomeRamo: (id: string) => string;
+  getNomeEdital: (id: string) => string;
+  getNomeTaxonomiaPorBranchId: (id: string) => string;
+  getNomeTipificacaoPorBranchId: (id: string) => string;
 }
 
-export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
+export default function DetalheCaso({
+  caso,
+  onVoltar,
+  getNomeTeste,
+  getNomeRamo,
+  getNomeEdital,
+  getNomeTaxonomiaPorBranchId,
+  getNomeTipificacaoPorBranchId,
+}: DetalheCasoProps) {
   const router = useRouter();
   return (
     <div
@@ -42,44 +55,49 @@ export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Linha 1 */}
         <div className="lg:col-span-4">
-          <ReadOnlyBox label="Teste associado" value={caso.teste} />
+          <ReadOnlyBox
+            label="Teste associado"
+            value={getNomeTeste(caso.test_collection_id)}
+          />
         </div>
 
         <div className="lg:col-span-4">
-          <ReadOnlyBox label="Taxonomia associada" value={caso.taxonomia} />
+          <ReadOnlyBox
+            label="Taxonomia associada"
+            value={getNomeTaxonomiaPorBranchId(caso.branch_id)}
+          />
         </div>
 
-        {/* upload ocupa linha 1 e linha 2 */}
-        <div className="lg:col-span-4 lg:row-span-2">
-          <Label>Upload do edital *</Label>
-          <div className="mt-2 h-full ">
-            <FileUpload />
-          </div>
+        <div className="lg:col-span-4">
+          <Label>Modelo de ia *</Label>
+
+          <Select value="">
+            <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem className="cursor-pointer" value="teste">
+                Teste
+              </SelectItem>
+              <SelectItem className="cursor-pointer" value="teste2">
+                Teste2
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Linha 2 */}
         <div className="lg:col-span-4">
-          <ReadOnlyBox label="Tipificação associada" value={caso.tipificacao} />
-        </div>
-
-        <div className="lg:col-span-4">
-          <ReadOnlyBox label="Ramo associado" value={caso.ramo} />
-        </div>
-
-        {/* Linha 3 */}
-        <div className="lg:col-span-4 lg:row-span-2">
           <ReadOnlyBox
-            label="Feedback esperado"
-            value={caso.feedbackEsperado}
-            minHeight="128px"
+            label="Tipificação associada"
+            value={getNomeTipificacaoPorBranchId(caso.branch_id)}
           />
         </div>
 
-        <div className="lg:col-span-4 lg:row-span-2">
+        <div className="lg:col-span-4">
           <ReadOnlyBox
-            label="Texto de entrada"
-            value={caso.textoEntrada}
-            minHeight="128px"
+            label="Ramo associado"
+            value={getNomeRamo(caso.branch_id)}
           />
         </div>
 
@@ -87,22 +105,47 @@ export default function DetalheCaso({ caso, onVoltar }: DetalheCasoProps) {
           <Label>Selecionar métricas *</Label>
 
           <Select value="">
-            <SelectTrigger className="w-full mt-2 hover:cursor-pointer">
+            <SelectTrigger className="w-full mt-2 hover:cursor-pointer py-5">
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="t1">Teste</SelectItem>
-              <SelectItem value="t2">Teste2</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
+        {/* Linha 3 */}
+        <div className="lg:col-span-4 lg:row-span-2">
+          <ReadOnlyBox
+            label="Feedback esperado"
+            value={caso.expected_feedback}
+            minHeight="128px"
+          />
+        </div>
+
+        <div className="lg:col-span-4 lg:row-span-2">
+          <ReadOnlyBox
+            label="Texto de entrada"
+            value={caso.input}
+            minHeight="128px"
+          />
+        </div>
+
         {/* Linha 4 */}
+
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Conformidade"
-            value={caso.conformidade}
+            value={caso.expected_fulfilled ? "Sim" : "Não"}
             icon={Circle}
+          />
+        </div>
+
+        {/* upload ocupa linha 1 e linha 2 */}
+        <div className="lg:col-span-4">
+          <ReadOnlyBox
+            label="Edital associado"
+            value={getNomeEdital(caso.doc_id)}
           />
         </div>
       </div>

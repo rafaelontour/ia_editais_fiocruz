@@ -9,6 +9,9 @@ interface ListaCasoProps {
   onOpen: (caso: Caso) => void;
   onEditar: (caso: Caso) => void;
   onExcluir: (id: string) => void;
+  getNomeTeste: (id: string) => string;
+  getNomeRamo: (id: string) => string;
+  getNomeEdital: (id: string) => string;
 }
 
 export default function ListaCaso({
@@ -16,6 +19,9 @@ export default function ListaCaso({
   onOpen,
   onEditar,
   onExcluir,
+  getNomeTeste,
+  getNomeRamo,
+  getNomeEdital,
 }: ListaCasoProps) {
   const breakpointColumns = {
     default: 3,
@@ -36,6 +42,9 @@ export default function ListaCaso({
           onOpen={() => onOpen(caso)}
           onEditar={() => onEditar(caso)}
           onExcluir={() => onExcluir(caso.id)}
+          getNomeTeste={getNomeTeste}
+          getNomeRamo={getNomeRamo}
+          getNomeEdital={getNomeEdital}
         />
       ))}
     </Masonry>

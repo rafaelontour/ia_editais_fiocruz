@@ -15,6 +15,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Teste } from "@/core/teste";
+import {
+  adicionarTesteService,
+  atualizarTesteService,
+  excluirTesteService,
+  getTestesService,
+} from "@/service/teste";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
@@ -26,9 +32,17 @@ export default function testes() {
   const [pesquisa, setPesquisa] = useState("");
   const termoBusca = useRef<string>("");
   const [testeFiltrado, setTesteFiltrado] = useState<Teste[]>([]);
+  const [testes, setTestes] = useState<Teste[]>([]);
 
   useEffect(() => {
-    setTesteFiltrado(mockTestes);
+    async function carregar() {
+      const resultado = await getTestesService();
+      if (resultado) {
+        setTestes(resultado);
+        setTesteFiltrado(resultado);
+      }
+    }
+    carregar();
   }, []);
 
   const breakpointColumns = {
@@ -38,65 +52,52 @@ export default function testes() {
     500: 1,
   };
 
-  const [mockTestes, setMockTestes] = useState<Teste[]>([
-    {
-      id: "1",
-      name: "Teste de Exemplo 1",
-      descricao: "Descrição do Teste de Exemplo 1",
-      created_at: "12/11/2023, 12:23:20",
-    },
-    {
-      id: "2",
-      name: "Teste de Exemplo 2",
-      descricao: "Descrição do Teste de Exemplo 2",
-      created_at: "12/11/2023, 12:23:20",
-    },
-  ]);
-
   function filtrarTeste() {
     if (termoBusca.current.trim() === "") {
-      setTesteFiltrado(mockTestes);
+      setTesteFiltrado(testes);
       return;
     }
 
-    const cc = mockTestes.filter(
-      (c) =>
-        c.name &&
-        c.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+    const filtrados = testes.filter(
+      (t) =>
+        t.name &&
+        t.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
     );
 
-    setTesteFiltrado(cc);
+    setTesteFiltrado(filtrados);
   }
 
-  function adicionarTeste(data: { name: string; descricao: string }) {
-    let id = crypto.randomUUID();
-    const novoTeste = {
-      id: id,
-      name: data.name,
-      descricao: data.descricao,
-      created_at: new Date().toLocaleString(),
-    };
-    setMockTestes([...mockTestes, novoTeste]);
-    setTesteFiltrado([...mockTestes, novoTeste]);
+  async function excluirTeste(id: string) {
+    const sucesso = await excluirTesteService(id);
+    if (!sucesso) {
+      console.error("Erro ao excluir teste");
+      return;
+    }
+
+    const filtrados = testes.filter((t) => t.id !== id);
+
+    setTestes(filtrados);
+    setTesteFiltrado(filtrados);
   }
 
-  function excluirTeste(id: string) {
-    setMockTestes(testeFiltrado.filter((t) => t.id !== id));
-    setTesteFiltrado(testeFiltrado.filter((t) => t.id !== id));
-  }
+  async function salvarEdicao(data: { name: string; description: string }) {
+    const sucesso = await atualizarTesteService(editandoForm.id, data);
+    if (!sucesso) {
+      console.error("Erro ao atualizar teste");
+      return;
+    }
 
-  function salvarEdicao(data: { name: string; descricao: string }) {
-    setMockTestes(
+    setTestes(
       testeFiltrado.map((t) =>
         t.id === editandoForm.id
-          ? { ...t, name: data.name, descricao: data.descricao }
+          ? { ...t, name: data.name, description: data.description }
           : t
       )
     );
     setTesteFiltrado(
       testeFiltrado.map((t) =>
         t.id === editandoForm.id
-          ? { ...t, name: data.name, descricao: data.descricao }
+          ? { ...t, name: data.name, description: data.description }
           : t
       )
     );
@@ -137,8 +138,16 @@ export default function testes() {
 
             <FormularioTeste
               mode="create"
-              onSubmit={(data) => {
-                adicionarTeste(data);
+              onSubmit={async (data) => {
+                const novoTeste = await adicionarTesteService({
+                  name: data.name,
+                  description: data.description,
+                });
+
+                if (novoTeste) {
+                  setTestes((prev) => [...prev, novoTeste]);
+                  setTesteFiltrado((prev) => [...prev, novoTeste]);
+                }
                 setOpenDialogTestes(false);
               }}
             />
@@ -185,7 +194,7 @@ export default function testes() {
             className="flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
           >
             <h2 className="text-2xl font-semibold">{mockTeste.name}</h2>
-            <p>{mockTeste.descricao}</p>
+            <p>{mockTeste.description}</p>
 
             <div className="flex justify-between items-center mt-3">
               <Calendario data={mockTeste.created_at} />

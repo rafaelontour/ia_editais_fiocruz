@@ -3,13 +3,6 @@ import { Button } from "../ui/button";
 import { DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MetricaFormData, MetricaSchema } from "@/core/schemas/metrica.schema";
@@ -19,9 +12,9 @@ interface FormularioMetricaProps {
     id: string;
     name: string;
     modelo: string;
-    notaCorte: number;
-    criterio: string;
-    passosAvaliacao: string;
+    threshold: number;
+    criteria: string;
+    evaluation_steps: string;
   };
   onSubmit: (data: any) => void;
   mode?: "create" | "edit";
@@ -32,10 +25,9 @@ function toFormData(
 ): MetricaFormData {
   return {
     name: data?.name ?? "",
-    modelo: data?.modelo ?? "",
-    notaCorte: Number(data?.notaCorte ?? 0),
-    criterio: data?.criterio ?? "",
-    passosAvaliacao: data?.passosAvaliacao ?? "",
+    threshold: Number(data?.threshold ?? 0),
+    criteria: data?.criteria ?? "",
+    evaluation_steps: data?.evaluation_steps ?? "",
   };
 }
 
@@ -65,7 +57,7 @@ export default function FormularioMetrica({
     <form
       onSubmit={handleSubmit((data) => {
         console.log("Data final:", data);
-        console.log("Tipo de notaCorte final:", typeof data.notaCorte);
+        console.log("Tipo de threshold final:", typeof data.threshold);
 
         onSubmit(data);
       })}
@@ -82,7 +74,7 @@ export default function FormularioMetrica({
       </div>
 
       <div className="flex justify-between gap-2">
-        <div className="flex flex-col gap-2 w-1/2">
+        {/* <div className="flex flex-col gap-2 w-1/2">
           <Label>Modelo de ia</Label>
           <Controller
             name="modelo"
@@ -108,17 +100,18 @@ export default function FormularioMetrica({
               {errors.modelo.message}
             </span>
           )}
-        </div>
+        </div> */}
 
-        <div className="flex flex-col gap-2 w-1/2">
+        <div className="flex flex-col gap-2 w-full">
           <Label>Nota de corte</Label>
           <Input
             type="number"
-            {...register("notaCorte", { valueAsNumber: true })}
+            step="0.1"
+            {...register("threshold", { valueAsNumber: true })}
           />
-          {errors.notaCorte && (
+          {errors.threshold && (
             <span className="text-red-500 text-sm italic">
-              {errors.notaCorte.message}
+              {errors.threshold.message}
             </span>
           )}
         </div>
@@ -128,12 +121,12 @@ export default function FormularioMetrica({
         <Label>Critério da métrica</Label>
         <textarea
           className="border rounded p-2 text-sm"
-          {...register("criterio")}
+          {...register("criteria")}
           rows={2.5}
         />
-        {errors.criterio && (
+        {errors.criteria && (
           <span className="text-red-500 text-sm italic">
-            {errors.criterio.message}
+            {errors.criteria.message}
           </span>
         )}
       </div>
@@ -142,12 +135,12 @@ export default function FormularioMetrica({
         <Label>Passos de avaliação da métrica</Label>
         <textarea
           className="border rounded p-2 text-sm"
-          {...register("passosAvaliacao")}
+          {...register("evaluation_steps")}
           rows={2.5}
         />
-        {errors.passosAvaliacao && (
+        {errors.evaluation_steps && (
           <span className="text-red-500 text-sm italic">
-            {errors.passosAvaliacao.message}
+            {errors.evaluation_steps.message}
           </span>
         )}
       </div>

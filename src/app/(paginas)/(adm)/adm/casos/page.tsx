@@ -12,13 +12,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Ramo, Taxonomia, Tipificacao } from "@/core";
+import { Edital, Tipificacao } from "@/core";
 import { Caso } from "@/core/caso";
-import { buscarRamosDaTaxonomiaService, getRamosService } from "@/service/ramo";
-
-import { getTaxonomiasService } from "@/service/taxonomia";
+import { Teste } from "@/core/teste";
+import useUsuario from "@/data/hooks/useUsuario";
+import {
+  adicionarCasoService,
+  atualizarCasoService,
+  buscarCasoService,
+  excluirCasoService,
+} from "@/service/caso";
+import { getEditaisService } from "@/service/edital";
+import { getTestesService } from "@/service/teste";
 import { getTipificacoesService } from "@/service/tipificacao";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 export default function casos() {
   const [openDialogAdd, setOpenDialogAdd] = useState(false);
@@ -32,6 +40,29 @@ export default function casos() {
   // Tipificações
   const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
   const [carregandoTip, setCarregandoTip] = useState(true);
+
+  // Testes
+  const [testes, setTestes] = useState<Teste[]>([]);
+  const [carregandoTeste, setCarregandoTeste] = useState(true);
+
+  // Editais
+  const [editais, setEditais] = useState<Edital[]>([]);
+  const [carregandoEdital, setCarregandoEdital] = useState(true);
+
+  // Contexto para pegar idUnidade
+  const { usuario } = useUsuario();
+  const idUnidade = usuario?.unit_id;
+
+  useEffect(() => {
+    async function carregar() {
+      const resultado = await buscarCasoService();
+      if (resultado) {
+        setCasos(resultado);
+        setCasoFiltrado(resultado);
+      }
+    }
+    carregar();
+  }, []);
 
   useEffect(() => {
     async function carregar() {
@@ -47,13 +78,44 @@ export default function casos() {
     carregar();
   }, []);
 
+  useEffect(() => {
+    async function carregar() {
+      try {
+        const resposta = await getTestesService();
+        setTestes(resposta ?? []);
+      } catch (e) {
+        console.error("Erro ao carregar testes", e);
+      } finally {
+        setCarregandoTeste(false);
+      }
+    }
+    carregar();
+  }, []);
+
+  useEffect(() => {
+    async function carregar() {
+      try {
+        const resposta = await getEditaisService(idUnidade);
+        setEditais(resposta ?? []);
+      } catch (e) {
+        console.error("Erro ao carregar editais", e);
+      } finally {
+        setCarregandoEdital(false);
+      }
+    }
+
+    if (idUnidade) {
+      carregar();
+    }
+  }, [idUnidade]);
+
   function filtrarCaso() {
     if (termoBusca.current.trim() === "") {
-      setCasoFiltrado(mockCasos);
+      setCasoFiltrado(casos);
       return;
     }
 
-    const cc = mockCasos.filter(
+    const cc = casos.filter(
       (c) =>
         c.name &&
         c.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
@@ -62,54 +124,32 @@ export default function casos() {
     setCasoFiltrado(cc);
   }
 
-  const [mockCasos, setMockCasos] = useState([
-    {
-      id: "1",
-      name: "Caso de teste de não conformidades para SIFAC",
-      taxonomia:
-        "TAX-Contratação de prestação de serviços de coleta e análise de efluentes",
-      tipificacao: "Tipificação teste",
-      ramo: "Validar que o licitante enviou simultaneamente a proposta e os documentos de habilitação proposta e os documentos de habilitação.",
-      teste: "Teste de Procisão - Edital X",
-      conformidade: "Sim",
-      feedbackEsperado:
-        "O output aborda todos os pontos principais, identificando que o critério de cadastro no SICAF e compatibilidade do ramo de atividade não foi explicitamente mencionado no documento, alinhando-se ao esperado. Além disso, sugere melhorias, indo além do esperado. No entanto, há uma leve diferença de detalhamento em relação ao esperado, pois o output traz recomendações adicionais, mas não há informações faltando sobre a ausência do critério.",
-      textoEntrada:
-        "O output aborda todos os pontos principais, identificando que o critério de cadastro no SICAF e compatibilidade do ramo de atividade não foi explicitamente mencionado no documento, alinhando-se ao esperado. Além disso, sugere melhorias, indo além do esperado. No entanto, há uma leve diferença de detalhamento em relação ao esperado, pois o output traz recomendações adicionais, mas não há informações faltando sobre a ausência do critério.",
-      created_at: "12/11/2023, 12:23:20",
-    },
-    {
-      id: "2",
-      name: "Caso de teste de não conformidades para SIFAC",
-      taxonomia:
-        "TAX-Contratação de prestação de serviços de coleta e análise de efluentes",
-      tipificacao: "Tipificação teste",
-      ramo: "Validar que o licitante enviou simultaneamente a proposta e os documentos de habilitação.",
-      teste: "Teste de Procisão - Edital X",
-      conformidade: "conformidade",
-      feedbackEsperado:
-        "O output aborda todos os pontos principais, identificando que o critério de cadastro no SICAF e compatibilidade do ramo de atividade não foi explicitamente mencionado no documento, alinhando-se ao esperado. Além disso, sugere melhorias, indo além do esperado. No entanto, há uma leve diferença de detalhamento em relação ao esperado, pois o output traz recomendações adicionais, mas não há informações faltando sobre a ausência do critério.",
-      textoEntrada: "texto de entrada",
-      created_at: "12/11/2023, 12:23:20",
-    },
-  ]);
+  const [casos, setCasos] = useState<Caso[]>([]);
 
-  function salvarEdicao(data: {
+  async function salvarEdicao(data: {
     name: string;
-    taxonomia: string;
-    tipificacao: string;
-    ramo: string;
-    teste: string;
-    conformidade: string;
-    feedbackEsperado: string;
-    textoEntrada: string;
+    taxonomy_id: string;
+    typification_id: string;
+    branch_id: string;
+    test_collection_id: string;
+    doc_id: string;
+    expected_fulfilled: string;
+    expected_feedback: string;
+    input: string;
     created_at?: string;
   }) {
-    const novosCasos = mockCasos.map((t) =>
-      t.id === editandoForm.id ? { ...t, ...data } : t
+    const payload = {
+      ...data,
+      expected_fulfilled: data.expected_fulfilled === "true",
+    };
+
+    const sucesso = await atualizarCasoService(editandoForm.id, data);
+
+    const novosCasos = casos.map((t) =>
+      t.id === editandoForm.id ? { ...t, ...payload } : t
     );
 
-    setMockCasos(novosCasos);
+    setCasos(novosCasos);
     setCasoFiltrado(novosCasos);
 
     if (casoSelecionado && casoSelecionado.id === editandoForm.id) {
@@ -123,38 +163,63 @@ export default function casos() {
     }
   }
 
-  function adicionarCaso(data: {
-    name: string;
-    taxonomia: string;
-    tipificacao: string;
-    ramo: string;
-    teste: string;
-    conformidade: string;
-    feedbackEsperado: string;
-    textoEntrada: string;
-    created_at?: string;
-  }) {
-    let id = crypto.randomUUID();
-    const novosCasos = {
-      id: id,
-      name: data.name,
-      taxonomia: data.taxonomia,
-      tipificacao: data.tipificacao,
-      ramo: data.ramo,
-      teste: data.teste,
-      conformidade: data.conformidade,
-      feedbackEsperado: data.feedbackEsperado,
-      textoEntrada: data.textoEntrada,
-      created_at: new Date().toLocaleString(),
-    };
-    setMockCasos([...mockCasos, novosCasos]);
-    setCasoFiltrado([...mockCasos, novosCasos]);
+  async function excluirCaso(id: string) {
+    const sucesso = await excluirCasoService(id);
+
+    if (!sucesso) {
+      toast.error("Erro ao excluir caso");
+      return;
+    }
+
+    toast.success("Caso de teste excluido com sucesso!");
+
+    setCasos(casos.filter((t) => t.id !== id));
+    setCasoFiltrado(casos.filter((t) => t.id !== id));
   }
 
-  function excluirCaso(id: string) {
-    setMockCasos(mockCasos.filter((t) => t.id !== id));
-    setCasoFiltrado(mockCasos.filter((t) => t.id !== id));
+  function getNomeTeste(id: string) {
+    return testes.find((t) => t.id === id)?.name ?? id;
   }
+
+  const ramos = tipificacoes.flatMap((t) =>
+    (t.taxonomies ?? []).flatMap((tx) => tx.branches ?? [])
+  );
+
+  function getNomeRamo(id: string): string {
+    const ram = ramos.find((r) => r.id === id);
+    return ram?.title ?? "";
+  }
+
+  function getNomeEdital(id: string) {
+    return editais.find((e) => e.id === id)?.name ?? id;
+  }
+
+  function getNomeTipificacaoPorBranchId(branchId: string): string {
+    for (const tip of tipificacoes) {
+      for (const tax of tip.taxonomies ?? []) {
+        for (const branch of tax.branches ?? []) {
+          if (branch.id === branchId) {
+            return tip.name ?? "";
+          }
+        }
+      }
+    }
+    return branchId; // fallback
+  }
+
+  function getNomeTaxonomiaPorBranchId(branchId: string): string {
+    for (const tip of tipificacoes) {
+      for (const tax of tip.taxonomies ?? []) {
+        for (const branch of tax.branches ?? []) {
+          if (branch.id === branchId) {
+            return tax.title ?? "";
+          }
+        }
+      }
+    }
+    return branchId; // fallback
+  }
+
   return (
     <>
       <div className="flex flex-col gap-5 ">
@@ -165,7 +230,7 @@ export default function casos() {
             <DialogTrigger asChild>
               <BotaoAdicionar texto="Adicionar caso" />
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="py-6 pl-6 pr-4">
               <DialogHeader>
                 <DialogTitle className="text-3xl font-bold">
                   Adicionar caso de teste
@@ -178,10 +243,37 @@ export default function casos() {
               <FormularioCaso
                 mode="create"
                 tipificacoes={tipificacoes}
+                testes={testes}
+                editais={editais}
                 carregandoTip={carregandoTip}
-                onSubmit={(data) => {
-                  adicionarCaso(data);
-                  setOpenDialogAdd(false);
+                onSubmit={async (data) => {
+                  try {
+                    const novoCaso = await adicionarCasoService({
+                      name: data.name,
+                      taxonomy_id: data.taxonomia,
+                      typification_id: data.tipificacao,
+                      branch_id: data.branch_id,
+                      test_collection_id: data.test_collection_id,
+                      doc_id: data.doc_id,
+                      expected_fulfilled: data.expected_fulfilled,
+                      expected_feedback: data.expected_feedback,
+                      input: data.input,
+                    });
+
+                    if (!novoCaso) {
+                      toast.error("Erro ao adicionar caso teste");
+                      return;
+                    }
+
+                    setCasos((prev) => [...prev, novoCaso]);
+                    setCasoFiltrado((prev) => [...prev, novoCaso]);
+
+                    toast.success("Caso teste adicionado com sucesso!");
+                    setOpenDialogAdd(false);
+                  } catch (e) {
+                    console.error(e);
+                    toast.error("Erro inesperado ao adicionar caso teste");
+                  }
                 }}
               />
             </DialogContent>
@@ -195,13 +287,16 @@ export default function casos() {
 
             {/* Cards dos Casos */}
             <ListaCaso
-              casos={mockCasos.filter((c) => c.name.toLowerCase())}
+              casos={casos.filter((c) => c.name.toLowerCase())}
               onOpen={(c) => setCasoSelecionado(c)}
               onEditar={(c) => {
                 setEditandoForm(c);
                 setOpenDialogEditar(true);
               }}
               onExcluir={(id) => excluirCaso(id)}
+              getNomeTeste={getNomeTeste}
+              getNomeRamo={getNomeRamo}
+              getNomeEdital={getNomeEdital}
             />
           </>
         )}
@@ -211,6 +306,11 @@ export default function casos() {
           <DetalheCaso
             caso={casoSelecionado}
             onVoltar={() => setCasoSelecionado(null)}
+            getNomeTeste={getNomeTeste}
+            getNomeRamo={getNomeRamo}
+            getNomeEdital={getNomeEdital}
+            getNomeTaxonomiaPorBranchId={getNomeTaxonomiaPorBranchId}
+            getNomeTipificacaoPorBranchId={getNomeTipificacaoPorBranchId}
           />
         )}
       </div>
@@ -231,6 +331,8 @@ export default function casos() {
               <FormularioCaso
                 mode="edit"
                 tipificacoes={tipificacoes}
+                testes={testes}
+                editais={editais}
                 carregandoTip={carregandoTip}
                 initialData={editandoForm}
                 onSubmit={(data) => {

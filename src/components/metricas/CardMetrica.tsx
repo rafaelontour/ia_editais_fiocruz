@@ -32,16 +32,16 @@ export default function CardMetrica({
       />
 
       <h2 className="text-2xl font-semibold">{metrica.name}</h2>
-      <div className="flex flex-row gap-3">
+      {/* <div className="flex flex-row gap-3">
         <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2 ">
           Modelo ia: {metrica.modelo}
         </p>
+      </div> */}
 
-        <p className="w-fit py-1 px-2 ">
-          <span className="font-semibold">Nota de corte: </span>
-          {metrica.notaCorte}
-        </p>
-      </div>
+      <p className=" ">
+        <span className="font-semibold">Nota de corte: </span>
+        {metrica.threshold}
+      </p>
 
       <div className="flex justify-between items-center mt-3">
         <Calendario data={metrica.created_at} />
