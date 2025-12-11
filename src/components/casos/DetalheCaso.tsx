@@ -14,6 +14,16 @@ import {
 import { FileUpload } from "../ui/file-upload";
 import Calendario from "../Calendario";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { executarTesteService } from "@/service/executarTeste";
+import { Metrica } from "@/core/metrica";
+import { getMetricasService } from "@/service/metrica";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  ExecucaoFormData,
+  ExecucaoSchema,
+} from "@/core/schemas/execucao.schema";
 
 interface DetalheCasoProps {
   caso: Caso;
@@ -35,8 +45,77 @@ export default function DetalheCaso({
   getNomeTipificacaoPorBranchId,
 }: DetalheCasoProps) {
   const router = useRouter();
+  const [file, setFile] = useState<File | null>(null);
+  const [metricas, setMetricas] = useState<Metrica[]>([]);
+  const [metricId, setMetricId] = useState<string>("");
+  const [modeloIa, setModeloIa] = useState<string>("");
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ExecucaoFormData>({
+    resolver: zodResolver(ExecucaoSchema),
+    defaultValues: {
+      metrica_id: "",
+    },
+  });
+
+  useEffect(() => {
+    async function carregarMetricas() {
+      try {
+        const lista = await getMetricasService();
+        if (lista) {
+          setMetricas(lista);
+          console.log("Metricas carregadas:", lista);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar métricas", error);
+      }
+    }
+    carregarMetricas();
+  }, []);
+
+  const onSubmit = async (data: ExecucaoFormData) => {
+    try {
+      console.log("=== DEBUG INICIO ===");
+
+      console.log("FILE ESTÁ AQUI?", file);
+      console.log("TIPO DO FILE:", file?.type);
+      console.log("TAMANHO DO FILE:", file?.size);
+
+      console.log("MÉTRICA SELECIONADA:", data.metrica_id);
+      console.log("TEST_CASE_ID:", caso.id);
+
+      if (!file) {
+        alert("Por favor, envie o arquivo.");
+        return;
+      }
+
+      const payload = {
+        test_case_id: caso.id,
+        metric_ids: [data.metrica_id],
+      };
+
+      console.log("PAYLOAD OBJETO:", payload);
+      console.log("PAYLOAD JSON:", JSON.stringify(payload));
+
+      console.log("=== DEBUG FIM ===");
+
+      const resultado = await executarTesteService(payload, file);
+
+      console.log("RESULTADO:", resultado);
+      alert("Teste executado com sucesso!");
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao executar o teste");
+    }
+  };
+
   return (
-    <div
+    <form
+      action=""
+      onSubmit={handleSubmit(onSubmit)}
       className="w-full p-6 rounded-md bg-white shadow-md flex flex-col gap-6 max-h-[65vh] overflow-y-auto"
       style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
     >
@@ -50,7 +129,6 @@ export default function DetalheCaso({
         </Button>
         <h2 className="text-2xl font-semibold">{caso.name}</h2>
       </div>
-
       {/* GRID 4×3 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Linha 1 */}
@@ -60,18 +138,15 @@ export default function DetalheCaso({
             value={getNomeTeste(caso.test_collection_id)}
           />
         </div>
-
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Taxonomia associada"
             value={getNomeTaxonomiaPorBranchId(caso.branch_id)}
           />
         </div>
-
         <div className="lg:col-span-4">
           <Label>Modelo de ia *</Label>
-
-          <Select value="">
+          <Select value="" onValueChange={setModeloIa}>
             <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
@@ -85,7 +160,6 @@ export default function DetalheCaso({
             </SelectContent>
           </Select>
         </div>
-
         {/* Linha 2 */}
         <div className="lg:col-span-4">
           <ReadOnlyBox
@@ -93,27 +167,39 @@ export default function DetalheCaso({
             value={getNomeTipificacaoPorBranchId(caso.branch_id)}
           />
         </div>
-
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Ramo associado"
             value={getNomeRamo(caso.branch_id)}
           />
         </div>
-
         <div className="lg:col-span-4">
           <Label>Selecionar métricas *</Label>
+          <Controller
+            name="metrica_id"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full mt-2 hover:cursor-pointer py-5">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
 
-          <Select value="">
-            <SelectTrigger className="w-full mt-2 hover:cursor-pointer py-5">
-              <SelectValue placeholder="Selecione" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="t1">Teste</SelectItem>
-            </SelectContent>
-          </Select>
+                <SelectContent>
+                  {metricas.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.metrica_id && (
+            <span className="text-red-500 text-sm">
+              {errors.metrica_id.message}
+            </span>
+          )}
         </div>
-
         {/* Linha 3 */}
         <div className="lg:col-span-4 lg:row-span-2">
           <ReadOnlyBox
@@ -122,7 +208,6 @@ export default function DetalheCaso({
             minHeight="128px"
           />
         </div>
-
         <div className="lg:col-span-4 lg:row-span-2">
           <ReadOnlyBox
             label="Texto de entrada"
@@ -130,9 +215,7 @@ export default function DetalheCaso({
             minHeight="128px"
           />
         </div>
-
         {/* Linha 4 */}
-
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Conformidade"
@@ -140,8 +223,13 @@ export default function DetalheCaso({
             icon={Circle}
           />
         </div>
-
-        {/* upload ocupa linha 1 e linha 2 */}
+        <div className="lg:col-span-4">
+          <Label>Upload do edital *</Label>
+          <div className="mt-2 h-full ">
+            <FileUpload onChange={(files) => setFile(files[0])} />
+          </div>
+        </div>
+        {/**/}
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Edital associado"
@@ -149,12 +237,14 @@ export default function DetalheCaso({
           />
         </div>
       </div>
-
       {/* Botões fora do grid */}
       <div className="flex justify-between">
         <Calendario />
         <div className="flex justify-end gap-x-2 gap-y-0 ">
-          <button className="rounded-md hover:cursor-pointer px-4 py-2 w-fit h-fit bg-verde text-white">
+          <button
+            className="rounded-md hover:cursor-pointer px-4 py-2 w-fit h-fit bg-verde text-white"
+            type="submit"
+          >
             Executar caso de teste
           </button>
           <button
@@ -165,7 +255,7 @@ export default function DetalheCaso({
           </button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
 

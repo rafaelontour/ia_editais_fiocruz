@@ -34,11 +34,6 @@ export default function DetalheMetrica({
         </Button>
         <h2 className="text-2xl font-semibold">{metrica.name}</h2>
       </div>
-      {/* <div className="flex flex-row ">
-        <p className="bg-zinc-400 text-white rounded-md border-1 border-gray-300 w-fit py-1 px-2 ">
-          Modelo ia: {metrica.modelo}
-        </p>
-      </div> */}
 
       <p>
         <span className="font-semibold">Nota de corte: </span>

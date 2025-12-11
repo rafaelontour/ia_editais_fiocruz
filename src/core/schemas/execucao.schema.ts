@@ -1,0 +1,9 @@
+import z from "zod";
+
+const ExecucaoSchema = z.object({
+  metrica_id: z.string().nonempty("Selecione uma métrica"),
+});
+
+export type ExecucaoFormData = z.infer<typeof ExecucaoSchema>;
+
+export { ExecucaoSchema };
