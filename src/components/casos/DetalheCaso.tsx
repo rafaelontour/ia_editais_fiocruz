@@ -95,6 +95,7 @@ export default function DetalheCaso({
       const payload = {
         test_case_id: caso.id,
         metric_ids: [data.metrica_id],
+        //model_id: modeloIa || "mock-model",
       };
 
       console.log("PAYLOAD OBJETO:", payload);
@@ -132,21 +133,24 @@ export default function DetalheCaso({
       {/* GRID 4×3 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Linha 1 */}
+        {/* Teste */}
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Teste associado"
             value={getNomeTeste(caso.test_collection_id)}
           />
         </div>
+        {/* Taxonomia */}
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Taxonomia associada"
             value={getNomeTaxonomiaPorBranchId(caso.branch_id)}
           />
         </div>
+        {/* Modelo de Ia*/}
         <div className="lg:col-span-4">
           <Label>Modelo de ia *</Label>
-          <Select value="" onValueChange={setModeloIa}>
+          <Select value={modeloIa} onValueChange={setModeloIa}>
             <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
@@ -161,18 +165,21 @@ export default function DetalheCaso({
           </Select>
         </div>
         {/* Linha 2 */}
+        {/* Tipificação */}
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Tipificação associada"
             value={getNomeTipificacaoPorBranchId(caso.branch_id)}
           />
         </div>
+        {/* Ramo */}
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Ramo associado"
             value={getNomeRamo(caso.branch_id)}
           />
         </div>
+        {/* Métricas */}
         <div className="lg:col-span-4">
           <Label>Selecionar métricas *</Label>
           <Controller
@@ -201,39 +208,42 @@ export default function DetalheCaso({
           )}
         </div>
         {/* Linha 3 */}
+        {/* Feedback esperado */}
         <div className="lg:col-span-4 lg:row-span-2">
           <ReadOnlyBox
             label="Feedback esperado"
             value={caso.expected_feedback}
-            minHeight="128px"
+            minHeight="153px"
           />
         </div>
+        {/* Texto de entrada */}
         <div className="lg:col-span-4 lg:row-span-2">
           <ReadOnlyBox
             label="Texto de entrada"
             value={caso.input}
-            minHeight="128px"
+            minHeight="153px"
           />
         </div>
         {/* Linha 4 */}
+        {/* Upload */}
+        <div className="lg:col-span-4 lg:row-span-2 max-h-[153px]">
+          <Label>Upload do edital *</Label>
+          <div className="mt-2 overflow-hidden">
+            <FileUpload onChange={(files) => setFile(files[0])} />
+          </div>
+        </div>
+        {/* Edital */}
+        <div className="lg:col-span-4">
+          <ReadOnlyBox
+            label="Edital associado"
+            value={getNomeEdital(caso.doc_id)}
+          />
+        </div>
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Conformidade"
             value={caso.expected_fulfilled ? "Sim" : "Não"}
             icon={Circle}
-          />
-        </div>
-        <div className="lg:col-span-4">
-          <Label>Upload do edital *</Label>
-          <div className="mt-2 h-full ">
-            <FileUpload onChange={(files) => setFile(files[0])} />
-          </div>
-        </div>
-        {/**/}
-        <div className="lg:col-span-4">
-          <ReadOnlyBox
-            label="Edital associado"
-            value={getNomeEdital(caso.doc_id)}
           />
         </div>
       </div>

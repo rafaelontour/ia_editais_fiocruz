@@ -20,6 +20,7 @@ import {
   getMetricasService,
 } from "@/service/metrica";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 export default function metricas() {
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
@@ -68,9 +69,11 @@ export default function metricas() {
   }) {
     const sucesso = await atualizarMetricaService(editandoForm.id, data);
     if (!sucesso) {
-      console.error("Erro ao atualizar métrica");
+      toast.error("Erro ao atualizar métrica");
       return;
     }
+
+    toast.success("Métrica atualizada com sucesso");
 
     const novasMetricas = metricas.map((t) =>
       t.id === editandoForm.id ? { ...t, ...data } : t
@@ -94,9 +97,11 @@ export default function metricas() {
   async function excluirMetrica(id: string) {
     const sucesso = await excluirMetricaService(id);
     if (!sucesso) {
-      console.error("Erro ao excluir métrica");
+      toast.error("Erro ao excluir métrica");
       return;
     }
+
+    toast.success("Métrica excluída com sucesso");
 
     const filtradas = metricas.filter((t) => t.id !== id);
 
@@ -127,18 +132,26 @@ export default function metricas() {
               <FormularioMetrica
                 mode="create"
                 onSubmit={async (data) => {
-                  const novaMetrica = await adicionarMetricaService({
-                    name: data.name,
-                    threshold: data.threshold,
-                    criteria: data.criteria,
-                    evaluation_steps: data.evaluation_steps,
-                  });
+                  try {
+                    const novaMetrica = await adicionarMetricaService({
+                      name: data.name,
+                      threshold: data.threshold,
+                      criteria: data.criteria,
+                      evaluation_steps: data.evaluation_steps,
+                    });
 
-                  if (novaMetrica) {
+                    if (!novaMetrica) {
+                      toast.error("Erro ao criar métrica");
+                      return;
+                    }
                     setMetricas((prev) => [...prev, novaMetrica]);
                     setMetricaFiltrada((prev) => [...prev, novaMetrica]);
+
+                    toast.success("Métrica criada com sucesso");
+                    setOpenDialogAdd(false);
+                  } catch (error) {
+                    toast.error("Erro inesperado ao criar métrica");
                   }
-                  setOpenDialogAdd(false);
                 }}
               />
             </DialogContent>

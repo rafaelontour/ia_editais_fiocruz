@@ -24,12 +24,12 @@ import {
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
+import { toast } from "sonner";
 
 export default function testes() {
   const [openDialogTestes, setOpenDialogTestes] = useState(false);
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
   const [editandoForm, setEditandoForm] = useState<any>(null);
-  const [pesquisa, setPesquisa] = useState("");
   const termoBusca = useRef<string>("");
   const [testeFiltrado, setTesteFiltrado] = useState<Teste[]>([]);
   const [testes, setTestes] = useState<Teste[]>([]);
@@ -70,9 +70,11 @@ export default function testes() {
   async function excluirTeste(id: string) {
     const sucesso = await excluirTesteService(id);
     if (!sucesso) {
-      console.error("Erro ao excluir teste");
+      toast.error("Erro ao excluir teste");
       return;
     }
+
+    toast.success("Teste excluído com sucesso");
 
     const filtrados = testes.filter((t) => t.id !== id);
 
@@ -83,10 +85,10 @@ export default function testes() {
   async function salvarEdicao(data: { name: string; description: string }) {
     const sucesso = await atualizarTesteService(editandoForm.id, data);
     if (!sucesso) {
-      console.error("Erro ao atualizar teste");
+      toast.error("Erro ao atualizar teste");
       return;
     }
-
+    toast.success("Teste atualizado com sucesso");
     setTestes(
       testeFiltrado.map((t) =>
         t.id === editandoForm.id
@@ -139,16 +141,25 @@ export default function testes() {
             <FormularioTeste
               mode="create"
               onSubmit={async (data) => {
-                const novoTeste = await adicionarTesteService({
-                  name: data.name,
-                  description: data.description,
-                });
+                try {
+                  const novoTeste = await adicionarTesteService({
+                    name: data.name,
+                    description: data.description,
+                  });
 
-                if (novoTeste) {
+                  if (!novoTeste) {
+                    toast.error("Erro ao criar teste");
+                    return;
+                  }
                   setTestes((prev) => [...prev, novoTeste]);
                   setTesteFiltrado((prev) => [...prev, novoTeste]);
+
+                  toast.success("Teste criado com sucesso");
+                  setOpenDialogTestes(false);
+                } catch (error) {
+                  console.error(error);
+                  toast.error("Erro inesperado ao criar teste");
                 }
-                setOpenDialogTestes(false);
               }}
             />
           </DialogContent>

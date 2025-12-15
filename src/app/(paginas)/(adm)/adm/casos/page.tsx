@@ -138,28 +138,39 @@ export default function casos() {
     input: string;
     created_at?: string;
   }) {
-    const payload = {
-      ...data,
-      expected_fulfilled: data.expected_fulfilled === "true",
-    };
+    try {
+      const payload = {
+        ...data,
+        expected_fulfilled: data.expected_fulfilled === "true",
+      };
 
-    const sucesso = await atualizarCasoService(editandoForm.id, data);
+      const sucesso = await atualizarCasoService(editandoForm.id, data);
 
-    const novosCasos = casos.map((t) =>
-      t.id === editandoForm.id ? { ...t, ...payload } : t
-    );
+      if (!sucesso) {
+        toast.error("Erro ao atualizar caso");
+        return;
+      }
 
-    setCasos(novosCasos);
-    setCasoFiltrado(novosCasos);
-
-    if (casoSelecionado && casoSelecionado.id === editandoForm.id) {
-      const metricaAtualizada = novosCasos.find(
-        (m) => m.id === editandoForm.id
+      const novosCasos = casos.map((t) =>
+        t.id === editandoForm.id ? { ...t, ...payload } : t
       );
 
-      if (metricaAtualizada) {
-        setCasoSelecionado(metricaAtualizada);
+      setCasos(novosCasos);
+      setCasoFiltrado(novosCasos);
+
+      if (casoSelecionado && casoSelecionado.id === editandoForm.id) {
+        const metricaAtualizada = novosCasos.find(
+          (m) => m.id === editandoForm.id
+        );
+
+        if (metricaAtualizada) {
+          setCasoSelecionado(metricaAtualizada);
+        }
       }
+      toast.success("Caso atualizado com sucesso");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro inesperado ao atualizar caso");
     }
   }
 
@@ -171,7 +182,7 @@ export default function casos() {
       return;
     }
 
-    toast.success("Caso de teste excluido com sucesso!");
+    toast.success("Caso de teste excluído com sucesso!");
 
     setCasos(casos.filter((t) => t.id !== id));
     setCasoFiltrado(casos.filter((t) => t.id !== id));
