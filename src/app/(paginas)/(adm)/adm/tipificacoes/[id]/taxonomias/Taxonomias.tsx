@@ -44,6 +44,7 @@ import FormularioRamo from "./FormularioRamo";
 import BotaoAdicionar from "@/components/botoes/BotaoAdicionar";
 import BotaoVoltar from "@/components/botoes/BotaoVoltar";
 import useUsuario from "@/data/hooks/useUsuario";
+import { IconDownload } from "@tabler/icons-react";
 
 const schemaTaxonomia = z.object({
     id_tipificacao: z.string().min(1),
@@ -318,6 +319,18 @@ export default function Taxonomias({ id }: { id: string }) {
     const refIdAux = useRef<string | undefined>(undefined);
     const [ordenarRamos, setOrdenarRamos] = useState<boolean>(false);
 
+    function baixarTipificacao() {
+        const url = process.env.NEXT_PUBLIC_URL_BASE;
+
+        if (!url) {
+            toast.error("Endereço do servidor não encontrado para baixar o arquivo!");
+            return    
+        }
+
+        const enderecoDonwload = `${url}/typification/export/pdf?typification_id=${id}`;
+        window.location.href = enderecoDonwload;
+    }
+
     return (
         <div className="flex flex-col flex-1 h-full overflow-hidden">
             <div
@@ -329,17 +342,17 @@ export default function Taxonomias({ id }: { id: string }) {
                 <div className="flex flex-col gap-2 mb-1">
                     <div className="flex items-center gap-4">
                         <BotaoVoltar />
-                        <p className="font-semibold text-4xl">
+                        <div className="font-semibold text-4xl">
 
                             {
                                 usuario?.access_level === "ADMIN" ? (
-                                    <p>Gestão de taxonomia e ramos</p>
+                                    <h3>Gestão de taxonomia e ramos</h3>
                                 ) : (
-                                    <p>Taxonomia e ramos</p>
+                                    <h3>Taxonomia e ramos</h3>
                                 )
                             }
 
-                        </p>
+                        </div>
                     </div>
 
                     <p className="max-w-[500px] truncate py-2 flex items-center gap-2">
@@ -360,60 +373,73 @@ export default function Taxonomias({ id }: { id: string }) {
                     </p>
                 </div>
 
-                {
-                    usuario?.access_level === "ADMIN" && (
-                        <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
-                            <DialogTrigger onClick={() => { setValue("id_tipificacao", id); flagHook.current = true }} asChild>
-                                <Button
-                                    variant={"destructive"}
-                                    className=" flex items-center gap-2 bg-vermelho cursor-pointer hover:shadow-md text-white py-2 px-4 rounded-sm"
-                                    style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
-                                >
-                                    <Plus color="white" size={18} />
-                                    <p className="text-sm">Adicionar taxonomia</p>
-                                </Button>
-                            </DialogTrigger>
+                <div className="flex items-center gap-2">
+                    <Button
+                        onClick={() => baixarTipificacao()}
+                        variant={"destructive"}
+                        style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
+                        className={`
+                            flex rounded-md gap-2 items-center px-4 py-2
+                            transition duration-100
+                            bg-vermelho text-white
+                            hover:cursor-pointer
+                        `}
+                        title="Download de um PDF contendo todas tipificações com suas respectivas taxonomias e ramos"
+                    >
+                        <span>Baixar tipificação</span>
+                        <IconDownload size={18} />
+                    </Button>
 
-                            <DialogContent ref={(e) => { divRefs.current["adicionar_tax"] = e }} onCloseAutoFocus={() => { reset(); setFontesSelecionadas([]); flagHook.current = false; }}>
-                                <DialogHeader>
-                                    <DialogTitle>Adicionar taxonomia</DialogTitle>
-                                    <DialogDescription>
-                                        Preencha os campos abaixo para adicionar uma nova taxonomia
-                                    </DialogDescription>
-                                </DialogHeader>
-
-                                <Formulario
-                                    register={register}
-                                    errors={errors}
-                                    control={control}
-                                    setValue={setValue}
-                                    idTipificacao={id}
-                                    fontes={fontes}
-                                    fontesSelecionadas={fontesSelecionadas}
-                                    setFontesSelecionadas={setFontesSelecionadas}
-                                    tipificacoes={tipificacoes}
-                                    divRefs={divRefs}
-                                />
-
-                                <DialogFooter>
-                                    <DialogClose>
-                                        <BotaoCancelar />
-                                    </DialogClose>
-
-                                    <BotaoSalvar onClick={handleSubmit(adicionarTaxonomia)} />
-                                </DialogFooter>
-
-                            </DialogContent>
-                        </Dialog>
-                    )
-                }
+                    {
+                        usuario?.access_level === "ADMIN" && (
+                            <Dialog open={openTaxonomia} onOpenChange={setOpenTaxonomia}>
+                                <DialogTrigger onClick={() => { setValue("id_tipificacao", id); flagHook.current = true }} asChild>
+                                    <Button
+                                        variant={"destructive"}
+                                        className=" flex items-center gap-2 bg-vermelho cursor-pointer hover:shadow-md text-white py-2 px-4 rounded-sm"
+                                        style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
+                                    >
+                                        <Plus color="white" size={18} />
+                                        <p className="text-sm">Adicionar taxonomia</p>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent ref={(e) => { divRefs.current["adicionar_tax"] = e }} onCloseAutoFocus={() => { reset(); setFontesSelecionadas([]); flagHook.current = false; }}>
+                                    <DialogHeader>
+                                        <DialogTitle>Adicionar taxonomia</DialogTitle>
+                                        <DialogDescription>
+                                            Preencha os campos abaixo para adicionar uma nova taxonomia
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <Formulario
+                                        register={register}
+                                        errors={errors}
+                                        control={control}
+                                        setValue={setValue}
+                                        idTipificacao={id}
+                                        fontes={fontes}
+                                        fontesSelecionadas={fontesSelecionadas}
+                                        setFontesSelecionadas={setFontesSelecionadas}
+                                        tipificacoes={tipificacoes}
+                                        divRefs={divRefs}
+                                    />
+                                    <DialogFooter>
+                                        <DialogClose>
+                                            <BotaoCancelar />
+                                        </DialogClose>
+                                        <BotaoSalvar onClick={handleSubmit(adicionarTaxonomia)} />
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        )
+                    }
+                </div>
 
             </div>
 
             <div className="flex gap-3 max-h-full overflow-y-auto">
                 <div className="flex flex-col w-1/2">
                     <div className="bg-white top-0 items-center gap-5 w-full px-0.5 pt-1 pb-1">
-                        <BarraDePesquisa className="w-[95.5%]" refInput={termoBusca} funcFiltrar={filtrarTaxonomiasPorNome} />
+                        { tax.length !== 0 && <BarraDePesquisa className="w-[95.5%]" refInput={termoBusca} funcFiltrar={filtrarTaxonomiasPorNome} /> }
                     </div>
 
                     {
@@ -720,11 +746,10 @@ export default function Taxonomias({ id }: { id: string }) {
                                 )
                             ) : (
                                 taxFiltradas.length === 0 ? (
-                                    <p className="ml-3 animate-pulse">Nenhuma taxonomia disponível</p>
+                                    <p className="ml-3 animate-pulse">Nenhum ramo disponível. Não há taxonomia cadastrada.</p>
                                 ) : (
                                     <p className="ml-3 animate-pulse">Selecione uma taxonomia.</p>
                                 )
-
                             )}
 
                         </CardContent>

@@ -183,7 +183,12 @@ export default function Fontes() {
                     </div>
                 </div>
 
-                <BarraDePesquisa className='w-full' refInput={termoBusca} funcFiltrar={filtrarFontes} />
+                {
+                    fontes.length !== 0 && (
+                        <BarraDePesquisa className='w-full' refInput={termoBusca} funcFiltrar={filtrarFontes} />
+                    )
+                }
+
             </div>
 
             {
@@ -199,8 +204,8 @@ export default function Fontes() {
                         className={'flex -ml-4 px-1 w-auto relative'}
                     >
                         {
-                            fontesFiltradas.map((fonte, index) => (
-                                <Div>
+                            fontesFiltradas.map((fonte) => (
+                                <Div key={fonte.id}>
                                     <div data-cy="item-fonte" className="flex flex-col gap-2">
                                         <h2 className="text-2xl font-semibold">{fonte.name}</h2>
                                         <p className={`py-1 w-fit wrrap-break-words text-md`}>

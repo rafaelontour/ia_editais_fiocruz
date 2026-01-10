@@ -1,17 +1,13 @@
 'use client'
 
-import Image from "next/image";
-
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import Head from "next/head";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
-import { ProcEditalProvider } from "@/data/context/ProcEdital";
 
 export default function RootLayout({
   children,
@@ -21,7 +17,6 @@ export default function RootLayout({
   const { usuario, barraLateralAberta, mudarEstadoBarraLateral } = useUsuario();
   const pathname = usePathname();
   const { items } = useUsuario();
-
 
   const titulosMap: Record<string, string> = {
     "/adm": "Início",
@@ -33,20 +28,17 @@ export default function RootLayout({
     "/adm/cargos": "Cargos",
   };
 
-  const title = titulosMap[pathname] || "Administrativo";
+  const title = titulosMap[pathname] || "IAEditais";
 
   // Atualiza o título dinamicamente no client (quando navega via Link)
   useEffect(() => {
+    console.log("pathname", pathname);
     document.title = `Administrativo - ${title}`;
-  }, [title]);
+  }, [pathname]);
 
   return (
     usuario && (
       <div className="flex flex-col h-screen overflow-hidden w-full scrollbar-hidden">
-      <Head>
-        <title>Administrativo - {title}</title>
-        <link rel="icon" sizes="32x32" type="image/x-icon" href="/favicon.ico" />
-      </Head>
       
       <Cabecalho />
       <div className="flex flex-1 overflow-y-hidden">

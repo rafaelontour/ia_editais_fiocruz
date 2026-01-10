@@ -47,7 +47,6 @@ export default function Editais() {
     } | null>(null);
 
     useEffect(() => {
-        getEditais();
         setMontado(true);
     }, [])
 
@@ -91,7 +90,9 @@ export default function Editais() {
         try {
             const resposta = await getEditaisService(usuario?.unit_id);
             
-            if (!resposta) toast.error("Erro ao buscar editais!");
+            if (!resposta) {
+                throw new Error();
+            }
 
             const dados = resposta || [];
             
