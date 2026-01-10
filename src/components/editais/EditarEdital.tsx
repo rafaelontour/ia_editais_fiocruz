@@ -200,7 +200,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                             <Select
                                                 value=""
                                                 onValueChange={(value) => {
-                                                    field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
+                                                    field.onChange([...(field.value ?? []), value]); // Adiciona o novo valor ao arrayvalue);
                                                     const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
                                                     if (tipificacaoEncontrada) {
                                                         setTipificacoesSelecionadas((prev) => [...prev, tipificacaoEncontrada]);
@@ -214,7 +214,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                     <SelectGroup>
                                                         <SelectLabel>Tipificações</SelectLabel>
                                                         {
-                                                            tipificacoes.filter(t => !field.value.includes(t.id)).map((tipificacao) => (
+                                                            tipificacoes.filter(t => !field.value?.includes(t.id)).map((tipificacao) => (
                                                                 <SelectItem
                                                                     key={tipificacao.id}
                                                                     value={tipificacao.id}
@@ -282,7 +282,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                 value=""
                                                 defaultValue="Selecione um usuário"
                                                 onValueChange={(value) => {
-                                                    field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
+                                                    field.onChange([...(field.value ?? []), value]); // Adiciona o novo valor ao arrayvalue);
                                                     if (responsaveisEdital.find((u) => u.id === value)) return
                                                     setResponsaveisEdital((anteriores) => [...anteriores, usuariosDaUnidade?.find((u) => u.id === value)!]);
                                                 }}
@@ -294,7 +294,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                     <SelectGroup>
                                                         <SelectLabel>Usuários</SelectLabel>
                                                         {
-                                                            usuariosDaUnidade?.filter(u => !field.value.includes(u.id)).map((u) => (
+                                                            usuariosDaUnidade?.filter(u => field.value?.includes(u.id)).map((u) => (
                                                                 <SelectItem
                                                                     key={u.id}
                                                                     value={u.id}
