@@ -214,21 +214,26 @@ export default function Tipificacoes() {
                         <p className="text-4xl font-bold">Gestão de tipificações</p>
 
                         <div className="flex items-center gap-2">
-                            <Button
-                                onClick={() => baixarTipificacao()}
-                                variant={"destructive"}
-                                style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
-                                className={`
-                                    flex rounded-md gap-2 items-center px-4 py-2
-                                    transition duration-100
-                                    bg-vermelho text-white
-                                    hover:cursor-pointer
-                                `}
-                                title="Download de um PDF contendo todas tipificações com suas respectivas taxonomias e ramos"
-                            >
-                                <span>Baixar todas tipificações</span>
-                                <IconDownload size={18} />
-                            </Button>
+                            {
+                                tipificacoes.length > 0 && (
+                                    <Button
+                                        onClick={() => baixarTipificacao()}
+                                        variant={"destructive"}
+                                        style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
+                                        className={`
+                                            flex rounded-md gap-2 items-center px-4 py-2
+                                            transition duration-100
+                                            bg-vermelho text-white
+                                            hover:cursor-pointer
+                                        `}
+                                        title="Download de um PDF contendo todas tipificações com suas respectivas taxonomias e ramos"
+                                    >
+                                        <span>Baixar todas tipificações</span>
+                                        <IconDownload size={18} />
+                                    </Button>
+                                )
+                            }
+                            
 
                             {usuario?.access_level === "ADMIN" && (
                                 <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
