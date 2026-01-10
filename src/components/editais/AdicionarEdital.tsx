@@ -222,7 +222,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                 <Select
                                                     value=""
                                                     onValueChange={(value) => {
-                                                        field.onChange([...field.value, value]); // Adiciona o novo valor ao arrayvalue);
+                                                        field.onChange([...(field.value ?? []), value]); // Adiciona o novo valor ao arrayvalue);
                                                         const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
 
                                                         if (tipificacaoEncontrada) {
