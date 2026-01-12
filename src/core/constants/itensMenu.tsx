@@ -9,6 +9,7 @@ import {
   ListChecks,
   Play,
   Sheet,
+  Sparkle,
   Type,
   TypeOutline,
   University,
@@ -61,6 +62,11 @@ const itemsAdm = [
     title: "Métricas",
     url: "/adm/metricas",
     icon: Gauge,
+  },
+  {
+    title: "Modelos de IA",
+    url: "/adm/modelos",
+    icon: Sparkle,
   },
   {
     title: "Casos de Testes",

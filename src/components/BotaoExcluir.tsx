@@ -15,10 +15,19 @@ import { Fonte, Ramo, Taxonomia, Tipificacao } from "@/core";
 import { Teste } from "@/core/teste";
 import { Metrica } from "@/core/metrica";
 import { Caso } from "@/core/caso";
+import { Modelo } from "@/core/modelo";
 
 interface BotaoExcluirProps {
   tipo: string;
-  item: Fonte | Tipificacao | Taxonomia | Ramo | Teste | Metrica | Caso;
+  item:
+    | Fonte
+    | Tipificacao
+    | Taxonomia
+    | Ramo
+    | Teste
+    | Metrica
+    | Caso
+    | Modelo;
   funcExcluir: (id: string) => void;
 }
 

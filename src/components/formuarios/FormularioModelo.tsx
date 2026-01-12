@@ -1,37 +1,36 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { DialogFooter } from "@/components/ui/dialog";
-import { useEffect } from "react";
-import { TesteSchema, TesteFormData } from "@/core/schemas/teste.schema";
-import { useForm } from "react-hook-form";
+import { ModeloFormData, ModeloSchema } from "@/core/schemas/modelo.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Label } from "@/components/ui/label";
+import { Input } from "../ui/input";
+import { DialogFooter } from "../ui/dialog";
+import { Button } from "../ui/button";
 
-interface FormularioTesteProps {
-  initialData?: TesteFormData | null;
-  onSubmit: (data: TesteFormData) => void;
+interface FormularioModeloProps {
+  initialData?: ModeloFormData | null;
+  onSubmit: (data: ModeloFormData) => void;
   mode?: "create" | "edit";
 }
 
-export default function FormularioTeste({
+export default function FormularioModelo({
   initialData,
   onSubmit,
   mode = "create",
-}: FormularioTesteProps) {
+}: FormularioModeloProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<TesteFormData>({
-    resolver: zodResolver(TesteSchema),
+  } = useForm<ModeloFormData>({
+    resolver: zodResolver(ModeloSchema),
     defaultValues: initialData || {
       name: "",
-      description: "",
+      code_name: "",
     },
   });
 
-  // Preenche o form quando estiver em modo EDITAR
   useEffect(() => {
     if (initialData) {
       reset(initialData);
@@ -44,7 +43,7 @@ export default function FormularioTeste({
       className="flex flex-col gap-4 text-lg"
     >
       <div className="flex flex-col gap-2">
-        <Label>Nome do Teste</Label>
+        <Label>Nome:</Label>
         <Input {...register("name")} />
         {errors.name && (
           <span className="text-red-500 text-sm italic">
@@ -54,14 +53,11 @@ export default function FormularioTeste({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Descrição</Label>
-        <textarea
-          {...register("description")}
-          className="border rounded p-2 text-sm"
-        />
-        {errors.description && (
+        <Label> Codinome: </Label>
+        <Input {...register("code_name")} />
+        {errors.code_name && (
           <span className="text-red-500 text-sm italic">
-            {errors.description.message}
+            {errors.code_name.message}
           </span>
         )}
       </div>
@@ -74,7 +70,10 @@ export default function FormularioTeste({
         >
           Cancelar
         </Button>
-        <Button type="submit" className="bg-verde text-white">
+        <Button
+          type="submit"
+          className=" bg-verde hover:bg-verde text-white hover:cursor-pointer"
+        >
           {mode === "create" ? "Salvar" : "Atualizar"}
         </Button>
       </DialogFooter>
