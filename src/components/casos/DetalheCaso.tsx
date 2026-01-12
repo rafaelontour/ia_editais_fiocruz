@@ -24,6 +24,7 @@ import {
   ExecucaoFormData,
   ExecucaoSchema,
 } from "@/core/schemas/execucao.schema";
+import { toast } from "sonner";
 
 interface DetalheCasoProps {
   caso: Caso;
@@ -50,6 +51,8 @@ export default function DetalheCaso({
   const [metricId, setMetricId] = useState<string>("");
   const [modeloIa, setModeloIa] = useState<string>("");
 
+  const [executando, setExecutando] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -57,7 +60,7 @@ export default function DetalheCaso({
   } = useForm<ExecucaoFormData>({
     resolver: zodResolver(ExecucaoSchema),
     defaultValues: {
-      metrica_id: "",
+      metrica_id: [],
     },
   });
 
@@ -88,15 +91,24 @@ export default function DetalheCaso({
       console.log("TEST_CASE_ID:", caso.id);
 
       if (!file) {
-        alert("Por favor, envie o arquivo.");
+        toast.error("Por favor, envie o arquivo.");
         return;
       }
 
       const payload = {
         test_case_id: caso.id,
-        metric_ids: [data.metrica_id],
+        metric_ids: data.metrica_id,
         //model_id: modeloIa || "mock-model",
       };
+
+      const tempRun = {
+        id: `temp-${Date.now()}`,
+        test_case_id: caso.id,
+        created_at: new Date().toISOString(),
+        status: "EXECUTANDO",
+      };
+
+      sessionStorage.setItem("execucao_em_andamento", JSON.stringify(tempRun));
 
       console.log("PAYLOAD OBJETO:", payload);
       console.log("PAYLOAD JSON:", JSON.stringify(payload));
@@ -105,11 +117,23 @@ export default function DetalheCaso({
 
       const resultado = await executarTesteService(payload, file);
 
+      sessionStorage.setItem("execucao_finalizada", resultado.test_run_id);
+
+      if (!resultado) {
+        toast.error("Erro ao executar caso de teste");
+        return;
+      }
+
+      const runId = resultado.test_run_id;
+
+      toast.success("Caso de uso executado com sucesso!");
+
       console.log("RESULTADO:", resultado);
-      alert("Teste executado com sucesso!");
     } catch (error) {
       console.error(error);
-      alert("Erro ao executar o teste");
+      toast.error("Erro ao executar caso de teste");
+    } finally {
+      setExecutando(false);
     }
   };
 
@@ -185,21 +209,44 @@ export default function DetalheCaso({
           <Controller
             name="metrica_id"
             control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full mt-2 hover:cursor-pointer py-5">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
+            render={({ field }) => {
+              const selected = field.value ?? [];
 
-                <SelectContent>
-                  {metricas.map((m) => (
-                    <SelectItem key={m.id} value={m.id}>
-                      {m.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+              return (
+                <Select
+                  onValueChange={(value) => {
+                    if (selected.includes(value)) {
+                      field.onChange(selected.filter((v) => v !== value));
+                    } else {
+                      field.onChange([...selected, value]);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full mt-2 hover:cursor-pointer py-5">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {metricas.map((m) => {
+                      const selecionada = selected.includes(m.id);
+
+                      return (
+                        <SelectItem
+                          key={m.id}
+                          value={m.id}
+                          className={
+                            selecionada ? "bg-gray-100 font-semibold" : ""
+                          }
+                        >
+                          {selecionada && "✓ "}
+                          {m.name}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              );
+            }}
           />
           {errors.metrica_id && (
             <span className="text-red-500 text-sm">
@@ -217,13 +264,13 @@ export default function DetalheCaso({
           />
         </div>
         {/* Texto de entrada */}
-        <div className="lg:col-span-4 lg:row-span-2">
+        {/* <div className="lg:col-span-4 lg:row-span-2">
           <ReadOnlyBox
             label="Texto de entrada"
             value={caso.input}
             minHeight="153px"
           />
-        </div>
+        </div> */}
         {/* Linha 4 */}
         {/* Upload */}
         <div className="lg:col-span-4 lg:row-span-2 max-h-[153px]">
@@ -233,12 +280,12 @@ export default function DetalheCaso({
           </div>
         </div>
         {/* Edital */}
-        <div className="lg:col-span-4">
+        {/* <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Edital associado"
             value={getNomeEdital(caso.doc_id)}
           />
-        </div>
+        </div> */}
         <div className="lg:col-span-4">
           <ReadOnlyBox
             label="Conformidade"
@@ -254,6 +301,7 @@ export default function DetalheCaso({
           <button
             className="rounded-md hover:cursor-pointer px-4 py-2 w-fit h-fit bg-verde text-white"
             type="submit"
+            onClick={() => router.push("/adm/execucoes")}
           >
             Executar caso de teste
           </button>

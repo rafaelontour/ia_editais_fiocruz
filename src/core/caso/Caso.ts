@@ -8,7 +8,7 @@ export interface Caso {
   doc_id: string;
   expected_fulfilled: boolean;
   expected_feedback: string;
-  input: string;
+
   created_at?: string;
   updated_at?: string;
 }

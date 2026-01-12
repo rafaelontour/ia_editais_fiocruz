@@ -1,6 +1,6 @@
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE;
 
-export async function executarTesteService(
+async function executarTesteService(
   payload: { test_case_id: string; metric_ids: string[] },
   file: File
 ) {
@@ -32,3 +32,35 @@ export async function executarTesteService(
     return undefined;
   }
 }
+
+async function buscarExecucoesService(params?: {
+  test_case_id?: string;
+  offset?: number;
+  limit?: number;
+}) {
+  try {
+    const query = new URLSearchParams();
+
+    if (params?.test_case_id) {
+      query.append("test_case_id", params.test_case_id);
+    }
+
+    query.append("offset", String(params?.offset ?? 0));
+    query.append("limit", String(params?.limit ?? 100));
+
+    const response = await fetch(`${urlBase}/test-runs/`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro ao buscar execuções de teste");
+    }
+
+    return response.json();
+  } catch (error) {
+    throw new Error("Erro ao buscar execuções de teste");
+  }
+}
+
+export { executarTesteService, buscarExecucoesService };

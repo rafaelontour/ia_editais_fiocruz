@@ -1,3 +1,4 @@
+import { url } from "inspector";
 import {
   Building,
   CircleCheckBig,
@@ -6,6 +7,7 @@ import {
   Home,
   IdCard,
   ListChecks,
+  Play,
   Sheet,
   Type,
   TypeOutline,
@@ -64,6 +66,11 @@ const itemsAdm = [
     title: "Casos de Testes",
     url: "/adm/casos",
     icon: ListChecks,
+  },
+  {
+    title: "Execuções",
+    url: "/adm/execucoes",
+    icon: Play,
   },
   {
     title: "Resultados",

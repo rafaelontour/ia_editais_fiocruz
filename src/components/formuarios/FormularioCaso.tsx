@@ -73,7 +73,6 @@ export default function FormularioCaso({
           : "false"
         : "",
       expected_feedback: initialData?.expected_feedback ?? "",
-      input: initialData?.input ?? "",
     },
   });
 
@@ -309,7 +308,7 @@ export default function FormularioCaso({
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
+      {/* <div className="flex flex-col gap-2">
         <Label>Texto de entrada</Label>
         <textarea
           className="border rounded p-2 text-sm"
@@ -321,7 +320,7 @@ export default function FormularioCaso({
             {errors.input.message}
           </span>
         )}
-      </div>
+      </div> */}
 
       <DialogFooter>
         <Button

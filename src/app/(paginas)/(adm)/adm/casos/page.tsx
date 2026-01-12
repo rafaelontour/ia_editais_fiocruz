@@ -268,7 +268,7 @@ export default function casos() {
                       doc_id: data.doc_id,
                       expected_fulfilled: data.expected_fulfilled,
                       expected_feedback: data.expected_feedback,
-                      input: data.input,
+                      // input: data.input,
                     });
 
                     if (!novoCaso) {

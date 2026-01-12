@@ -19,7 +19,6 @@ const CasoSchema = z.object({
   expected_feedback: z
     .string()
     .min(1, "O feedback esperado do caso é obrigatório"),
-  input: z.string().min(1, "O texto de entrada do caso é obrigatório"),
 });
 
 export type CasoFormData = z.infer<typeof CasoSchema>;

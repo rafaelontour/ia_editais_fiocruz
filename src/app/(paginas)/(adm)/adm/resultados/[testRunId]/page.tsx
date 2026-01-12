@@ -1,21 +1,22 @@
 "use client";
-import BarraDePesquisa from "@/components/BarraDePesquisa";
-import Masonry from "react-masonry-css";
+
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { useParams } from "next/navigation";
+import Masonry from "react-masonry-css";
+import BarraDePesquisa from "@/components/BarraDePesquisa";
 import { buscarResultadosService } from "@/service/resultado";
 import { Resultado } from "@/core/resultado";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { buscarCasoService } from "@/service/caso";
 import { Caso } from "@/core/caso";
 
-export default function resultados() {
+export default function ResultadosPorTestRun() {
+  const params = useParams();
+  const testRunId = params.testRunId as string;
+
+  const [resultados, setResultados] = useState<Resultado[]>([]);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
-  const [resultado, setResultado] = useState<Resultado[]>([]);
-
-  {
-    /* Map o nome dos casos */
-  }
   const [casosMap, setCasosMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -34,21 +35,26 @@ export default function resultados() {
   }, []);
 
   useEffect(() => {
-    async function carregar() {
-      const response = await buscarResultadosService({});
-      return setResultado(response.test_results);
+    async function carregarResultados() {
+      if (!testRunId) return;
+
+      const response = await buscarResultadosService({
+        test_run_id: testRunId,
+      });
+
+      setResultados(response.test_results);
     }
 
-    carregar();
-  }, []);
+    carregarResultados();
+  }, [testRunId]);
 
   const breakpointColumns = {
     default: 1,
   };
 
   return (
-    <div className="flex flex-col gap-5 pd-10">
-      <h2 className="text-4xl font-bold">Gestão dos resultados</h2>
+    <div className="flex flex-col gap-5 p-6">
+      <h2 className="text-4xl font-bold">Resultados do teste</h2>
 
       <BarraDePesquisa />
 
@@ -56,7 +62,7 @@ export default function resultados() {
         breakpointCols={breakpointColumns}
         className="flex gap-5 mb-10 px-1"
       >
-        {resultado.map((result) => (
+        {resultados.map((result) => (
           <div
             key={result.id}
             className="flex flex-col gap-4 rounded-md p-4 w-full transition-all duration-300 mb-3 pb-4"
@@ -128,14 +134,14 @@ export default function resultados() {
                   {result.actual_feedback}
                 </p>
 
-                <h3 className="font-semibold mt-3">Feedback esperado</h3>
-                <p className="text-sm text-gray-700">
-                  {result.expected_feedback}
-                </p>
-
                 <h3 className="font-semibold mt-3">Reason feedback</h3>
                 <p className="text-sm text-gray-700">
                   {result.reason_feedback}
+                </p>
+
+                <h3 className="font-semibold mt-3">Feedback esperado</h3>
+                <p className="text-sm text-gray-700">
+                  {result.expected_feedback}
                 </p>
 
                 <div className="flex flex-row gap-3 mt-5">
