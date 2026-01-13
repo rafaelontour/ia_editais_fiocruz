@@ -7,6 +7,8 @@ import { buscarResultadosService } from "@/service/resultado";
 import { Resultado } from "@/core/resultado";
 import { buscarCasoService } from "@/service/caso";
 import { Caso } from "@/core/caso";
+import { getModeloService } from "@/service/modelo";
+import { Modelo } from "@/core/modelo";
 
 export default function resultados() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
@@ -17,6 +19,7 @@ export default function resultados() {
     /* Map o nome dos casos */
   }
   const [casosMap, setCasosMap] = useState<Record<string, string>>({});
+  const [modelosMap, setModelosMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function carregarCaso() {
@@ -31,6 +34,20 @@ export default function resultados() {
       setCasosMap(map);
     }
     carregarCaso();
+  }, []);
+
+  useEffect(() => {
+    async function carregarModelo() {
+      const modelosResponse = await getModeloService();
+
+      if (!modelosResponse) return;
+      const map: Record<string, string> = {};
+      modelosResponse.forEach((m: Modelo) => {
+        map[m.id] = m.name;
+      });
+      setModelosMap(map);
+    }
+    carregarModelo();
   }, []);
 
   useEffect(() => {
@@ -71,7 +88,7 @@ export default function resultados() {
                 <div className="flex flex-row gap-3">
                   <p>
                     <span className="font-semibold">Modelo ia:</span>{" "}
-                    {result.model_id}
+                    {modelosMap[result.model_id] ?? "Modelo não encontrado"}
                   </p>
                   <p>
                     <span className="font-semibold">Nota de corte:</span>{" "}
@@ -133,7 +150,9 @@ export default function resultados() {
                   {result.expected_feedback}
                 </p>
 
-                <h3 className="font-semibold mt-3">Reason feedback</h3>
+                <h3 className="font-semibold mt-3">
+                  Feedback da IA avaliadora
+                </h3>
                 <p className="text-sm text-gray-700">
                   {result.reason_feedback}
                 </p>

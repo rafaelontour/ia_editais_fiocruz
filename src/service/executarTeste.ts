@@ -1,7 +1,7 @@
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE;
 
 async function executarTesteService(
-  payload: { test_case_id: string; metric_ids: string[] },
+  payload: { test_case_id: string; metric_ids: string[]; model_id: string },
   file: File
 ) {
   try {
@@ -48,16 +48,18 @@ async function buscarExecucoesService(params?: {
     query.append("offset", String(params?.offset ?? 0));
     query.append("limit", String(params?.limit ?? 100));
 
-    const response = await fetch(`${urlBase}/test-runs/`, {
+    const response = await fetch(`${urlBase}/test-runs/?${query.toString()}`, {
       method: "GET",
       credentials: "include",
     });
 
     if (!response.ok) {
+      const erro = await response.text();
+      console.error("Erro GET /test-runs:", erro);
       throw new Error("Erro ao buscar execuções de teste");
     }
-
-    return response.json();
+    const { test_runs } = await response.json();
+    return test_runs;
   } catch (error) {
     throw new Error("Erro ao buscar execuções de teste");
   }

@@ -3,6 +3,7 @@ import BarraDePesquisa from "@/components/BarraDePesquisa";
 import Calendario from "@/components/Calendario";
 import { Caso } from "@/core/caso";
 import { Execucao } from "@/core/execucao";
+import useUsuario from "@/data/hooks/useUsuario";
 import { buscarCasoService } from "@/service/caso";
 import { buscarExecucoesService } from "@/service/executarTeste";
 import { CircleCheckBig } from "lucide-react";
@@ -30,6 +31,8 @@ export default function execucoes() {
   const params = useParams();
   const casoId = params?.casoId as string | undefined;
 
+  const { usuario } = useUsuario();
+
   useEffect(() => {
     async function carregarCaso() {
       const casosResponse = await buscarCasoService();
@@ -46,51 +49,85 @@ export default function execucoes() {
   }, []);
 
   useEffect(() => {
+    if (!usuario?.id) return;
+
+    const ws = new WebSocket(
+      `ws://${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario.id}`
+    );
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.event !== "test_run.update") return;
+
+      const { test_run_id, status, message, progress } = data;
+
+      setExecucoes((prev) =>
+        prev.map((run) =>
+          run.id === test_run_id ? { ...run, status, message, progress } : run
+        )
+      );
+    };
+
+    ws.onerror = (err) => {
+      console.error("Erro WS execuções", err);
+    };
+
+    return () => ws.close();
+  }, [usuario?.id]); // 🔥 ESSENCIAL
+
+  useEffect(() => {
     async function carregar() {
       const response = await buscarExecucoesService({
         test_case_id: casoId,
       });
 
-      let runs = response.test_runs;
+      if (!response) return;
 
-      const temp = sessionStorage.getItem("execucao_em_andamento");
-      if (temp) {
-        const tempRun = JSON.parse(temp);
-        runs = [tempRun, ...runs];
-      }
-
-      setExecucoes(runs);
-
-      //return setExecucoes(response.test_runs);
+      setExecucoes(response);
     }
 
     carregar();
   }, [casoId]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const finalizada = sessionStorage.getItem("execucao_finalizada");
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     const finalizada = sessionStorage.getItem("execucao_finalizada");
 
-      if (finalizada) {
-        sessionStorage.removeItem("execucao_em_andamento");
-        sessionStorage.removeItem("execucao_finalizada");
+  //     if (finalizada) {
+  //       sessionStorage.removeItem("execucao_em_andamento");
+  //       sessionStorage.removeItem("execucao_finalizada");
 
-        // refaz GET → agora vem do backend
-        buscarExecucoesService({ test_case_id: casoId }).then((r) =>
-          setExecucoes(r.test_runs)
-        );
-      }
-    }, 1000);
+  //       // refaz GET → agora vem do backend
+  //       buscarExecucoesService({ test_case_id: casoId }).then((r) =>
+  //         setExecucoes(r.test_runs)
+  //       );
+  //     }
+  //   }, 1000);
 
-    return () => clearInterval(interval);
-  }, [casoId]);
+  //   return () => clearInterval(interval);
+  // }, [casoId]);
 
-  function getStatus(run: any) {
-    if (run.status === "EXECUTANDO") {
-      return { label: "Executando", className: "bg-amber-500" };
+  function getStatus(run: Execucao) {
+    switch (run.status) {
+      case "PENDING":
+        return { label: "Pendente", className: "bg-gray-400" };
+
+      case "PROCESSING":
+        return { label: "Processando", className: "bg-amber-500" };
+
+      case "EVALUATING":
+        return { label: "Avaliando", className: "bg-blue-500" };
+
+      case "COMPLETED":
+        return { label: "Concluído", className: "bg-verde" };
+
+      case "ERROR":
+        return { label: "Erro", className: "bg-red-500" };
+
+      default:
+        return { label: run.status, className: "bg-gray-300" };
     }
-
-    return { label: "Executado", className: "bg-verde" };
   }
 
   return (

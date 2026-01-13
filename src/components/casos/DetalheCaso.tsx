@@ -25,6 +25,8 @@ import {
   ExecucaoSchema,
 } from "@/core/schemas/execucao.schema";
 import { toast } from "sonner";
+import { Modelo } from "@/core/modelo";
+import { getModeloService } from "@/service/modelo";
 
 interface DetalheCasoProps {
   caso: Caso;
@@ -50,6 +52,7 @@ export default function DetalheCaso({
   const [metricas, setMetricas] = useState<Metrica[]>([]);
   const [metricId, setMetricId] = useState<string>("");
   const [modeloIa, setModeloIa] = useState<string>("");
+  const [modelosIa, setModelosIa] = useState<Modelo[]>([]);
 
   const [executando, setExecutando] = useState(false);
 
@@ -63,6 +66,22 @@ export default function DetalheCaso({
       metrica_id: [],
     },
   });
+
+  useEffect(() => {
+    async function carregarModelos() {
+      try {
+        const lista = await getModeloService();
+        if (lista) {
+          setModelosIa(lista);
+          console.log("Modelos de IA carregados:", lista);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar modelos de IA", error);
+      }
+    }
+
+    carregarModelos();
+  }, []);
 
   useEffect(() => {
     async function carregarMetricas() {
@@ -83,13 +102,6 @@ export default function DetalheCaso({
     try {
       console.log("=== DEBUG INICIO ===");
 
-      console.log("FILE ESTÁ AQUI?", file);
-      console.log("TIPO DO FILE:", file?.type);
-      console.log("TAMANHO DO FILE:", file?.size);
-
-      console.log("MÉTRICA SELECIONADA:", data.metrica_id);
-      console.log("TEST_CASE_ID:", caso.id);
-
       if (!file) {
         toast.error("Por favor, envie o arquivo.");
         return;
@@ -98,37 +110,42 @@ export default function DetalheCaso({
       const payload = {
         test_case_id: caso.id,
         metric_ids: data.metrica_id,
-        //model_id: modeloIa || "mock-model",
+        model_id: modeloIa,
       };
 
-      const tempRun = {
-        id: `temp-${Date.now()}`,
-        test_case_id: caso.id,
-        created_at: new Date().toISOString(),
-        status: "EXECUTANDO",
-      };
-
-      sessionStorage.setItem("execucao_em_andamento", JSON.stringify(tempRun));
-
-      console.log("PAYLOAD OBJETO:", payload);
-      console.log("PAYLOAD JSON:", JSON.stringify(payload));
-
-      console.log("=== DEBUG FIM ===");
+      // execução temporária (UX enquanto o backend processa)
+      sessionStorage.setItem(
+        "execucao_em_andamento",
+        JSON.stringify({
+          id: `temp-${Date.now()}`,
+          test_case_id: caso.id,
+          created_at: new Date().toISOString(),
+          status: "PENDING",
+        })
+      );
 
       const resultado = await executarTesteService(payload, file);
-
-      sessionStorage.setItem("execucao_finalizada", resultado.test_run_id);
 
       if (!resultado) {
         toast.error("Erro ao executar caso de teste");
         return;
       }
 
-      const runId = resultado.test_run_id;
+      // agora salva com o ID real retornado pelo backend
+      sessionStorage.setItem(
+        "execucao_em_andamento",
+        JSON.stringify({
+          id: resultado.test_run_id,
+          test_case_id: caso.id,
+          created_at: new Date().toISOString(),
+          status: resultado.status ?? "PENDING",
+        })
+      );
 
-      toast.success("Caso de uso executado com sucesso!");
+      toast.success("Execução iniciada! Você pode acompanhar em Execuções.");
 
-      console.log("RESULTADO:", resultado);
+      // navega normalmente
+      router.push("/adm/execucoes");
     } catch (error) {
       console.error(error);
       toast.error("Erro ao executar caso de teste");
@@ -179,12 +196,15 @@ export default function DetalheCaso({
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem className="cursor-pointer" value="teste">
-                Teste
-              </SelectItem>
-              <SelectItem className="cursor-pointer" value="teste2">
-                Teste2
-              </SelectItem>
+              {modelosIa.map((modelo) => (
+                <SelectItem
+                  key={modelo.id}
+                  value={modelo.id}
+                  className="cursor-pointer"
+                >
+                  {modelo.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -301,7 +321,7 @@ export default function DetalheCaso({
           <button
             className="rounded-md hover:cursor-pointer px-4 py-2 w-fit h-fit bg-verde text-white"
             type="submit"
-            onClick={() => router.push("/adm/execucoes")}
+            //onClick={() => router.push("/adm/execucoes")}
           >
             Executar caso de teste
           </button>
