@@ -24,10 +24,10 @@ interface FormularioCasoProps {
     tipificacao: string;
     branch_id: string;
     test_collection_id: string;
-    doc_id: string;
+    // doc_id: string;
     expected_fulfilled: boolean;
     expected_feedback: string;
-    input: string;
+    // input: string;
     created_at?: string;
   };
   onSubmit: (data: any) => void;
@@ -66,7 +66,7 @@ export default function FormularioCaso({
       typification_id: initialData?.tipificacao ?? "",
       branch_id: initialData?.branch_id ?? "",
       test_collection_id: initialData?.test_collection_id ?? "",
-      doc_id: initialData?.doc_id ?? "",
+      // doc_id: initialData?.doc_id ?? "",
       expected_fulfilled: initialData
         ? initialData.expected_fulfilled
           ? "true"
@@ -111,7 +111,7 @@ export default function FormularioCaso({
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
+      {/* <div className="flex flex-col gap-2">
         <Label>Edital associado</Label>
         <Controller
           name="doc_id"
@@ -136,7 +136,7 @@ export default function FormularioCaso({
             {errors.doc_id.message}
           </span>
         )}
-      </div>
+      </div> */}
 
       <div className="flex flex-col gap-2">
         <Label>Tipificação associada</Label>

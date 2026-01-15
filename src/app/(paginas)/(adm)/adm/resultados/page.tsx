@@ -103,6 +103,13 @@ export default function resultados() {
                     <span className="font-semibold">Passou Conformidade:</span>{" "}
                     {result.passed_fulfilled ? "Sim" : "Não"}
                   </p>
+
+                  <p>
+                    <span>
+                      Teste Input
+                      {result.input}
+                    </span>
+                  </p>
                 </div>
               </div>
 

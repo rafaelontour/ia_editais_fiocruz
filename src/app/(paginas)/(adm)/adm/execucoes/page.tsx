@@ -10,6 +10,7 @@ import { CircleCheckBig } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Masonry from "react-masonry-css";
+import { toast } from "sonner";
 
 export default function execucoes() {
   const breakpointColumns = {
@@ -25,6 +26,10 @@ export default function execucoes() {
     /* Map o nome dos casos */
   }
   const [casosMap, setCasosMap] = useState<Record<string, string>>({});
+
+  const [toastStatusMap, setToastStatusMap] = useState<Record<string, string>>(
+    {}
+  );
 
   const router = useRouter();
 
@@ -55,12 +60,33 @@ export default function execucoes() {
       `ws://${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario.id}`
     );
 
+    ws.onopen = () => {
+      console.log("🟢 WebSocket conectado com sucesso");
+    };
+
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
       if (data.event !== "test_run.update") return;
 
       const { test_run_id, status, message, progress } = data;
+
+      setToastStatusMap((prev) => {
+        if (prev[test_run_id] === status) return prev;
+
+        if (status === "COMPLETED") {
+          toast.success("Execução finalizada com sucesso!");
+        }
+
+        if (status === "ERROR") {
+          toast.error(message ?? "Erro na execução do teste");
+        }
+
+        return {
+          ...prev,
+          [test_run_id]: status,
+        };
+      });
 
       setExecucoes((prev) =>
         prev.map((run) =>
@@ -90,6 +116,8 @@ export default function execucoes() {
     carregar();
   }, [casoId]);
 
+  // Polling usando antes de ter o ws
+
   // useEffect(() => {
   //   const interval = setInterval(() => {
   //     const finalizada = sessionStorage.getItem("execucao_finalizada");
@@ -107,6 +135,30 @@ export default function execucoes() {
 
   //   return () => clearInterval(interval);
   // }, [casoId]);
+
+  // Misto polling e ws (quando o ws não funcionar usa o polling normalmente ws vai servir pra prod e polling pra dev mas ainda tenho que fazer alguns testes)
+
+  useEffect(() => {
+    if (
+      !execucoes.some(
+        (e) =>
+          e.status === "PENDING" ||
+          e.status === "PROCESSING" ||
+          e.status === "EVALUATING"
+      )
+    ) {
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      const response = await buscarExecucoesService({ test_case_id: casoId });
+      if (!response) return;
+
+      setExecucoes(response);
+    }, 3000); // a cada 3s
+
+    return () => clearInterval(interval);
+  }, [execucoes, casoId]);
 
   function getStatus(run: Execucao) {
     switch (run.status) {

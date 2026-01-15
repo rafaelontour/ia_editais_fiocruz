@@ -132,10 +132,10 @@ export default function casos() {
     typification_id: string;
     branch_id: string;
     test_collection_id: string;
-    doc_id: string;
+    //doc_id: string;
     expected_fulfilled: string;
     expected_feedback: string;
-    input: string;
+    //input: string;
     created_at?: string;
   }) {
     try {
@@ -265,7 +265,7 @@ export default function casos() {
                       typification_id: data.tipificacao,
                       branch_id: data.branch_id,
                       test_collection_id: data.test_collection_id,
-                      doc_id: data.doc_id,
+                      // doc_id: data.doc_id,
                       expected_fulfilled: data.expected_fulfilled,
                       expected_feedback: data.expected_feedback,
                       // input: data.input,

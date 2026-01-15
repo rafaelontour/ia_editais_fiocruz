@@ -5,7 +5,7 @@ export interface Caso {
   typification_id: string;
   branch_id: string;
   test_collection_id: string;
-  doc_id: string;
+  //doc_id: string;
   expected_fulfilled: boolean;
   expected_feedback: string;
 

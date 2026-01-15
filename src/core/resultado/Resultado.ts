@@ -4,6 +4,7 @@ export interface Resultado {
   test_case_id: string;
   metric_id: string;
   model_id: string;
+  input: string;
   threshold_used: number;
   reason_feedback: string;
   score_feedback: number;
