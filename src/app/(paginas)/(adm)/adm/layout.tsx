@@ -120,7 +120,7 @@ export default function RootLayout({
                     {
                       usuario && (
                         usuario.icon ? (
-                          <img src={usuario.icon} className="w-8 h-8 rounded-full" />
+                          <img src={usuario.icon.filepath} className="w-8 h-8 rounded-full" />
                         ) : (
                           <UserIcon size={20} />
                         )

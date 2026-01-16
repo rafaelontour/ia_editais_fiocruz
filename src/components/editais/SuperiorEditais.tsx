@@ -1,11 +1,12 @@
 "use client"
 
-import { ChevronRightIcon } from "lucide-react";
+import { Archive, ChevronRightIcon } from "lucide-react";
 import CategoriaColor from "./CategoriaColor";
 import { Button } from "../ui/button";
 import AdicionarEdital from "./AdicionarEdital";
 import { Dispatch, SetStateAction } from "react";
 import useUsuario from "@/data/hooks/useUsuario";
+import Link from "next/link";
 
 interface Props {
     funcaoAtualizarEditais: Dispatch<SetStateAction<boolean>>
@@ -27,7 +28,22 @@ export default function SuperiorEditais ({ funcaoAtualizarEditais, flagEdital } 
 
                 {
                     (usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (
-                    <div className="w-full">
+                    <div className="w-full flex items-center gap-2">
+                        <Link href="/adm/editais/arquivados">
+                            <Button
+                                variant={"destructive"}
+                                className="
+                                    bg-vermelho text-white
+                                    hover:cursor-pointer px-4
+                                    flex items-center gap-2
+                                "
+                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                            >
+                                <Archive size={18} />
+                                <p>Editais arquivados</p>
+                            </Button>
+                        </Link>
+
                         <AdicionarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} />
                     </div>
                     )
