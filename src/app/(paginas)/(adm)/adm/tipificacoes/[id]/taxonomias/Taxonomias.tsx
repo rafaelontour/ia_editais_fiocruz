@@ -348,7 +348,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                 usuario?.access_level === "ADMIN" ? (
                                     <h3>Gestão de taxonomia e ramos</h3>
                                 ) : (
-                                    <h3>Taxonomia e ramos</h3>
+                                    <h3>Taxonomias e ramos</h3>
                                 )
                             }
 
@@ -384,7 +384,7 @@ export default function Taxonomias({ id }: { id: string }) {
                             bg-vermelho text-white
                             hover:cursor-pointer
                         `}
-                        title="Download de um PDF contendo todas tipificações com suas respectivas taxonomias e ramos"
+                        title="Download de um PDF desta tipificação com suas respectivas taxonomias e ramos"
                     >
                         <span>Baixar tipificação</span>
                         <IconDownload size={18} />

@@ -104,11 +104,13 @@ export default function RootLayout({
                 </SidebarGroup>
               </SidebarContent>
               <SidebarFooter>
-                <div className="flex w-full items-center gap-4">
-                  <img className="w-fit" src="/logo_ia_editais.png" alt="Logo IAEditais" />
-                  <h1 className="text-lg font-semibold">
-                  </h1>
-                </div>
+                {
+                  <div className="flex w-full items-center gap-4">
+                    <img className="w-fit" src="/logo_ia_editais.png" alt="Logo IAEditais" />
+                    falskdjfkleaf
+                  </div>
+
+                }
               </SidebarFooter>
     
           </Sidebar>

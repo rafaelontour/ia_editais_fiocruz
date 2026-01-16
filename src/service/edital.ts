@@ -1,5 +1,6 @@
 import { Edital } from "@/core";
 import { toast } from "sonner";
+import { ca } from "zod/v4/locales";
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
@@ -32,9 +33,11 @@ async function getEditalPorIdService(id: string | undefined): Promise<Edital | u
             }
         })
 
+        console.log("Data: ", res);
         if (!res.ok) return
 
-        const data = await res.json();
+        const { data } = await res.json();
+
 
         return data;
         
@@ -166,6 +169,43 @@ async function definirStatusConcluido(editalId: string): Promise<number | undefi
     }
 }
 
+async function arquivarEditalService(editalId: string) {
+    try {
+        const resposta = await fetch(`${urlBase}/doc/${editalId}/toggle-archive`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
+
+        return resposta.status
+    } catch (e) {
+        return
+    }
+}
+
+async function getEditaisArquivadosService(idUnidade: string | undefined) {
+    try {
+        const res = await fetch(`${urlBase}/doc?unit_id=${idUnidade}&archived=true`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
+
+        
+        if (res.status !== 200) return
+        
+        const editais = await res.json();
+
+        return editais
+    } catch (e) {
+        return
+    }
+}
+
 export {
     getEditaisService,
     getEditalPorIdService,
@@ -175,5 +215,7 @@ export {
     definirStatusRascunho,
     definirStatusEmConstrucao,
     definirStatusEmAnalise,
-    definirStatusConcluido
+    definirStatusConcluido,
+    arquivarEditalService,
+    getEditaisArquivadosService
 }

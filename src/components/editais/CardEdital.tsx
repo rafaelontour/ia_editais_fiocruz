@@ -6,9 +6,9 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import EditarEdital from "./EditarEdital";
 import { Button } from "../ui/button";
-import { Info, Trash, View } from "lucide-react";
+import { Archive, Info, Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-import { excluirEditalService } from "@/service/edital";
+import { arquivarEditalService, excluirEditalService } from "@/service/edital";
 import { toast } from "sonner";
 import Link from "next/link";
 import { formatarData } from "@/lib/utils";
@@ -16,6 +16,7 @@ import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { IconLoaderQuarter, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
 import useEditalProc from "@/data/hooks/useProcEdital";
+import { useRouter } from "next/navigation";
 
 
 interface Props {
@@ -46,10 +47,10 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
         if (resposta !== 204) {
             toast.error("Erro ao excluir edital!");
+            return
         }
 
         toast.success("Edital excluido com sucesso!");
-        funcaoAtualizarEditais(!flagEdital);
     }
 
     const cor = () => {
@@ -67,6 +68,19 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                 return "bg-green-800";
         }
     };
+
+    async function arquivarEdital(id: string) {
+        const resposta = await arquivarEditalService(id);
+
+        if (resposta !== 200) {
+            toast.error("Erro ao arquivar edital!");
+            return    
+        } 
+
+
+        funcaoAtualizarEditais(!flagEdital);
+        toast.success("Edital arquivado!");
+    }
 
     return (
         <div
@@ -172,7 +186,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                         {
                                             edital.status !== "COMPLETED" && (
                                                 <Link href={`/adm/editais/${edital.id}`}>
-                                                    <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
+                                                    <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5">
                                                         <View />
                                                     </Button>
                                                 </Link>
@@ -181,7 +195,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
                                         {
                                             edital.status === "COMPLETED" &&
-                                            <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-[14px]">
+                                            <Button title="Visualizar edital" variant={"outline"} size={"icon"} className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5">
                                                 <View />
                                             </Button>
                                         }
@@ -195,16 +209,30 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                                         )
                                                     }
 
+                                                    { usuario?.access_level === "ADMIN" && (edital.history && edital.history[0].status === "COMPLETED") && (
+                                                        <Button
+                                                            size={"icon"}
+                                                            title="Arquivar edital "
+                                                            variant={"outline"}
+                                                            onClick={() => arquivarEdital(edital.id)}
+                                                            className="
+                                                                h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5
+                                                            "
+                                                        >
+                                                            <Archive />    
+                                                        </Button>
+                                                    )}
+
                                                     {
-                                                        ((usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (edital.history && (edital.history[0].status === "PENDING" || edital.history[0].status === "UNDER_CONSTRUCTION"))) && (
+                                                        ((usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (edital.history && (edital.history[0].status === "PENDING" || edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "COMPLETED"))) && (
                                                             <Dialog>
                                                                 <DialogTrigger asChild>
                                                                     <Button
                                                                         size={"icon"}
                                                                         className="
-                                                            h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
-                                                            text-white transition-all rounded-sm p-[14px]
-                                                            ">
+                                                                            h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
+                                                                            text-white transition-all rounded-sm p-3.5
+                                                                            ">
                                                                         <Trash />
                                                                     </Button>
                                                                 </DialogTrigger>
@@ -226,6 +254,8 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                                             </Dialog>
                                                         )
                                                     }
+
+                                                    
                                                 </div>
                                             )
                                         }

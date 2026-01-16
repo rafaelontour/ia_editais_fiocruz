@@ -25,7 +25,6 @@ import { formatarData, simularAtraso } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 export default function Editais() {
-    const [montado, setMontado] = useState<boolean>(false);
     const [adicionouNovoEdital, setAdicionouNovoEdital] = useState<boolean>(false);
     const [carregandoEditais, setCarregandoEditais] = useState<boolean>(true);
     const statuses: StatusEdital[] = ["PENDING", "UNDER_CONSTRUCTION", "WAITING_FOR_REVIEW", "COMPLETED"];
@@ -45,10 +44,6 @@ export default function Editais() {
         to: StatusEdital
         overId: string | null
     } | null>(null);
-
-    useEffect(() => {
-        setMontado(true);
-    }, [])
 
     
     async function moverParaRascunho(editalId: string) {
@@ -279,7 +274,6 @@ export default function Editais() {
     };
 
     return (
-        montado &&
         <div className="flex flex-col h-full relative gap-4">
 
             <SuperiorEditais funcaoAtualizarEditais={setAdicionouNovoEdital} flagEdital={adicionouNovoEdital} />

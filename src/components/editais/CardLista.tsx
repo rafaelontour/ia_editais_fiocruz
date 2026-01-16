@@ -49,7 +49,7 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
         </div>
       </div>
 
-      <div className="space-y-3 overflow-y-auto px-[4px] scrollbar-style pb-2">
+      <div className="space-y-3 overflow-y-auto px-1 scrollbar-style pb-2">
           {editais.map((edital) => (
             // PASSA containerId para o cartão (necessário para usar data.containerId no useSortable)
             <CardEdital funcaoAtualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} key={edital.id} edital={edital} containerId={status} />

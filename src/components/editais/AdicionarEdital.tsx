@@ -284,12 +284,12 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                             <div 
                                                 className={`
                                                     grid ${tipificacoesSelecionadas.length === 1 ? "grid-cols-1" : tipificacoesSelecionadas.length === 2 ? "grid-cols-2" : "grid-cols-3" } 
-                                                    gap-3 border-gray-200 rounded-md border-1 p-3
+                                                    gap-3 border-gray-200 rounded-md border p-3
                                                 `}
                                             >
                                                 {
                                                     tipificacoesSelecionadas.filter((t) => tipificacoes.find((tp) => tp.id === t.id)).map((t: Tipificacao) => (
-                                                        <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                        <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
                                                             <div role="button" className="flex h-full" onClick={() => {
                                                                 const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
                                                                 setTipificacoesSelecionadas(novaLista);
@@ -298,7 +298,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                 <div className="flex items-center h-full" title="Remover tipificação">
                                                                     <span
                                                                         className="
-                                                                            bg-red-200 p-[10px] h-full flex items-center justify-center
+                                                                            bg-red-200 p-2.5 h-full flex items-center justify-center
                                                                             hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                                             transition-all duration-200 ease-in-out
                                                                         "
@@ -403,10 +403,10 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                     responsaveisEdital.length > 0 && (
                                         <div className="flex flex-col gap-3 w-full">
                                             <Label htmlFor="tipe" className="text-lg">{responsaveisEdital.length > 1 ? "Responsáveis selecionados" : "Responsável selecionado"}</Label>
-                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border p-3">
                                                 {
                                                     responsaveisEdital.map((usuario: UsuarioUnidade) => (
-                                                        <div key={usuario.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                        <div key={usuario.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
                                                             <div role="button" className="flex h-full" onClick={() => {
                                                                 const novaLista = responsaveisEdital.filter((u) => u.id !== usuario.id)
                                                                 setResponsaveisEdital(novaLista);
@@ -415,7 +415,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                 <div className="flex items-center h-full" title="Remover usuário">
                                                                     <span
                                                                         className="
-                                                                            bg-red-200 p-[10px] h-full flex items-center justify-center
+                                                                            bg-red-200 p-2.5 h-full flex items-center justify-center
                                                                             hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                                             transition-all duration-200 ease-in-out
                                                                         "

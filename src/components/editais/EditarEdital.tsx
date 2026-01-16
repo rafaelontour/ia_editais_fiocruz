@@ -156,7 +156,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
         <div>
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger asChild>
-                    <Button variant={"outline"} size={"icon"} className="h-6 w-6 p-[14px] border-gray-300 rounded-sm hover:cursor-pointer">
+                    <Button variant={"outline"} size={"icon"} className="h-6 w-6 p-3.5 border-gray-300 rounded-sm hover:cursor-pointer">
                         <PencilLine />
                     </Button>
                 </SheetTrigger>
@@ -241,10 +241,10 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                 tipificacoesSelecionadas.length > 0 && (
                                     <div className="flex flex-col gap-3 w-full">
                                         <Label htmlFor="tipe" className="text-lg">Tipificações selecionadas</Label>
-                                        <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                        <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border p-3">
                                             {
                                                 tipificacoesSelecionadas.map((t: Tipificacao) => (
-                                                    <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                    <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
                                                         <button className="h-full" onClick={() => {
                                                             const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
                                                             setTipificacoesSelecionadas(novaLista);
@@ -253,7 +253,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                             <div className="flex items-center h-full" title="Remover tipificação">
                                                                 <span
                                                                     className="
-                                                                            bg-red-200 p-[10px] h-full flex items-center
+                                                                            bg-red-200 p-3.5 h-full flex items-center
                                                                             hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                                             transition-all duration-200 ease-in-out
                                                                         "
@@ -352,10 +352,10 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                     responsaveisEdital.length > 0 && (
                                         <div className="flex flex-col gap-3 w-full">
                                             <Label htmlFor="tipe" className="text-lg">{responsaveisEdital.length > 1 ? "Responsáveis selecionados" : "Responsável selecionado"}</Label>
-                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border-1 p-3">
+                                            <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border p-3">
                                                 {
                                                     responsaveisEdital.map((responsavel: UsuarioUnidade) => (
-                                                        <div key={responsavel?.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                                        <div key={responsavel?.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
                                                             <button onClick={() => {
                                                                 const novaLista = responsaveisEdital.filter((u) => u.id !== responsavel?.id)
                                                                 setResponsaveisEdital(novaLista);
@@ -364,7 +364,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                                 <div className="flex items-center" title="Remover usuário">
                                                                     <span
                                                                         className="
-                                                                            bg-red-200 p-[10px]
+                                                                            bg-red-200 p-2.5
                                                                             hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                                             transition-all duration-200 ease-in-out
                                                                         "
