@@ -91,24 +91,19 @@ export default function resultados() {
                     {modelosMap[result.model_id] ?? "Modelo não encontrado"}
                   </p>
                   <p>
-                    <span className="font-semibold">Nota de corte:</span>{" "}
+                    <span className="font-semibold">Ponto de corte:</span>{" "}
                     {result.threshold_used}
                   </p>
                   <p>
-                    <span className="font-semibold">Score feedback:</span>{" "}
+                    <span className="font-semibold">
+                      Nota da IA avaliadora:
+                    </span>{" "}
                     {Number(result.score_feedback).toFixed(2)}
                   </p>
 
                   <p>
-                    <span className="font-semibold">Passou Conformidade:</span>{" "}
+                    <span className="font-semibold">Passou no teste?</span>{" "}
                     {result.passed_fulfilled ? "Sim" : "Não"}
-                  </p>
-
-                  <p>
-                    <span>
-                      Teste Input
-                      {result.input}
-                    </span>
                   </p>
                 </div>
               </div>
@@ -147,37 +142,58 @@ export default function resultados() {
             {/* Conteudo do botão de expandir */}
             {expandedCard === result.id && (
               <div className="transition-all duration-300 mt-3 p-3 rounded bg-gray-100">
-                <h3 className="font-semibold">Feedback atual</h3>
+                <h3 className="font-semibold">Feedback do IAEditais</h3>
                 <p className="text-sm text-gray-700">
                   {result.actual_feedback}
                 </p>
 
-                <h3 className="font-semibold mt-3">Feedback esperado</h3>
-                <p className="text-sm text-gray-700">
-                  {result.expected_feedback}
-                </p>
+                <div className="flex flex-col gap-1 mt-3">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold">Feedback esperado</h3>
 
-                <h3 className="font-semibold mt-3">
-                  Feedback da IA avaliadora
-                </h3>
-                <p className="text-sm text-gray-700">
-                  {result.reason_feedback}
-                </p>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full font-medium
+                      ${
+                        result.expected_fulfilled
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      resultado esperado:{" "}
+                      {result.expected_fulfilled ? "sim" : "não"}
+                    </span>
+                  </div>
 
-                <div className="flex flex-row gap-3 mt-5">
-                  <p>
-                    <span className="font-semibold mt-3">
-                      Conformidade esperada:
-                    </span>{" "}
-                    {result.expected_fulfilled ? "Sim" : "Não"}
-                  </p>
-                  <p>
-                    <span className="font-semibold mt-3">
-                      Conformidade atual:
-                    </span>{" "}
-                    {result.actual_fulfilled ? "Sim" : "Não"}
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {result.expected_feedback}
                   </p>
                 </div>
+
+                <div className="flex flex-col gap-1 mt-3">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold ">
+                      Feedback da IA avaliadora
+                    </h3>
+
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full font-medium
+                      ${
+                        result.actual_fulfilled
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      resultado da IA: {result.actual_fulfilled ? "sim" : "não"}
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {result.reason_feedback}
+                  </p>
+                </div>
+
+                <h3 className="font-semibold mt-3">Prompt enviado à IA</h3>
+                <p className="text-sm text-gray-700">{result.input}</p>
               </div>
             )}
           </div>

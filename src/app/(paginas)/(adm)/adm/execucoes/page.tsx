@@ -38,6 +38,10 @@ export default function execucoes() {
 
   const { usuario } = useUsuario();
 
+  const [statusAnterior, setStatusAnterior] = useState<Record<string, string>>(
+    {}
+  );
+
   useEffect(() => {
     async function carregarCaso() {
       const casosResponse = await buscarCasoService();
@@ -52,6 +56,38 @@ export default function execucoes() {
     }
     carregarCaso();
   }, []);
+
+  useEffect(() => {
+    if (!execucoes.length) return;
+
+    execucoes.forEach((run) => {
+      const statusAntes = statusAnterior[run.id];
+      const statusAgora = run.status;
+
+      // ainda não tínhamos esse run
+      if (!statusAntes) return;
+
+      // status não mudou
+      if (statusAntes === statusAgora) return;
+
+      // TRANSIÇÕES IMPORTANTES
+      if (statusAntes === "PROCESSING" && statusAgora === "COMPLETED") {
+        toast.success("Execução finalizada com sucesso!");
+      }
+
+      if (statusAntes === "PROCESSING" && statusAgora === "ERROR") {
+        toast.error(run.message ?? "Erro na execução do teste");
+      }
+    });
+
+    // atualiza snapshot
+    const novoMapa: Record<string, string> = {};
+    execucoes.forEach((run) => {
+      novoMapa[run.id] = run.status;
+    });
+
+    setStatusAnterior(novoMapa);
+  }, [execucoes]);
 
   useEffect(() => {
     if (!usuario?.id) return;
@@ -71,22 +107,32 @@ export default function execucoes() {
 
       const { test_run_id, status, message, progress } = data;
 
-      setToastStatusMap((prev) => {
-        if (prev[test_run_id] === status) return prev;
+      // setToastStatusMap((prev) => {
+      //   if (prev[test_run_id] === status) return prev;
 
-        if (status === "COMPLETED") {
-          toast.success("Execução finalizada com sucesso!");
-        }
+      //   if (status === "COMPLETED") {
+      //     toast.success("Execução finalizada com sucesso!");
+      //   }
 
-        if (status === "ERROR") {
-          toast.error(message ?? "Erro na execução do teste");
-        }
+      //   if (status === "ERROR") {
+      //     toast.error(message ?? "Erro na execução do teste");
+      //   }
 
-        return {
-          ...prev,
-          [test_run_id]: status,
-        };
-      });
+      //   return {
+      //     ...prev,
+      //     [test_run_id]: status,
+      //   };
+      // });
+
+      // if (status === "COMPLETED") {
+      //   console.log("🔥 STATUS COMPLETED RECEBIDO");
+      //   toast.success("Execução finalizada com sucesso! TESTANDO TOAST");
+      // }
+
+      // if (status === "ERROR") {
+      //   console.log("🔥 STATUS ERROR RECEBIDO");
+      //   toast.error(message ?? "Erro na execução do teste");
+      // }
 
       setExecucoes((prev) =>
         prev.map((run) =>

@@ -10,6 +10,8 @@ export interface Execucao {
   test_collection_id: string;
   test_case_id: string;
   status: TestRunStatus;
+  message?: string;
+  progress?: number;
   created_by: string;
   created_at: string;
   updated_at: string;

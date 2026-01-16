@@ -278,7 +278,7 @@ export default function DetalheCaso({
         {/* Feedback esperado */}
         <div className="lg:col-span-4 lg:row-span-2">
           <ReadOnlyBox
-            label="Feedback esperado"
+            label="Feedback esperado (IAEditais)"
             value={caso.expected_feedback}
             minHeight="153px"
           />
@@ -308,7 +308,7 @@ export default function DetalheCaso({
         </div> */}
         <div className="lg:col-span-4">
           <ReadOnlyBox
-            label="Conformidade"
+            label="Resultado esperado"
             value={caso.expected_fulfilled ? "Sim" : "Não"}
             icon={Circle}
           />
