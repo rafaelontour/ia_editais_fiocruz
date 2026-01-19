@@ -63,7 +63,9 @@ export default function DetalheCaso({
   } = useForm<ExecucaoFormData>({
     resolver: zodResolver(ExecucaoSchema),
     defaultValues: {
-      metrica_id: [],
+      metric_ids: [],
+      model_id: undefined as unknown as string,
+      file: undefined as unknown as File,
     },
   });
 
@@ -102,15 +104,10 @@ export default function DetalheCaso({
     try {
       console.log("=== DEBUG INICIO ===");
 
-      if (!file) {
-        toast.error("Por favor, envie o arquivo.");
-        return;
-      }
-
       const payload = {
         test_case_id: caso.id,
-        metric_ids: data.metrica_id,
-        model_id: modeloIa,
+        metric_ids: data.metric_ids,
+        model_id: data.model_id,
       };
 
       // execução temporária (UX enquanto o backend processa)
@@ -121,13 +118,13 @@ export default function DetalheCaso({
           test_case_id: caso.id,
           created_at: new Date().toISOString(),
           status: "PENDING",
-        })
+        }),
       );
 
-      const resultado = await executarTesteService(payload, file);
+      const resultado = await executarTesteService(payload, data.file);
 
       if (!resultado) {
-        toast.error("Erro ao executar caso de teste");
+        toast.error("Erro ao executar caso de teste 2");
         return;
       }
 
@@ -139,7 +136,7 @@ export default function DetalheCaso({
           test_case_id: caso.id,
           created_at: new Date().toISOString(),
           status: resultado.status ?? "PENDING",
-        })
+        }),
       );
 
       toast.success("Execução iniciada! Você pode acompanhar em Execuções.");
@@ -148,7 +145,7 @@ export default function DetalheCaso({
       router.push("/adm/execucoes");
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao executar caso de teste");
+      toast.error("Erro ao executar caso de teste 1");
     } finally {
       setExecutando(false);
     }
@@ -191,22 +188,33 @@ export default function DetalheCaso({
         {/* Modelo de Ia*/}
         <div className="lg:col-span-4">
           <Label>Modelo de ia *</Label>
-          <Select value={modeloIa} onValueChange={setModeloIa}>
-            <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
-              <SelectValue placeholder="Selecione" />
-            </SelectTrigger>
-            <SelectContent>
-              {modelosIa.map((modelo) => (
-                <SelectItem
-                  key={modelo.id}
-                  value={modelo.id}
-                  className="cursor-pointer"
-                >
-                  {modelo.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Controller
+            name="model_id"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {modelosIa.map((modelo) => (
+                    <SelectItem
+                      key={modelo.id}
+                      value={modelo.id}
+                      className="cursor-pointer"
+                    >
+                      {modelo.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.model_id && (
+            <span className="text-red-500 text-sm">
+              {errors.model_id.message}
+            </span>
+          )}
         </div>
         {/* Linha 2 */}
         {/* Tipificação */}
@@ -227,7 +235,7 @@ export default function DetalheCaso({
         <div className="lg:col-span-4">
           <Label>Selecionar métricas *</Label>
           <Controller
-            name="metrica_id"
+            name="metric_ids"
             control={control}
             render={({ field }) => {
               const selected = field.value ?? [];
@@ -268,9 +276,9 @@ export default function DetalheCaso({
               );
             }}
           />
-          {errors.metrica_id && (
+          {errors.metric_ids && (
             <span className="text-red-500 text-sm">
-              {errors.metrica_id.message}
+              {errors.metric_ids.message}
             </span>
           )}
         </div>
@@ -296,7 +304,20 @@ export default function DetalheCaso({
         <div className="lg:col-span-4 lg:row-span-2 max-h-[153px]">
           <Label>Upload do edital *</Label>
           <div className="mt-2 overflow-hidden">
-            <FileUpload onChange={(files) => setFile(files[0])} />
+            <Controller
+              name="file"
+              control={control}
+              render={({ field }) => (
+                <FileUpload
+                  onChange={(files) => field.onChange(files[0] ?? null)}
+                />
+              )}
+            />
+            {errors.file && (
+              <span className="text-red-500 text-sm ">
+                {errors.file.message}
+              </span>
+            )}
           </div>
         </div>
         {/* Edital */}
