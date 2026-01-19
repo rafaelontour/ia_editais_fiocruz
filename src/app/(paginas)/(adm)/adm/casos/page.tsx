@@ -118,7 +118,7 @@ export default function casos() {
     const cc = casos.filter(
       (c) =>
         c.name &&
-        c.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+        c.name.toLowerCase().startsWith(termoBusca.current.toLowerCase()),
     );
 
     setCasoFiltrado(cc);
@@ -151,8 +151,8 @@ export default function casos() {
         return;
       }
 
-      const novosCasos = casos.map((t) =>
-        t.id === editandoForm.id ? { ...t, ...payload } : t
+      const novosCasos = casoFiltrado.map((t) =>
+        t.id === editandoForm.id ? { ...t, ...payload } : t,
       );
 
       setCasos(novosCasos);
@@ -160,7 +160,7 @@ export default function casos() {
 
       if (casoSelecionado && casoSelecionado.id === editandoForm.id) {
         const metricaAtualizada = novosCasos.find(
-          (m) => m.id === editandoForm.id
+          (m) => m.id === editandoForm.id,
         );
 
         if (metricaAtualizada) {
@@ -193,7 +193,7 @@ export default function casos() {
   }
 
   const ramos = tipificacoes.flatMap((t) =>
-    (t.taxonomies ?? []).flatMap((tx) => tx.branches ?? [])
+    (t.taxonomies ?? []).flatMap((tx) => tx.branches ?? []),
   );
 
   function getNomeRamo(id: string): string {
@@ -298,7 +298,7 @@ export default function casos() {
 
             {/* Cards dos Casos */}
             <ListaCaso
-              casos={casos.filter((c) => c.name.toLowerCase())}
+              casos={casoFiltrado.filter((c) => c.name.toLowerCase())}
               onOpen={(c) => setCasoSelecionado(c)}
               onEditar={(c) => {
                 setEditandoForm(c);
