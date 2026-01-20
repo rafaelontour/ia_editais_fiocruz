@@ -23,7 +23,7 @@ async function getModeloService(): Promise<Modelo[] | undefined> {
 }
 
 async function adicionarModeloService(
-  data: ModeloFormData
+  data: ModeloFormData,
 ): Promise<Modelo | undefined> {
   try {
     const response = await fetch(`${urlBase}/models`, {
@@ -36,6 +36,12 @@ async function adicionarModeloService(
       }),
     });
 
+    if (response.status === 409) {
+      const error: any = new Error("Nome duplicado");
+      error.status = 409;
+      throw error;
+    }
+
     if (!response.ok) {
       throw new Error("Erro ao adicionar modelo de ia");
     }
@@ -45,6 +51,7 @@ async function adicionarModeloService(
     return resultado as Modelo;
   } catch (error) {
     console.error("Erro ao adicionar modelo", error);
+    throw error;
   }
 }
 
@@ -63,7 +70,7 @@ async function excluirModeloService(id: string): Promise<boolean | undefined> {
 
 async function atualizarModeloService(
   id: string,
-  data: ModeloFormData
+  data: ModeloFormData,
 ): Promise<Modelo | undefined> {
   try {
     const response = await fetch(`${urlBase}/models/${id}`, {

@@ -23,7 +23,7 @@ async function getMetricasService(): Promise<Metrica[] | undefined> {
 }
 
 async function adicionarMetricaService(
-  data: MetricaFormData
+  data: MetricaFormData,
 ): Promise<Metrica | undefined> {
   try {
     const response = await fetch(`${urlBase}/metrics`, {
@@ -40,6 +40,12 @@ async function adicionarMetricaService(
       }),
     });
 
+    if (response.status === 409) {
+      const error: any = new Error("Nome duplicado");
+      error.status = 409;
+      throw error;
+    }
+
     if (!response.ok) {
       throw new Error("Erro ao adicionar métrica");
     }
@@ -49,12 +55,13 @@ async function adicionarMetricaService(
     return resultado as Metrica;
   } catch (error) {
     console.error("Erro ao adicionar métrica", error);
+    throw error;
   }
 }
 
 async function atualizarMetricaService(
   id: string,
-  data: MetricaFormData
+  data: MetricaFormData,
 ): Promise<Metrica | undefined> {
   try {
     const response = await fetch(`${urlBase}/metrics/${id}`, {

@@ -23,7 +23,7 @@ async function getTestesService(): Promise<Teste[] | undefined> {
 }
 
 async function adicionarTesteService(
-  data: TesteFormData
+  data: TesteFormData,
 ): Promise<Teste | undefined> {
   try {
     const response = await fetch(`${urlBase}/test-collections`, {
@@ -38,6 +38,12 @@ async function adicionarTesteService(
       }),
     });
 
+    if (response.status === 409) {
+      const error: any = new Error("Nome duplicado");
+      error.status = 409;
+      throw error;
+    }
+
     if (!response.ok) {
       throw new Error("Erro ao adicionar teste");
     }
@@ -47,12 +53,13 @@ async function adicionarTesteService(
     return resultado as Teste;
   } catch (error) {
     console.error("Erro ao adicionar teste", error);
+    throw error;
   }
 }
 
 async function atualizarTesteService(
   id: string,
-  data: TesteFormData
+  data: TesteFormData,
 ): Promise<Teste | undefined> {
   try {
     const response = await fetch(`${urlBase}/test-collections/${id}`, {

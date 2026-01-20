@@ -158,7 +158,11 @@ export default function Modelos() {
 
                   toast.success("Modelo criado com sucesso");
                   setOpenDialogModelo(false);
-                } catch (error) {
+                } catch (error: any) {
+                  if (error?.status === 409) {
+                    toast.error("Já existe um modelo de IA com esse codinome");
+                    return;
+                  }
                   console.error("Erro ao criar modelo de IA:", error);
                   toast.error("Erro ao criar modelo de IA");
                 }

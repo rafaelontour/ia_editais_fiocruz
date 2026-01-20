@@ -156,7 +156,11 @@ export default function testes() {
 
                   toast.success("Teste criado com sucesso");
                   setOpenDialogTestes(false);
-                } catch (error) {
+                } catch (error: any) {
+                  if (error?.status === 409) {
+                    toast.error("Já existe uma coleção de teste com esse nome");
+                    return;
+                  }
                   console.error(error);
                   toast.error("Erro inesperado ao criar teste");
                 }

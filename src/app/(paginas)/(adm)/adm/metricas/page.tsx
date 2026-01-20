@@ -139,7 +139,7 @@ export default function metricas() {
                       criteria: data.criteria,
                       evaluation_steps: data.evaluation_steps,
                     });
-
+                    console.log("novaMetrica:", novaMetrica);
                     if (!novaMetrica) {
                       toast.error("Erro ao criar métrica");
                       return;
@@ -149,7 +149,11 @@ export default function metricas() {
 
                     toast.success("Métrica criada com sucesso");
                     setOpenDialogAdd(false);
-                  } catch (error) {
+                  } catch (error: any) {
+                    if (error?.status === 409) {
+                      toast.error("Já existe uma métrica com esse nome");
+                      return;
+                    }
                     toast.error("Erro inesperado ao criar métrica");
                   }
                 }}
