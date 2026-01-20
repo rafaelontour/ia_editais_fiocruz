@@ -63,7 +63,7 @@ export default function Modelos() {
     const filtrados = modelos.filter(
       (m) =>
         m.name &&
-        m.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+        m.name.toLowerCase().startsWith(termoBusca.current.toLowerCase()),
     );
 
     setModeloFiltrado(filtrados);
@@ -95,15 +95,15 @@ export default function Modelos() {
       modeloFiltrado.map((m) =>
         m.id === editandoForm.id
           ? { ...m, name: data.name, code_name: data.code_name }
-          : m
-      )
+          : m,
+      ),
     );
     setModeloFiltrado(
       modeloFiltrado.map((m) =>
         m.id === editandoForm.id
           ? { ...m, name: data.name, code_name: data.code_name }
-          : m
-      )
+          : m,
+      ),
     );
   }
 
@@ -153,8 +153,8 @@ export default function Modelos() {
                     return;
                   }
 
-                  setModelos((prev) => [...prev, novoModelo]);
-                  setModeloFiltrado((prev) => [...prev, novoModelo]);
+                  setModelos((prev) => [novoModelo, ...prev]);
+                  setModeloFiltrado((prev) => [novoModelo, ...prev]);
 
                   toast.success("Modelo criado com sucesso");
                   setOpenDialogModelo(false);

@@ -61,7 +61,7 @@ export default function testes() {
     const filtrados = testes.filter(
       (t) =>
         t.name &&
-        t.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+        t.name.toLowerCase().startsWith(termoBusca.current.toLowerCase()),
     );
 
     setTesteFiltrado(filtrados);
@@ -93,15 +93,15 @@ export default function testes() {
       testeFiltrado.map((t) =>
         t.id === editandoForm.id
           ? { ...t, name: data.name, description: data.description }
-          : t
-      )
+          : t,
+      ),
     );
     setTesteFiltrado(
       testeFiltrado.map((t) =>
         t.id === editandoForm.id
           ? { ...t, name: data.name, description: data.description }
-          : t
-      )
+          : t,
+      ),
     );
   }
 
@@ -151,8 +151,8 @@ export default function testes() {
                     toast.error("Erro ao criar teste");
                     return;
                   }
-                  setTestes((prev) => [...prev, novoTeste]);
-                  setTesteFiltrado((prev) => [...prev, novoTeste]);
+                  setTestes((prev) => [novoTeste, ...prev]);
+                  setTesteFiltrado((prev) => [novoTeste, ...prev]);
 
                   toast.success("Teste criado com sucesso");
                   setOpenDialogTestes(false);

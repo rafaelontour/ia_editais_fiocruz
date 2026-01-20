@@ -28,7 +28,7 @@ export default function metricas() {
   const [editandoForm, setEditandoForm] = useState<any>(null);
   const [pesquisa, setPesquisa] = useState("");
   const [metricaSelecionada, setMetricaSelecionada] = useState<Metrica | null>(
-    null
+    null,
   );
   const termoBusca = useRef<string>("");
 
@@ -55,7 +55,7 @@ export default function metricas() {
     const mm = metricas.filter(
       (m) =>
         m.name &&
-        m.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
+        m.name.toLowerCase().startsWith(termoBusca.current.toLowerCase()),
     );
 
     setMetricaFiltrada(mm);
@@ -76,7 +76,7 @@ export default function metricas() {
     toast.success("Métrica atualizada com sucesso");
 
     const novasMetricas = metricas.map((t) =>
-      t.id === editandoForm.id ? { ...t, ...data } : t
+      t.id === editandoForm.id ? { ...t, ...data } : t,
     );
 
     setMetricas(novasMetricas);
@@ -85,7 +85,7 @@ export default function metricas() {
     // se tiver expandido, atualizar a métrica selecionada também ou seja o endpoind vai ser pelo id da métrica
     if (metricaSelecionada && metricaSelecionada.id === editandoForm.id) {
       const metricaAtualizada = novasMetricas.find(
-        (m) => m.id === editandoForm.id
+        (m) => m.id === editandoForm.id,
       );
 
       if (metricaAtualizada) {
@@ -144,8 +144,8 @@ export default function metricas() {
                       toast.error("Erro ao criar métrica");
                       return;
                     }
-                    setMetricas((prev) => [...prev, novaMetrica]);
-                    setMetricaFiltrada((prev) => [...prev, novaMetrica]);
+                    setMetricas((prev) => [novaMetrica, ...prev]);
+                    setMetricaFiltrada((prev) => [novaMetrica, ...prev]);
 
                     toast.success("Métrica criada com sucesso");
                     setOpenDialogAdd(false);
@@ -170,7 +170,7 @@ export default function metricas() {
 
             <ListaMetricas
               metricas={metricaFiltrada.filter((m) =>
-                m.name.toLowerCase().includes(pesquisa.toLowerCase())
+                m.name.toLowerCase().includes(pesquisa.toLowerCase()),
               )}
               onOpen={(m) => setMetricaSelecionada(m)} // maxima
               onEditar={(m) => {

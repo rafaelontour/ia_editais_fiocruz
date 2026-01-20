@@ -276,8 +276,8 @@ export default function casos() {
                       return;
                     }
 
-                    setCasos((prev) => [...prev, novoCaso]);
-                    setCasoFiltrado((prev) => [...prev, novoCaso]);
+                    setCasos((prev) => [novoCaso, ...prev]);
+                    setCasoFiltrado((prev) => [novoCaso, ...prev]);
 
                     toast.success("Caso teste adicionado com sucesso!");
                     setOpenDialogAdd(false);
