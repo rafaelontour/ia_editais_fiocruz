@@ -20,12 +20,13 @@ import {
   getModeloService,
 } from "@/service/modelo";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
 
 export default function Modelos() {
+  const [carregando, setCarregando] = useState<boolean>(true);
   const [openDialogModelo, setOpenDialogModelo] = useState(false);
   const [modeloFiltrado, setModeloFiltrado] = useState<Modelo[]>([]);
   const [modelos, setModelos] = useState<Modelo[]>([]);
@@ -40,6 +41,7 @@ export default function Modelos() {
       const resultado = await getModeloService();
 
       if (resultado) {
+        setCarregando(false);
         setModelos(resultado);
         setModeloFiltrado(resultado);
       }
@@ -198,43 +200,54 @@ export default function Modelos() {
         </DialogContent>
       </Dialog>
 
-      <Masonry
-        breakpointCols={breakpointCols}
-        className="flex relative gap-5 mb-10 px-1
-      "
-      >
-        {modeloFiltrado.map((modelo) => (
-          <div
-            style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
-            key={modelo.id}
-            className="flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
-          >
-            <h2 className="text-2xl font-semibold">{modelo.name}</h2>
-            <p>
-              <span className="font-bold">codinome:</span> {modelo.code_name}
-            </p>
+      {carregando ? (
+        <div className="flex justify-center items-center gap-2 text-sm text-gray-400">
+          <span>Carregando coleção de testes...</span>
+          <Loader2 className="animate-spin ml-2" />
+        </div>
+      ) : modeloFiltrado.length > 0 ? (
+        <Masonry
+          breakpointCols={breakpointCols}
+          className="flex relative gap-5 mb-10 px-1
+          "
+        >
+          {modeloFiltrado.map((modelo) => (
+            <div
+              style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
+              key={modelo.id}
+              className="flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
+            >
+              <h2 className="text-2xl font-semibold">{modelo.name}</h2>
+              <p>
+                <span className="font-bold">codinome:</span> {modelo.code_name}
+              </p>
 
-            <div className="flex justify-between items-center mt-3">
-              <Calendario data={modelo.created_at} />
+              <div className="flex justify-between items-center mt-3">
+                <Calendario data={modelo.created_at} />
 
-              <div className="flex gap-3">
-                <BotaoEditar
-                  onClick={() => {
-                    setEditandoForm(modelo);
-                    setOpenDialogEditar(true);
-                  }}
-                />
+                <div className="flex gap-3">
+                  <BotaoEditar
+                    onClick={() => {
+                      setEditandoForm(modelo);
+                      setOpenDialogEditar(true);
+                    }}
+                  />
 
-                <BotaoExcluir
-                  funcExcluir={excluirModelo}
-                  item={modelo}
-                  tipo="modelo"
-                />
+                  <BotaoExcluir
+                    funcExcluir={excluirModelo}
+                    item={modelo}
+                    tipo="modelo"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </Masonry>
+          ))}
+        </Masonry>
+      ) : (
+        <p className="text-gray-400 text-2xl text-center animate-pulse">
+          Nenhuma coleção de teste encontrada.
+        </p>
+      )}
     </div>
   );
 }

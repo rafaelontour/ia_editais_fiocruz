@@ -19,10 +19,12 @@ import {
   excluirMetricaService,
   getMetricasService,
 } from "@/service/metrica";
+import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function metricas() {
+  const [carregando, setCarregando] = useState<boolean>(true);
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
   const [openDialogAdd, setOpenDialogAdd] = useState(false);
   const [editandoForm, setEditandoForm] = useState<any>(null);
@@ -36,6 +38,7 @@ export default function metricas() {
     async function carregar() {
       const resultado = await getMetricasService();
       if (resultado) {
+        setCarregando(false);
         setMetricas(resultado);
         setMetricaFiltrada(resultado);
       }
@@ -162,29 +165,39 @@ export default function metricas() {
           </Dialog>
         </div>
 
-        {!metricaSelecionada && (
-          <>
-            {/* Barra de pesquisa */}
+        <>
+          {!metricaSelecionada && (
             <BarraDePesquisa
               refInput={termoBusca}
               funcFiltrar={filtrarMetricas}
             />
+          )}
 
-            {/* Cards de Métrica */}
-
-            <ListaMetricas
-              metricas={metricaFiltrada.filter((m) =>
-                m.name.toLowerCase().includes(pesquisa.toLowerCase()),
-              )}
-              onOpen={(m) => setMetricaSelecionada(m)} // maxima
-              onEditar={(m) => {
-                setEditandoForm(m);
-                setOpenDialogEditar(true);
-              }}
-              onExcluir={(id) => excluirMetrica(id)}
-            />
-          </>
-        )}
+          {carregando ? (
+            <div className="flex justify-center items-center gap-2 text-sm text-gray-400">
+              <span>Carregando coleção de testes...</span>
+              <Loader2 className="animate-spin ml-2" />
+            </div>
+          ) : metricaFiltrada.length > 0 ? (
+            !metricaSelecionada && (
+              <ListaMetricas
+                metricas={metricaFiltrada.filter((m) =>
+                  m.name.toLowerCase().includes(pesquisa.toLowerCase()),
+                )}
+                onOpen={(m) => setMetricaSelecionada(m)} // maxima
+                onEditar={(m) => {
+                  setEditandoForm(m);
+                  setOpenDialogEditar(true);
+                }}
+                onExcluir={(id) => excluirMetrica(id)}
+              />
+            )
+          ) : (
+            <p className="text-gray-400 text-2xl text-center animate-pulse">
+              Nenhuma coleção de teste encontrada.
+            </p>
+          )}
+        </>
 
         {/* Métrica expandida */}
         {metricaSelecionada && (

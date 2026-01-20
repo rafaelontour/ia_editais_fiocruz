@@ -21,7 +21,7 @@ import {
   excluirTesteService,
   getTestesService,
 } from "@/service/teste";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
@@ -33,11 +33,13 @@ export default function testes() {
   const termoBusca = useRef<string>("");
   const [testeFiltrado, setTesteFiltrado] = useState<Teste[]>([]);
   const [testes, setTestes] = useState<Teste[]>([]);
+  const [carregando, setCarregando] = useState<boolean>(true);
 
   useEffect(() => {
     async function carregar() {
       const resultado = await getTestesService();
       if (resultado) {
+        setCarregando(false);
         setTestes(resultado);
         setTesteFiltrado(resultado);
       }
@@ -198,40 +200,52 @@ export default function testes() {
         </DialogContent>
       </Dialog>
       {/* Cards de Teste*/}
-      <Masonry
-        breakpointCols={breakpointColumns}
-        className="flex relative gap-5 mb-10 px-1"
-      >
-        {testeFiltrado.map((mockTeste) => (
-          <div
-            style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
-            key={mockTeste.id}
-            className="flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
-          >
-            <h2 className="text-2xl font-semibold">{mockTeste.name}</h2>
-            <p>{mockTeste.description}</p>
 
-            <div className="flex justify-between items-center mt-3">
-              <Calendario data={mockTeste.created_at} />
+      {carregando ? (
+        <div className="flex justify-center items-center gap-2 text-sm text-gray-400">
+          <span>Carregando coleção de testes...</span>
+          <Loader2 className="animate-spin ml-2" />
+        </div>
+      ) : testeFiltrado.length > 0 ? (
+        <Masonry
+          breakpointCols={breakpointColumns}
+          className="flex relative gap-5 mb-10 px-1"
+        >
+          {testeFiltrado.map((mockTeste) => (
+            <div
+              style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
+              key={mockTeste.id}
+              className="flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
+            >
+              <h2 className="text-2xl font-semibold">{mockTeste.name}</h2>
+              <p>{mockTeste.description}</p>
 
-              <div className="flex gap-3">
-                <BotaoEditar
-                  onClick={() => {
-                    setEditandoForm(mockTeste);
-                    setOpenDialogEditar(true);
-                  }}
-                />
+              <div className="flex justify-between items-center mt-3">
+                <Calendario data={mockTeste.created_at} />
 
-                <BotaoExcluir
-                  funcExcluir={excluirTeste}
-                  item={mockTeste}
-                  tipo="teste"
-                />
+                <div className="flex gap-3">
+                  <BotaoEditar
+                    onClick={() => {
+                      setEditandoForm(mockTeste);
+                      setOpenDialogEditar(true);
+                    }}
+                  />
+
+                  <BotaoExcluir
+                    funcExcluir={excluirTeste}
+                    item={mockTeste}
+                    tipo="teste"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </Masonry>
+          ))}
+        </Masonry>
+      ) : (
+        <p className="text-gray-400 text-2xl text-center animate-pulse">
+          Nenhuma coleção de teste encontrada.
+        </p>
+      )}
     </div>
   );
 }

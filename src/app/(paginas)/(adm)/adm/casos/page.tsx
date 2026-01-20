@@ -25,13 +25,14 @@ import {
 import { getEditaisService } from "@/service/edital";
 import { getTestesService } from "@/service/teste";
 import { getTipificacoesService } from "@/service/tipificacao";
+import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function casos() {
+  const [carregando, setCarregando] = useState<boolean>(true);
   const [openDialogAdd, setOpenDialogAdd] = useState(false);
   const [casoSelecionado, setCasoSelecionado] = useState<Caso | null>(null);
-  const [pesquisa, setPesquisa] = useState("");
   const [editandoForm, setEditandoForm] = useState<any>(null);
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
   const termoBusca = useRef<string>("");
@@ -57,6 +58,7 @@ export default function casos() {
     async function carregar() {
       const resultado = await buscarCasoService();
       if (resultado) {
+        setCarregando(false);
         setCasos(resultado);
         setCasoFiltrado(resultado);
       }
@@ -291,27 +293,38 @@ export default function casos() {
           </Dialog>
         </div>
 
+        <>
         {!casoSelecionado && (
-          <>
-            {/* Barra de pesquisa */}
             <BarraDePesquisa funcFiltrar={filtrarCaso} refInput={termoBusca} />
-
-            {/* Cards dos Casos */}
-            <ListaCaso
-              casos={casoFiltrado.filter((c) => c.name.toLowerCase())}
-              onOpen={(c) => setCasoSelecionado(c)}
-              onEditar={(c) => {
-                setEditandoForm(c);
-                setOpenDialogEditar(true);
-              }}
-              onExcluir={(id) => excluirCaso(id)}
-              getNomeTeste={getNomeTeste}
-              getNomeRamo={getNomeRamo}
-              getNomeEdital={getNomeEdital}
-            />
-          </>
         )}
-
+          
+          {carregando ? (
+            <div className="flex justify-center items-center gap-2 text-sm text-gray-400">
+              <span>Carregando casos de testes...</span>
+              <Loader2 className="animate-spin ml-2" />
+            </div>
+          ) : casoFiltrado.length > 0 ? (
+            !casoSelecionado && (
+              <ListaCaso
+                casos={casoFiltrado.filter((c) => c.name.toLowerCase())}
+                onOpen={(c) => setCasoSelecionado(c)}
+                onEditar={(c) => {
+                  setEditandoForm(c);
+                  setOpenDialogEditar(true);
+                }}
+                onExcluir={(id) => excluirCaso(id)}
+                getNomeTeste={getNomeTeste}
+                getNomeRamo={getNomeRamo}
+                getNomeEdital={getNomeEdital}
+              />
+            ) 
+          ) : (
+            <p className="text-gray-400 text-2xl text-center animate-pulse">
+              Nenhum caso de teste encontrado.
+            </p>
+          )}   
+        </>
+    
         {/* Caso expandido */}
         {casoSelecionado && (
           <DetalheCaso

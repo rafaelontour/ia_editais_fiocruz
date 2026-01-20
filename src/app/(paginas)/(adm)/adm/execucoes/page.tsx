@@ -6,7 +6,7 @@ import { Execucao } from "@/core/execucao";
 import useUsuario from "@/data/hooks/useUsuario";
 import { buscarCasoService } from "@/service/caso";
 import { buscarExecucoesService } from "@/service/executarTeste";
-import { CircleCheckBig } from "lucide-react";
+import { CircleCheckBig, Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Masonry from "react-masonry-css";
@@ -20,6 +20,7 @@ export default function execucoes() {
     500: 1,
   };
 
+  const [carregando, setCarregando] = useState<boolean>(true);
   const [execucoes, setExecucoes] = useState<Execucao[]>([]);
 
   {
@@ -28,7 +29,7 @@ export default function execucoes() {
   const [casosMap, setCasosMap] = useState<Record<string, string>>({});
 
   const [toastStatusMap, setToastStatusMap] = useState<Record<string, string>>(
-    {}
+    {},
   );
 
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function execucoes() {
   const { usuario } = useUsuario();
 
   const [statusAnterior, setStatusAnterior] = useState<Record<string, string>>(
-    {}
+    {},
   );
 
   useEffect(() => {
@@ -64,13 +65,10 @@ export default function execucoes() {
       const statusAntes = statusAnterior[run.id];
       const statusAgora = run.status;
 
-      // ainda não tínhamos esse run
       if (!statusAntes) return;
 
-      // status não mudou
       if (statusAntes === statusAgora) return;
 
-      // TRANSIÇÕES IMPORTANTES
       if (statusAntes === "PROCESSING" && statusAgora === "COMPLETED") {
         toast.success("Execução finalizada com sucesso!");
       }
@@ -93,7 +91,7 @@ export default function execucoes() {
     if (!usuario?.id) return;
 
     const ws = new WebSocket(
-      `ws://${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario.id}`
+      `ws://${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario.id}`,
     );
 
     ws.onopen = () => {
@@ -136,8 +134,8 @@ export default function execucoes() {
 
       setExecucoes((prev) =>
         prev.map((run) =>
-          run.id === test_run_id ? { ...run, status, message, progress } : run
-        )
+          run.id === test_run_id ? { ...run, status, message, progress } : run,
+        ),
       );
     };
 
@@ -156,6 +154,7 @@ export default function execucoes() {
 
       if (!response) return;
 
+      setCarregando(false);
       setExecucoes(response);
     }
 
@@ -190,7 +189,7 @@ export default function execucoes() {
         (e) =>
           e.status === "PENDING" ||
           e.status === "PROCESSING" ||
-          e.status === "EVALUATING"
+          e.status === "EVALUATING",
       )
     ) {
       return;
@@ -235,58 +234,69 @@ export default function execucoes() {
 
         <BarraDePesquisa />
       </div>
-      <Masonry
-        breakpointCols={breakpointColumns}
-        className="flex relative gap-5 mb-10 px-1"
-      >
-        {execucoes.map((run, index) => {
-          const numero = execucoes.length - index;
+      {carregando ? (
+        <div className="flex justify-center items-center gap-2 text-sm text-gray-400">
+          <span>Carregando execuções...</span>
+          <Loader2 className="animate-spin ml-2" />
+        </div>
+      ) : execucoes.length > 0 ? (
+        <Masonry
+          breakpointCols={breakpointColumns}
+          className="flex relative gap-5 mb-10 px-1"
+        >
+          {execucoes.map((run, index) => {
+            const numero = execucoes.length - index;
 
-          return (
-            <div
-              style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
-              key={run.id}
-              className="flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
-            >
-              {/* <h2>id: {run.id}</h2> */}
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-2xl font-semibold ">
-                    {casosMap[run.test_case_id] ?? "Caso não encontrado"}
-                  </p>
-                  <span>Execução #{numero}</span>
+            return (
+              <div
+                style={{ boxShadow: "0 0 5px rgba(0,0,0,.3)" }}
+                key={run.id}
+                className="flex flex-col gap-2 rounded-md p-4 w-full transition ease-in-out duration-100 mb-5"
+              >
+                {/* <h2>id: {run.id}</h2> */}
+                <div className="flex justify-between">
+                  <div>
+                    <p className="text-2xl font-semibold ">
+                      {casosMap[run.test_case_id] ?? "Caso não encontrado"}
+                    </p>
+                    <span>Execução #{numero}</span>
+                  </div>
+
+                  {(() => {
+                    const status = getStatus(run);
+
+                    return (
+                      <span
+                        className={`text-white px-2 py-1 rounded-full text-xs w-fit h-fit ${status.className}`}
+                      >
+                        {status.label}
+                      </span>
+                    );
+                  })()}
                 </div>
 
-                {(() => {
-                  const status = getStatus(run);
+                <div className="flex justify-between items-center mt-3">
+                  <Calendario data={run.created_at} />
 
-                  return (
-                    <span
-                      className={`text-white px-2 py-1 rounded-full text-xs w-fit h-fit ${status.className}`}
-                    >
-                      {status.label}
-                    </span>
-                  );
-                })()}
+                  <button
+                    className="rounded-md border border-gray-300 bg-branco hover:cursor-pointer px-2 py-1 w-fit h-fit text-black "
+                    onClick={() => router.push(`/adm/resultados/${run.id}`)}
+                  >
+                    <div className="flex flex-row justify-center items-center gap-2">
+                      <CircleCheckBig color="black" size={16} />
+                      resultados
+                    </div>
+                  </button>
+                </div>
               </div>
-
-              <div className="flex justify-between items-center mt-3">
-                <Calendario data={run.created_at} />
-
-                <button
-                  className="rounded-md border border-gray-300 bg-branco hover:cursor-pointer px-2 py-1 w-fit h-fit text-black "
-                  onClick={() => router.push(`/adm/resultados/${run.id}`)}
-                >
-                  <div className="flex flex-row justify-center items-center gap-2">
-                    <CircleCheckBig color="black" size={16} />
-                    resultados
-                  </div>
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </Masonry>
+            );
+          })}
+        </Masonry>
+      ) : (
+        <p className="text-gray-400 text-2xl text-center animate-pulse">
+          Nenhuma coleção de teste encontrada.
+        </p>
+      )}
     </div>
   );
 }
