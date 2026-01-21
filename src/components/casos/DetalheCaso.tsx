@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Circle } from "lucide-react";
+import { ArrowLeft, CheckCircle, CheckCircle2, Circle } from "lucide-react";
 import { Button } from "../ui/button";
 import { Caso } from "@/core/caso";
 import { Label } from "../ui/label";
@@ -27,6 +27,7 @@ import {
 import { toast } from "sonner";
 import { Modelo } from "@/core/modelo";
 import { getModeloService } from "@/service/modelo";
+import { cn } from "@/lib/utils";
 
 interface DetalheCasoProps {
   caso: Caso;
@@ -239,19 +240,49 @@ export default function DetalheCaso({
             control={control}
             render={({ field }) => {
               const selected = field.value ?? [];
+              const [selectValue, setSelectValue] = useState<string>("");
+
+              const selectedMetrics = metricas.filter((m) =>
+                selected.includes(m.id),
+              );
+
+              const maxVisible = 2;
+              const visible = selectedMetrics.slice(0, maxVisible);
+              const hiddenCount = selectedMetrics.length - visible.length;
 
               return (
                 <Select
+                  value={selectValue}
                   onValueChange={(value) => {
                     if (selected.includes(value)) {
                       field.onChange(selected.filter((v) => v !== value));
                     } else {
                       field.onChange([...selected, value]);
                     }
+                    setSelectValue("");
                   }}
                 >
-                  <SelectTrigger className="w-full mt-2 hover:cursor-pointer py-5">
-                    <SelectValue placeholder="Selecione" />
+                  <SelectTrigger className="w-full mt-2 py-5 hover:cursor-pointer">
+                    {selected.length === 0 ? (
+                      <span className="text-muted-foreground">Selecione</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {visible.map((m) => (
+                          <span
+                            key={m.id}
+                            className="px-2 py-1 rounded-md bg-green-100 text-green-800 text-sm"
+                          >
+                            {m.name}
+                          </span>
+                        ))}
+
+                        {hiddenCount > 0 && (
+                          <span className="px-2 py-1 rounded-md bg-gray-200 text-gray-700 text-sm">
+                            +{hiddenCount}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </SelectTrigger>
 
                   <SelectContent>
@@ -262,12 +293,20 @@ export default function DetalheCaso({
                         <SelectItem
                           key={m.id}
                           value={m.id}
-                          className={
-                            selecionada ? "bg-gray-100 font-semibold" : ""
-                          }
+                          className={cn(
+                            "cursor-pointer",
+                            selecionada && "bg-gray-100",
+                          )}
                         >
-                          {selecionada && "✓ "}
-                          {m.name}
+                          <div className="flex items-center gap-2">
+                            {selecionada ? (
+                              <CheckCircle className="w-4 h-4 text-primary" />
+                            ) : (
+                              <Circle className="w-4 h-4 text-gray-300" />
+                            )}
+
+                            <span>{m.name}</span>
+                          </div>
                         </SelectItem>
                       );
                     })}
