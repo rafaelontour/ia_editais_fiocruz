@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { Modelo } from "@/core/modelo";
 import { getModeloService } from "@/service/modelo";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 interface DetalheCasoProps {
   caso: Caso;
@@ -56,6 +57,8 @@ export default function DetalheCaso({
   const [modelosIa, setModelosIa] = useState<Modelo[]>([]);
 
   const [executando, setExecutando] = useState(false);
+
+  const [open, setOpen] = useState<boolean>(false);
 
   const {
     control,
@@ -235,12 +238,12 @@ export default function DetalheCaso({
         {/* Métricas */}
         <div className="lg:col-span-4">
           <Label>Selecionar métricas *</Label>
+
           <Controller
             name="metric_ids"
             control={control}
             render={({ field }) => {
               const selected = field.value ?? [];
-              const [selectValue, setSelectValue] = useState<string>("");
 
               const selectedMetrics = metricas.filter((m) =>
                 selected.includes(m.id),
@@ -251,54 +254,58 @@ export default function DetalheCaso({
               const hiddenCount = selectedMetrics.length - visible.length;
 
               return (
-                <Select
-                  value={selectValue}
-                  onValueChange={(value) => {
-                    if (selected.includes(value)) {
-                      field.onChange(selected.filter((v) => v !== value));
-                    } else {
-                      field.onChange([...selected, value]);
-                    }
-                    setSelectValue("");
-                  }}
-                >
-                  <SelectTrigger className="w-full mt-2 py-5 hover:cursor-pointer">
-                    {selected.length === 0 ? (
-                      <span className="text-muted-foreground">Selecione</span>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {visible.map((m) => (
-                          <span
-                            key={m.id}
-                            className="px-2 py-1 rounded-md bg-green-100 text-green-800 text-sm"
-                          >
-                            {m.name}
-                          </span>
-                        ))}
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <div className="w-full mt-2 px-3 py-2 border rounded-md flex flex-wrap gap-2 items-center hover:cursor-pointer">
+                      {selected.length === 0 ? (
+                        <span className="text-muted-foreground">Selecione</span>
+                      ) : (
+                        <>
+                          {visible.map((m) => (
+                            <span
+                              key={m.id}
+                              className="px-2 py-1 rounded-md bg-green-100 text-green-800 text-sm"
+                            >
+                              {m.name}
+                            </span>
+                          ))}
 
-                        {hiddenCount > 0 && (
-                          <span className="px-2 py-1 rounded-md bg-gray-200 text-gray-700 text-sm">
-                            +{hiddenCount}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    {metricas.map((m) => {
-                      const selecionada = selected.includes(m.id);
-
-                      return (
-                        <SelectItem
-                          key={m.id}
-                          value={m.id}
-                          className={cn(
-                            "cursor-pointer",
-                            selecionada && "bg-gray-100",
+                          {hiddenCount > 0 && (
+                            <span className="px-2 py-1 rounded-md bg-gray-200 text-gray-700 text-sm">
+                              +{hiddenCount}
+                            </span>
                           )}
-                        >
-                          <div className="flex items-center gap-2">
+                        </>
+                      )}
+                    </div>
+                  </PopoverTrigger>
+
+                  <PopoverContent
+                    align="start"
+                    side="bottom"
+                    className="w-(--radix-popover-trigger-width) p-2"
+                  >
+                    <div className="flex flex-col gap-1 max-h-64 overflow-auto">
+                      {metricas.map((m) => {
+                        const selecionada = selected.includes(m.id);
+
+                        return (
+                          <div
+                            key={m.id}
+                            onClick={() => {
+                              if (selecionada) {
+                                field.onChange(
+                                  selected.filter((v) => v !== m.id),
+                                );
+                              } else {
+                                field.onChange([...selected, m.id]);
+                              }
+                            }}
+                            className={cn(
+                              "flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer hover:bg-gray-100",
+                              selecionada && "bg-gray-100",
+                            )}
+                          >
                             {selecionada ? (
                               <CheckCircle className="w-4 h-4 text-primary" />
                             ) : (
@@ -307,20 +314,22 @@ export default function DetalheCaso({
 
                             <span>{m.name}</span>
                           </div>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
+                        );
+                      })}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               );
             }}
           />
+
           {errors.metric_ids && (
             <span className="text-red-500 text-sm">
               {errors.metric_ids.message}
             </span>
           )}
         </div>
+
         {/* Linha 3 */}
         {/* Feedback esperado */}
         <div className="lg:col-span-4 lg:row-span-2">
