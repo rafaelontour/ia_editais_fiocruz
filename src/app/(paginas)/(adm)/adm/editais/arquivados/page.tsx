@@ -1,8 +1,9 @@
 "use client"
 
 import BarraDePesquisa from "@/components/BarraDePesquisa";
+import BotaoVoltar from "@/components/botoes/BotaoVoltar";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Edital } from "@/core";
 import { EditalArquivo } from "@/core/edital/Edital";
 import useUsuario from "@/data/hooks/useUsuario";
@@ -23,6 +24,7 @@ export default function EditaisArquivados() {
     const [editaisArquivados, setEditaisArquivados] = useState<Edital[]>([]);
     const [editalParaVisualizar, setEditalParaVisualizar] = useState<EditalArquivo | null>(null);
     const [editaisArquivadosFiltrados, setEditaisArquivadosFiltrados] = useState<Edital[]>([]);
+    const [carregando, setCarregando] = useState<boolean>(true);
 
     async function getEditaisArquivados() {
         const res = await getEditaisArquivadosService(usuario?.unit_id)
@@ -34,6 +36,7 @@ export default function EditaisArquivados() {
 
         setEditaisArquivados(res.documents);
         setEditaisArquivadosFiltrados(res.documents);
+        setCarregando(false);
     }
 
 
@@ -78,19 +81,25 @@ export default function EditaisArquivados() {
     }
 
     function filtrarEditais() {
+        setCarregando(true);
         const editaisFiltrados = editaisArquivados.filter(edital => edital.name && edital.name.toLowerCase().includes(termoBusca.current.toLowerCase()));
         setEditaisArquivadosFiltrados(editaisFiltrados);
+        setCarregando(false);
     }
 
     const termoBusca = useRef<string>("");
 
     return (
         <div className="flex flex-col gap-5">
-            <h2 className="text-4xl font-bold">Editais  arquivados</h2>
+            <div className="flex items-center gap-6">
+                <BotaoVoltar />
+                <h2 className="text-4xl font-bold">Editais  arquivados</h2>
+            </div>
 
             <BarraDePesquisa className="w-full" refInput={termoBusca} funcFiltrar={filtrarEditais} />
+
             {
-                editaisArquivadosFiltrados ? (
+                !carregando ? (
                     editaisArquivadosFiltrados.length > 0 ? (
                         <div className="w-full flex flex-col gap-10 overflow-hidden">
 
@@ -171,15 +180,50 @@ export default function EditaisArquivados() {
                                                             </DialogContent>
                                                         </Dialog>
 
-                                                        <Button
-                                                            onClick={() => desarquivarEdital(edital.id)}
-                                                            size="icon"
-                                                            variant="outline"
-                                                            className="h-8 w-8 hover:cursor-pointer"
-                                                            title="Desarquivar edital"
-                                                        >
-                                                            <IconArchive />
-                                                        </Button>
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="outline"
+                                                                    className="h-8 w-8 hover:cursor-pointer"
+                                                                    title="Desarquivar edital"
+                                                                >
+                                                                    <IconArchive />
+                                                                </Button>
+                                                            </DialogTrigger>
+
+                                                            <DialogContent className="rounded-2xl">
+                                                                <DialogHeader>
+                                                                    <DialogTitle className="text-2xl">Desarquivar edital</DialogTitle>
+                                                                </DialogHeader>
+
+                                                                <DialogDescription className="text-md">
+                                                                    Tem certeza que deseja desarquivar o edital <span className="font-bold">{edital.name}</span>?
+                                                                </DialogDescription>
+
+                                                                <DialogFooter>
+                                                                    <DialogClose
+                                                                        className="
+                                                                            border bg-slate-300 px-3 py-1 rounded-sm hover:cursor-pointer
+                                                                        "
+                                                                    >
+                                                                        Cancelar
+                                                                    </DialogClose>
+
+                                                                    <DialogClose asChild>
+                                                                        <Button
+                                                                            onClick={() => desarquivarEdital(edital.id)}
+                                                                            size={"icon"}
+                                                                            variant={"destructive"}
+                                                                            className="w-fit border-gray-300 hover:cursor-pointer bg-green-500 hover:bg-green-500 transition-all rounded-sm p-3.5"
+                                                                        >
+                                                                            Desarquivar
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
 
                                                         <Button
                                                             onClick={() => excluirEdital(edital.id)}

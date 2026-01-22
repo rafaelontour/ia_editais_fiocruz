@@ -33,7 +33,6 @@ async function getEditalPorIdService(id: string | undefined): Promise<Edital | u
             }
         })
 
-        console.log("Data: ", res);
         if (!res.ok) return
 
         const { data } = await res.json();

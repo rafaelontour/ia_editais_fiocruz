@@ -210,17 +210,52 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                                     }
 
                                                     { usuario?.access_level === "ADMIN" && (edital.history && edital.history[0].status === "COMPLETED") && (
-                                                        <Button
-                                                            size={"icon"}
-                                                            title="Arquivar edital "
-                                                            variant={"outline"}
-                                                            onClick={() => arquivarEdital(edital.id)}
-                                                            className="
-                                                                h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5
-                                                            "
-                                                        >
-                                                            <Archive />    
-                                                        </Button>
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    size={"icon"}
+                                                                    title="Arquivar edital "
+                                                                    variant={"outline"}
+                                                                    className="
+                                                                        h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5
+                                                                    "
+                                                                >
+                                                                    <Archive />
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            
+                                                            <DialogContent className="rounded-2xl">
+                                                                <DialogHeader>
+                                                                    <DialogTitle className="text-2xl">Arquivar edital</DialogTitle>
+                                                                </DialogHeader>
+
+                                                                <DialogDescription className="text-md">
+                                                                    Tem certeza que deseja arquivar o edital <span className="font-bold">{edital.name}</span>?
+                                                                </DialogDescription>
+
+                                                                <DialogFooter>
+                                                                    <DialogClose
+                                                                        className="
+                                                                            border bg-slate-300 px-3 py-1 rounded-sm hover:cursor-pointer
+                                                                        "
+                                                                    >
+                                                                        Cancelar
+                                                                    </DialogClose>
+
+                                                                    <DialogClose asChild>
+                                                                        <Button
+                                                                            onClick={() => arquivarEdital(edital.id)}
+                                                                            size={"icon"}
+                                                                            variant={"destructive"}
+                                                                            className="w-fit border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5"
+                                                                        >
+                                                                            Arquivar
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     )}
 
                                                     {
@@ -239,7 +274,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
                                                                 <DialogContent className="rounded-2xl">
                                                                     <DialogHeader>
-                                                                        <DialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital Edital Fiocruz 2025/1?</DialogTitle>
+                                                                        <DialogTitle className="text-2xl font-bold">Tem certeza que deseja excluir o edital <span className="font-bold">{edital.name}</span>?</DialogTitle>
                                                                         <DialogDescription className="text-[14px] text-vermelho">
                                                                             Após a exclusão, não será possível recuperar os dados desse edital e análise realizada
                                                                         </DialogDescription>

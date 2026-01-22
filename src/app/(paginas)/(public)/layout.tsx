@@ -19,6 +19,8 @@ import { usePathname } from "next/navigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
+import { UserIcon } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function RootLayout({
   children,
@@ -29,6 +31,7 @@ export default function RootLayout({
   const { items } = useUsuario()
   const pathname = usePathname()
   const { barraLateralAberta, mudarEstadoBarraLateral } = useUsuario()
+  const { usuario } = useUsuario()
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -105,12 +108,48 @@ export default function RootLayout({
               </SidebarContent>
               <SidebarFooter>
                 {
-                  <div className="flex w-full items-center gap-4">
-                    <img className="w-fit" src="/logo_ia_editais.png" alt="Logo IAEditais" />
-                    falskdjfkleaf
+                  usuario && (
+                    <div className="flex items-center gap-4 w-full">
+                  <div className="flex items-center justify-center w-full min-w-8 max-w-12 h-12 bg-blue-400 rounded-full">
+                    
+                    {
+                      usuario && (
+                        usuario.icon ? (
+                          <img src={usuario.icon.filepath} className="w-8 h-8 rounded-full" />
+                        ) : (
+                          <UserIcon size={20} />
+                        )
+                      )
+                    }
                   </div>
+                
 
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: barraLateralAberta ? 1 : 0,
+                    pointerEvents: barraLateralAberta ? "auto" : "none",
+                    transition: {
+                      delay: barraLateralAberta ? 0.3 : 0,
+                      duration: 0.2,
+                      ease: "easeOut"
+                    }
+                  }}
+                  exit={{
+                    display: barraLateralAberta ? "flex" : "none"
+                  }}
+                  style={{
+                    display: barraLateralAberta ? "flex" : "none"
+                  }}
+                  className="flex flex-col min-w-[120px]"
+                >
+                  <span className="text-sm font-bold">{usuario?.username}</span>
+                  <Link href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
+                </motion.div>
+                </div>
+                  )
                 }
+                
               </SidebarFooter>
     
           </Sidebar>
