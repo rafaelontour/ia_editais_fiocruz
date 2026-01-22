@@ -22,7 +22,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
         index: 0
     })
 
-    
+
     const scrollToIndex = (index: number) => {
         const el = refs.current[index];
         if (el) {
@@ -36,7 +36,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
             setUltimaTab(true)
         }
     }, [taxonomias])
-    
+
     return (
         taxonomias && taxonomias.length > 0 && (
             <div className="flex flex-1">
@@ -47,7 +47,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                     onValueChange={(val) => setAbaSelecionada(val)}
                 >
                     <h3 className="font-bold text-2xl text-black text-left">Taxonomias</h3>
-                    
+
                     <div className="flex items-center justify-between gap-2">
                         <Button
                             className={`
@@ -76,7 +76,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                         >
                             <ChevronLeft className={`${primeiraTab ? "text-gray-400" : "text-white"}`} />
                         </Button>
-                        
+
                         <TabsList className="flex overflow-hidden">
                             <div className="flex gap-2 items-center mx-3 overflow-x-hidden">
                                 <div className="flex w-max">
@@ -84,7 +84,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                                         taxonomias.map((tax, index) => (
                                             <div key={index} className="flex items-center">
                                                 <TabsTrigger
-                                                    ref={el => {refs.current[index] = el}} // ← aqui conecta cada aba ao array de refs
+                                                    ref={el => { refs.current[index] = el }} // ← aqui conecta cada aba ao array de refs
                                                     onClick={() => {
                                                         setTaxonomiaSelecionada(anterior => ({
                                                             ...anterior,
@@ -116,8 +116,8 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                                                 </TabsTrigger>
 
                                                 {index < taxonomias.length - 1 && (
-                                                <span className="text-xs text-zinc-500 mx-4">|</span>
-                                            )}
+                                                    <span className="text-xs text-zinc-500 mx-4">|</span>
+                                                )}
                                             </div>
                                         ))
                                     }
