@@ -34,7 +34,6 @@ export default function RootLayout({
 
   // Atualiza o título dinamicamente no client (quando navega via Link)
   useEffect(() => {
-    console.log("pathname", pathname);
     document.title = `Administrativo - ${title}`;
   }, [pathname]);
 

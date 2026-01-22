@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react"
 import { NivelAcesso } from "../enum/nivelAcessoEnum"
 
 export interface UsuarioUnidade {
-    id: string,
+    id: string | undefined,
     unit_id?: string,
     phone_number?: string,
     username?: string,

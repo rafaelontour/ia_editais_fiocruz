@@ -129,11 +129,56 @@ async function buscarResponsavelEdital(idResponsavel: string): Promise<string> {
     }
 }
 
+async function trocarSenhaService(id: string | undefined, senhaAntiga: string, senhaNova: string) {
+    try {
+        const res = await fetch(`${urlBase}/user/password`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ user_id: id, current_password: senhaAntiga, new_password: senhaNova })
+        })
+
+        return res.status
+    } catch (e) {
+        return
+    }
+}
+
+async function atualizarInfoUsuarioService(usuario: UsuarioUnidade) {
+    try {
+        const url = `${urlBase}/user/`;
+
+        const res = await fetch(url, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: usuario.id,
+                username: usuario.username,
+                email: usuario.email,
+                unit_id: usuario.unit_id,
+                phone_number: usuario.phone_number,
+                access_level: usuario.access_level
+            })
+        });
+
+        return res.status
+    } catch (e) {
+        console.error("Erro ao tentar criar usuário: ", e);
+    }
+}
+
 export {
     getUsuarioLogado,
     getUsuariosPorUnidade,
     adicionarUsuarioService,
     atualizarUsuarioService,
     excluirUsuarioService,
-    buscarResponsavelEdital
+    buscarResponsavelEdital,
+    trocarSenhaService,
+    atualizarInfoUsuarioService
 }
