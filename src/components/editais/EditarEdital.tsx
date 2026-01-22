@@ -105,7 +105,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
         const re = (usuariosDaUnidade ?? []).filter((u) =>
             (edital.editors ?? []).some((e) => e.id === u.id)
         );
-        setValue("responsavel", re.map((u) => u.id));
+        setValue("responsavel", re.map((u) => u.id!));
         setResponsaveisEdital(re);
     }
 
@@ -294,10 +294,10 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                     <SelectGroup>
                                                         <SelectLabel>Usuários</SelectLabel>
                                                         {
-                                                            usuariosDaUnidade?.filter(u => field.value?.includes(u.id)).map((u) => (
+                                                            usuariosDaUnidade?.filter(u => field.value?.includes(u.id!)).map((u) => (
                                                                 <SelectItem
                                                                     key={u.id}
-                                                                    value={u.id}
+                                                                    value={u.id!}
                                                                 >
                                                                     {u.username}
                                                                 </SelectItem>
@@ -359,7 +359,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                             <button onClick={() => {
                                                                 const novaLista = responsaveisEdital.filter((u) => u.id !== responsavel?.id)
                                                                 setResponsaveisEdital(novaLista);
-                                                                setValue("responsavel", [...novaLista.map((u) => u.id)]);
+                                                                setValue("responsavel", [...novaLista.map((u) => u.id!)]);
                                                             }}>
                                                                 <div className="flex items-center" title="Remover usuário">
                                                                     <span

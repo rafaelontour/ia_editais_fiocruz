@@ -33,6 +33,8 @@ COPY --from=builder /app/package-lock.json ./package-lock.json
 # Instala somente dependências de produção
 RUN npm install --omit=dev
 
+RUN npm audit fix
+
 # Expondo a porta que a aplicação vai rodar
 EXPOSE 4000
 
