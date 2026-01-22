@@ -171,7 +171,7 @@ export default function RootLayout({
               <SidebarTrigger
                 onClick={() => mudarEstadoBarraLateral()}
                 className={`
-                  mt-4 ml-4 mb-2 rounded-sm mb-1
+                  mt-4 ml-4 rounded-sm mb-1
                   hover:cursor-pointer
                   bg-vermelho hover:bg-vermelho text-white hover:text-white
                   

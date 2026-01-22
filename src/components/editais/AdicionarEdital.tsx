@@ -347,7 +347,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                                 .map(usuario => (
                                                                     <SelectItem
                                                                         key={usuario.id}
-                                                                        value={usuario.id}
+                                                                        value={usuario.id!}
                                                                         className="hover:cursor-pointer"
                                                                     >
                                                                         {usuario.username}
