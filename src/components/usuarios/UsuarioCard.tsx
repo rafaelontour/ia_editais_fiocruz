@@ -65,7 +65,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
   }, [openDialogEditar, reset, usuario]);
 
   const atualizarUsuario = async (data: FormData) => {
-    const resposta =atualizarUsuarioService(data, usuario.id);
+    const resposta = atualizarUsuarioService(data, usuario.id!);
 
     if (await resposta !== 200) {
       toast.error('Não foi possível atualizar o usuário!');
@@ -94,8 +94,8 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
     <Div>
       <div className="flex flex-col gap-2">
         <h2 className="text-xl font-semibold">{usuario.username}</h2>
-        <p className="py-1 w-fit break-words text-sm">{usuario.email}</p>
-        <p className="py-1 w-fit break-words text-sm">{usuario.access_level}</p>
+        <p className="py-1 w-fit wrap-break-words text-sm">{usuario.email}</p>
+        <p className="py-1 w-fit wrap-break-words text-sm">{usuario.access_level}</p>
 
       </div>
 
@@ -275,7 +275,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
 
                 <Button
                   className="flex bg-red-500 hover:bg-red-600 text-white hover:cursor-pointer"
-                  onClick={() => excluirUsuario(usuario.id)}
+                  onClick={() => excluirUsuario(usuario.id!)}
                 >
                   Excluir
                 </Button>
