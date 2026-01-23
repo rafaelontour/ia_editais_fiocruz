@@ -264,14 +264,14 @@ export default function DetalheCaso({
                           {visible.map((m) => (
                             <span
                               key={m.id}
-                              className="px-2 py-1 rounded-md bg-green-100 text-green-800 text-sm"
+                              className="px-2 py-0.5 rounded-md bg-green-100 text-green-800 text-sm"
                             >
                               {m.name}
                             </span>
                           ))}
 
                           {hiddenCount > 0 && (
-                            <span className="px-2 py-1 rounded-md bg-gray-200 text-gray-700 text-sm">
+                            <span className="px-2 py-0.5 rounded-md bg-gray-200 text-gray-700 text-sm">
                               +{hiddenCount}
                             </span>
                           )}
@@ -385,7 +385,7 @@ export default function DetalheCaso({
       </div>
       {/* Botões fora do grid */}
       <div className="flex justify-between">
-        <Calendario />
+        <Calendario data={caso.created_at} />
         <div className="flex justify-end gap-x-2 gap-y-0 ">
           <button
             className="rounded-md hover:cursor-pointer px-4 py-2 w-fit h-fit bg-verde text-white"

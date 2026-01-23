@@ -118,7 +118,7 @@ export default function resultados() {
 
                 <div className="flex justify-center items-center">
                   <span
-                    className={`px-3 py-1 rounded text-white text-sm ${
+                    className={`px-3 py-1 rounded-sm text-white text-sm ${
                       result.passed_feedback ? "bg-verde" : "bg-vermelho"
                     }`}
                   >
