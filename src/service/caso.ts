@@ -22,6 +22,30 @@ async function buscarCasoService(): Promise<Caso[] | undefined> {
   }
 }
 
+async function buscarCasoPorColecaoService(
+  collectionId: string,
+): Promise<Caso[] | undefined> {
+  try {
+    const response = await fetch(
+      `${urlBase}/test-cases?test_collection_id=${collectionId}`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Erro ao buscar casos");
+    }
+
+    const { test_cases } = await response.json();
+
+    return test_cases as Caso[];
+  } catch (error) {
+    console.error("Erro ao buscar casos", error);
+  }
+}
+
 async function adicionarCasoService(data: CasoFormData) {
   const response = await fetch(`${urlBase}/test-cases`, {
     method: "POST",
@@ -49,7 +73,7 @@ async function adicionarCasoService(data: CasoFormData) {
 
 async function atualizarCasoService(
   test_case_id: string,
-  data: CasoFormData
+  data: CasoFormData,
 ): Promise<Caso | undefined> {
   try {
     const response = await fetch(`${urlBase}/test-cases/${test_case_id}`, {
@@ -93,6 +117,7 @@ async function excluirCasoService(id: string): Promise<boolean | undefined> {
 
 export {
   buscarCasoService,
+  buscarCasoPorColecaoService,
   adicionarCasoService,
   atualizarCasoService,
   excluirCasoService,

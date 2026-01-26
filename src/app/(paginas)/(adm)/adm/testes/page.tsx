@@ -21,7 +21,8 @@ import {
   excluirTesteService,
   getTestesService,
 } from "@/service/teste";
-import { Loader2, Plus } from "lucide-react";
+import { ListCheck, ListChecks, Loader2, Plus, Wrench } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
@@ -34,6 +35,8 @@ export default function testes() {
   const [testeFiltrado, setTesteFiltrado] = useState<Teste[]>([]);
   const [testes, setTestes] = useState<Teste[]>([]);
   const [carregando, setCarregando] = useState<boolean>(true);
+
+  const router = useRouter();
 
   useEffect(() => {
     async function carregar() {
@@ -224,6 +227,12 @@ export default function testes() {
                 <Calendario data={mockTeste.created_at} />
 
                 <div className="flex gap-3">
+                  <Button
+                    onClick={() => router.push(`/adm/testes/${mockTeste.id}`)}
+                    className="flex justify-center items-center h-8 w-8 border bg-branco border-gray-300 hover:bg-branco hover:cursor-pointer rounded-sm"
+                  >
+                    <ListChecks color="black" size={16} />
+                  </Button>
                   <BotaoEditar
                     onClick={() => {
                       setEditandoForm(mockTeste);

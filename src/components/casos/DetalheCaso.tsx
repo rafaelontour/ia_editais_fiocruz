@@ -38,6 +38,7 @@ interface DetalheCasoProps {
   getNomeEdital: (id: string) => string;
   getNomeTaxonomiaPorBranchId: (id: string) => string;
   getNomeTipificacaoPorBranchId: (id: string) => string;
+  hideCreateButton?: boolean;
 }
 
 export default function DetalheCaso({
@@ -48,6 +49,7 @@ export default function DetalheCaso({
   getNomeEdital,
   getNomeTaxonomiaPorBranchId,
   getNomeTipificacaoPorBranchId,
+  hideCreateButton,
 }: DetalheCasoProps) {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
@@ -145,7 +147,6 @@ export default function DetalheCaso({
 
       toast.success("Execução iniciada! Você pode acompanhar em Execuções.");
 
-      // navega normalmente
       router.push("/adm/execucoes");
     } catch (error) {
       console.error(error);
