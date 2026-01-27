@@ -168,7 +168,45 @@ async function atualizarInfoUsuarioService(usuario: UsuarioUnidade) {
 
         return res.status
     } catch (e) {
-        console.error("Erro ao tentar criar usuário: ", e);
+        return
+    }
+}
+
+async function adicionarFotoPerfilService(id: string | undefined, formData: FormData) {
+
+    try {
+        const res = await fetch(`${urlBase}/user/${id}/icon`, {
+            method: "POST",
+            credentials: "include",
+            body: formData
+        });
+        return res.status
+    } catch (e) {
+        return
+    }
+}
+
+async function atualizarFotoDePerfilService(id: string | undefined,) {
+    try {
+        const res = await fetch(`${urlBase}/user/${id}/icon`, {
+            method: "PUT",
+            credentials: "include",
+        });
+        return res.status
+    } catch (e) {
+        return
+    }
+}
+
+async function excluirFotoDePerfilService(id: string | undefined,) {
+    try {
+        const res = await fetch(`${urlBase}/user/${id}/icon`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+        return res.status
+    } catch (e) {
+        return
     }
 }
 
@@ -180,5 +218,8 @@ export {
     excluirUsuarioService,
     buscarResponsavelEdital,
     trocarSenhaService,
-    atualizarInfoUsuarioService
+    atualizarInfoUsuarioService,
+    adicionarFotoPerfilService,
+    atualizarFotoDePerfilService,
+    excluirFotoDePerfilService
 }

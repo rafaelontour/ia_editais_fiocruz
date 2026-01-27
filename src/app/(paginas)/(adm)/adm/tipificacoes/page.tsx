@@ -252,6 +252,7 @@ export default function Tipificacoes() {
                                             <p className="text-white text-sm">Adicionar tipificação</p>
                                         </Button>
                                     </DialogTrigger>
+                                    
                                     <DialogContent onCloseAutoFocus={limparCampos}>
                                         <DialogHeader>
                                             <DialogTitle className="text-3xl font-bold">
@@ -261,6 +262,7 @@ export default function Tipificacoes() {
                                                 Preencha os campos abaixo para adicionar uma nova tipificação
                                             </DialogDescription>
                                         </DialogHeader>
+
                                         <Formulario
                                             fontes={fontes}
                                             fontesSelecionadas={fontesSelecionadas}

@@ -109,12 +109,12 @@ export default function Formulario({
                         <div
                             className={`
                                 grid ${fontesSelecionadas.length === 1 ? "grid-cols-1" : fontesSelecionadas.length === 2 ? "grid-cols-2" : "grid-cols-3" } 
-                                gap-3 border-gray-200 rounded-md border-1 p-3
+                                gap-3 border-gray-200 rounded-md border p-3
                             `}
                         >
                             {
                                 fontesSelecionadas.map((fonte: Fonte) => (
-                                    <div data-cy="fonte-selecionada" key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border-1 pr-3 overflow-hidden">
+                                    <div data-cy="fonte-selecionada" key={fonte.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
                                         <div role="button" className="flex h-full" onClick={() => {
                                             const novaLista = fontesSelecionadas.filter((f: Fonte) => f.id !== fonte.id);
                                             setFontesSelecionadas(novaLista);
@@ -123,7 +123,7 @@ export default function Formulario({
                                             <div className="flex items-center h-full" title="Remover fonte">
                                                 <span
                                                     className="
-                                                        bg-red-200 p-[10px] h-full flex items-center justify-center
+                                                        bg-red-200 p-2.5 h-full flex items-center justify-center
                                                         hover:bg-red-400 hover:cursor-pointer hover:text-white
                                                         transition-all duration-200 ease-in-out
                                                     "

@@ -3,6 +3,7 @@
 import BotaoCancelar from "@/components/botoes/BotaoCancelar";
 import BotaoSalvar from "@/components/botoes/BotaoSalvar";
 import RotuloOpcional from "@/components/RotuloOpcional";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
@@ -12,15 +13,17 @@ import { UsuarioUnidade } from "@/core/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { formatarData } from "@/lib/utils";
 import { getUnidadePorId } from "@/service/unidade";
-import { atualizarInfoUsuarioService, trocarSenhaService } from "@/service/usuario";
+import { adicionarFotoPerfilService, atualizarFotoDePerfilService, atualizarInfoUsuarioService, excluirFotoDePerfilService, trocarSenhaService } from "@/service/usuario";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconPassword } from "@tabler/icons-react";
-import { User, Mail, Shield, LogOut, Pencil, Phone, Info } from "lucide-react";
+import { url } from "inspector";
+import { User, Mail, Shield, LogOut, Pencil, Phone, Info, X, Trash, ImageIcon } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z, { set } from "zod";
+import z, { file, set } from "zod";
 
 const schemaUsuario = z.object({
   nome: z.string().min(4, "O nome de usuário é obrigatório"),
@@ -35,7 +38,8 @@ const schemaTrocarSenha = z.object({
 })
 
 export default function MeuPerfil() {
-  const { usuario } = useUsuario();
+  const { usuario, deslogar } = useUsuario();
+  const router = useRouter()
 
   type formTrocarSenha = z.infer<typeof schemaTrocarSenha>;
   const {
@@ -54,7 +58,8 @@ export default function MeuPerfil() {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    watch
   } = useForm<formData>({
     resolver: zodResolver(schemaUsuario),
     defaultValues: {
@@ -68,10 +73,31 @@ export default function MeuPerfil() {
   const [carregando, setCarregando] = useState(true);
   const [openAlterarSenha, setOpenAlterarSenha] = useState<boolean>(false);
   const [openEditarInfo, setOpenEditarInfo] = useState<boolean>(false);
+  const [previaImagem, setPreviaImagem] = useState<string | null>(null);
+  const [imagem, setImagem] = useState<File | null>(null);
+  const urlBase = process.env.NEXT_PUBLIC_URL_BASE
+  const [atualizarImagemPerfil, setAtualizarImagemPerfil] = useState<boolean>(false);
+  const [excluirImagemPerfil, setExcluirImagemPerfil] = useState<boolean>(false);
 
   useEffect(() => {
+    if (usuario?.icon?.file_path) setPreviaImagem(`${urlBase}/${usuario.icon.file_path}`);
     buscarUnidade();
   }, []);
+
+  useEffect(() => {
+    if (openEditarInfo) {
+      if (usuario?.icon?.file_path) {
+        setPreviaImagem(`${urlBase}/${usuario.icon.file_path}`);
+      } else {
+        setPreviaImagem(null);
+      }
+
+      setExcluirImagemPerfil(false);
+      setAtualizarImagemPerfil(false);
+      setImagem(null);
+    }
+  }, [openEditarInfo]);
+
 
   async function buscarUnidade() {
     try {
@@ -127,15 +153,70 @@ export default function MeuPerfil() {
       access_level: usuario?.access_level,
     }
 
-    const res = await atualizarInfoUsuarioService(usuarioModificado);
+    const res = await atualizarInfoUsuarioService(usuarioModificado);  // Atualizar informações gerais
 
     if (res !== 200) {
       toast.error("Erro ao atualizar usuário!");
       return
     }
 
+    if (atualizarImagemPerfil) { // Atualizar foto de perfil
+      const res2 = await atualizarFotoDePerfilService(usuario?.id);
+
+      if (res2 !== 200) {
+        toast.error("Erro ao atualizar foto de perfil!");
+      }
+    }
+
+    if (excluirImagemPerfil) { // Excluir foto de perfil
+      excluirFotoDePerfil();
+    }
+
+    if (usuario?.icon?.file_path === undefined) { // Adicionar uma nova foto de perfil sem ter uma anterior
+      
+      const dados: FormData = new FormData();
+      if (!imagem) return
+      dados.append("file", imagem);
+      
+      const res2 = await adicionarFotoPerfilService(usuario?.id, dados)
+  
+      if (res2 !== 200) {
+        toast.error("Erro ao adicionar foto de perfil!");
+      } else {
+        toast.success("Foto de perfil atualizada com sucesso!");
+      }
+
+    }
+
     toast.success("Dados atualizados com sucesso!");
     setOpenEditarInfo(false);
+  }
+
+  async function excluirFotoDePerfil() {
+
+    const res = await excluirFotoDePerfilService(usuario?.id);
+
+    if (res !== 200) {
+      toast.error("Erro ao excluir foto de perfil!");
+      return
+    }
+
+    toast.success("Foto de perfil excluída com sucesso!");
+  }
+
+  function mostrarImagem(e: React.ChangeEvent<HTMLInputElement>) {
+
+    if (!e.target.files) return;
+    setImagem(e.target.files?.[0]);
+    const arquivo = e.target.files?.[0];
+    
+    if (!arquivo) return;
+    
+    if (previaImagem) setPreviaImagem(null);
+
+    setPreviaImagem(URL.createObjectURL(arquivo));
+
+    if (usuario?.icon?.file_path !== undefined) setAtualizarImagemPerfil(true);
   }
 
   const senhaAtual = watchSenhaAtual("senhaAtual", "");
@@ -172,13 +253,11 @@ export default function MeuPerfil() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
         <div className="border rounded-md p-6 flex flex-col items-center gap-4">
-          {usuario?.icon ? (
-            <Image
-              src={usuario.icon.filepath}
+          {usuario?.icon?.file_path ? (
+            <img
+              src={urlBase + usuario?.icon?.file_path}
               alt="Minha foto"
-              width={160}
-              height={160}
-              className="rounded-full object-cover"
+              className="rounded-full object-cover h-52 w-52"
             />
           ) : (
             <div className="flex items-center justify-center w-40 h-40 bg-zinc-400 rounded-full">
@@ -203,7 +282,15 @@ export default function MeuPerfil() {
                 </DialogTrigger>
               </div>
             
-              <DialogContent onCloseAutoFocus={() => reset()} className="w-[50%]">
+              <DialogContent
+                onCloseAutoFocus={() => { 
+                  reset();
+                  setPreviaImagem(null),
+                  setExcluirImagemPerfil(false);
+                  setAtualizarImagemPerfil(false); 
+                }}
+                className="w-[50%]"
+              >
                 <DialogHeader>
                   <DialogTitle className="text-3xl font-bold">Editar perfil</DialogTitle>
                   <div className="flex items-center gap-2">
@@ -219,21 +306,68 @@ export default function MeuPerfil() {
                 <div className="flex flex-col gap-3">
                   <p className="text-lg">Imagem de perfil</p>
             
-                  <div className="relative w-full h-fit border border-zinc-300 rounded-md">
-                    <div className="">
+                  <div className="relative w-full h-fit border rounded-md">
                       {
-                        !usuario?.id ? (
-                          <p>tem foto</p>
-                        ) : (
-                          <div className="flex justify-center w-full relative">
-                            <div className="w-full bg-zinc-200 rounded-md" title="Enviar foto de perfil">
-                              <FileUpload />
+                        previaImagem ? (
+                          <div className="flex flex-col justify-center items-center gap-4 p-4 border-zinc-300">
+                            <img
+                              src={urlBase! + usuario?.icon?.file_path}
+                              alt="Imagem de perfil" className="object-cover w-52 h-52 rounded-full" 
+                            />
+
+                            <div className="flex w-full justify-between items-center gap-2">
+                              <Button
+                                className="hover:cursor-pointer bg-vermelho hover:bg-vermelho"
+                                title="Remover imagem"
+                                onClick={() => { setPreviaImagem(null); setExcluirImagemPerfil(true) }}
+                                type="button"
+                              >
+                                <Trash size={16} />
+                                <span>Remover imagem</span>
+                              </Button>
+
+                              <label className="cursor-pointer">
+                                <div
+                                  className="hover:cursor-pointer flex items-center gap-2"
+                                  title="Alterar imagem"
+                                >
+                                  <ImageIcon size={16} />
+                                  <span>Alterar imagem</span>
+
+                                  <input
+                                    className="hidden"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => { mostrarImagem(e) }}
+                                  />
+                                </div>
+                              </label>
+
                             </div>
                           </div>
+                        ) : (
+                          <label className="cursor-pointer">
+                              <div
+                                className="
+                                  w-full flex justify-center items-center border-2
+                                  border-zinc-500 border-dashed rounded-md p-4
+                                  bg-zinc-100 hover:bg-zinc-200 ease-in-out duration-300
+                                "
+                                title="Enviar foto de perfil"
+                              >
+                                <input
+                                  className="hidden"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => mostrarImagem(e)}
+                                />
+                              <p>Clique aqui para enviar uma foto de perfil</p>
+                            </div>
+
+                          </label>
                         )
                       }
             
-                    </div>
                   </div>
                 </div>
 
@@ -415,9 +549,12 @@ export default function MeuPerfil() {
 
       </div>
 
-      {/* AÇÕES GERAIS */}
+      {/* Botão de sair da conta */}
       <div className="flex justify-end">
-        <button className="flex items-center gap-2 text-red-600 border border-red-600 px-4 py-2 rounded hover:bg-red-50">
+        <button
+          className="flex items-center gap-2 text-red-600 hover:cursor-pointer border border-red-600 px-4 py-2 rounded hover:bg-red-50"
+          onClick={() => { deslogar(); router.push("/"); }}
+        >
           <LogOut size={18} />
           Sair da conta
         </button>

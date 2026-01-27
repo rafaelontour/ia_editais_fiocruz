@@ -1,12 +1,12 @@
 "use client";
 
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import EditarEdital from "./EditarEdital";
 import { Button } from "../ui/button";
-import { Archive, Info, Trash, View } from "lucide-react";
+import { Archive, Check, CheckIcon, Info, Logs, LogsIcon, Send, Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { arquivarEditalService, excluirEditalService } from "@/service/edital";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import Link from "next/link";
 import { formatarData } from "@/lib/utils";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { IconLoaderQuarter, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
+import { IconLoaderQuarter, IconLogs, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
 import useEditalProc from "@/data/hooks/useProcEdital";
 import { useRouter } from "next/navigation";
 
@@ -26,9 +26,16 @@ interface Props {
     flagEdital: boolean
 }
 
+type HistoricoPorDia = {
+    data: string;
+    modificacoes: string[];
+}
+
 export default function CardEdital({ edital, containerId, funcaoAtualizarEditais, flagEdital }: Props) {
     const { usuario } = useUsuario();
     const { editalProcessado, idEditalAtivo } = useEditalProc();
+    const [openExcluirEdital, setOpenExcluirEdital] = useState<boolean>(false);
+    const [datasComModificacoes, setDatasComModificacoes] = useState<HistoricoPorDia[] | null>(null)
 
     // passa data.containerId para o hook
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -51,6 +58,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
         }
 
         toast.success("Edital excluido com sucesso!");
+        funcaoAtualizarEditais(!flagEdital);
     }
 
     const cor = () => {
@@ -77,9 +85,14 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             return    
         } 
 
-
         funcaoAtualizarEditais(!flagEdital);
         toast.success("Edital arquivado!");
+    }
+
+    function gerarLogEdital() {
+        if (!edital.history) return;
+
+        const dataDoDia = edital.history[0]
     }
 
     return (
@@ -96,46 +109,114 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
             {/* drag handle: aplicamos attributes & listeners aqui (evita conflitos com botões dentro do card) */}
             <div {...attributes} {...listeners} className={`${!editalProcessado && idEditalAtivo === edital.id && "hidden"} h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
-                <span className={`text-md  text-white pointer-events-none italic`}>Segure nesta área para arrastar</span>
+                <span
+                    className={`
+                        w-fulltext-md pointer-events-none italic
+                    `}
+                >
+                    Segure nesta área para arrastar
+                </span>
             </div>
 
-            <div className="relative p-3">
+            <div className="relative p-3 overflow-x-hidden">
                 <div className="flex flex-col-reverse items-start justify-between gap-2">
                     <h3 className="font-semibold text-xl">{edital.name}</h3>
 
-                    {
-                        edital.history &&
-                        edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 2 &&
-                        edital.history.filter((h) => h.status === "WAITING_FOR_REVIEW").length >= 1 && (
-                            <Tooltip>
-                                <div className="flex items-center bg-black pl-3 pr-2 py-1 rounded-md" style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}>
-                                    <TooltipTrigger>
-                                        {
-                                            edital.history[0].status !== "COMPLETED" ? (
-                                                <span className="flex items-center gap-1 text-sm font-bold text-white" >
-                                                    Retrabalhando <IconProgressHelp className="mt-0.5" size={17} />
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-1 text-sm font-bold text-white" >
-                                                    Retrabalhado <IconProgressCheck color="green" className="mt-0.5" size={17} />
-                                                </span>
-                                            )
-                                        }
-                                    </TooltipTrigger>
-
-                                    <TooltipContent className="text-md">
-                                        {
-                                            edital.history[0].status !== "COMPLETED" ? (
-                                                <span>Este edital já esteve em fase de análise e voltou para fase de construção em algum momento</span>
-                                            ) : (
-                                                <span>Este edital esteve em análise, mas voltou para construção pelo menos 1 vez</span>
-                                            )
-                                        }
-                                    </TooltipContent>
+                    <div className="w-full my-0.5 flex justify-between">
+                        {
+                            edital.history &&
+                            edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 2 &&
+                            edital.history.filter((h) => h.status === "WAITING_FOR_REVIEW").length >= 1 && (
+                                <Tooltip>
+                                    <div className="flex items-center bg-black pl-3 pr-2 py-1 rounded-md" style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}>
+                                        <TooltipTrigger>
+                                            {
+                                                edital.history[0].status !== "COMPLETED" ? (
+                                                    <span className="flex items-center gap-1 text-sm font-bold text-white" >
+                                                        Retrabalhando <IconProgressHelp className="mt-0.5" size={17} />
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-1 text-sm font-bold text-white" >
+                                                        Retrabalhado <IconProgressCheck color="green" className="mt-0.5" size={17} />
+                                                    </span>
+                                                )
+                                            }
+                                        </TooltipTrigger>
+                                        <TooltipContent className="text-md">
+                                            {
+                                                edital.history[0].status !== "COMPLETED" ? (
+                                                    <span>Este edital já esteve em fase de análise e voltou para fase de construção em algum momento</span>
+                                                ) : (
+                                                    <span>Este edital esteve em análise, mas voltou para construção pelo menos 1 vez</span>
+                                                )
+                                            }
+                                        </TooltipContent>
+                                    </div>
+                                </Tooltip>
+                            )
+                        }
+                        
+                            
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <div
+                                    className="
+                                        flex gap-2 items-center hover:cursor-pointer
+                                        pl-3 pr-2 py-1 rounded-md font-bold text-sm hover:underline
+                                    "
+                                    title="Ver histórico de atualização do estado do edital"
+                                >
+                                    <p>Logs do edital</p>
+                                    <IconLogs size={17} />
                                 </div>
-                            </Tooltip>
-                        )
-                    }
+                            </DialogTrigger>
+
+                            <DialogContent className="w-[60%]">
+                                <DialogHeader>
+                                    <DialogTitle className="text-3xl">Historico de atualização do estado do edital</DialogTitle>
+                                </DialogHeader>
+
+                                <DialogDescription className="text-md mb-8">
+                                    Ações, editores e estados do edital
+                                </DialogDescription>
+
+                                {
+                                    edital.history &&
+                                    edital.history.map((h, index) => (
+                                        <div key={index} className="flex flex-col justify-between">
+                                            {  
+                                                index === 0 ? (
+                                                    <div className="w-full flex justify-center items-center gap-2">
+                                                        <CheckIcon className="text-green-500" size={25} /> 
+                                                        <span className="font-semibold text-lg">Edital enviado em {formatarData(h.created_at)}</span>
+                                                    </div>
+                                                ) : (
+                                                    <div>
+                                                        <span>{formatarData(h.created_at)}</span>
+                                                        <span>{h.status}</span>
+                                                        {index}
+
+                                                    </div>
+                                                )
+                                            }
+                                            
+                                        </div>
+                                    ))
+                                }
+
+                            </DialogContent>
+
+                            {
+                                edital.status === "COMPLETED" && 
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button onClick={() => arquivarEdital(edital.id)}>Arquivar edital</Button>
+                                    </DialogClose>
+                                </DialogFooter>
+                            }
+                        </Dialog>
+                        
+                    </div>
                 </div>
 
                 <hr className="my-1" />
@@ -260,7 +341,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
                                                     {
                                                         ((usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST") && (edital.history && (edital.history[0].status === "PENDING" || edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "COMPLETED"))) && (
-                                                            <Dialog>
+                                                            <Dialog open={openExcluirEdital} onOpenChange={setOpenExcluirEdital}>
                                                                 <DialogTrigger asChild>
                                                                     <Button
                                                                         size={"icon"}

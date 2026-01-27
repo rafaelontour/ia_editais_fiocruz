@@ -32,6 +32,7 @@ export default function RootLayout({
   const pathname = usePathname()
   const { barraLateralAberta, mudarEstadoBarraLateral } = useUsuario()
   const { usuario } = useUsuario()
+  const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -110,12 +111,12 @@ export default function RootLayout({
                 {
                   usuario && (
                     <div className="flex items-center gap-4 w-full">
-                  <div className="flex items-center justify-center w-full min-w-8 max-w-12 h-12 bg-blue-400 rounded-full">
+                  <div className={ `flex items-center justify-center w-full min-w-8 max-w-12 transition-all duration-100  ${barraLateralAberta ? "h-12" : "h-9"} bg-verde rounded-full`}>
                     
                     {
                       usuario && (
                         usuario.icon ? (
-                          <img src={usuario.icon.filepath} className="w-8 h-8 rounded-full" />
+                          <img src={urlBase + usuario.icon.file_path} className="w-8 h-8 rounded-full" />
                         ) : (
                           <UserIcon size={20} />
                         )

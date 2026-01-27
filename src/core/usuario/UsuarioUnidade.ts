@@ -12,6 +12,6 @@ export interface UsuarioUnidade {
     updated_at?: string | number
     editable_documents?: string[]
     icon?: {
-        filepath: string
+        file_path: string
     }
 }

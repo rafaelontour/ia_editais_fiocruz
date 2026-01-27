@@ -32,6 +32,8 @@ export default function RootLayout({
 
   const title = titulosMap[pathname] || "IAEditais";
 
+  const urlBase = process.env.NEXT_PUBLIC_URL_BASE
+
   // Atualiza o título dinamicamente no client (quando navega via Link)
   useEffect(() => {
     document.title = `Administrativo - ${title}`;
@@ -114,12 +116,12 @@ export default function RootLayout({
 
               <SidebarFooter>
                 <div className="flex items-center gap-4 w-full">
-                  <div className="flex items-center justify-center w-full min-w-8 max-w-12 h-12 bg-blue-400 rounded-full">
+                  <div className={`flex items-center justify-center transition-all duration-100 w-full ${barraLateralAberta ? "h-12" : "h-9"} min-w-8 max-w-12  bg-verde rounded-full`}>
                     
                     {
                       usuario && (
                         usuario.icon ? (
-                          <img src={usuario.icon.filepath} className="w-8 h-8 rounded-full" />
+                          <img src={urlBase + usuario.icon.file_path} className={`w-8 h-8 rounded-full`} />
                         ) : (
                           <UserIcon size={20} />
                         )
@@ -144,7 +146,7 @@ export default function RootLayout({
                   style={{
                     display: barraLateralAberta ? "flex" : "none"
                   }}
-                  className="flex flex-col min-w-[120px]"
+                  className={`flex flex-col min-w-[120px]`}
                 >
                   <span className="text-sm font-bold">{usuario?.username}</span>
                   <Link href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>

@@ -15,6 +15,8 @@ export default function Cabecalho() {
     const { usuario, deslogar, mensagemLogin } = useUsuario();
     const router = useRouter();
 
+    const [montado, setMontado] = useState<boolean>(false);
+
     const [unidade, setUnidade] = useState<Unidade | null>(null);
     const [cargo, setCargo] = useState<string | null>(null);
     const versaoPlataforma: string | undefined = process.env.NEXT_PUBLIC_VERSAO_PLATAFORMA;
@@ -35,6 +37,10 @@ export default function Cabecalho() {
                   usuario.access_level === "AUDITOR" ? "AUDITOR" : "DEFAULT";
         setCargo(c);
     }
+
+    useEffect(() => {
+        setMontado(true);
+    }, []);
 
     useEffect(() => {
         carregarInfoUsuario()
@@ -86,27 +92,33 @@ export default function Cabecalho() {
             </motion.div>
 
             {/* Botão login/logout */}
-            {!usuario ? (
-                <Button
-                    onClick={() => router.push("/auth/login")}
-                    variant="destructive"
-                    className="flex h-fit ml-auto mr-2 py-[5px] px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
-                    style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
-                >
-                    <IconLogin color="white" size={26} />
-                    <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
-                </Button>
-            ) : (
-                <Button
-                    onClick={() => { deslogar(); router.push("/"); }}
-                    variant="destructive"
-                    className="flex h-fit ml-auto mr-2 py-[5px] px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
-                    style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
-                >
-                    <IconLogout color="white" size={26} />
-                    <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
-                </Button>
-            )}
+
+            {
+                montado && (
+                    !usuario ? (
+                        <Button
+                            onClick={() => router.push("/auth/login")}
+                            variant="destructive"
+                            className="flex h-fit ml-auto mr-2 py-[5px] px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
+                            style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                        >
+                            <IconLogin color="white" size={26} />
+                            <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={() => { deslogar(); router.push("/"); }}
+                            variant="destructive"
+                            className="flex h-fit ml-auto mr-2 py-[5px] px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
+                            style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                        >
+                            <IconLogout color="white" size={26} />
+                            <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
+                        </Button>
+                    )
+                )
+            }
+            
         </header>
     );
 }
