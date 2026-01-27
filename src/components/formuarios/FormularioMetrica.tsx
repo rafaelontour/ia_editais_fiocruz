@@ -21,11 +21,11 @@ interface FormularioMetricaProps {
 }
 
 function toFormData(
-  data: FormularioMetricaProps["initialData"]
+  data: FormularioMetricaProps["initialData"],
 ): MetricaFormData {
   return {
     name: data?.name ?? "",
-    threshold: Number(data?.threshold ?? 0),
+    threshold: Number(data?.threshold ?? 0.5),
     criteria: data?.criteria ?? "",
     evaluation_steps: data?.evaluation_steps ?? "",
   };
@@ -109,6 +109,10 @@ export default function FormularioMetrica({
             step="0.1"
             {...register("threshold", { valueAsNumber: true })}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Valor padrão recomendado: <strong>0.5</strong>. Você pode alterar se
+            necessário.
+          </p>
           {errors.threshold && (
             <span className="text-red-500 text-sm italic">
               {errors.threshold.message}

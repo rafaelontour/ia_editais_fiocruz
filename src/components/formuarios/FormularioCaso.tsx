@@ -35,6 +35,7 @@ interface FormularioCasoProps {
   tipificacoes?: Tipificacao[];
   testes?: Teste[];
   editais?: Edital[];
+  defaultCollectionId?: string;
   carregandoEdital?: boolean;
   carregandoTeste?: boolean;
   carregandoTip?: boolean;
@@ -46,6 +47,7 @@ export default function FormularioCaso({
   mode = "create",
   tipificacoes = [],
   testes = [],
+  defaultCollectionId,
   editais = [],
   carregandoEdital = false,
   carregandoTeste = false,
@@ -65,7 +67,8 @@ export default function FormularioCaso({
       taxonomy_id: initialData?.taxonomia ?? "",
       typification_id: initialData?.tipificacao ?? "",
       branch_id: initialData?.branch_id ?? "",
-      test_collection_id: initialData?.test_collection_id ?? "",
+      test_collection_id:
+        initialData?.test_collection_id ?? defaultCollectionId ?? "",
       // doc_id: initialData?.doc_id ?? "",
       expected_fulfilled: initialData
         ? initialData.expected_fulfilled
@@ -237,32 +240,34 @@ export default function FormularioCaso({
         )}
       </div>
       <div className="flex justify-between gap-2">
-        <div className="flex flex-col gap-2 w-1/2">
-          <Label>Teste associado</Label>
-          <Controller
-            name="test_collection_id"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full cursor-pointer">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {testes?.map((test: Teste) => (
-                    <SelectItem key={test.id} value={test.id!}>
-                      {test.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        {!defaultCollectionId && (
+          <div className="flex flex-col gap-2 w-1/2">
+            <Label>Teste associado</Label>
+            <Controller
+              name="test_collection_id"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full cursor-pointer">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {testes?.map((test: Teste) => (
+                      <SelectItem key={test.id} value={test.id!}>
+                        {test.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.test_collection_id && (
+              <span className="text-red-500 text-sm italic">
+                {errors.test_collection_id.message}
+              </span>
             )}
-          />
-          {errors.test_collection_id && (
-            <span className="text-red-500 text-sm italic">
-              {errors.test_collection_id.message}
-            </span>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-2 w-1/2">
           <Label>Conformidade com o ramo?</Label>

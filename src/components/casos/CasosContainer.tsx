@@ -279,6 +279,7 @@ export default function CasosContainer({
                   testes={testes}
                   editais={editais}
                   carregandoTip={carregandoTip}
+                  defaultCollectionId={collectionId}
                   onSubmit={async (data) => {
                     try {
                       const novoCaso = await adicionarCasoService({
