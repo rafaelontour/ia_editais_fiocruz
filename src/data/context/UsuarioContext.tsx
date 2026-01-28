@@ -5,12 +5,14 @@ import { UsuarioUnidade } from "@/core/usuario";
 import { logout } from "@/service/auth";
 import { getUsuarioLogado } from "@/service/usuario";
 import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export interface ContextoProps {
     usuario: UsuarioUnidade | undefined
     setUsuario: Dispatch<SetStateAction<UsuarioUnidade | undefined>>
     logarUsuario: () => void
     deslogar: () => void
+    buscarDadosAtualizados: () => void
     items: MenuItem[]
     mensagemLogin: string,
     barraLateralAberta: boolean
@@ -34,7 +36,7 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
         });
         
     }
-    
+
     useEffect(() => {
         const estadoBarra = localStorage.getItem("barraLateralAberta")
 
@@ -46,6 +48,17 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
         getUsuarioLogado()
         setMontado(true)
     }, [])
+
+    async function buscarDadosAtualizados() {
+        const [res, status] = await getUsuarioLogado();
+
+        if (status !== 200) {
+            toast.error("Erro ao buscar dados do usuário!");
+            return
+        }
+
+        setUsuario(res)
+    }
 
     async function logarUsuario() {
         try {
@@ -95,6 +108,7 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
                 logarUsuario: logarUsuario,
                 deslogar: deslogar,
                 items: items,
+                buscarDadosAtualizados: buscarDadosAtualizados,
                 mensagemLogin: mensagemLogin,
                 barraLateralAberta: barraLateralAberta,
                 mudarEstadoBarraLateral: mudarEstadoBarraLateral

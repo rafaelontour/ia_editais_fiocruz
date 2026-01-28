@@ -38,7 +38,7 @@ const schemaTrocarSenha = z.object({
 })
 
 export default function MeuPerfil() {
-  const { usuario, deslogar } = useUsuario();
+  const { usuario, deslogar, buscarDadosAtualizados } = useUsuario();
   const router = useRouter()
 
   type formTrocarSenha = z.infer<typeof schemaTrocarSenha>;
@@ -59,7 +59,6 @@ export default function MeuPerfil() {
     handleSubmit,
     formState: { errors },
     reset,
-    watch
   } = useForm<formData>({
     resolver: zodResolver(schemaUsuario),
     defaultValues: {
@@ -77,7 +76,18 @@ export default function MeuPerfil() {
   const [imagem, setImagem] = useState<File | null>(null);
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE
   const [atualizarImagemPerfil, setAtualizarImagemPerfil] = useState<boolean>(false);
-  const [excluirImagemPerfil, setExcluirImagemPerfil] = useState<boolean>(false);
+  const [adicionouImagemPerfil, setAdicionouImagemPerfil] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!usuario) return;
+
+    reset({
+      nome: usuario.username ?? "",
+      telefone: usuario.phone_number ?? "",
+      email: usuario.email ?? "",
+    });
+  }, [usuario, reset]);
+
 
   useEffect(() => {
     if (usuario?.icon?.file_path) setPreviaImagem(`${urlBase}/${usuario.icon.file_path}`);
@@ -85,14 +95,17 @@ export default function MeuPerfil() {
   }, []);
 
   useEffect(() => {
-    if (openEditarInfo) {
-      if (usuario?.icon?.file_path) {
-        setPreviaImagem(`${urlBase}/${usuario.icon.file_path}`);
-      } else {
-        setPreviaImagem(null);
-      }
+    if (!usuario) return;
 
-      setExcluirImagemPerfil(false);
+    if (usuario.icon?.file_path) {
+      setPreviaImagem(`${urlBase}/${usuario.icon.file_path}`);
+    } else {
+      setPreviaImagem(null);
+    }
+  }, [usuario]);
+
+  useEffect(() => {
+    if (openEditarInfo) {
       setAtualizarImagemPerfil(false);
       setImagem(null);
     }
@@ -160,34 +173,7 @@ export default function MeuPerfil() {
       return
     }
 
-    if (atualizarImagemPerfil) { // Atualizar foto de perfil
-      const res2 = await atualizarFotoDePerfilService(usuario?.id);
-
-      if (res2 !== 200) {
-        toast.error("Erro ao atualizar foto de perfil!");
-      }
-    }
-
-    if (excluirImagemPerfil) { // Excluir foto de perfil
-      excluirFotoDePerfil();
-    }
-
-    if (usuario?.icon?.file_path === undefined) { // Adicionar uma nova foto de perfil sem ter uma anterior
-      
-      const dados: FormData = new FormData();
-      if (!imagem) return
-      dados.append("file", imagem);
-      
-      const res2 = await adicionarFotoPerfilService(usuario?.id, dados)
-  
-      if (res2 !== 200) {
-        toast.error("Erro ao adicionar foto de perfil!");
-      } else {
-        toast.success("Foto de perfil atualizada com sucesso!");
-      }
-
-    }
-
+    await buscarDadosAtualizados()
     toast.success("Dados atualizados com sucesso!");
     setOpenEditarInfo(false);
   }
@@ -201,22 +187,35 @@ export default function MeuPerfil() {
       return
     }
 
+    buscarDadosAtualizados()
     toast.success("Foto de perfil excluída com sucesso!");
   }
 
-  function mostrarImagem(e: React.ChangeEvent<HTMLInputElement>) {
+  async function mostrarImagem(e: React.ChangeEvent<HTMLInputElement>) {
+
+    setAdicionouImagemPerfil(true);
 
     if (!e.target.files) return;
     setImagem(e.target.files?.[0]);
     const arquivo = e.target.files?.[0];
-    
-    if (!arquivo) return;
-    
-    if (previaImagem) setPreviaImagem(null);
 
     setPreviaImagem(URL.createObjectURL(arquivo));
+  }
 
-    if (usuario?.icon?.file_path !== undefined) setAtualizarImagemPerfil(true);
+  async function adicionarFotoDePerfil() {
+    const dados: FormData = new FormData();
+    if (!imagem) return
+    dados.append("file", imagem);
+
+    const res2 = await adicionarFotoPerfilService(usuario?.id, dados)
+  
+    if (res2 !== 200) {
+      toast.error("Erro ao adicionar foto de perfil!");
+    } else {
+      toast.success("Foto de perfil atualizada com sucesso!");
+    }
+
+    buscarDadosAtualizados()
   }
 
   const senhaAtual = watchSenhaAtual("senhaAtual", "");
@@ -253,17 +252,130 @@ export default function MeuPerfil() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
         <div className="border rounded-md p-6 flex flex-col items-center gap-4">
-          {usuario?.icon?.file_path ? (
-            <img
-              src={urlBase + usuario?.icon?.file_path}
-              alt="Minha foto"
-              className="rounded-full object-cover h-52 w-52"
-            />
+          
+          {
+            (atualizarImagemPerfil || adicionouImagemPerfil) && (
+              <div className="flex items-center gap-2">
+                <Info size={16} />
+                <p>Clique em salvar para manter a alteração</p>
+              </div>
+            )
+          }
+
+          {usuario?.icon?.file_path !== undefined ? (
+            <div className="relative rounded-full overflow-hidden">
+              <img
+                src={urlBase + usuario?.icon?.file_path}
+                alt="Minha foto"
+                className="object-cover h-52 w-52"
+              />
+
+              <div 
+                className="
+                  absolute flex not-odd:items-center justify-center
+                  top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2
+                  bg-zinc-100 opacity-0 hover:opacity-70 w-full h-full z-10
+                  
+                "
+              >
+                
+                <div className="flex flex-col gap-2">
+                  <Button
+                    className="hover:cursor-pointer "
+                    variant={"destructive"}
+                    onClick={() => excluirFotoDePerfil()}
+                  >
+                    <Trash size={16} />
+                    <p>Remover foto</p>
+                  </Button>
+
+                  <Button>
+                    <ImageIcon size={16} />
+                    <p>Alterar foto</p>
+                  </Button>
+                  
+                </div>
+              </div>
+            </div>
           ) : (
-            <div className="flex items-center justify-center w-40 h-40 bg-zinc-400 rounded-full">
-              <User color="white" size={80} />
+            <div className="relative overflow-hidden flex items-center justify-center w-52 h-52 bg-zinc-400 rounded-full">
+
+              {
+                previaImagem ? (
+                  <img
+                    src={previaImagem}
+                    alt="Minha foto"
+                    className="rounded-full object-cover h-52 w-52"
+                  />
+
+                ) : (
+                  <User color="white" size={80} />
+                )
+              }
+              <div 
+                className="
+                  absolute flex not-odd:items-center justify-center
+                  top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2
+                  bg-zinc-100 opacity-0 hover:opacity-70 w-full h-full z-10
+                "
+              >
+                
+                <div className="flex flex-col gap-2">
+
+                  {
+                    previaImagem ? (
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          className="hover:cursor-pointer "
+                          variant={"destructive"}
+                          onClick={() => {
+                            if (!adicionouImagemPerfil) excluirFotoDePerfil();
+                            setPreviaImagem(null);
+                            setAtualizarImagemPerfil(false) 
+                          }}
+                        >
+                          <Trash size={16} />
+                          <p>Remover foto</p>
+                        </Button>
+
+                        <Button>
+                          <ImageIcon size={16} />
+                          <p>Alterar foto</p>
+                        </Button>
+                        
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer">
+                        <div className="flex items-center gap-2 ">
+                          <ImageIcon size={16} />
+                          <p>Enviar foto</p>
+                          <input
+                            className="hidden"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => mostrarImagem(e)}
+                          />
+                        </div>
+                      </label>
+
+                    )
+                  } 
+                </div>
+
+              </div>
             </div>
           )}
+
+          {
+            previaImagem && adicionouImagemPerfil && (
+                <Button
+                  className="cursor-pointer bg-green-400"
+                  onClick={() => { adicionarFotoDePerfil(); setAdicionouImagemPerfil(false); setAtualizarImagemPerfil(false) }}
+                >
+                  Salvar
+                </Button>
+            )
+          }
 
           <div className="text-center">
             <p className="text-2xl font-bold">{usuario?.username}</p>
@@ -277,7 +389,7 @@ export default function MeuPerfil() {
                 <DialogTrigger asChild>
                   <button className="flex items-center gap-2 text-sm px-4 py-2 border rounded hover:bg-zinc-100 hover:cursor-pointer">
                     <Pencil size={16} />
-                    Editar perfil
+                    Editar informações
                   </button>
                 </DialogTrigger>
               </div>
@@ -285,9 +397,6 @@ export default function MeuPerfil() {
               <DialogContent
                 onCloseAutoFocus={() => { 
                   reset();
-                  setPreviaImagem(null),
-                  setExcluirImagemPerfil(false);
-                  setAtualizarImagemPerfil(false); 
                 }}
                 className="w-[50%]"
               >
@@ -303,73 +412,6 @@ export default function MeuPerfil() {
                     </div>
                   </div>
                 </DialogHeader>
-                <div className="flex flex-col gap-3">
-                  <p className="text-lg">Imagem de perfil</p>
-            
-                  <div className="relative w-full h-fit border rounded-md">
-                      {
-                        previaImagem ? (
-                          <div className="flex flex-col justify-center items-center gap-4 p-4 border-zinc-300">
-                            <img
-                              src={urlBase! + usuario?.icon?.file_path}
-                              alt="Imagem de perfil" className="object-cover w-52 h-52 rounded-full" 
-                            />
-
-                            <div className="flex w-full justify-between items-center gap-2">
-                              <Button
-                                className="hover:cursor-pointer bg-vermelho hover:bg-vermelho"
-                                title="Remover imagem"
-                                onClick={() => { setPreviaImagem(null); setExcluirImagemPerfil(true) }}
-                                type="button"
-                              >
-                                <Trash size={16} />
-                                <span>Remover imagem</span>
-                              </Button>
-
-                              <label className="cursor-pointer">
-                                <div
-                                  className="hover:cursor-pointer flex items-center gap-2"
-                                  title="Alterar imagem"
-                                >
-                                  <ImageIcon size={16} />
-                                  <span>Alterar imagem</span>
-
-                                  <input
-                                    className="hidden"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => { mostrarImagem(e) }}
-                                  />
-                                </div>
-                              </label>
-
-                            </div>
-                          </div>
-                        ) : (
-                          <label className="cursor-pointer">
-                              <div
-                                className="
-                                  w-full flex justify-center items-center border-2
-                                  border-zinc-500 border-dashed rounded-md p-4
-                                  bg-zinc-100 hover:bg-zinc-200 ease-in-out duration-300
-                                "
-                                title="Enviar foto de perfil"
-                              >
-                                <input
-                                  className="hidden"
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => mostrarImagem(e)}
-                                />
-                              <p>Clique aqui para enviar uma foto de perfil</p>
-                            </div>
-
-                          </label>
-                        )
-                      }
-            
-                  </div>
-                </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-3">
