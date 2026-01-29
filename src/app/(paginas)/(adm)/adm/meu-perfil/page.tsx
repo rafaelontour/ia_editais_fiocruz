@@ -8,6 +8,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Unidade } from "@/core/unidade";
 import { UsuarioUnidade } from "@/core/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
@@ -15,9 +16,9 @@ import { formatarData } from "@/lib/utils";
 import { getUnidadePorId } from "@/service/unidade";
 import { adicionarFotoPerfilService, atualizarFotoDePerfilService, atualizarInfoUsuarioService, excluirFotoDePerfilService, trocarSenhaService } from "@/service/usuario";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconPassword } from "@tabler/icons-react";
+import { IconBrandWhatsapp, IconPassword } from "@tabler/icons-react";
 import { url } from "inspector";
-import { User, Mail, Shield, LogOut, Pencil, Phone, Info, X, Trash, ImageIcon } from "lucide-react";
+import { User, Mail, Shield, LogOut, Pencil, Phone, Info, X, Trash, ImageIcon, ShieldQuestionIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -554,9 +555,35 @@ export default function MeuPerfil() {
 
           <h3 className="text-xl font-semibold mb-2">Informações da conta</h3>
 
-          <div className="flex items-center gap-3">
-            <Phone size={18} />
-            <span>{usuario?.phone_number}</span>
+          <div className="flex flex-col gap-4 border p-4 rounded-md">
+            <div className="flex items-center gap-4">
+              <Info className="text-verde" size={38} />
+              <p>Este número é usado para notificá-lo sobre os editais. Mantenha-o atualizado para receber as notificações.</p>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <IconBrandWhatsapp size={18} />
+                <span>{usuario?.phone_number}</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger>
+                    <ShieldQuestionIcon size={20} />
+                  </TooltipTrigger>
+                  <TooltipContent className="text-md mr-6">
+                    <p>Ao clicar em "Testar número", se você receber uma mensagem no WhatsApp, está tudo certo.<br /> Caso contrário, altere em "Editar informações" para ser notificado via mensagem sobre os editais.</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Button className="ml-2 hover:cursor-pointer">
+                  Testar número
+                </Button>
+
+              </div>
+              
+            </div>
           </div>
 
           <div className="flex items-center gap-3">

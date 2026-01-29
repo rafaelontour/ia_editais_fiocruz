@@ -4,6 +4,7 @@ import {
   Gauge,
   Home,
   IdCard,
+  InboxIcon,
   Sheet,
   Type,
   TypeOutline,
@@ -49,15 +50,10 @@ const itemsAdm = [
     icon: IdCard,
   },
   {
-    title: "Coleção de testes",
-    url: "/adm/testes",
-    icon: Wrench,
-  },
-  {
-    title: "Métricas",
-    url: "/adm/metricas",
-    icon: Gauge,
-  },
+    title: "Editais arquivados",
+    url: "/adm/editais/arquivados",
+    icon: InboxIcon,
+  }
 ];
 
 const itemsAuditorAnalista = [
@@ -76,6 +72,11 @@ const itemsAuditorAnalista = [
     url: "/adm/tipificacoes",
     icon: Type,
   },
+  {
+    title: "Editais arquivados",
+    url: "/adm/editais/arquivados",
+    icon: InboxIcon,
+  }
 ];
 
 const itemsUsuarioComum = [

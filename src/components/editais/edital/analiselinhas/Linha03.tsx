@@ -99,7 +99,7 @@ export default function Linha03({ edital, resumoIA }: Props) {
                                             : "bg-gray-200"}
                                         `}
                                     >
-                                            Média de todos os ramos: {media?.toFixed(2)}
+                                        Média de todos os ramos: {media?.toFixed(2)}
                                     </p>
                                 </div>
                             </div>

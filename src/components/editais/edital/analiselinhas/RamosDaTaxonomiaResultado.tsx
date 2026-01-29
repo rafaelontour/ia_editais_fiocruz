@@ -1,14 +1,19 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Branch } from "@/core/tipificacao/Tipificacao"
-import { ChevronLeft, ChevronRight, Link } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-
+import { DetalhesRamoDialog } from "./DetalhesRamoDialog"
+import { useParams } from "next/navigation"
 
 interface Props {
     ramos: Branch[]
 }
+
 export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
+
+    const params = useParams()
+    const docId = params.id as string
 
     const [ultimaTab, setUltimaTab] = useState<boolean>(false)
     const [primeiraTab, setPrimeiraTab] = useState<boolean>(true)
@@ -34,7 +39,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
             el.scrollIntoView({ behavior: "smooth", inline: "center", block: "start" });
         }
     };
-    
+
     return (
         <div className="w-full flex flex-col flex-1 border border-gray-300 rounded-sm p-4">
             <Tabs defaultValue="tabRamo0" value={abaSelecionada} onValueChange={(val) => setAbaSelecionada(val)}>
@@ -80,7 +85,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
                                         <div key={index} className="flex items-center">
                                             <TabsTrigger
                                                 title={ramo.title}
-                                                ref={el => {refs.current[index] = el}} // ← aqui conecta cada aba ao array de refs
+                                                ref={el => { refs.current[index] = el }}
                                                 onClick={() => {
                                                     setRamoSelecionado(anterior => ({
                                                         ...anterior,
@@ -120,7 +125,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
 
                     <Button
                         className={`
-                            ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho" }
+                            ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
                             hover:cursor-pointer text-lg
                         `}
                         title={`${!ultimaTab ? "Tipificação seguinte" : "Você está na última aba"}`}
@@ -144,7 +149,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
                             setUltimaTab(proximoIndex === ramos.length - 1)
                         }}
                     >
-                        <ChevronRight className={`${ultimaTab ? "text-gray-400" : "text-white"}`}  />
+                        <ChevronRight className={`${ultimaTab ? "text-gray-400" : "text-white"}`} />
                     </Button>
                 </div>
 
@@ -164,7 +169,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-col bg-zinc-400 gap-2 w-[1px]" />
+                                    <div className="flex flex-col bg-zinc-400 gap-2 w-px" />
 
                                     <div className="flex flex-col gap-2 w-full">
                                         <h3 className="text-lg font-semibold">Detalhamento</h3>
@@ -176,9 +181,13 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
 
                                 <hr className="mt-2 mb-4 border-gray-300 w-full" />
 
-                                <div className="flex flex-row gap-3 px-3 w-full">
-                                    <h3 className="font-semibold">Resutado: </h3>
-                                    { ramo?.evaluation?.score } / 10
+                                <div className="flex flex-row gap-3 px-3 w-full items-center justify-between">
+                                    <div className="flex flex-row gap-3 items-center">
+                                        <h3 className="font-semibold">Resultado: </h3>
+                                        {ramo?.evaluation?.score} / 10
+                                    </div>
+
+                                    <DetalhesRamoDialog ramo={ramo} docId={docId} />
                                 </div>
                             </div>
                         </TabsContent>
