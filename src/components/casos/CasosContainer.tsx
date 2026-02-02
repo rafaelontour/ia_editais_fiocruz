@@ -26,9 +26,11 @@ import {
 import { getEditaisService } from "@/service/edital";
 import { getTestesService } from "@/service/teste";
 import { getTipificacoesService } from "@/service/tipificacao";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 
 interface CasosContainerProps {
   collectionId?: string;
@@ -46,6 +48,7 @@ export default function CasosContainer({
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
   const termoBusca = useRef<string>("");
   const [casoFiltrado, setCasoFiltrado] = useState<Caso[]>([]);
+  const router = useRouter();
 
   // Tipificações
   const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
@@ -255,7 +258,18 @@ export default function CasosContainer({
     <>
       <div className="flex flex-col gap-5 ">
         <div className="flex items-center justify-between">
-          <h2 className="text-4xl font-bold">Gestão de casos de testes</h2>
+          <div className="flex gap-4">
+            {collectionId && !casoSelecionado && (
+              <Button
+                onClick={() => router.push("/adm/testes")}
+                className="h-8 w-8 bg-branco border border-gray-300 hover:bg-branco hover:cursor-pointer rounded-sm"
+              >
+                <ArrowLeft size={18} color="black" />
+              </Button>
+            )}
+
+            <h2 className="text-4xl font-bold">Gestão de casos de testes</h2>
+          </div>
           {/* Modal do Form */}
           {!hideCreateButton && !casoSelecionado && (
             <Dialog open={openDialogAdd} onOpenChange={setOpenDialogAdd}>
