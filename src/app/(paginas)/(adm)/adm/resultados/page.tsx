@@ -1,7 +1,7 @@
 "use client";
 import BarraDePesquisa from "@/components/BarraDePesquisa";
 import Masonry from "react-masonry-css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { buscarResultadosService } from "@/service/resultado";
 import { Resultado } from "@/core/resultado";
@@ -9,11 +9,23 @@ import { buscarCasoService } from "@/service/caso";
 import { Caso } from "@/core/caso";
 import { getModeloService } from "@/service/modelo";
 import { Modelo } from "@/core/modelo";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 export default function resultados() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [carregando, setCarregando] = useState<boolean>(true);
   const [resultado, setResultado] = useState<Resultado[]>([]);
+  const termoBusca = useRef<string>("");
+
+  function filtrarResultados() {}
 
   {
     /* Map o nome dos casos */
@@ -69,7 +81,82 @@ export default function resultados() {
     <div className="flex flex-col gap-5 pd-10">
       <h2 className="text-4xl font-bold">Gestão dos resultados</h2>
 
-      <BarraDePesquisa />
+      <BarraDePesquisa
+        className="mb-0"
+        refInput={termoBusca}
+        funcFiltrar={filtrarResultados}
+      />
+
+      <div
+        className="flex flex-col -mt-3 gap-4 justify-between p-4  rounded-md"
+        style={{ boxShadow: "rgba(0, 0, 0, 0.3) 0px 0px 5px" }}
+      >
+        <div className="flex w-full gap-2">
+          <div className="flex flex-col w-full">
+            <Label>Status:</Label>
+            <Select>
+              <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aprovador">Aprovado</SelectItem>
+                <SelectItem value="reprovador">Reprovado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col w-full">
+            <Label>Modelo IA:</Label>
+            <Select>
+              <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aprovador">GPT-4.1 nano</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col w-full">
+            <Label>Nota de corte:</Label>
+            <Select>
+              <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aprovador">0.5</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col w-full">
+            <Label>Passou:</Label>
+            <Select>
+              <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aprovador">Sim</SelectItem>
+                <SelectItem value="saprovador">Não</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col w-full">
+            <Label>Ordenar por:</Label>
+            <Select>
+              <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aprovador">Data de criação</SelectItem>
+                <SelectItem value="saprovador">Maior nota</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <Button className="bg-gray-400 hover:bg-gray-300">
+            Limpar Filtros
+          </Button>
+        </div>
+      </div>
 
       {carregando ? (
         <div className="flex justify-center items-center gap-2 text-sm text-gray-400">
@@ -79,7 +166,7 @@ export default function resultados() {
       ) : resultado.length > 0 ? (
         <Masonry
           breakpointCols={breakpointColumns}
-          className="flex gap-5 mb-10 px-1"
+          className="flex gap-5 mb-10 "
         >
           {resultado.map((result) => (
             <div
