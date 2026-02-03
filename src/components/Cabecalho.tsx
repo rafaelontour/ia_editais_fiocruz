@@ -1,7 +1,7 @@
 'use client'
 
 import useUsuario from "@/data/hooks/useUsuario";
-import { IconLogin, IconLogout } from "@tabler/icons-react";
+import { IconLogin, IconLogout, IconSignLeft } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { UserCog2Icon } from "lucide-react";
@@ -96,15 +96,31 @@ export default function Cabecalho() {
             {
                 montado && (
                     !usuario ? (
-                        <Button
-                            onClick={() => router.push("/auth/login")}
-                            variant="destructive"
-                            className="flex h-fit ml-auto mr-2 py-[5px] px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
-                            style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
-                        >
-                            <IconLogin color="white" size={26} />
-                            <p className="text-branco text-sm mt-1">{mensagemLogin}</p>
-                        </Button>
+                        <div className="w-fit absolute right-4 justify-end flex items-centert gap-2">
+                            <Button
+                                type="button"
+                                onClick={() => router.push("/auth/cadastro")}
+                                variant="destructive"
+                                className="flex h-fit ml-auto mr-2 py-[5px] px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
+                                style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                            >
+                                <p className="text-branco text-sm my-1">Criar conta</p>
+                            </Button>
+
+                            <Button
+                                type="button"
+                                onClick={() => router.push("/auth/login")}
+                                variant="destructive"
+                                className="flex h-fit ml-auto mr-2 py-[5px] px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
+                                style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                            >
+                                <IconLogin color="white" size={26} />
+                                <p className="text-branco text-sm my-1">{mensagemLogin}</p>
+                            </Button>
+
+                        </div>
+
+
                     ) : (
                         <Button
                             onClick={() => { deslogar(); router.push("/"); }}

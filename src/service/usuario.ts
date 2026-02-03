@@ -42,25 +42,48 @@ async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<Usu
     }
 }
 
-async function adicionarUsuarioService(dados: any) {
+async function adicionarUsuarioService(dados: any, daTelaCadastro?: boolean) {
     try {
         const url = `${urlBase}/user/`;
 
-        const res = await fetch(url, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: dados.nome,
-                email: dados.email,
-                unit_id: dados.unidade,
-                phone_number: dados.whatsapp,
-                access_level: dados.perfil
-            })
+        let res;
 
-        });
+        console.log("dados: ", dados);
+        console.log("daTelaCadastro: ", daTelaCadastro);
+
+        if (!daTelaCadastro) {
+            res = await fetch(url, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: dados.nome,
+                    email: dados.email,
+                    phone_number: dados.whatsapp,
+                    unit_id: dados.unidade,
+                    access_level: dados.perfil
+                })
+            });
+        } else {
+            res = await fetch(url, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: dados.nomeCompleto,
+                    email: dados.email,
+                    phone_number: dados.whatsapp,
+                    access_level: dados.access_level,
+                    unit_id: dados.unidade,
+                    password: dados.password
+                })
+            });
+        }
+
 
         return res.status
 
@@ -210,6 +233,23 @@ async function excluirFotoDePerfilService(id: string | undefined,) {
     }
 }
 
+async function validarNumeroWhatsappService(id: string | undefined) {
+    if (!id) return
+    try {
+        const res = await fetch(`${urlBase}/user/${id}/test-whatsapp`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
+
+        return res.status
+    } catch(e) {
+        return 
+    }
+}
+
 export {
     getUsuarioLogado,
     getUsuariosPorUnidade,
@@ -221,5 +261,6 @@ export {
     atualizarInfoUsuarioService,
     adicionarFotoPerfilService,
     atualizarFotoDePerfilService,
-    excluirFotoDePerfilService
+    excluirFotoDePerfilService,
+    validarNumeroWhatsappService,
 }

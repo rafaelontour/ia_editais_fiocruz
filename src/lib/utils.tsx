@@ -57,6 +57,8 @@ function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/*******  2e886966-1bd6-44eb-8e34-1e1a5e7d7dcc  *******/
 async function simularAtraso(intervalo: number) {
     await sleep(intervalo);
 }

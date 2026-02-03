@@ -41,9 +41,45 @@ async function logout() {
     }
 }
 
+async function mandarEmailParaRecuperarSenhaService(email: string) {
+    try {
+        const res = await fetch(`${urlBase}/auth/forgot-password`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ email: email })
+        })
+
+        return res.status
+    } catch (e) {
+        return
+    }
+}
+
+async function enviarCodigoWhatsAppService(email: string, codigo: string, senhaNova: string) {
+    try {
+        const res = await fetch(`${urlBase}/auth/reset-password`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ email: email, token: codigo, new_password: senhaNova })
+        })
+
+        return res.status
+    } catch (e) {
+        return
+    }
+}
+
 export {
     getToken,
-    logout
+    logout,
+    mandarEmailParaRecuperarSenhaService,
+    enviarCodigoWhatsAppService
 }
 
 // async function atualizarUsuario(email: string, password: string) {

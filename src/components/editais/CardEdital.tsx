@@ -16,7 +16,8 @@ import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { IconLoaderQuarter, IconLogs, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
 import useEditalProc from "@/data/hooks/useProcEdital";
-import { useRouter } from "next/navigation";
+import { AnimatedTooltip } from "../ui/animated-tooltip";
+import { DragOverlay } from "@dnd-kit/core";
 
 
 interface Props {
@@ -32,10 +33,10 @@ type HistoricoPorDia = {
 }
 
 export default function CardEdital({ edital, containerId, funcaoAtualizarEditais, flagEdital }: Props) {
+
     const { usuario } = useUsuario();
     const { editalProcessado, idEditalAtivo } = useEditalProc();
     const [openExcluirEdital, setOpenExcluirEdital] = useState<boolean>(false);
-    const [datasComModificacoes, setDatasComModificacoes] = useState<HistoricoPorDia[] | null>(null)
 
     // passa data.containerId para o hook
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -95,6 +96,28 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
         const dataDoDia = edital.history[0]
     }
 
+    type Item = {
+        id: string;
+        name: string;
+        designation: string;
+        image: string;
+    };
+
+    const urlBase = process.env.NEXT_PUBLIC_URL_BASE
+
+    const responsaveis: any[] = []
+
+    edital.editors?.map(
+        (editor) => (
+            responsaveis.push({
+                id: editor.id,
+                name: editor.username?.split(" ")[0],
+                designation: "Analista",
+                image: editor.icon?.file_path !== undefined ? urlBase + editor.icon.file_path : "/user.png",
+            })
+        )
+    )
+
     return (
         <div
             ref={setNodeRef}
@@ -119,10 +142,10 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             </div>
 
             <div className="relative p-3 overflow-x-hidden">
-                <div className="flex flex-col-reverse items-start justify-between gap-2">
+                <div className="flex flex-col-reverse items-start justify-between">
                     <h3 className="font-semibold text-xl">{edital.name}</h3>
 
-                    <div className="w-full my-0.5 flex justify-between">
+                    <div className="relative w-full my-0.5 flex justify-between">
                         {
                             edital.history &&
                             edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 2 &&
@@ -155,19 +178,21 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                 </Tooltip>
                             )
                         }
-                        
                             
                         <Dialog>
                             <DialogTrigger asChild>
                                 <div
                                     className="
-                                        flex gap-2 items-center hover:cursor-pointer
-                                        pl-3 pr-2 py-1 rounded-md font-bold text-sm hover:underline
+                                        bg-zinc-200 rounded-sm px-2 py-0.5
+                                        flex items-center gap-1
+                                        absolute right-1
+                                        hover:cursor-pointer
                                     "
-                                    title="Ver histórico de atualização do estado do edital"
+                                    title="Ver histórico de atualização do edital"
+                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}
                                 >
-                                    <p>Logs do edital</p>
-                                    <IconLogs size={17} />
+                                    <p className="text-sm italic">Logs</p>
+                                    <IconLogs size={18} />
                                 </div>
                             </DialogTrigger>
 
@@ -233,7 +258,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                         <span>{formatarData(edital.created_at)}</span>
                     </div>
 
-                    <div>
+                    <div className="flex flex-col  gap-2">
 
                         <h4 className="font-semibold">
                             {
@@ -245,13 +270,10 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                             }
                         </h4>
 
-                        <ul>
-                            {
-                                edital.editors?.map((editor, index) => (
-                                    <li key={index} className="list-disc text-md ml-4">{editor.username}</li>
-                                ))
-                            }
-                        </ul>
+                        <div className="flex items-center gap-2">
+                            <span className="ml-1">-</span>
+                            <AnimatedTooltip items={responsaveis} />
+                        </div>
                     </div>
 
                     {

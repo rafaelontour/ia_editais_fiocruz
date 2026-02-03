@@ -1,7 +1,7 @@
 import { Button } from "../ui/button";
 
 
-export default function BotaoSalvar({ onClick }: { onClick?: () => void }) {
+export default function BotaoSalvar({ onClick, rotulo }: { onClick?: () => void , rotulo?: string } ) {
     return (
         <Button
             onClick={onClick}
@@ -13,7 +13,7 @@ export default function BotaoSalvar({ onClick }: { onClick?: () => void }) {
             style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
             data-cy="botao-salvar-generico"
         >
-            Salvar
+            { rotulo ? rotulo : "Salvar" }
         </Button>
     )
 }

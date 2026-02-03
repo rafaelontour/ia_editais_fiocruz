@@ -2,10 +2,8 @@
 
 import BotaoCancelar from "@/components/botoes/BotaoCancelar";
 import BotaoSalvar from "@/components/botoes/BotaoSalvar";
-import RotuloOpcional from "@/components/RotuloOpcional";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -14,17 +12,15 @@ import { UsuarioUnidade } from "@/core/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { formatarData } from "@/lib/utils";
 import { getUnidadePorId } from "@/service/unidade";
-import { adicionarFotoPerfilService, atualizarFotoDePerfilService, atualizarInfoUsuarioService, excluirFotoDePerfilService, trocarSenhaService } from "@/service/usuario";
+import { adicionarFotoPerfilService, atualizarInfoUsuarioService, excluirFotoDePerfilService, trocarSenhaService, validarNumeroWhatsappService } from "@/service/usuario";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconBrandWhatsapp, IconPassword } from "@tabler/icons-react";
-import { url } from "inspector";
 import { User, Mail, Shield, LogOut, Pencil, Phone, Info, X, Trash, ImageIcon, ShieldQuestionIcon } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z, { file, set } from "zod";
+import z from "zod";
 
 const schemaUsuario = z.object({
   nome: z.string().min(4, "O nome de usuário é obrigatório"),
@@ -228,6 +224,15 @@ export default function MeuPerfil() {
       /[A-Z]/.test(senhaAtual) && /[a-z]/.test(senhaAtual),
   };
 
+  async function verificarNumeroWhatsapp() {
+    const res = await validarNumeroWhatsappService(usuario?.id);
+
+    toast.info("Mensagem enviada. Verifique seu WhatsApp!");
+
+    if (res === 200) {
+
+    }
+  }
 
   type RegrasSenha = {
     maiusculas_minusculas: boolean;
@@ -279,10 +284,9 @@ export default function MeuPerfil() {
                   
                 "
               >
-                
                 <div className="flex flex-col gap-2">
                   <Button
-                    className="hover:cursor-pointer "
+                    className="hover:cursor-pointer"
                     variant={"destructive"}
                     onClick={() => excluirFotoDePerfil()}
                   >
@@ -339,9 +343,18 @@ export default function MeuPerfil() {
                           <p>Remover foto</p>
                         </Button>
 
-                        <Button>
+                        <Button
+                          className="hover:cursor-pointer"
+                          type="button"
+                        >
                           <ImageIcon size={16} />
                           <p>Alterar foto</p>
+                          <input
+                            className="hidden"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => mostrarImagem(e)}
+                          />
                         </Button>
                         
                       </div>
@@ -358,11 +371,9 @@ export default function MeuPerfil() {
                           />
                         </div>
                       </label>
-
                     )
                   } 
                 </div>
-
               </div>
             </div>
           )}
@@ -540,6 +551,7 @@ export default function MeuPerfil() {
                     )}
                   </div>
                 </div>
+                
                 <DialogFooter>
                   <DialogClose>
                     <BotaoCancelar />
@@ -577,7 +589,7 @@ export default function MeuPerfil() {
                   </TooltipContent>
                 </Tooltip>
 
-                <Button className="ml-2 hover:cursor-pointer">
+                <Button type="button" onClick={verificarNumeroWhatsapp} className="ml-2 hover:cursor-pointer">
                   Testar número
                 </Button>
 

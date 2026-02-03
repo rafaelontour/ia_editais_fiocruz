@@ -9,7 +9,7 @@ export default function Div(dados: DivProps) {
             className="
                 flex flex-col gap-2 rounded-md p-4 mb-4
                 transition ease-in-out duration-100
-                min-w-[250px]
+                min-w-[250px] relative
             "
         >
             {dados.children}

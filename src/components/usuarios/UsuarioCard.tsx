@@ -14,6 +14,7 @@ import { Input } from "../ui/input";
 import { toast } from "sonner";
 import { formatarData } from "@/lib/utils";
 import Div from "../Div";
+import { IconUser } from "@tabler/icons-react";
 
 const schemaUsuario = z.object({
   username: z.string().min(1, "O nome é obrigatório"),
@@ -51,6 +52,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
 
   const [openDialogEditar, setOpenDialogEditar] = useState(false);
   const [openDialogExcluir, setOpenDialogExcluir] = useState(false);
+  const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
   useEffect(() => {
     if (openDialogEditar) {
@@ -97,6 +99,20 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
         <p className="py-1 w-fit wrap-break-words text-sm">{usuario.email}</p>
         <p className="py-1 w-fit wrap-break-words text-sm">{usuario.access_level}</p>
 
+      </div>
+
+      <div className="absolute right-3 top-3">
+        
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gray-300 overflow-hidden" style={{ boxShadow: "0 2px 2px rgba(0, 0, 0, .5)" }}>
+              {
+                usuario.icon?.file_path === undefined ? (
+                  <IconUser />
+                ) : (
+                  <img className="w-full h-full objetct-cover" src={urlBase + usuario.icon.file_path } alt="Imagem de perfil" />
+                )
+              }
+            </div>
+         
       </div>
 
       <div className="flex justify-between items-center mt-3">

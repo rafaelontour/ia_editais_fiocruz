@@ -123,7 +123,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         }
 
         // ---------- WebSocket ----------
-        const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario?.id}`);
+        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario?.id}`);
 
         ws.onopen = () => {
             return;
@@ -369,7 +369,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                                                     </SelectGroup>
                                                 </SelectContent>
                                             </Select>
-                                            
                                         )}
                                     />
 
