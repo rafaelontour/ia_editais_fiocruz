@@ -237,7 +237,7 @@ async function validarNumeroWhatsappService(id: string | undefined) {
     if (!id) return
     try {
         const res = await fetch(`${urlBase}/user/${id}/test-whatsapp`, {
-            method: "GET",
+            method: "POST",
             credentials: "include",
             headers: {
                 "Content-type": "application/json"

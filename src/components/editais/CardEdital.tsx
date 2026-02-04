@@ -145,7 +145,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                 <div className="flex flex-col-reverse items-start justify-between">
                     <h3 className="font-semibold text-xl">{edital.name}</h3>
 
-                    <div className="relative w-full my-0.5 flex justify-between">
+                    <div className="relative w-full my-2 flex justify-between">
                         {
                             edital.history &&
                             edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 2 &&
@@ -179,7 +179,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                             )
                         }
                             
-                        <Dialog>
+                        {/* <Dialog>
                             <DialogTrigger asChild>
                                 <div
                                     className="
@@ -239,7 +239,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                     </DialogClose>
                                 </DialogFooter>
                             }
-                        </Dialog>
+                        </Dialog> */}
                         
                     </div>
                 </div>
