@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { useState } from "react";
-import { Fonte, Ramo, Taxonomia, Tipificacao } from "@/core";
+import { Fonte, Tipificacao, Ramo, Taxonomia } from "@/core";
 import { Teste } from "@/core/teste";
 import { Metrica } from "@/core/metrica";
 import { Caso } from "@/core/caso";
@@ -32,7 +32,7 @@ interface BotaoExcluirProps {
 }
 
 export default function BotaoExcluir(dados: BotaoExcluirProps) {
-  const [dialogOpen, setDialogOpen] = useState<string | undefined>("");
+  const [dialogOpen, setDialogOpen] = useState<string | undefined>(undefined);
 
   return (
     <Dialog
@@ -42,7 +42,7 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
       <DialogTrigger asChild>
         <Button
           data-cy="componente-excluir"
-          title={`Excluir ${dados.item}`}
+          title={`Excluir ${dados.tipo}`}
           className="h-8 w-8 bg-vermelho hover:bg-vermelho hover:cursor-pointer rounded-sm"
           size={"icon"}
         >

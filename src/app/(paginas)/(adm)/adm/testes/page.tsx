@@ -230,6 +230,7 @@ export default function testes() {
                   <Button
                     onClick={() => router.push(`/adm/testes/${mockTeste.id}`)}
                     className="flex justify-center items-center h-8 w-8 border bg-branco border-gray-300 hover:bg-branco hover:cursor-pointer rounded-sm"
+                    title="Casos de teste"
                   >
                     <ListChecks color="black" size={16} />
                   </Button>
@@ -238,6 +239,7 @@ export default function testes() {
                       setEditandoForm(mockTeste);
                       setOpenDialogEditar(true);
                     }}
+                    title="Editar Teste"
                   />
 
                   <BotaoExcluir

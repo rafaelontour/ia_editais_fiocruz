@@ -2,10 +2,11 @@
 
 import { Metrica } from "@/core/metrica";
 import Calendario from "../Calendario";
-import BotaoEditar from "../BotaoEditar";
+
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../ui/button";
-import BotaoExcluir from "../botoes/BotaoExcluir";
+import BotaoExcluir from "../BotaoExcluir";
+import BotaoEditar from "../BotaoEditar";
 
 interface CardDetalheMetricaProps {
   metrica: Metrica;
@@ -56,7 +57,7 @@ export default function DetalheMetrica({
         <Calendario data={metrica.created_at} />
 
         <div className="flex gap-3">
-          <BotaoEditar onClick={onEditar} />
+          <BotaoEditar onClick={onEditar} title="Editar Métrica" />
           <BotaoExcluir funcExcluir={onExcluir} item={metrica} tipo="métrica" />
         </div>
       </div>

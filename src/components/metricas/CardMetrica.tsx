@@ -4,7 +4,7 @@ import { Maximize2 } from "lucide-react";
 import Calendario from "../Calendario";
 import BotaoEditar from "../BotaoEditar";
 import { Metrica } from "@/core/metrica";
-import BotaoExcluir from "../botoes/BotaoExcluir";
+import BotaoExcluir from "../BotaoExcluir";
 
 interface CardMetricaProps {
   metrica: Metrica;
@@ -47,7 +47,7 @@ export default function CardMetrica({
         <Calendario data={metrica.created_at} />
 
         <div className="flex gap-3">
-          <BotaoEditar onClick={onEditar} />
+          <BotaoEditar onClick={onEditar} title="Editar Métrica" />
           <BotaoExcluir funcExcluir={onExcluir} item={metrica} tipo="Métrica" />
         </div>
       </div>

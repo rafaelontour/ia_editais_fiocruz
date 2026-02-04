@@ -231,12 +231,13 @@ export default function Modelos() {
                       setEditandoForm(modelo);
                       setOpenDialogEditar(true);
                     }}
+                    title="Editar Modelo"
                   />
 
                   <BotaoExcluir
                     funcExcluir={excluirModelo}
                     item={modelo}
-                    tipo="modelo"
+                    tipo="Modelo"
                   />
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { Caso } from "@/core/caso";
 import Calendario from "../Calendario";
 import BotaoEditar from "../BotaoEditar";
 import { Maximize2 } from "lucide-react";
-import BotaoExcluir from "../botoes/BotaoExcluir";
+import BotaoExcluir from "../BotaoExcluir";
 
 interface CardCasoProps {
   caso: Caso;
@@ -49,13 +49,8 @@ export default function CardCaso({
         <Calendario data={caso.created_at} />
 
         <div className="flex gap-3">
-          <BotaoEditar onClick={onEditar} />
-
-          <BotaoExcluir
-            funcExcluir={onExcluir}
-            item={caso}
-            tipo="caso de teste"
-          />
+          <BotaoEditar onClick={onEditar} title="Editar Caso" />
+          <BotaoExcluir funcExcluir={onExcluir} item={caso} tipo="Caso" />
         </div>
       </div>
     </div>
