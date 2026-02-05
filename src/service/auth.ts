@@ -59,6 +59,7 @@ async function mandarEmailParaRecuperarSenhaService(email: string) {
 }
 
 async function enviarCodigoWhatsAppService(email: string, codigo: string, senhaNova: string) {
+    console.log("codigo:", codigo);
     try {
         const res = await fetch(`${urlBase}/auth/reset-password`, {
             method: "POST",

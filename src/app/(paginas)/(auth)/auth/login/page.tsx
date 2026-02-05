@@ -61,9 +61,9 @@ export default function Login() {
     register: registerTrocarSenha,
     handleSubmit: handleSubmitTrocarSenha,
     watch: watchSenhaNova,
-    reset: resetTrocarSenha,
     formState: { errors: errorsTrocarSenha },
-    setError: setErrorTrocarSenha
+    setError: setErrorTrocarSenha,
+    reset: resetSenha
   } = useForm<formTrocarSenha>({
     resolver: zodResolver(schemaTrocarSenha),
     defaultValues: {
@@ -136,7 +136,7 @@ export default function Login() {
     setCodigo(novoCodigo)
 
     // vai para o próximo input automaticamente
-    if (valor && index < 3) {
+    if (valor && index < 5) {
       inputsRef.current[index + 1]?.focus()
     }
   }
@@ -164,7 +164,9 @@ export default function Login() {
       return;
     }
 
-    const res = await enviarCodigoWhatsAppService(emailTrocarSenha, inputsRef.current.map((input) => input?.value).join(""), formData.senha);
+    const codigoWpp = codigo.map((input) => input).join("");
+    console.log("codigo:", codigoWpp);
+    const res = await enviarCodigoWhatsAppService(emailTrocarSenha, codigoWpp, formData.senha);
 
     if (res === 400) {
       toast.error("Código inválido!");
@@ -180,8 +182,6 @@ export default function Login() {
     setCarregando(true)
 
     const res = await mandarEmailParaRecuperarSenhaService(formDataEmail.email)
-
-    console.log(res)
 
     if (res !== 200) {
       toast.error("Email inválido!");
@@ -201,7 +201,7 @@ export default function Login() {
 
     const codigo = inputsRef.current.map((input) => input?.value).join("")
     
-    if (codigo.length !== 4) {
+    if (codigo.length !== 6) {
       toast.error("Digite o código completo!")
       setCarregando(false)
       return
@@ -343,7 +343,6 @@ export default function Login() {
           <DialogContent
             onCloseAutoFocus={() => {
               setCarregando(false)
-              setCodigo(["", "", "", ""])
             }}
           >
             <DialogHeader>
@@ -394,9 +393,10 @@ export default function Login() {
 
           <DialogContent
             onCloseAutoFocus={() => { 
-              setCodigo(["", "", "", ""])
+              setCodigo(["", "", "", "", "", ""])
               setCarregando(false)
               setEmailTrocarSenha("")
+              resetSenha()
             }}
             className="p-8"
           >
