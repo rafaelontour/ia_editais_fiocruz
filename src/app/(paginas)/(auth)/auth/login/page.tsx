@@ -47,7 +47,7 @@ export default function Login() {
 
   const { logarUsuario } = useUsuario()
   const [carregando, setCarregando] = useState<boolean>(false)
-  const [codigo, setCodigo] = useState<string[]>(["", "", "", ""])
+  const [codigo, setCodigo] = useState<string[]>(["", "", "", "", "", ""])
   const inputsRef = useRef<Array<HTMLInputElement | null>>([])
   const [digitandoEmail, setDigitandoEmail] = useState<boolean>(false)
   const [esqueceuSenha, setEsqueceuSenha] = useState<boolean>(false)
