@@ -129,9 +129,16 @@ export default function Login() {
   }
 
   function handleChange(valor: string, index: number) {
-    if (!/^\d?$/.test(valor)) return // só números (0-9)
+     // aceita letras (a-z, A-Z) e números (0-9), apenas 1 caractere
+    if (!/^[a-zA-Z0-9]?$/.test(valor)) return
 
     const novoCodigo = [...codigo]
+    if (/^[a-zA-Z]$/.test(valor)) {
+      valor = valor.toUpperCase()
+      novoCodigo[index] = valor
+    } else {
+      novoCodigo[index] = valor
+    }
     novoCodigo[index] = valor
     setCodigo(novoCodigo)
 
@@ -363,7 +370,6 @@ export default function Login() {
                   onChange={(e) => handleChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   maxLength={1}
-                  inputMode="numeric"
                   className="w-10 h-12 text-center text-xl border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-verde"
                 />
               ))}
