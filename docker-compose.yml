@@ -9,5 +9,6 @@ services:
     environment:
       NEXT_PUBLIC_VERSAO_PLATAFORMA: "1.1.0"
     ports:
-      - "3000:4000"
+      - "4000:4000"
     restart: unless-stopped
+
