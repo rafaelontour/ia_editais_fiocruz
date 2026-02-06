@@ -13,7 +13,7 @@ interface Props {
 export default function AnaliseEdital ({ edital, editalArquivo, resumoIA }: Props) {
     
     return (
-        <div className="flex max-w-fit flex-col gap-4">
+        <div className="flex w-full flex-col gap-4">
             <Linha01 edital={edital} />
 
             <div className="flex flex-col gap-4 overflow-y-auto">

@@ -11,18 +11,20 @@ import { getEditalPorIdService } from "@/service/edital";
 import { EditalArquivo } from "@/core/edital/Edital";
 import VisualizarEditalCliente from "./VisualizarEditalCliente";
 
-export default async function VisualizarEdital({ params }: any) {
-    const { id } = await params
-    const urlBase = process.env.NEXT_PUBLIC_URL_BASE
-    const editalArquivo: EditalArquivo = await getEditalArquivoService(id);
-    const edital: Edital | undefined = await getEditalPorIdService(id);
-    const resumoIA = await remark()
-        .use(remarkParse) // parse Markdown
-        .use(remarkRehype) // converte Markdown -> HTML AST
-        .use(rehypeSanitize) // sanitiza tags e atributos
-        .use(rehypeStringify) // gera string HTML
-        .process(editalArquivo?.releases[0].description || "");
+export default async function VisualizarEdital({ params, }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
 
+  const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-    return <VisualizarEditalCliente edital={edital} editalArquivo={editalArquivo} urlBase={urlBase!} resumoIA={resumoIA.toString()} />
+  const editalArquivo = await getEditalArquivoService(id)
+  const edital = await getEditalPorIdService(id)
+
+  return (
+    <VisualizarEditalCliente
+      edital={edital}
+      editalArquivo={editalArquivo}
+      urlBase={urlBase!}
+      resumoIA="..."
+    />
+  )
 }
