@@ -48,13 +48,13 @@ jobs:
 
           echo "🚀 Iniciando deploy via docker-compose..."
 
-          cd /home/ubuntu
+          cd /home/ubuntu/apps/prod
 
-          if [ ! -d "iaEditais-prod" ]; then
-            git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-prod
-            cd iaEditais-prod
+          if [ ! -d "iaEditais-front" ]; then
+            git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-front
+            cd iaEditais-front
           else
-            cd iaEditais-prod
+            cd iaEditais-front
             git fetch origin main
             git reset --hard origin/main
           fi
