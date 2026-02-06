@@ -27,6 +27,8 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
     const [abrirDialogAdicionar, setAbrirDialogAdicionar] = useState(false);
      const [enviandoComentario, setEnviandoComentario] = useState<boolean>(false);
 
+    const urlBase = process.env.NEXT_PUBLIC_URL_BASE
+
     const { usuario } = useUsuario();
 
     useEffect(() => {
@@ -233,7 +235,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                     <div className="flex rounded-full w-14 h-14 bg-gray-300 justify-center items-center">
                                         {
                                             item.author?.icon ? (
-                                                <img src={item.author.icon.file_path} alt="Foto de perfil" className="rounded-full w-14 h-14 object-cover" />
+                                                <img src={urlBase + item.author.icon.file_path} alt="Foto de perfil" className="rounded-full w-14 h-14 object-cover" />
                                             ) : (
                                                 <User size={32} color="#6B7280" />
                                             )
@@ -320,3 +322,4 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
         </div>
     );
 }
+
