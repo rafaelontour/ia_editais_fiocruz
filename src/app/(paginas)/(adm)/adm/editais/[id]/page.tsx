@@ -19,12 +19,19 @@ export default async function VisualizarEdital({ params, }: { params: Promise<{ 
   const editalArquivo = await getEditalArquivoService(id)
   const edital = await getEditalPorIdService(id)
 
+  const resumoIA = await remark()
+  .use(remarkParse) // parse Markdown 
+  .use(remarkRehype) // converte Markdown -> HTML AST
+  .use(rehypeSanitize) // sanitiza tags e atributos
+  .use(rehypeStringify) // gera string HTML
+  .process(editalArquivo?.releases[0].description || "");
+
   return (
     <VisualizarEditalCliente
       edital={edital}
       editalArquivo={editalArquivo}
       urlBase={urlBase!}
-      resumoIA="..."
+      resumoIA={String(resumoIA)}
     />
   )
 }

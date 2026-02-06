@@ -115,7 +115,7 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
                         <TooltipContent className="italic">Clique sobre a linha abaixo, segure e puxe para os lados para alterar a vizualização</TooltipContent>
                     </Tooltip>
 
-                    <ResizableHandle className="w-[1px] h-full" />
+                    <ResizableHandle className="w-px h-full" />
                 </div>
 
                 <ResizablePanel className="h-full" minSize={35} defaultSize={50}>

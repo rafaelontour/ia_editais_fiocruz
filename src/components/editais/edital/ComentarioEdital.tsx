@@ -230,8 +230,14 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                         {comentarios.map((item) => (
                             <div key={item.id} className="flex flex-row gap-5 bg-slate-50 rounded-xl p-5 border border-gray-10">
                                 <div>
-                                    <div className="flex rounded-xl w-14 h-14 bg-gray-300 justify-center items-center">
-                                        <User />
+                                    <div className="flex rounded-full w-14 h-14 bg-gray-300 justify-center items-center">
+                                        {
+                                            item.author?.icon ? (
+                                                <img src={item.author.icon.file_path} alt="Foto de perfil" className="rounded-full w-14 h-14 object-cover" />
+                                            ) : (
+                                                <User size={32} color="#6B7280" />
+                                            )
+                                        }
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3 relative w-full">
@@ -253,7 +259,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                                     title="Editar comentário"
                                                     variant={"outline"}
                                                     size={"icon"}
-                                                    className="h-6 w-6 p-[14px] border-gray-300 rounded-sm hover:cursor-pointer"
+                                                    className="h-6 w-6 p-3.5 border-gray-300 rounded-sm hover:cursor-pointer"
                                                 >
                                                     <PencilLine />
                                                 </Button>
