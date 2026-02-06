@@ -23,5 +23,6 @@ export default async function VisualizarEdital({ params }: any) {
         .use(rehypeStringify) // gera string HTML
         .process(editalArquivo?.releases[0].description || "");
 
+
     return <VisualizarEditalCliente edital={edital} editalArquivo={editalArquivo} urlBase={urlBase!} resumoIA={resumoIA.toString()} />
 }

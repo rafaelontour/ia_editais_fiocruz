@@ -24,19 +24,21 @@ async function getEditaisService(idUnidade: string | undefined): Promise<Edital[
 }
 
 async function getEditalPorIdService(id: string | undefined): Promise<Edital | undefined> {
+    console.log("getEditalPorIdService id:", id);
     try {
         const res = await fetch(`${urlBase}/doc/${id}`, {
             method: "GET",
             credentials: "include",
+            cache: "no-store",
             headers: {
                 "Content-type": "application/json"
             }
         })
 
+        
         if (!res.ok) return
-
-        const { data } = await res.json();
-
+        
+        const data = await res.json();
 
         return data;
         
