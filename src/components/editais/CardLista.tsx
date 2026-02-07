@@ -29,7 +29,7 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col max-h-full gap-2 pt-2 px-1 rounded-2xl bg-slate-700 overflow-hidden"
+      className="flex flex-col wrap-break-words max-h-full gap-2 pt-2 px-1 rounded-2xl bg-slate-700 overflow-hidden"
       style={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.6)" }}
     >
       <div

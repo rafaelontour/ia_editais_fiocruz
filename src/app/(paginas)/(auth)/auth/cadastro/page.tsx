@@ -172,7 +172,7 @@ export default function Cadastro() {
                     <div className="flex gap-4">
                         <label htmlFor="senha" className="flex flex-col w-full gap-2">
                             <p className="text-[18px]">Senha</p>
-                            <input {...register("senha")} name="senha" type="text" className="bg-branco rounded-md border-gray-300 border py-2 px-2 w-full" />
+                            <input {...register("senha")} name="senha" type="password" className="bg-branco rounded-md border-gray-300 border py-2 px-2 w-full" />
                         </label>
                     </div>
 

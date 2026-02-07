@@ -124,7 +124,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             title={!editalProcessado && idEditalAtivo === edital.id ? "Aguarde o processamento do edital para ver o resultado" : ""}
             style={style}
             className={`
-                bg-white rounded-md shadow-sm
+                bg-white rounded-md shadow-sm wrap-break-word
                 ${!editalProcessado && idEditalAtivo === edital.id && "cursor-progress"}
                 ${isDragging ? "opacity-30" : "opacity-100"}
             `}
@@ -134,16 +134,16 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             <div {...attributes} {...listeners} className={`${!editalProcessado && idEditalAtivo === edital.id && "hidden"} h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
                 <span
                     className={`
-                        w-fulltext-md pointer-events-none italic
+                        w-full text-center text-md pointer-events-none italic
                     `}
                 >
                     Segure nesta área para arrastar
                 </span>
             </div>
 
-            <div className="relative p-3 overflow-x-hidden">
-                <div className="flex flex-col-reverse items-start justify-between">
-                    <h3 className="font-semibold text-xl">{edital.name}</h3>
+            <div className="grid grid-cols-1 relative p-3 overflow-x-hidden">
+                <div className="flex flex-col-reverse items-start justify-between min-w-0 wrap-break-word">
+                    <h3 style={{ maxWidth: "-webkit-fill-available"}} className="font-semibold text-xl min-w-0 wrap-break-word">{edital.name}</h3>
 
                     <div className="relative w-full my-2 flex justify-between">
                         {
