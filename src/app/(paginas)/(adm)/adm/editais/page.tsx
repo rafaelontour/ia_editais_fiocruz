@@ -327,14 +327,14 @@ export default function Editais() {
                                 const item = findItem(activeId);
                                 if (!item) return null;
                                 return (
-                                    <>
-                                        <div className="h-16 bg-gray-200 rounded-sm mb-2" />
-                                        <div>
+                                    <div>
+                                        <div className="h-16 bg-gray-200 rounded-sm mb-2 wrap-break-words whitespace-normal" />
+                                        <div className="min-w-0 wrap-break-word">
                                             <h3 className="font-semibold">{item.name}</h3>
                                             <p className="text-sm text-gray-600">Data: {formatarData(item.created_at)}</p>
                                             <p className="text-sm text-gray-600">{(item.editors && item.editors.length > 1) ? "Responsáveis" : "Responsável"}: {(item.editors ?? []).map(e => e.username).join(", ")}</p>
                                         </div>
-                                    </>
+                                    </div>
                                 );
                             })()}
                         </div>

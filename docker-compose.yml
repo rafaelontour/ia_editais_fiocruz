@@ -5,9 +5,9 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_VERSAO_PLATAFORMA: "beta-2.5.x"
+    container_name: fiotec-front
     environment:
       NEXT_PUBLIC_VERSAO_PLATAFORMA: "beta-2.5.x"
     ports:
       - "4000:4000"
     restart: unless-stopped
-

@@ -43,13 +43,11 @@ async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<Usu
 }
 
 async function adicionarUsuarioService(dados: any, daTelaCadastro?: boolean) {
+    console.log("Dados: ", dados)
     try {
         const url = `${urlBase}/user/`;
 
         let res;
-
-        console.log("dados: ", dados);
-        console.log("daTelaCadastro: ", daTelaCadastro);
 
         if (!daTelaCadastro) {
             res = await fetch(url, {
@@ -58,29 +56,15 @@ async function adicionarUsuarioService(dados: any, daTelaCadastro?: boolean) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    username: dados.nome,
-                    email: dados.email,
-                    phone_number: dados.whatsapp,
-                    unit_id: dados.unidade,
-                    access_level: dados.perfil
-                })
+                body: JSON.stringify(dados)
             });
         } else {
             res = await fetch(url, {
                 method: "POST",
-                credentials: "include",
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    username: dados.nomeCompleto,
-                    email: dados.email,
-                    phone_number: dados.whatsapp,
-                    access_level: dados.access_level,
-                    unit_id: dados.unidade,
-                    password: dados.password
-                })
+                body: JSON.stringify(dados)
             });
         }
 
