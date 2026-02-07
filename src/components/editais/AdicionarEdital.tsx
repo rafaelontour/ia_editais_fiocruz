@@ -103,7 +103,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
 
         if (resposta !== 201) {
             if (resposta === 409) {
-                toast.error("Erro ao enviar edital!", { description: "Ja existe um edital cadastrado esse nome ou número!" });
+                toast.error("Erro ao enviar edital!", { description: "Já existe um edital cadastrado com esse número!" });
                 return;
             }
             toast.error("Erro ao enviar edital!");
