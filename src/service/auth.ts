@@ -7,13 +7,15 @@ async function getToken(dados: any) {
         const dadosLogin = new URLSearchParams(dados).toString()
 
         const res = await fetch(url, {
-            method: "POST",
+            method: "POST",www
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: dadosLogin,
             credentials: "include"
         });
+
+        console.log("res:", res)
 
         const data = await res.json()
 
