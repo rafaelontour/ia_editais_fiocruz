@@ -1,12 +1,10 @@
 import { Edital } from "@/core";
-import { toast } from "sonner";
-import { ca } from "zod/v4/locales";
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getEditaisService(idUnidade: string | undefined): Promise<Edital[] | undefined> {
     try {
-        const res = await fetch(`${urlBase}/doc/?unit_id=${idUnidade}`, {
+        const res = await fetch(`${urlBase}/doc?unit_id=${idUnidade}`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -49,7 +47,7 @@ async function getEditalPorIdService(id: string | undefined): Promise<Edital | u
 
 async function adicionarEditalService(dados: any): Promise<[number, string] | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/doc/`, {
+        const resposta = await fetch(`${urlBase}/doc`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -68,7 +66,7 @@ async function adicionarEditalService(dados: any): Promise<[number, string] | un
 
 async function atualizarEditalService(dados: any): Promise<number | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/doc/`, {
+        const resposta = await fetch(`${urlBase}/doc`, {
             method: "PUT",
             credentials: "include",
             headers: {
@@ -92,7 +90,7 @@ async function atualizarEditalService(dados: any): Promise<number | undefined> {
 
 async function excluirEditalService(editalId: string): Promise<number | undefined> {
     try {
-        const responsta = await fetch(`${urlBase}/doc/${editalId}/`, {
+        const responsta = await fetch(`${urlBase}/doc/${editalId}`, {
             method: "DELETE",
             credentials: "include",
             headers: {

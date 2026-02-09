@@ -23,7 +23,7 @@ async function getUsuarioLogado() {
 
 async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<UsuarioUnidade[] | undefined> {
     try {
-        const res = await fetch(`${urlBase}/user/?unit_id=${unidadeId}`, {
+        const res = await fetch(`${urlBase}/user?unit_id=${unidadeId}`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -45,7 +45,7 @@ async function getUsuariosPorUnidade(unidadeId: string | undefined): Promise<Usu
 async function adicionarUsuarioService(dados: any, daTelaCadastro?: boolean) {
     console.log("Dados: ", dados)
     try {
-        const url = `${urlBase}/user/`;
+        const url = `${urlBase}/user`;
 
         let res;
 
@@ -79,7 +79,7 @@ async function adicionarUsuarioService(dados: any, daTelaCadastro?: boolean) {
 
 async function atualizarUsuarioService(dados: any, id: string): Promise<number | undefined> {
     try {
-        const url = `${urlBase}/user/`;
+        const url = `${urlBase}/user`;
 
         const res = await fetch(url, {
             method: "PUT",
@@ -105,7 +105,7 @@ async function atualizarUsuarioService(dados: any, id: string): Promise<number |
 
 async function excluirUsuarioService(usuarioId: string): Promise<number | undefined> {
     try {
-        const res = await fetch(`${urlBase}/user/${usuarioId}/`, {
+        const res = await fetch(`${urlBase}/user/${usuarioId}`, {
             method: "DELETE",
             credentials: "include",
         });
@@ -120,7 +120,7 @@ async function excluirUsuarioService(usuarioId: string): Promise<number | undefi
 
 async function buscarResponsavelEdital(idResponsavel: string): Promise<string> {
     try {
-        const res = await fetch(`${urlBase}/user/${idResponsavel}/`, {
+        const res = await fetch(`${urlBase}/user/${idResponsavel}`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -155,7 +155,7 @@ async function trocarSenhaService(id: string | undefined, senhaAntiga: string, s
 
 async function atualizarInfoUsuarioService(usuario: UsuarioUnidade) {
     try {
-        const url = `${urlBase}/user/`;
+        const url = `${urlBase}/user`;
 
         const res = await fetch(url, {
             method: "PUT",

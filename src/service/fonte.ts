@@ -4,7 +4,7 @@ const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getFontesService(): Promise<Fonte[] | undefined> {
     try {
-        const dados = await fetch(`${urlBase}/source/`, {
+        const dados = await fetch(`${urlBase}/source`, {
             method: 'GET',
             credentials: "include"
         })
@@ -23,7 +23,7 @@ async function getFontesService(): Promise<Fonte[] | undefined> {
 
 async function adicionarFonteService(nome: string, descricao: string): Promise<number | undefined> {
     try {
-        const url = `${urlBase}/source/`
+        const url = `${urlBase}/source`
         const resposta = await fetch(`${url}`, {
             method: 'POST',
             headers: {
@@ -44,7 +44,7 @@ async function adicionarFonteService(nome: string, descricao: string): Promise<n
 
 async function atualizarFonteService(id: string, nome: string, descricao: string): Promise<number | undefined> {
     try {
-        const url = `${urlBase}/source/`
+        const url = `${urlBase}/source`
         const resposta = await fetch(`${url}`, {
             method: 'PUT',
             headers: {

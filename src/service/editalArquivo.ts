@@ -2,7 +2,7 @@ const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getEditalArquivoService(id: string | null | undefined): Promise<any> {
     try {
-        const resposta = await fetch(`${urlBase}/doc/${id}/release/`, {
+        const resposta = await fetch(`${urlBase}/doc/${id}/release`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -27,7 +27,7 @@ async function enviarArquivoService(idEdital: string | undefined, arquivo: File 
         const formData = new FormData();
         formData.append('file', arquivo!);
 
-        const res = await fetch(`${urlBase}/doc/${idEdital}/release/`, {
+        const res = await fetch(`${urlBase}/doc/${idEdital}/release`, {
             method: "POST",
             credentials: "include",
             body: formData
