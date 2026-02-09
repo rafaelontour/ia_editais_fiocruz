@@ -4,7 +4,7 @@ const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getRamosService(id: string | undefined): Promise<Ramo[] | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/branch?taxonomy_id=${id}/`, {
+        const resposta = await fetch(`${urlBase}/branch?taxonomy_id=${id}`, {
             method: "GET",
             credentials: "include",
         });
@@ -24,7 +24,7 @@ async function getRamosService(id: string | undefined): Promise<Ramo[] | undefin
 
 async function adicionarRamoService(ramo: Ramo): Promise<number | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/branch/`, {
+        const resposta = await fetch(`${urlBase}/branch`, {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -63,7 +63,7 @@ async function buscarRamosDaTaxonomiaService(idTaxonomia: string | undefined): P
 
 async function atualizarRamoService(dadosRamos: Ramo): Promise<number | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/branch/`, {
+        const resposta = await fetch(`${urlBase}/branch`, {
             method: 'PUT',
             credentials: "include",
             headers: {
@@ -80,7 +80,7 @@ async function atualizarRamoService(dadosRamos: Ramo): Promise<number | undefine
 
 async function excluirRamoService(idRamo: string | undefined): Promise<number | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/branch/${idRamo}/`, { method: "DELETE", credentials: "include" });
+        const resposta = await fetch(`${urlBase}/branch/${idRamo}`, { method: "DELETE", credentials: "include" });
         return resposta.status
     } catch (error) {
         console.error('Erro ao excluir ramo:', error);

@@ -3,7 +3,7 @@ import { Fonte, Tipificacao } from "@/core";
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getTipificacoesService(): Promise<Tipificacao[] | undefined> {
-    const url = `${urlBase}/typification/`;
+    const url = `${urlBase}/typification`;
 
     try {
         const response = await fetch(url, {
@@ -20,7 +20,7 @@ async function getTipificacoesService(): Promise<Tipificacao[] | undefined> {
 
         const json = await response.json();
         return json.typifications;
-    } catch(e) {
+    } catch (e) {
         return
     }
 }
@@ -49,7 +49,7 @@ async function getTipificacaoPorIdService(id: string | undefined): Promise<Tipif
 }
 
 async function adicionarTipificacaoService(nome: string, fontesSelecionadas: Fonte[]): Promise<Tipificacao | null> {
-    const url = `${urlBase}/typification/`
+    const url = `${urlBase}/typification`
 
     try {
         const listaIds = fontesSelecionadas.map(fonte => fonte.id)
@@ -96,7 +96,7 @@ async function excluirTipificacaoService(id: string): Promise<number | undefined
 }
 
 async function atualizarTipificacaoService(tipificacao: Tipificacao): Promise<number | undefined> {
-    const url = `${urlBase}/typification/`
+    const url = `${urlBase}/typification`
 
     try {
         const dados = await fetch(url, {

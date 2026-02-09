@@ -30,7 +30,7 @@ async function getTaxonomiasService(): Promise<Taxonomia[] | undefined> {
 async function adicionarTaxonomiaService(taxonomia: Taxonomia): Promise<number | undefined> {
 
     try {
-        const resposta = await fetch(`${urlBase}/taxonomy/`, {
+        const resposta = await fetch(`${urlBase}/taxonomy`, {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -68,14 +68,14 @@ async function atualizarTaxonomiaService(taxonomia: Taxonomia): Promise<number |
         })
 
         return resposta.status
-    } catch(error) {
+    } catch (error) {
         return
     }
 }
 
 async function excluirTaxonomiaService(idTaxomonia: string | undefined): Promise<number | undefined> {
     try {
-        const resposta = await fetch(`${urlBase}/taxonomy/${idTaxomonia}/`, {
+        const resposta = await fetch(`${urlBase}/taxonomy/${idTaxomonia}`, {
             method: "DELETE",
             credentials: "include",
             headers: {

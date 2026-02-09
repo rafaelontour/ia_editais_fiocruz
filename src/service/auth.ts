@@ -84,23 +84,3 @@ export {
     mandarEmailParaRecuperarSenhaService,
     enviarCodigoWhatsAppService
 }
-
-// async function atualizarUsuario(email: string, password: string) {
-//      try{
-//         const url = `${urlBase}/token `;
-
-//         const res = await fetch(url, {
-//             method: "GET",
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({
-//                 password, email
-//             })
-//         });
-//       const data = await res.json()
-//      return data;
-//     }catch(e){
-//         console.error("Erro ao tentar criar usuário: ", e);
-//     }
-// }
