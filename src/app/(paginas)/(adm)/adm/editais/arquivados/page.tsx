@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Edital } from "@/core";
 import { EditalArquivo } from "@/core/edital/Edital";
 import useUsuario from "@/data/hooks/useUsuario";
-import { formatarData, simularAtraso } from "@/lib/utils";
+import { formatarData } from "@/lib/utils";
 import { arquivarEditalService, excluirEditalService, getEditaisArquivadosService, getEditalPorIdService } from "@/service/edital";
 import { getEditalArquivoService } from "@/service/editalArquivo";
 import { IconArchive } from "@tabler/icons-react";
