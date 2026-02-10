@@ -90,12 +90,6 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
         toast.success("Edital arquivado!");
     }
 
-    function gerarLogEdital() {
-        if (!edital.history) return;
-
-        const dataDoDia = edital.history[0]
-    }
-
     type Item = {
         id: string;
         name: string;
@@ -134,7 +128,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             <div {...attributes} {...listeners} className={`${!editalProcessado && idEditalAtivo === edital.id && "hidden"} h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
                 <span
                     className={`
-                        w-full text-center text-md pointer-events-none italic
+                        w-full text-center text-white text-md pointer-events-none italic
                     `}
                 >
                     Segure nesta área para arrastar

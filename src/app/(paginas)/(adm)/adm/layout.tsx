@@ -22,7 +22,7 @@ export default function RootLayout({
 
   const titulosMap: Record<string, string> = {
     "/adm": "Início",
-    "/adm/editais": "Meus Editais",
+    "/adm/editais": "Meus documentos",
     "/adm/tipificacoes": "Tipificações",
     "/adm/taxonomias": "Taxonomias",
     "/adm/fontes": "Fontes",

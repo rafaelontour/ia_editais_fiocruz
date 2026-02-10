@@ -194,13 +194,13 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                         style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
                     >
                         <Upload size={18} color="white" />
-                        <p className="text-white text-[16px]">Enviar novo edital</p>
+                        <p className="text-white text-[16px]">Enviar novo documento</p>
                     </Button> 
                 </SheetTrigger>
                 
                 <SheetContent onCloseAutoFocus={limparDados} side="right" className="w-full px-10 pt-5 overflow-y-auto">
                     <SheetHeader className="pl-0">
-                        <SheetTitle className="text-4xl">Adicionar edital</SheetTitle>
+                        <SheetTitle className="text-4xl">Adicionar documento</SheetTitle>
                         <SheetDescription className="text-xl">Preencha as informações abaixo</SheetDescription>
                     </SheetHeader>
                 
@@ -209,7 +209,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
                             <div className="flex flex-col gap-3">
                                 <div className="flex gap-3">
                                     <div className="flex flex-col gap-3 w-1/2">
-                                        <Label htmlFor="name" className="text-lg">Nome do edital</Label>
+                                        <Label htmlFor="name" className="text-lg">Nome do documento</Label>
                                         <Input
                                             {...register("nome")}
                                             id="name"

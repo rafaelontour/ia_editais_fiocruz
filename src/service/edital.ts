@@ -22,7 +22,6 @@ async function getEditaisService(idUnidade: string | undefined): Promise<Edital[
 }
 
 async function getEditalPorIdService(id: string | undefined): Promise<Edital | undefined> {
-    console.log("getEditalPorIdService id:", id);
     try {
         const res = await fetch(`${urlBase}/doc/${id}`, {
             method: "GET",

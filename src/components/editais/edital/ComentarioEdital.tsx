@@ -1,16 +1,20 @@
+import BotaoCancelar from "@/components/botoes/BotaoCancelar";
+import BotaoSalvar from "@/components/botoes/BotaoSalvar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Comentario, Edital } from "@/core/edital/Edital";
 import useUsuario from "@/data/hooks/useUsuario";
 import { formatarData } from "@/lib/utils";
-import { excluirComentarioEditalService, fazerComentarioEditalService } from "@/service/comentarioEdital";
-import { getEditalPorIdService } from "@/service/edital";
+import { atualizarComentarioEditalService, excluirComentarioEditalService, fazerComentarioEditalService } from "@/service/comentarioEdital";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { IconLoader2 } from "@tabler/icons-react";
-import { time } from "console";
 import { PencilLine, Plus, Send, Trash, User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import z from "zod";
+import { en } from "zod/v4/locales";
 
 interface Props {
     edital: Edital | undefined;
@@ -18,14 +22,34 @@ interface Props {
     buscarComentariosEdital: () => void;
 }
 
+const schemaComentario = z.object({
+    content: z.string().min(5, "O comentário não pode ser vazio"),
+})
+
 export default function ComentarioEdital({ edital, comentarios, buscarComentariosEdital }: Props) {
     const [mostrarFormulario, setMostrarFormulario] = useState<boolean>(false);
     const [novoComentario, setNovoComentario] = useState<string>("");
     const [carregando, setCarregando] = useState<boolean>(false);
     const [montado, setMontado] = useState<boolean>(false);
     const [dialogComentario, setDialogComentario] = useState<string | null>(null);
-    const [abrirDialogAdicionar, setAbrirDialogAdicionar] = useState(false);
-     const [enviandoComentario, setEnviandoComentario] = useState<boolean>(false);
+    const [abrirDialogAdicionar, setAbrirDialogAdicionar] = useState<boolean>(false);
+    const [dialogEditarComentario, setDialogEditarComentario] = useState<string | null>(null);
+    const [enviandoComentario, setEnviandoComentario] = useState<boolean>(false);
+
+    type FormComentario = z.infer<typeof schemaComentario>;
+    const {
+        register: registerComentario,
+        handleSubmit: handleSubmitComentario,
+        formState: { errors: errorsComentario },
+        setValue: setValueComentario,
+        reset: resetComentario,
+        watch: watchComentario
+    } = useForm<FormComentario>({
+        resolver: zodResolver(schemaComentario),
+        defaultValues: {
+            content: ""
+        }
+    })
 
     const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
@@ -44,15 +68,9 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
     const temComentarios = comentarios && comentarios.length > 0;
 
     async function enviarComentario() {
-        if (!novoComentario.trim()) {
-            toast.warning("Digite um comentário antes de enviar.");
-            setEnviandoComentario(false);
-            return;
-        }
-        
         setEnviandoComentario(true);
 
-        const resposta = await fazerComentarioEditalService(edital?.id, { content: novoComentario });
+        const resposta = await fazerComentarioEditalService(edital?.id, { content: watchComentario("content") });
         
         if (resposta != 201) {
             toast.error("Erro ao fazer comentário!");
@@ -69,6 +87,28 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
 
     }
 
+    async function atualizarComentario() {
+        setEnviandoComentario(true);
+
+        const comentario: Comentario = {
+            id: dialogEditarComentario!,
+            content: watchComentario("content")
+        }
+
+        const resposta = await atualizarComentarioEditalService(comentario);
+        
+        if (resposta != 200) {
+            toast.error("Erro ao atualizar comentário!");
+            return;
+        }
+
+        toast.success("Comentário atualizado com sucesso!");
+        setEnviandoComentario(false);
+        setDialogComentario(null);
+        setDialogEditarComentario(null);
+        buscarComentariosEdital();
+    }
+
     async function excluirComentario(id: string | undefined) {
         const resposta = await excluirComentarioEditalService(id);
 
@@ -80,6 +120,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
         toast.success("Comentário excluido com sucesso!");
         buscarComentariosEdital();
     }
+
 
     return (
         montado &&
@@ -107,23 +148,28 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                         </Button>
                                     </DialogTrigger>
 
-                                    <DialogContent>
+                                    <DialogContent onCloseAutoFocus={() => resetComentario()}>
                                         <DialogHeader>
                                             <DialogTitle>Adicionar comentário</DialogTitle>
                                             <DialogDescription>
-                                                <p>Digite o comentário abaixo:</p>
+                                                Digite o comentário abaixo:
                                             </DialogDescription>
                                         </DialogHeader>
 
                                         <Textarea
+                                            {...registerComentario("content")}
                                             placeholder="Escreva um comentário"
                                             className="w-full"
-                                            value={novoComentario}
-                                            onChange={(e) => setNovoComentario(e.target.value)}
                                         />
 
+                                        {errorsComentario.content && (
+                                            <p className="text-red-500 text-sm mt-2">
+                                                {errorsComentario.content.message}
+                                            </p>
+                                        )}
+
                                         <DialogFooter>
-                                            <DialogClose>
+                                            <DialogClose asChild>
                                                 {
                                                     !enviandoComentario && (
                                                         <Button variant={"outline"} className="hover:cursor-pointer">
@@ -139,7 +185,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                                 disabled={enviandoComentario}
                                                 variant="destructive"
                                                 className={`bg-vermelho hover:cursor-pointer ${enviandoComentario && "cursor-not-allowed bg-red-400"}`} 
-                                                onClick={enviarComentario}
+                                                onClick={handleSubmitComentario(enviarComentario)}
                                             >
                                                 {
                                                     enviandoComentario ? (
@@ -174,11 +220,18 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                             {mostrarFormulario ? (
                                 <div className="flex flex-col gap-4 w-full px-4">
                                     <Textarea
+                                        {...registerComentario("content")}
                                         placeholder="Escreva um comentário"
                                         className="w-full"
                                         value={novoComentario}
                                         onChange={(e) => setNovoComentario(e.target.value)}
                                     /> 
+
+                                    {errorsComentario.content && (
+                                        <p className="text-red-500 text-sm">
+                                            {errorsComentario.content.message}
+                                        </p>
+                                    )}
 
                                     {
                                     enviandoComentario ? (
@@ -191,11 +244,11 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                             variant="destructive"
                                             className="bg-vermelho hover:cursor-pointer"
                                             style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
-                                            onClick={enviarComentario}
+                                            onClick={handleSubmitComentario(enviarComentario)}
                                         >
                                             <Send size={17} className="mr-2" />
                                             Enviar comentário
-                                    </Button>
+                                        </Button>
                                     )
                                 }
                                     
@@ -206,12 +259,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                         Nenhum comentário ainda para este edital
                                     </p>
 
-                                    {
-                                        ((edital?.history?.[0]?.status === "PENDING" || edital?.history?.[0]?.status === "UNDER_CONSTRUCTION") && usuario?.access_level === "ANALYST") ||
-                                        ((edital?.history?.[0]?.status === "WAITING_FOR_REVIEW" || edital?.history?.[0]?.status === "COMPLETED") && usuario?.access_level === "AUDITOR") ||
-                                        
-                                        usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST" && (
-                                
+                                    
                                         <Button
                                             type="button"
                                             className="bg-vermelho hover:cursor-pointer"
@@ -222,8 +270,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                             <Plus className="mr-2" />
                                             <span>Adicionar comentário</span>
                                         </Button>
-                                        )
-                                    }
+                                  
                                 </>
                             )}
                         </div>
@@ -250,6 +297,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                             {formatarData(item.created_at)}
                                         </p>
                                     </div>
+
                                     <p className="text-sm font-semibold text-gray-400 max-h-24 overflow-y-auto">
                                         {item.content}
                                     </p>
@@ -258,14 +306,54 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                             item.author?.id === usuario?.id) && (
 
                                             <div className="flex items-center gap-2 absolute right-0 top-0">
-                                                <Button
-                                                    title="Editar comentário"
-                                                    variant={"outline"}
-                                                    size={"icon"}
-                                                    className="h-6 w-6 p-3.5 border-gray-300 rounded-sm hover:cursor-pointer"
-                                                >
-                                                    <PencilLine />
-                                                </Button>
+                                                <Dialog open={dialogEditarComentario === item.id} onOpenChange={(open) => setDialogEditarComentario(open ? item.id! : null)}>
+                                                    <DialogTrigger asChild>
+                                                        <Button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setDialogEditarComentario(item.id!);
+                                                                setValueComentario("content", item.content!)
+                                                            }}
+                                                            title="Editar comentário"
+                                                            variant={"outline"}
+                                                            size={"icon"}
+                                                            className="h-6 w-6 p-3.5 border-gray-300 rounded-sm hover:cursor-pointer"
+                                                        >
+                                                            <PencilLine />
+                                                        </Button>
+                                                    </DialogTrigger>
+
+                                                    <DialogContent className={`${enviandoComentario && "cursor-not-allowed"}`} onCloseAutoFocus={() => resetComentario()}>
+                                                        <DialogHeader>
+                                                            <DialogTitle>Editar comentário</DialogTitle>
+                                                            <DialogDescription>
+                                                                Edite o comentário abaixo:
+                                                            </DialogDescription>
+                                                        </DialogHeader>
+
+                                                        <div className="flex flex-col">
+                                                            <Textarea
+                                                                value={watchComentario("content")}
+                                                                onChange={(e) => setValueComentario("content", e.target.value)}
+                                                            />
+
+                                                            {errorsComentario.content && (
+                                                                <p className="text-red-500 text-sm">
+                                                                    {errorsComentario.content.message}
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        <DialogFooter className={`${enviandoComentario && "pointer-events-none"}`}>
+                                                            <DialogClose>
+                                                                <BotaoCancelar />
+                                                            </DialogClose>
+
+                                                            <BotaoSalvar onClick={handleSubmitComentario(atualizarComentario)} />
+
+                                                        </DialogFooter>
+                                                    </DialogContent>
+                                                </Dialog>
 
                                                 <Dialog
                                                     open={dialogComentario === item.id}

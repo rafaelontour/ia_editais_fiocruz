@@ -71,7 +71,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
             <div className="flex items-center justify-between">
                 <div className="flex items-center flex-row gap-7">
                     <BotaoVoltar />
-                    <Label className="text-2xl font-semibold"><strong>Edital</strong>: <span className="font-semibold">{edital?.name}</span></Label>
+                    <Label className="text-2xl font-semibold"><strong>Documento</strong>: <span className="font-semibold">{edital?.name}</span></Label>
                     
                     <div
                         className="pointer-events-none flex items-center gap-2 px-3 py-1 rounded-md font-semibold"

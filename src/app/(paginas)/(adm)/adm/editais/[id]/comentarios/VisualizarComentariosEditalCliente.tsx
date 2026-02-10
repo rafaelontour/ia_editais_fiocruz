@@ -62,19 +62,18 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
             <div className="flex flex-row gap-7 pb-6">
                 <BotaoVoltar />
 
-                <Label className="text-2xl font-bold"><strong>Edital</strong>: {edital?.name}</Label>
+                <Label className="text-2xl font-bold"><strong>Documento</strong>: {edital?.name}</Label>
                 {
                     buscandoEdital ? (
                         <p className="flex items-center">
-                            <span>Carregando..</span>
+                            <span>Carregando...</span>
                             <LoaderCircle className="animate-spin text-gray-600" />
                         </p>
                     ) : (
                         <div
-                            className="pointer-events-none flex items-center gap-2 px-3 py-1 rounded-md text-white font-semibold"
+                            className="pointer-events-none flex items-center gap-2 px-3 py-1 rounded-md font-semibold"
                             style={{
-                                backgroundColor: getStatusColor(edital?.history ? edital.history[0].status : "PENDING"),
-                                boxShadow: "0 0 3px rgba(0, 0, 0, .5)"
+                                border: `2px dashed ${getStatusColor(edital?.history ? edital.history[0].status : "PENDING")}`,
                             }}
                         >
                             <span>{edital?.history && verificarStatusEdital(edital?.history[0].status)}</span>
@@ -98,7 +97,7 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
                             ></iframe>
                         ) : (
                             <p className="flex items-center flex-col">
-                                <span className="text-gray-600">Carregando edital...</span>
+                                <span className="text-gray-600">Carregando documento...</span>
                                 <LoaderCircle className="animate-spin text-gray-600" />
                             </p>
                         )

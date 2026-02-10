@@ -42,6 +42,27 @@ async function fazerComentarioEditalService(id: string | undefined, comentario: 
     }
 }
 
+async function atualizarComentarioEditalService(comentario: Comentario): Promise<number | undefined> {
+    try {
+        const resposta = await fetch(`${urlBase}/doc/message`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({
+                id: comentario.id,
+                content: comentario.content,
+                mentions: []
+            })
+        })
+
+        return resposta.status
+    } catch(e) {
+        return
+    }
+}
+
 async function excluirComentarioEditalService(idComentario: string | undefined): Promise<number | undefined> {
     try {
         const resposta = await fetch(`${urlBase}/doc/message/${idComentario}`, {
@@ -61,5 +82,6 @@ async function excluirComentarioEditalService(idComentario: string | undefined):
 export {
     buscarComentariosPorIdEditalService,
     fazerComentarioEditalService,
+    atualizarComentarioEditalService,
     excluirComentarioEditalService
 }

@@ -29,7 +29,9 @@ const schemaFonte = z.object({
 export default function Fontes() {
 
     type FormDataFonte = z.infer<typeof schemaFonte>
-    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<FormDataFonte>({
+    const {
+        register, handleSubmit, formState: { errors }, setValue, reset
+    } = useForm<FormDataFonte>({
         resolver: zodResolver(schemaFonte),
         defaultValues: {
             nome: "",
@@ -207,7 +209,7 @@ export default function Fontes() {
                             fontesFiltradas.map((fonte) => (
                                 <Div key={fonte.id}>
                                     <div data-cy="item-fonte" className="flex flex-col gap-2">
-                                        <h2 className="text-2xl font-semibold">{fonte.name}</h2>
+                                        <h2 className="text-2xl font-semibold wrap-break-word">{fonte.name}</h2>
                                         <p className={`py-1 w-fit wrrap-break-words text-md`}>
                                             {fonte.description}
                                         </p>
