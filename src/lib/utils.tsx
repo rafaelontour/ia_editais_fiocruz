@@ -1,5 +1,5 @@
 import { StatusEdital } from "@/core/edital/Edital";
-import { IconChecks, IconHourglassEmpty, IconHourglassFilled, IconHourglassHigh, IconHourglassLow, IconPaperBag } from "@tabler/icons-react";
+import { IconChecks } from "@tabler/icons-react";
 import { clsx, type ClassValue } from "clsx"
 import { Construction, Copy, EyeIcon } from "lucide-react";
 import React from "react";

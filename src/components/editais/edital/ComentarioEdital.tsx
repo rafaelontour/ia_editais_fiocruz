@@ -3,7 +3,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Textarea } from "@/components/ui/textarea";
 import { Comentario, Edital } from "@/core/edital/Edital";
 import useUsuario from "@/data/hooks/useUsuario";
-import { formatarData, simularAtraso } from "@/lib/utils";
+import { formatarData } from "@/lib/utils";
 import { excluirComentarioEditalService, fazerComentarioEditalService } from "@/service/comentarioEdital";
 import { getEditalPorIdService } from "@/service/edital";
 import { IconLoader2 } from "@tabler/icons-react";
@@ -277,7 +277,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                                             size={"icon"}
                                                             className="
                                                                 h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
-                                                                text-white transition-all rounded-sm p-[14px]
+                                                                text-white transition-all rounded-sm p-3.5
                                                             ">
                                                             <Trash />
                                                         </Button>
