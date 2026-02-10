@@ -5,6 +5,8 @@ import { Construction, Copy, EyeIcon } from "lucide-react";
 import React from "react";
 import { twMerge } from "tailwind-merge"
 
+const CHAVE_EDITAIS_PROCESSANDO = "lista_ids_editais_processando";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -53,14 +55,17 @@ function iconeParaStatusDoEdital(status: StatusEdital): React.ReactNode {
   }
 }
 
-function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function lerLista() {
+  try {
+    const valor = localStorage.getItem(CHAVE_EDITAIS_PROCESSANDO);  
+    return valor ? JSON.parse(valor) : [];
+  } catch {
+    return [];
+  }
 }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/*******  2e886966-1bd6-44eb-8e34-1e1a5e7d7dcc  *******/
-async function simularAtraso(intervalo: number) {
-    await sleep(intervalo);
+function salvarLista(lista: string[]) {
+  localStorage.setItem(CHAVE_EDITAIS_PROCESSANDO, JSON.stringify(lista));
 }
 
 
@@ -69,5 +74,6 @@ export {
   getStatusColor,
   verificarStatusEdital,
   iconeParaStatusDoEdital,
-  simularAtraso
+  lerLista,
+  salvarLista
 };

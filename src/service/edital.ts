@@ -32,7 +32,6 @@ async function getEditalPorIdService(id: string | undefined): Promise<Edital | u
                 "Content-type": "application/json"
             }
         })
-
         
         if (!res.ok) return
         

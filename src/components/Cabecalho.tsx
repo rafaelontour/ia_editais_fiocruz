@@ -34,7 +34,7 @@ export default function Cabecalho() {
         // Define cargo
         const c = usuario.access_level === "ADMIN" ? "ADMINISTRADOR" :
                   usuario.access_level === "ANALYST" ? "ANALISTA" :
-                  usuario.access_level === "AUDITOR" ? "AUDITOR" : "DEFAULT";
+                  usuario.access_level === "AUDITOR" ? "AUDITOR" : "CARGO NÃO DEFINIDO"
         setCargo(c);
     }
 

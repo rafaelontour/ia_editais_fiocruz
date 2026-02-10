@@ -8,9 +8,10 @@ import { useParams } from "next/navigation"
 
 interface Props {
     ramos: Branch[]
+    taxonomia: string | undefined
 }
 
-export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
+export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
 
     const params = useParams()
     const docId = params.id as string
@@ -187,7 +188,7 @@ export default function RamosDaTaxonomiaResultado({ ramos }: Props) {
                                         {ramo?.evaluation?.score} / 10
                                     </div>
 
-                                    <DetalhesRamoDialog ramo={ramo} docId={docId} />
+                                    <DetalhesRamoDialog ramo={ramo} docId={docId} taxonomia={taxonomia} />
                                 </div>
                             </div>
                         </TabsContent>

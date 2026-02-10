@@ -21,7 +21,7 @@ import CardLista from "@/components/editais/CardLista";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import useUsuario from "@/data/hooks/useUsuario";
-import { formatarData, simularAtraso } from "@/lib/utils";
+import { formatarData } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 export default function Editais() {

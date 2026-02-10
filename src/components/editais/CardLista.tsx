@@ -55,6 +55,6 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
             <CardEdital funcaoAtualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} key={edital.id} edital={edital} containerId={status} />
           ))}
       </div>
-    </div>
+    </div> 
   );
 }

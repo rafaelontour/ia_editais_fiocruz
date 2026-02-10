@@ -120,6 +120,8 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             editors_ids: responsaveisEdital.map(usuario => usuario.id)
         }
 
+        console.log(dados)
+
         const r = await atualizarEditalService(dados);
 
 
@@ -294,7 +296,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                     <SelectGroup>
                                                         <SelectLabel>Usuários</SelectLabel>
                                                         {
-                                                            usuariosDaUnidade?.filter(u => field.value?.includes(u.id!)).map((u) => (
+                                                            usuariosDaUnidade?.filter(u => !field.value?.includes(u.id!)).map((u) => (
                                                                 <SelectItem
                                                                     key={u.id}
                                                                     value={u.id!}

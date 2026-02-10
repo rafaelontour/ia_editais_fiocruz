@@ -166,6 +166,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                                 <RamosDaTaxonomiaResultado
                                     ramos={taxonomia.branches ? taxonomia.branches : []}
                                     key={taxonomia.id}
+                                    taxonomia={taxonomia.title}
                                 />
                             </TabsContent>
                         ))

@@ -23,6 +23,7 @@ import { adicionarEditalService } from "@/service/edital";
 import { enviarArquivoService } from "@/service/editalArquivo";
 import useUsuario from "@/data/hooks/useUsuario";
 import useEditalProc from "@/data/hooks/useProcEdital";
+import { lerLista, salvarLista } from "@/lib/utils";
 
 const schemaEdital = z.object({
     nome: z.string().min(5, "O nome do edital é obrigatório"),
@@ -69,6 +70,8 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const { usuario } = useUsuario();
     const { editalProcessado, setEditalProcessado, setIdEditalAtivo } = useEditalProc();
 
+     const lista = lerLista();
+
     const a = useRef<number>(0);
     
     async function buscarTipificacoes() {
@@ -99,7 +102,12 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         
         const [resposta, idEdital] = (await adicionarEditalService(dados)) ?? [];
 
-        setIdEditalAtivo(idEdital);
+        if (!lista.includes(idEdital)) {
+            lista.push(idEdital);
+            salvarLista(lista);
+        }
+
+        console.log("Lista de editais processando:", lista);
 
         if (resposta !== 201) {
             if (resposta === 409) {

@@ -2,26 +2,25 @@ const urlBase: string | undefined = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getToken(dados: any) {
     try {
-        const url = `${urlBase}/auth/sign-in`;
-
+        const url = `${urlBase}/auth/sign-in`
         const dadosLogin = new URLSearchParams(dados).toString()
-
         const res = await fetch(url, {
             method: "POST",
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                "Content-Type": "application/x-www-form-urlencoded",
             },
             body: dadosLogin,
             credentials: "include"
-        });
+        })
 
-        console.log("res:", res)
+        if (res.status === 401) {
+            return null
+        }
 
         const data = await res.json()
-
-        return data;
-    } catch (e) {
-        return
+        return data
+    } catch {
+        return null
     }
 }
 

@@ -104,12 +104,14 @@ export default function Login() {
       const formData = new FormData();
       formData.append("username", data.email)
       formData.append("password", data.senha)
-      const token = await getToken(formData)
+      const [token, codigo] = await getToken(formData)
 
       if (!token) {
         toast.error("Email ou senha inválidos")
         return
       }
+
+      console.log("token:", token)
 
       // const [ dados, status ] = await getUsuarioLogado()
 

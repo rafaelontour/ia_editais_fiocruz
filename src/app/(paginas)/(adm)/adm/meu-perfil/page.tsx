@@ -125,7 +125,8 @@ export default function MeuPerfil() {
     switch (usuario?.access_level) {
       case "ADMIN": return "Administrador";
       case "ANALYST": return "Analista";
-      default: return "Auditor";
+      case "AUDITOR": return "Auditor";
+      default: return "Usuário";
     }
   }
 

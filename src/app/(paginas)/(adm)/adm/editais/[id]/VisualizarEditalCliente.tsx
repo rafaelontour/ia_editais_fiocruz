@@ -74,10 +74,9 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
                     <Label className="text-2xl font-semibold"><strong>Edital</strong>: <span className="font-semibold">{edital?.name}</span></Label>
                     
                     <div
-                        className="pointer-events-none flex items-center gap-2 px-3 py-1 rounded-md text-white font-semibold"
+                        className="pointer-events-none flex items-center gap-2 px-3 py-1 rounded-md font-semibold"
                         style={{
-                            backgroundColor: getStatusColor(edital?.history ? edital.history[0].status : "PENDING"),
-                            // boxShadow: "0 0 3px rgba(0, 0, 0, .5)"
+                            border: `2px dashed ${getStatusColor(edital?.history ? edital.history[0].status : "PENDING")}`,
                         }}
                     >
                         <span>{edital?.history && verificarStatusEdital(edital?.history[0].status)}</span>

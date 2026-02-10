@@ -209,7 +209,8 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                                     {
                                         ((edital?.history?.[0]?.status === "PENDING" || edital?.history?.[0]?.status === "UNDER_CONSTRUCTION") && usuario?.access_level === "ANALYST") ||
                                         ((edital?.history?.[0]?.status === "WAITING_FOR_REVIEW" || edital?.history?.[0]?.status === "COMPLETED") && usuario?.access_level === "AUDITOR") ||
-                                        usuario?.access_level === "ADMIN" && (
+                                        
+                                        usuario?.access_level === "ADMIN" || usuario?.access_level === "ANALYST" && (
                                 
                                         <Button
                                             type="button"

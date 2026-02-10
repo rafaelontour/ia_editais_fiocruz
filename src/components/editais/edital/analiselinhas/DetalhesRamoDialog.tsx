@@ -18,9 +18,10 @@ import { toast } from "sonner"
 interface Props {
     ramo: Branch
     docId: string
+    taxonomia: string | undefined
 }
 
-export function DetalhesRamoDialog({ ramo, docId }: Props) {
+export function DetalhesRamoDialog({ ramo, docId, taxonomia }: Props) {
     const [mensagem, setMensagem] = useState("")
     const [historicoMensagens, setHistoricoMensagens] = useState<DocumentMessage[]>([])
 
@@ -97,6 +98,8 @@ export function DetalhesRamoDialog({ ramo, docId }: Props) {
             <DialogContent onCloseAutoFocus={() => setMensagem("")} className="w-1/2 flex flex-col max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle className="text-2xl pr-4 truncate" title={ramo.title}>
+                        <p className="text-3xl">{taxonomia}</p>
+                        <br />
                         {ramo.title}
                     </DialogTitle>
                 </DialogHeader>
