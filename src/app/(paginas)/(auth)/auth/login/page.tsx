@@ -16,6 +16,7 @@ import { Loader2, Send } from "lucide-react"
 import { useRef, useState } from "react"
 import BotaoCancelar from "@/components/botoes/BotaoCancelar"
 import BotaoSalvar from "@/components/botoes/BotaoSalvar"
+import { getUsuarioLogado } from "@/service/usuario"
 
 
 const loginSchema = z.object({
@@ -104,21 +105,19 @@ export default function Login() {
       const formData = new FormData();
       formData.append("username", data.email)
       formData.append("password", data.senha)
-      const [token, codigo] = await getToken(formData)
+      const token = await getToken(formData)
 
       if (!token) {
         toast.error("Email ou senha inválidos")
         return
       }
 
-      console.log("token:", token)
+      const [ dados, status ] = await getUsuarioLogado()
 
-      // const [ dados, status ] = await getUsuarioLogado()
-
-      // if (status == 401) {
-      //   toast.error("Erro ao fazer login! Credenciais inválidas.")
-      //   return
-      // }
+      if (status == 401) {
+        toast.error("Erro ao fazer login! Credenciais inválidas.")
+        return
+      }
 
       logarUsuario()
       toast.success("Login efetuado com sucesso!")
