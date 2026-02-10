@@ -297,7 +297,10 @@ export default function Login() {
                   <DialogDescription></DialogDescription>
                 </DialogHeader>
 
-                <p>Informe seu email abaixo:</p>
+                <div className="flex flex-col gap-2">
+                  <p>Enviaremos uma mensagem para o número associado ao seu email.</p>
+                  <p>Informe-o abaixo:</p>
+                </div>
 
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="email" className="text-xl">Email</Label>
