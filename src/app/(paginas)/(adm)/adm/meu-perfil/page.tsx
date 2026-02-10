@@ -87,19 +87,18 @@ export default function MeuPerfil() {
 
 
   useEffect(() => {
-    if (usuario?.icon?.file_path) setPreviaImagem(`${urlBase}/${usuario.icon.file_path}`);
     buscarUnidade();
   }, []);
 
-  useEffect(() => {
-    if (!usuario) return;
+  // useEffect(() => {
+  //   if (!usuario) return;
 
-    if (usuario.icon?.file_path) {
-      setPreviaImagem(`${urlBase}/${usuario.icon.file_path}`);
-    } else {
-      setPreviaImagem(null);
-    }
-  }, [usuario]);
+  //   if (usuario.icon?.file_path) {
+  //     setPreviaImagem(`${urlBase}/${usuario.icon.file_path}`);
+  //   } else {
+  //     setPreviaImagem(null);
+  //   }
+  // }, [usuario]);
 
   useEffect(() => {
     if (openEditarInfo) {
@@ -126,7 +125,7 @@ export default function MeuPerfil() {
       case "ADMIN": return "Administrador";
       case "ANALYST": return "Analista";
       case "AUDITOR": return "Auditor";
-      default: return "Usuário";
+      default: return "Não definido";
     }
   }
 
@@ -177,7 +176,6 @@ export default function MeuPerfil() {
   }
 
   async function excluirFotoDePerfil() {
-
     const res = await excluirFotoDePerfilService(usuario?.id);
 
     if (res !== 200) {
@@ -269,115 +267,76 @@ export default function MeuPerfil() {
             )
           }
 
-          {usuario?.icon?.file_path !== undefined ? (
-            <div className="relative rounded-full overflow-hidden">
+          <div className="relative rounded-full overflow-hidden w-52 h-52 bg-zinc-400 flex items-center justify-center">
+            {/* IMAGEM / ÍCONE */}
+            {previaImagem ? (
+              // 🔹 Prévia (imagem nova)
               <img
-                src={urlBase + usuario?.icon?.file_path}
-                alt="Minha foto"
-                className="object-cover h-52 w-52"
+                src={previaImagem}
+                alt="Prévia da foto"
+                className="object-cover h-full w-full"
               />
+            ) : usuario?.icon?.file_path ? (
+              // 🔹 Imagem salva
+              <img
+                src={urlBase + usuario.icon.file_path}
+                alt="Foto de perfil"
+                className="object-cover h-full w-full"
+              />
+            ) : (
+              // 🔹 Sem imagem
+              <User color="white" size={80} />
+            )}
 
-              <div 
-                className="
-                  absolute flex not-odd:items-center justify-center
-                  top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2
-                  bg-zinc-100 opacity-0 hover:opacity-70 w-full h-full z-10
-                  
-                "
-              >
-                <div className="flex flex-col gap-2">
+            {/* OVERLAY */}
+            <div
+              className="
+                absolute inset-0 flex items-center justify-center
+                bg-zinc-100 opacity-0 hover:opacity-70
+                transition-opacity z-10
+              "
+            >
+              <div className="flex flex-col gap-2">
+                {/* REMOVER */}
+                {(previaImagem || usuario?.icon?.file_path) && (
                   <Button
                     className="hover:cursor-pointer"
-                    variant={"destructive"}
-                    onClick={() => excluirFotoDePerfil()}
+                    variant="destructive"
+                    onClick={() => {
+                      if (!previaImagem && usuario?.icon?.file_path) {
+                        excluirFotoDePerfil(); // remove do backend
+                      }
+                      setPreviaImagem(null);
+                      setAtualizarImagemPerfil(false);
+                    }}
                   >
                     <Trash size={16} />
                     <p>Remover foto</p>
                   </Button>
+                )}
 
-                  <Button>
+                {/* ALTERAR / ENVIAR */}
+                <label className="cursor-pointer">
+                  <div className="inline-flex items-center gap-2 rounded-md border px-4 py-2 hover:bg-zinc-300">
                     <ImageIcon size={16} />
-                    <p>Alterar foto</p>
-                  </Button>
-                  
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="relative overflow-hidden flex items-center justify-center w-52 h-52 bg-zinc-400 rounded-full">
+                    <p>
+                      {previaImagem || usuario?.icon?.file_path
+                        ? "Alterar foto"
+                        : "Enviar foto"}
+                    </p>
+                  </div>
 
-              {
-                previaImagem ? (
-                  <img
-                    src={previaImagem}
-                    alt="Minha foto"
-                    className="rounded-full object-cover h-52 w-52"
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={mostrarImagem}
                   />
-
-                ) : (
-                  <User color="white" size={80} />
-                )
-              }
-              <div 
-                className="
-                  absolute flex not-odd:items-center justify-center
-                  top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2
-                  bg-zinc-100 opacity-0 hover:opacity-70 w-full h-full z-10
-                "
-              >
-                
-                <div className="flex flex-col gap-2">
-
-                  {
-                    previaImagem ? (
-                      <div className="flex flex-col gap-2">
-                        <Button
-                          className="hover:cursor-pointer "
-                          variant={"destructive"}
-                          onClick={() => {
-                            if (!adicionouImagemPerfil) excluirFotoDePerfil();
-                            setPreviaImagem(null);
-                            setAtualizarImagemPerfil(false) 
-                          }}
-                        >
-                          <Trash size={16} />
-                          <p>Remover foto</p>
-                        </Button>
-
-                        <Button
-                          className="hover:cursor-pointer"
-                          type="button"
-                        >
-                          <ImageIcon size={16} />
-                          <p>Alterar foto</p>
-                          <input
-                            className="hidden"
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => mostrarImagem(e)}
-                          />
-                        </Button>
-                        
-                      </div>
-                    ) : (
-                      <label className="cursor-pointer">
-                        <div className="flex items-center gap-2 ">
-                          <ImageIcon size={16} />
-                          <p>Enviar foto</p>
-                          <input
-                            className="hidden"
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => mostrarImagem(e)}
-                          />
-                        </div>
-                      </label>
-                    )
-                  } 
-                </div>
+                </label>
               </div>
             </div>
-          )}
+          </div>
+
 
           {
             previaImagem && adicionouImagemPerfil && (
@@ -396,7 +355,7 @@ export default function MeuPerfil() {
           </div>
 
           {/* Ações futuras */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center gap-2">
             <Dialog open={openEditarInfo} onOpenChange={setOpenEditarInfo}>
               <div className="flex gap-3 mt-2">
                 <DialogTrigger asChild>
