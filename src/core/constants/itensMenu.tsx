@@ -25,7 +25,7 @@ const itemsAdm = [
     icon: Home,
   },
   {
-    title: "Meus editais",
+    title: "Meus documentos",
     url: "/adm/editais",
     icon: Sheet,
   },
@@ -63,7 +63,7 @@ const itemsAuditorAnalista = [
     icon: Home,
   },
   {
-    title: "Meus editais",
+    title: "Meus documentos",
     url: "/adm/editais",
     icon: Sheet,
   },
