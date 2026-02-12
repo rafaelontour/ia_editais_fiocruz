@@ -43,7 +43,7 @@ jobs:
 
     - name: Deploy no servidor via SSH
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} '
           set -e
 
           echo "🚀 Iniciando deploy via docker-compose..."
@@ -65,4 +65,4 @@ jobs:
           docker compose up -d --build
 
           echo "✅ Deploy concluído com sucesso!"
-        EOF
+        '
