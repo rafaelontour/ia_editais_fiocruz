@@ -58,7 +58,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [urlCaminhoArquivoEdital, setUrlArquivoEdital] = useState<string>("");
 
     async function buscarCaminhoEdital() {
-        const arquivo: EditalArquivo = await getEditalArquivoService(edital.id!);
+        const arquivo: EditalArquivo = await getEditalArquivoService(edital.id!) as EditalArquivo;
         setUrlArquivoEdital(arquivo.releases[0].file_path);
     }
 
