@@ -272,6 +272,7 @@ export default function Tipificacoes() {
                                             register={register}
                                             errors={errors}
                                         />
+
                                         <DialogFooter>
                                             <DialogClose>
                                                 <BotaoCancelar />
@@ -294,7 +295,7 @@ export default function Tipificacoes() {
 
                 <Masonry
                     breakpointCols={breakpointColumns}
-                    className="flex relative gap-5 mb-10 px-1 h-full"
+                    className="flex relative gap-5 mb-10 px-3 h-full"
                 >
                     {
                         carregandoTipificacoes ? (

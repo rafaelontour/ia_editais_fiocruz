@@ -45,11 +45,17 @@ export default function Linha03({ edital, resumoIA }: Props) {
     const [ultimaTab, setUltimaTab] = useState<boolean>(false)
     const [primeiraTab, setPrimeiraTab] = useState<boolean>(true)
     const [abaSelecionada, setAbaSelecionada] = useState<string>("tab0")
-    const notas = edital?.releases
-        .map((release) => release.check_tree
+    // const notas = edital?.releases[0]
+    //     .map((release) => release.check_tree
+    //     .map((tipificacao) => tipificacao.taxonomies
+    //     .map((taxonomia) => taxonomia.branches
+    //     .map((ramo: any) => ramo.evaluation.score ))))
+    //     .flat(Infinity)
+
+    const notas = edital?.releases[0].check_tree
         .map((tipificacao) => tipificacao.taxonomies
         .map((taxonomia) => taxonomia.branches
-        .map((ramo: any) => ramo.evaluation.score ))))
+        .map((ramo: any) => ramo.evaluation.score )))
         .flat(Infinity)
 
     const media: number | undefined = ((): number | undefined => {

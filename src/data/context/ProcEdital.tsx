@@ -58,7 +58,7 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
                 const listaAtual: string[] = dados ? JSON.parse(dados) : [];
 
                 if (listaAtual.length === 0) {
-                    stopPolling(); // 🔴 para completamente
+                    stopPolling(); // para completamente
                     return;
                 }
 
@@ -66,20 +66,18 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
 
                 for (const id of listaAtual) {
                     try {
-                        const edital: EditalArquivo | undefined =
-                            await getEditalArquivoService(id);
+                        const edital: EditalArquivo | undefined = await getEditalArquivoService(id);
 
-                        if (edital && edital.releases[0].check_tree === null) {
+                        const checkTree = edital?.releases?.[0]?.check_tree;
+
+                        if (checkTree == null || (Array.isArray(checkTree) && checkTree.length === 0)) {
                             idsRestantes.push(id);
-                        } else if (edital) {
-                            const e: Edital =
-                                await getEditalPorIdService(id) as Edital;
+                        } else {
+                            const e: Edital = await getEditalPorIdService(id) as Edital;
 
                             toast.success(
-                                `Edital ${e.name} processado!`,
-                                {
-                                    description:
-                                        "O resultado do edital processado já está disponível para visualização."
+                                `Edital ${e.name} processado!`, {
+                                    description: "O resultado do edital processado já está disponível para visualização."
                                 }
                             );
                         }

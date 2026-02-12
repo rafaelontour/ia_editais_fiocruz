@@ -197,7 +197,7 @@ export default function RootLayout({
                 borderRadius: "10px",
               }}
             >
-              <div className="h-full overflow-auto no-scrollbar px-1">
+              <div className="h-full overflow-auto no-scrollbar px-0.5">
                 {children}
               </div>
             </div>

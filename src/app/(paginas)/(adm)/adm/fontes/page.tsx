@@ -203,7 +203,7 @@ export default function Fontes() {
                     <Masonry
                         breakpointCols={breakpointColumnsObj}
                         columnClassName="pl-4"
-                        className={'flex -ml-4 px-1 w-auto relative'}
+                        className={'flex -ml-4 px-3 w-auto relative'}
                     >
                         {
                             fontesFiltradas.map((fonte) => (
