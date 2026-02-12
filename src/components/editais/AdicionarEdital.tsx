@@ -23,7 +23,6 @@ import { adicionarEditalService } from "@/service/edital";
 import { enviarArquivoService } from "@/service/editalArquivo";
 import useUsuario from "@/data/hooks/useUsuario";
 import useEditalProc from "@/data/hooks/useProcEdital";
-import { lerLista, salvarLista } from "@/lib/utils";
 
 const schemaEdital = z.object({
     nome: z.string().min(5, "O nome do edital é obrigatório"),
@@ -68,9 +67,7 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
     const [tipificacoesSelecionadas, setTipificacoesSelecionadas] = useState<Tipificacao[] | []>([]);
     const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
     const { usuario } = useUsuario();
-    const { editalProcessado, setEditalProcessado, setIdEditalAtivo } = useEditalProc();
-
-     const lista = lerLista();
+    const { lista, salvarLista } = useEditalProc();
 
     const a = useRef<number>(0);
     
@@ -102,12 +99,10 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
         
         const [resposta, idEdital] = (await adicionarEditalService(dados)) ?? [];
 
-        if (!lista.includes(idEdital)) {
-            lista.push(idEdital);
+        if (!lista.includes(idEdital!)) {
+            lista.push(idEdital!);
             salvarLista(lista);
         }
-
-        console.log("Lista de editais processando:", lista);
 
         if (resposta !== 201) {
             if (resposta === 409) {
@@ -117,6 +112,8 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
             toast.error("Erro ao enviar edital!");
             return;
         }
+
+        toast.info("Edital enviado!", { description: "O edital está sendo processado e em breve você poderá ver o resultado!" });
 
         atualizarEditais(!flagEdital);
         limparDados();
@@ -130,43 +127,6 @@ export default function AdicionarEdital({ atualizarEditais, flagEdital } : Props
             return;
         }
 
-        // ---------- WebSocket ----------
-        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_URL_WS}/ws/${usuario?.id}`);
-
-        ws.onopen = () => {
-            return;
-        };
-
-        ws.onmessage = (event) => {
-            const dados = JSON.parse(event.data);
-
-            if (dados.event === "doc.release.update") {
-                if (dados.message === "complete" && a.current === 0) {
-                    setEditalProcessado(false);
-                    setIdEditalAtivo("");
-                    toast.success("Edital processado! ✅", { description: "Agora você já pode visualizar o resultado!" });
-                    a.current = 1;
-                    ws.close();
-                }
-            }
-
-            if (dados.event === "doc.kanban.update") {
-                // Mudar depois
-            }
-        };
-
-        ws.onerror = (error) => {
-            toast.error("Erro no WebSocket!", { description: "Ocorreu um erro ao acompanhar o arquivo. Erro: " + error });
-            ws.close();
-            setIdEditalAtivo("");
-            return;
-        };
-
-        ws.onclose = () => {
-            return;
-        };
-
-        toast.info("Edital enviado!", { description: "Aguarde o processamento do edital..." });
     }
 
 

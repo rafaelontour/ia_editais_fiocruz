@@ -14,10 +14,9 @@ import Link from "next/link";
 import { formatarData } from "@/lib/utils";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { IconLoaderQuarter, IconLogs, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
+import { IconLoaderQuarter, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
 import useEditalProc from "@/data/hooks/useProcEdital";
 import { AnimatedTooltip } from "../ui/animated-tooltip";
-import { DragOverlay } from "@dnd-kit/core";
 
 
 interface Props {
@@ -27,15 +26,10 @@ interface Props {
     flagEdital: boolean
 }
 
-type HistoricoPorDia = {
-    data: string;
-    modificacoes: string[];
-}
-
 export default function CardEdital({ edital, containerId, funcaoAtualizarEditais, flagEdital }: Props) {
 
     const { usuario } = useUsuario();
-    const { editalProcessado, idEditalAtivo } = useEditalProc();
+    const { lista } = useEditalProc();
     const [openExcluirEdital, setOpenExcluirEdital] = useState<boolean>(false);
 
     // passa data.containerId para o hook
@@ -115,17 +109,16 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     return (
         <div
             ref={setNodeRef}
-            title={!editalProcessado && idEditalAtivo === edital.id ? "Aguarde o processamento do edital para ver o resultado" : ""}
+        title={lista.includes(edital.id) ? "Aguarde o processamento do edital para ver o resultado" : edital.name}
             style={style}
             className={`
                 bg-white rounded-md shadow-sm wrap-break-word
-                ${!editalProcessado && idEditalAtivo === edital.id && "cursor-progress"}
                 ${isDragging ? "opacity-30" : "opacity-100"}
             `}
         >
 
             {/* drag handle: aplicamos attributes & listeners aqui (evita conflitos com botões dentro do card) */}
-            <div {...attributes} {...listeners} className={`${!editalProcessado && idEditalAtivo === edital.id && "hidden"} h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
+            <div {...attributes} {...listeners} className={`${lista.includes(edital.id) && "hidden"} h-12 teste ${cor()} rounded-t-sm flex items-center justify-center`}>
                 <span
                     className={`
                         w-full text-center text-white text-md pointer-events-none italic
@@ -271,7 +264,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                     </div>
 
                     {
-                        !editalProcessado && idEditalAtivo === edital.id ? (
+                        lista.includes(edital.id) ? (
                             <div className="h-12 w-full flex items-center bg-zinc-300 p-2 rounded-md justify-center  mt-2">
                                 <span className="text-md pointer-events-none italic">Processando edital...</span>
                                 <IconLoaderQuarter className="animate-spin ml-2" size={20} />

@@ -5,8 +5,6 @@ import { Construction, Copy, EyeIcon } from "lucide-react";
 import React from "react";
 import { twMerge } from "tailwind-merge"
 
-const CHAVE_EDITAIS_PROCESSANDO = "lista_ids_editais_processando";
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -55,25 +53,9 @@ function iconeParaStatusDoEdital(status: StatusEdital): React.ReactNode {
   }
 }
 
-function lerLista() {
-  try {
-    const valor = localStorage.getItem(CHAVE_EDITAIS_PROCESSANDO);  
-    return valor ? JSON.parse(valor) : [];
-  } catch {
-    return [];
-  }
-}
-
-function salvarLista(lista: string[]) {
-  localStorage.setItem(CHAVE_EDITAIS_PROCESSANDO, JSON.stringify(lista));
-}
-
-
 export {
   formatarData,
   getStatusColor,
   verificarStatusEdital,
-  iconeParaStatusDoEdital,
-  lerLista,
-  salvarLista
+  iconeParaStatusDoEdital
 };
