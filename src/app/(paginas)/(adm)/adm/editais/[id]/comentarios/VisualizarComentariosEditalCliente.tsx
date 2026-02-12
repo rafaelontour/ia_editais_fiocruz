@@ -35,7 +35,7 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
     
     async function buscarEditalArquivo() {
         const editalArquivo = await getEditalArquivoService(idEditalString);
-        setEnderecoArquivo(urlBase + editalArquivo.releases[0].file_path);
+        setEnderecoArquivo(urlBase + editalArquivo!.releases[0].file_path);
     }
 
     async function buscarComentariosEdital() {
