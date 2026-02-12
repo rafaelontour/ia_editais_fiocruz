@@ -112,7 +112,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                                                     key={index}
                                                     value={"tabTax" + index}
                                                 >
-                                                    {tax.title}
+                                                    <p className="max-w-96 truncate">{tax.title}</p>
                                                 </TabsTrigger>
 
                                                 {index < taxonomias.length - 1 && (

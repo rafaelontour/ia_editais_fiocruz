@@ -21,7 +21,7 @@ import BotaoVoltar from "@/components/botoes/BotaoVoltar";
 interface VisualizarEditalClienteProps {
     edital: Edital | undefined
     resumoIA: string
-    editalArquivo: EditalArquivo
+    editalArquivo: EditalArquivo | undefined
     urlBase: string
 }
 
@@ -173,7 +173,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
                 <ResizablePanel minSize={30} defaultSize={50}>
                     <div className="flex w-full h-full">
                         <iframe
-                            src={urlBase + editalArquivo.releases[0].file_path}
+                            src={urlBase + editalArquivo?.releases[0].file_path}
                             className="h-full border-2 border-gray-300 rounded-md items-center w-full"
                         >
 

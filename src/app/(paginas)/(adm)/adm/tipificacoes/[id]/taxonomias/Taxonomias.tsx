@@ -471,11 +471,11 @@ export default function Taxonomias({ id }: { id: string }) {
                                             }}
                                         >
                                             <CardHeader>
-                                                <CardTitle className="text-2xl">{item.title}</CardTitle>
+                                                <CardTitle className="text-2xl wrap-break-word">{item.title}</CardTitle>
                                             </CardHeader>
 
                                             <CardContent>
-                                                <p className="text-md">{item.description}</p>
+                                                <p className="text-md wrap-break-word">{item.description}</p>
                                             </CardContent>
 
                                             <CardFooter className="flex justify-between">

@@ -109,7 +109,7 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
                                                 value={"tabRamo" + index}
                                             >
                                                 <div>
-                                                    {ramo.title}
+                                                    <p className="max-w-96 truncate">{ramo.title}</p>
                                                 </div>
                                             </TabsTrigger>
                                             {
