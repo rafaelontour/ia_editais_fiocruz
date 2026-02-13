@@ -457,9 +457,9 @@ export default function Taxonomias({ id }: { id: string }) {
                                             key={index}
                                             data-cy="item-taxonomia"
                                             className={`
-                                        hover:cursor-pointer m-4 ml-0 
-                                        ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}
-                                    `}
+                                                hover:cursor-pointer m-4 ml-0 
+                                                ${idSelecionado && idSelecionado === index.toString() ? "bg-orange-100" : "hover:bg-gray-200"}
+                                            `}
                                             onMouseDown={() => {
                                                 setIdSelecionado(index.toString())
                                             }}
@@ -470,8 +470,8 @@ export default function Taxonomias({ id }: { id: string }) {
                                                 buscarRamos(item.id)
                                             }}
                                         >
-                                            <CardHeader>
-                                                <CardTitle className="text-2xl wrap-break-word">{item.title}</CardTitle>
+                                            <CardHeader className="min-w-0">
+                                                <CardTitle className="text-2xl wrap-break-word whitespace-normal">{item.title}</CardTitle>
                                             </CardHeader>
 
                                             <CardContent>

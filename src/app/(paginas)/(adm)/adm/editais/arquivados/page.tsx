@@ -11,7 +11,7 @@ import { formatarData } from "@/lib/utils";
 import { arquivarEditalService, excluirEditalService, getEditaisArquivadosService, getEditalPorIdService } from "@/service/edital";
 import { getEditalArquivoService } from "@/service/editalArquivo";
 import { IconArchive } from "@tabler/icons-react";
-import { Loader2, Receipt, Trash, View } from "lucide-react";
+import { Check, Copy, Loader2, Trash, View } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -89,6 +89,21 @@ export default function EditaisArquivados() {
 
     const termoBusca = useRef<string>("");
 
+    function traduzirStatusEdital(status: string | undefined) {
+        switch (status) {
+            case "PENDING":
+                return <p className="flex items-center gap-2 bg-[#99A1AF] px-2 py-1 rounded-sm w-fit">Rascunho <Copy /></p>;
+            case "IN_REVIEW":
+                return <p className="flex items-center gap-2 bg-[#FF0000] px-2 py-1 rounded-sm w-fit">Em construção</p>
+            case "UNDER_CONSTRUCTION":
+                return <p className="flex items-center gap-2 bg-[#656149] px-2 py-1 rounded-sm w-fit">Em construção</p>;
+            case "COMPLETED":
+                return <p className="flex items-center gap-2 bg-[#006400] px-2 py-1 rounded-sm w-fit"><Check />Concluído</p>;
+            default:
+                return <p></p>; 
+        }
+    }
+
     return (
         <div className="flex flex-col gap-5">
             <div className="flex items-center gap-6">
@@ -148,8 +163,10 @@ export default function EditaisArquivados() {
                                                 </td>
 
 
-                                                <td className="px-4 py-3">
-                                                    {edital.history && edital.history[0].status}
+                                                <td className=" text-white">
+                                                    <p className="">
+                                                        {traduzirStatusEdital(edital.history && edital.history[0].status)}
+                                                    </p>
                                                 </td>
 
 
@@ -215,7 +232,7 @@ export default function EditaisArquivados() {
                                                                             onClick={() => desarquivarEdital(edital.id)}
                                                                             size={"icon"}
                                                                             variant={"destructive"}
-                                                                            className="w-fit border-gray-300 hover:cursor-pointer bg-green-500 hover:bg-green-500 transition-all rounded-sm p-3.5"
+                                                                            className="w-fit border-gray-300 hover:cursor-pointer bg-vermelho hover:bg-vermelho transition-all rounded-sm p-3.5"
                                                                         >
                                                                             Desarquivar
                                                                         </Button>
@@ -225,14 +242,49 @@ export default function EditaisArquivados() {
                                                             </DialogContent>
                                                         </Dialog>
 
-                                                        <Button
-                                                            onClick={() => excluirEdital(edital.id)}
-                                                            size="icon"
-                                                            className="h-8 w-8 bg-vermelho hover:bg-vermelho hover:cursor-pointer"
-                                                            title="Excluir edital"
-                                                        >
-                                                            <Trash color="white" />
-                                                        </Button>
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    size="icon"
+                                                                    className="h-8 w-8 bg-vermelho hover:bg-vermelho hover:cursor-pointer"
+                                                                    title="Excluir edital"
+                                                                >
+                                                                    <Trash color="white" />
+                                                                </Button>
+                                                            </DialogTrigger>
+
+                                                            <DialogContent className="rounded-2xl">
+                                                                <DialogHeader>
+                                                                    <DialogTitle className="text-2xl">Excluir edital</DialogTitle>
+                                                                </DialogHeader>
+
+                                                                <DialogDescription className="text-md">
+                                                                    Tem certeza que deseja excluir o edital <span className="font-bold">{edital.name}</span>?
+                                                                </DialogDescription>
+
+                                                                <DialogFooter>
+                                                                    <DialogClose
+                                                                        className="
+                                                                            border bg-slate-300 px-3 py-1 rounded-sm hover:cursor-pointer
+                                                                        "
+                                                                    >
+                                                                        Cancelar
+                                                                    </DialogClose>
+
+                                                                    <DialogClose asChild>
+                                                                        <Button
+                                                                            onClick={() => excluirEdital(edital.id)}
+                                                                            size={"icon"}
+                                                                            variant={"destructive"}
+                                                                            className="w-fit border-gray-300 hover:cursor-pointer bg-vermelho hover:bg-vermelho transition-all rounded-sm p-3.5"
+                                                                        >
+                                                                            Excluir
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </div>
                                                 </td>
                                             </tr>
