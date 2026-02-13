@@ -150,7 +150,7 @@ export default function Fontes() {
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-5 sticky top-0 z-10 bg-white justify-between w-full items-center">
+            <div className="flex flex-col gap-5 sticky top-0 z-1 justify-between w-full items-center">
                 <div className="flex w-full justify-between relative">
                     <div className="w-full flex justify-between items-center">
                         <h2 className="text-4xl font-bold">
@@ -200,75 +200,65 @@ export default function Fontes() {
                         <Loader2 className="animate-spin ml-2" />
                     </div>
                 ) : fontesFiltradas.length > 0 ? (
-                    <Masonry
-                        breakpointCols={breakpointColumnsObj}
-                        columnClassName="pl-4"
-                        className={'flex -ml-4 px-3 w-auto relative'}
-                    >
-                        {
-                            fontesFiltradas.map((fonte) => (
-                                <Div key={fonte.id}>
-                                    <div data-cy="item-fonte" className="flex flex-col gap-2">
-                                        <h2 className="text-2xl font-semibold wrap-break-word">{fonte.name}</h2>
-                                        <p className={`py-1 w-fit wrrap-break-words text-md`}>
-                                            {fonte.description}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex justify-between items-center mt-3">
-                                        <Calendario data={fonte.created_at} />
-                                        <div className="flex gap-3">
-                                            <Dialog open={openDialogIdEditar === fonte.id} onOpenChange={(open) => setOpenDialogIdEditar(open ? fonte.id : null)}>
-                                                <DialogTrigger asChild>
-                                                    <Button
-                                                        title="Editar fonte"
-                                                        className={`
-                                                            h-8 w-8 hover:cursor-pointer border border-gray-300 rounded-sm
-                                                            bg-branco hover:bg-branco
-                                                        `}
-                                                        size={"icon"}
-                                                    >
-                                                        <PencilLine color="black" />
-                                                    </Button>
-                                                </DialogTrigger>
-
-                                                <DialogContent onCloseAutoFocus={() => reset()}>
-
-                                                    <DialogHeader>
-                                                        <DialogTitle className="text-3xl font-bold">
-                                                            Atualizar fonte
-                                                        </DialogTitle>
-
-                                                        <DialogDescription className="text-md pb-4">
-                                                            Atualize os dados da fonte selecionada
-                                                        </DialogDescription>
-
-                                                    </DialogHeader>
-
-                                                    <Formulario
-                                                        register={register}
-                                                        errors={errors}
-                                                    />
-
-                                                    <DialogFooter>
-                                                        <DialogClose>
-                                                            <BotaoCancelar />
-                                                        </DialogClose>
-
-                                                        <BotaoSalvar onClick={handleSubmit(atualizarFonte)} />
-                                                    </DialogFooter>
-
-                                                </DialogContent>
-                                            </Dialog>
-
-                                            <BotaoExcluir tipo="fonte" item={fonte} funcExcluir={excluirFonte} />
-
+                    <div>
+                        <Masonry
+                            breakpointCols={breakpointColumnsObj}
+                            className={'flex py-1 px-3 gap-5 h-[calc(100vh-280px)] overflow-y-auto'}
+                        >
+                            {
+                                fontesFiltradas.map((fonte) => (
+                                    <Div key={fonte.id}>
+                                        <div data-cy="item-fonte" className="flex flex-col gap-2">
+                                            <h2 className="text-2xl font-semibold wrap-break-word">{fonte.name}</h2>
+                                            <p className={`py-1 w-fit wrrap-break-words text-md`}>
+                                                {fonte.description}
+                                            </p>
                                         </div>
-                                    </div>
-                                </Div>
-                            ))
-                        }
-                    </Masonry>
+                                        <div className="flex justify-between items-center mt-3">
+                                            <Calendario data={fonte.created_at} />
+                                            <div className="flex gap-3">
+                                                <Dialog open={openDialogIdEditar === fonte.id} onOpenChange={(open) => setOpenDialogIdEditar(open ? fonte.id : null)}>
+                                                    <DialogTrigger asChild>
+                                                        <Button
+                                                            title="Editar fonte"
+                                                            className={`
+                                                                h-8 w-8 hover:cursor-pointer border border-gray-300 rounded-sm
+                                                                bg-branco hover:bg-branco
+                                                            `}
+                                                            size={"icon"}
+                                                        >
+                                                            <PencilLine color="black" />
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent onCloseAutoFocus={() => reset()}>
+                                                        <DialogHeader>
+                                                            <DialogTitle className="text-3xl font-bold">
+                                                                Atualizar fonte
+                                                            </DialogTitle>
+                                                            <DialogDescription className="text-md pb-4">
+                                                                Atualize os dados da fonte selecionada
+                                                            </DialogDescription>
+                                                        </DialogHeader>
+                                                        <Formulario
+                                                            register={register}
+                                                            errors={errors}
+                                                        />
+                                                        <DialogFooter>
+                                                            <DialogClose>
+                                                                <BotaoCancelar />
+                                                            </DialogClose>
+                                                            <BotaoSalvar onClick={handleSubmit(atualizarFonte)} />
+                                                        </DialogFooter>
+                                                    </DialogContent>
+                                                </Dialog>
+                                                <BotaoExcluir tipo="fonte" item={fonte} funcExcluir={excluirFonte} />
+                                            </div>
+                                        </div>
+                                    </Div>
+                                ))
+                            }
+                        </Masonry>
+                    </div>
                 ) : (
                     <p
                         className="

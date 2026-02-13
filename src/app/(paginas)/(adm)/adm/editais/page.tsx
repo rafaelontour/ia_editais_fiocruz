@@ -284,7 +284,7 @@ export default function Editais() {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
             >
-                <div className="flex justify-between h-[85%] relative gap-3">
+                <div className="flex justify-between h-[calc(100vh-208px)] relative gap-3">
                     {carregandoEditais ? (
                         <div className="flex items-center gap-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                             <p className="text-xl animate-pulse">Buscando editais...</p>

@@ -67,7 +67,7 @@ export default function VisualizarEditalCliente({ edital, editalArquivo, urlBase
     }
 
     return (
-        <div className="flex flex-col w-screen= h-full max-h-full gap-10">
+        <div className="flex flex-col w-screen= h-[calc(100vh-100px)] max-h-full gap-10">
             <div className="flex items-center justify-between">
                 <div className="flex items-center flex-row gap-7">
                     <BotaoVoltar />

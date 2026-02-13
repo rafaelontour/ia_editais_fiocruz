@@ -1,25 +1,12 @@
 'use client'
 
-import Image from "next/image";
-
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger
-} from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
-import useUsuario from "@/data/hooks/useUsuario";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
-import { UserIcon } from "lucide-react";
+import { Expand, Menu, SidebarCloseIcon, SidebarOpenIcon, UserIcon } from "lucide-react";
 import { motion } from "motion/react";
 
 export default function RootLayout({
@@ -27,188 +14,133 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { usuario, barraLateralAberta, mudarEstadoBarraLateral } = useUsuario();
+  const pathname = usePathname();
+  const { items } = useUsuario();
 
-  const { items } = useUsuario()
-  const pathname = usePathname()
-  const { barraLateralAberta, mudarEstadoBarraLateral } = useUsuario()
-  const { usuario } = useUsuario()
+  const titulosMap: Record<string, string> = {
+    "/adm": "Início",
+    "/adm/editais": "Meus documentos",
+    "/adm/tipificacoes": "Tipificações",
+    "/adm/taxonomias": "Taxonomias",
+    "/adm/fontes": "Fontes",
+    "/adm/unidades": "Unidades",
+    "/adm/cargos": "Cargos",
+  };
+
+  const title = titulosMap[pathname] || "IAEditais";
+
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
+  // Atualiza o título dinamicamente no client (quando navega via Link)
+  useEffect(() => {
+    document.title = `Administrativo - ${title}`;
+  }, [pathname]);
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      <Cabecalho />
+    usuario && (
+      <div className="flex flex-col overflow-hidden w-full scrollbar-hidden">
+      
+        <Cabecalho />
 
-      <div className="flex flex-1 overflow-y-hidden">
-        <SidebarProvider defaultOpen={barraLateralAberta}>
-          <Sidebar
-            variant="inset" collapsible="icon" className="relative"
-          >
-              <SidebarContent>
-                <SidebarGroup>
-                  <SidebarMenu>
-                    {items && items.length > 0 ? (
-                      items.map((item) => {
-                        const ativo = pathname === item.url;
-                        return (
-                          barraLateralAberta ? (
-                            <SidebarMenuItem key={item.title}>
-                              <SidebarMenuButton
-                                className={`
-                                  rounded-sm transition-all duration-15 py-[18px] pl-3
-                                  ${ativo
-                                    ? "bg-[#D03C30] text-white hover:bg-[#D03C30] hover:text-white"
-                                    : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
-                                `}
-                                asChild
-                              >
-                                <Link className="flex items-center gap-2" href={item.url}>
-                                  <item.icon className="w-5 h-5" />
-                                  <span className="text-[16px]">{item.title}</span>
-                                </Link>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
+        <div className="overflow-hidden">
 
-                          ) : (
-                            <Tooltip key={item.title}>
-                              <TooltipTrigger>
-                                <SidebarMenuItem key={item.title}>
-                                  <SidebarMenuButton
-                                    className={`
-                                      rounded-sm transition-all duration-15 py-[18px] pl-3
-                                      ${ativo
-                                        ? "bg-[#D03C30] text-white hover:bg-[#D03C30] hover:text-white"
-                                        : "hover:bg-[#D03C30] hover:text-white bg-[#CCCCCC]"}
-                                    `}
-                                    asChild
-                                  >
-                                    <Link className="flex items-center gap-2" href={item.url}>
-                                      <item.icon className="w-5 h-5" />
-                                      <span className="text-[16px]">{item.title}</span>
-                                    </Link>
-                                  </SidebarMenuButton>
-                                </SidebarMenuItem>
-                              </TooltipTrigger>
+          <div className="flex">
 
-                              <TooltipContent side="right">
-                                <p className="text-sm">{item.title}</p>
-                              </TooltipContent>
+            <motion.div
+              layout
+              className="flex top-14 left-0 h-[calc(100vh-4rem)] bg-zinc-100 z-10 overflow-hidden"
+              style={{ boxShadow: "4px 0 3px rgba(0, 0, 0, .2)"}}
+              animate={{ width: barraLateralAberta ? 260 : 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <div className={`w-[300px] flex flex-col justify-between`}>
+                <nav className={``}>
+                  <ul>
+                    {items.map((item) => (
+                      <li key={item.url}>
+                        <Link href={item.url} className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-200 ${pathname === item.url ? "bg-gray-300 font-bold" : ""}`}>
+                          <item.icon size={20} />
+                          {barraLateralAberta && <span>{item.title}</span>}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
 
-                            </Tooltip>
-                          )
-                        );
-                      })
-                    ) : (
-                      barraLateralAberta ? (
-                        <div className=" text-gray-400 text-sm animate-pulse w-fit">Carregando menu...</div>
-                      ) : (
-                        <IconLoader2 className="w-5 h-5 animate-spin" />
-                      )
-                    )}
-                  </SidebarMenu>
-                </SidebarGroup>
-              </SidebarContent>
-              <SidebarFooter>
-                {
-                  usuario && (
-                    <div className="flex items-center gap-4 w-full">
-                  <div className={ `flex items-center justify-center w-full min-w-8 max-w-12 transition-all duration-100  ${barraLateralAberta ? "h-12" : "h-9"} bg-verde rounded-full`}>
+                <div className="flex items-center gap-4 w-full p-4">
+                  <div className={`flex items-center justify-center transition-all duration-100 w-full ${barraLateralAberta ? "h-12" : "h-9"} min-w-8 max-w-12  bg-verde rounded-full`}>
                     
                     {
                       usuario && (
                         usuario.icon ? (
-                          <img src={urlBase + usuario.icon.file_path} className="w-8 h-8 rounded-full" />
+                          <img src={urlBase + usuario.icon.file_path} className={`w-8 h-8 rounded-full`} />
                         ) : (
                           <UserIcon size={20} />
                         )
                       )
                     }
                   </div>
-                
 
-                <motion.div
-                  initial={false}
-                  animate={{
-                    opacity: barraLateralAberta ? 1 : 0,
-                    pointerEvents: barraLateralAberta ? "auto" : "none",
-                    transition: {
-                      delay: barraLateralAberta ? 0.3 : 0,
-                      duration: 0.2,
-                      ease: "easeOut"
-                    }
-                  }}
-                  exit={{
-                    display: barraLateralAberta ? "flex" : "none"
-                  }}
-                  style={{
-                    display: barraLateralAberta ? "flex" : "none"
-                  }}
-                  className="flex flex-col min-w-[120px]"
-                >
-                  <span className="text-sm font-bold">{usuario?.username}</span>
-                  <Link href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
-                </motion.div>
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      opacity: barraLateralAberta ? 1 : 0,
+                      pointerEvents: barraLateralAberta ? "auto" : "none",
+                      transition: {
+                        delay: barraLateralAberta ? 0.3 : 0,
+                        duration: 0.2,
+                        ease: "easeOut"
+                      }
+                    }}
+                    exit={{
+                      display: barraLateralAberta ? "flex" : "none"
+                    }}
+                    style={{
+                      display: barraLateralAberta ? "flex" : "none"
+                    }}
+                    className={`flex flex-col min-w-[120px]`}
+                  >
+                    <span className="text-sm font-bold">{usuario?.username}</span>
+                    <Link href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
+                  </motion.div>
                 </div>
-                  )
-                }
-                
-              </SidebarFooter>
-    
-          </Sidebar>
-          <div
-            className="
-              flex flex-1 relative
-            "
-          >
-            <div
-              className="
-                absolute left-0 top-0 
-                overflow-hidden flex w-full
-              "
-              style={{
-                borderTopLeftRadius: "10px",
-                borderTopRightRadius: "10px",
-              }}
-            >
-              <SidebarTrigger
-                onClick={() => mudarEstadoBarraLateral()}
-                className="
-                mt-4 ml-4
-                hover:cursor-pointer
-                
-                "
-              />
+              </div>
 
-              <div 
-                className="
-                  flex items-center pl-4 py-3
-                  h-16 w-[95%] bg-white sticky
-                  top-0 left-0 pointer-events-none z-10
-                "
-                style={{ 
-                  background: "linear-gradient(to bottom, rgb(202, 202, 202) 0%, white 7%)",
-                }}
-              >
-                <p></p>
-              </div>
-            </div>
-            
-            <div
-              className="
-                flex w-full flex-col h-[98%]
-                bg-white flex-1 pt-20 px-12 overflow-y-auto scrollbar-hide
-              "
-              style={{
-                boxShadow: "inset 0px 0px 5px rgba(0, 0, 0, .5)",
-                borderRadius: "10px",
-              }}
+              <Tooltip>
+                  <TooltipTrigger asChild className="hover:cursor-pointer">
+                    <motion.button
+                      animate={{ x: barraLateralAberta ? 0 : -20 }}
+                      className={`
+                        fixed bg-red-500 text-white rounded-md
+                        w-8 h-8 p-2 z-20 top-18 ${barraLateralAberta ? "left-[275px]" : "left-8"}
+                        opacity-30 hover:opacity-85 transition-opacity
+                      `}
+                      onClick={mudarEstadoBarraLateral}
+                    >
+                      { barraLateralAberta ? <SidebarCloseIcon size={16} /> : <SidebarOpenIcon size={16} />}
+                    </motion.button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    { barraLateralAberta ? "Recolher menu" : "Expandir menu" }
+                  </TooltipContent>
+                </Tooltip>
+                
+            </motion.div>
+
+            <motion.div
+              layout
+              className="flex-1 px-10"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <div className="w-full">
-                {children}
-              </div>
-            </div>
+              <div className="h-10" />
+                  {children}
+            </motion.div>
+
           </div>
-        </SidebarProvider>
+        </div>
+        
       </div>
-    </div>
+    )
   );
 }

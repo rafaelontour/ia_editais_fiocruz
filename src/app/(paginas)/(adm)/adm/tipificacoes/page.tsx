@@ -208,8 +208,8 @@ export default function Tipificacoes() {
 
     return (
         <div>
-            <div className="flex flex-col gap-5 pb-10">
-                <div className="flex flex-col gap-5 sticky top-0 z-10 bg-white justify-between w-full items-center">
+            <div className="flex flex-col pb-2 gap-5">
+                <div className="flex flex-col gap-5 sticky top-0 z-10 justify-between w-full items-center">
                     <div className="flex items-center justify-between w-full">
                         <p className="text-4xl font-bold">Gestão de tipificações</p>
 
@@ -295,7 +295,7 @@ export default function Tipificacoes() {
 
                 <Masonry
                     breakpointCols={breakpointColumns}
-                    className="flex relative gap-5 mb-10 px-3 h-full"
+                    className="flex gap-5 mb-10 py-1 px-3 h-[calc(100vh-280px)] overflow-y-auto"
                 >
                     {
                         carregandoTipificacoes ? (
