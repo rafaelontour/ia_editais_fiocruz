@@ -18,12 +18,106 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Metrica } from "@/core/metrica";
+import { getMetricasService } from "@/service/metrica";
 
 export default function resultados() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [carregando, setCarregando] = useState<boolean>(true);
   const [resultado, setResultado] = useState<Resultado[]>([]);
   const termoBusca = useRef<string>("");
+
+  const FILTROS_DEFAULT = {
+    modelId: undefined as string | undefined,
+    metricId: undefined as string | undefined,
+    testRunId: undefined as string | undefined,
+    testCaseId: undefined as string | undefined,
+    sortBy: "created_at" as "created_at" | "updated_at",
+    sortOrder: "desc" as "asc" | "desc",
+  };
+
+  const [modelos, setModelos] = useState<Modelo[]>([]);
+  const [carregandoModelos, setCarregandoModelos] = useState(false);
+
+  const [metricas, setMetricas] = useState<Metrica[]>([]);
+  const [carregandoMetricas, setCarregandoMetricas] = useState(false);
+
+  const [statusFiltro, setStatusFiltro] = useState<
+    "aprovado" | "reprovado" | undefined
+  >(undefined);
+
+  const [filtros, setFiltros] =
+    useState<typeof FILTROS_DEFAULT>(FILTROS_DEFAULT);
+
+  useEffect(() => {
+    async function fetchResultados() {
+      setCarregando(true);
+
+      const response = await buscarResultadosService({
+        metric_id: filtros.metricId,
+        model_id: filtros.modelId,
+        test_run_id: filtros.testRunId,
+        test_case_id: filtros.testCaseId,
+        sort_by: filtros.sortBy,
+        sort_order: filtros.sortOrder,
+        offset: 0,
+        limit: 100,
+      });
+
+      let resultados = response.test_results;
+
+      if (statusFiltro) {
+        resultados = resultados.filter((result) =>
+          statusFiltro === "aprovado"
+            ? result.passed_feedback
+            : !result.passed_feedback,
+        );
+      }
+
+      setResultado(resultados);
+      setCarregando(false);
+    }
+
+    fetchResultados();
+  }, [
+    filtros.metricId,
+    filtros.modelId,
+    filtros.testRunId,
+    filtros.testCaseId,
+    filtros.sortBy,
+    filtros.sortOrder,
+    statusFiltro,
+  ]);
+
+  useEffect(() => {
+    async function carregarModelos() {
+      setCarregandoModelos(true);
+
+      const response = await getModeloService();
+      if (response) {
+        setModelos(response);
+      }
+
+      setCarregandoModelos(false);
+    }
+
+    carregarModelos();
+  }, []);
+
+  useEffect(() => {
+    async function carregarMetricas() {
+      setCarregandoMetricas(true);
+
+      const response = await getMetricasService();
+      if (response) {
+        setMetricas(response);
+      }
+
+      setCarregandoMetricas(false);
+    }
+
+    carregarMetricas();
+  }, []);
 
   function filtrarResultados() {}
 
@@ -94,24 +188,76 @@ export default function resultados() {
         <div className="flex w-full gap-2">
           <div className="flex flex-col w-full">
             <Label>Status:</Label>
-            <Select>
+
+            <Select
+              value={statusFiltro ?? ""}
+              onValueChange={(value) =>
+                setStatusFiltro(value as "aprovado" | "reprovado")
+              }
+            >
               <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
+
               <SelectContent>
-                <SelectItem value="aprovador">Aprovado</SelectItem>
-                <SelectItem value="reprovador">Reprovado</SelectItem>
+                <SelectItem value="aprovado">Aprovado</SelectItem>
+                <SelectItem value="reprovado">Reprovado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col w-full">
+            <Label>Modelo IA:</Label>
+            <Select
+              value={filtros.modelId ?? ""}
+              onValueChange={(value) =>
+                setFiltros((prev) => ({
+                  ...prev,
+                  modelId: value,
+                }))
+              }
+            >
+              <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
+                <SelectValue
+                  placeholder={
+                    carregandoModelos ? "Carregando modelos..." : "Selecione"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {modelos.map((modelo) => (
+                  <SelectItem key={modelo.id} value={modelo.id}>
+                    {modelo.code_name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="flex flex-col w-full">
-            <Label>Modelo IA:</Label>
-            <Select>
+            <Label>Métrica:</Label>
+            <Select
+              value={filtros.metricId ?? ""}
+              onValueChange={(value) => {
+                console.log("metrica seleciona:", value);
+                setFiltros((prev) => ({
+                  ...prev,
+                  metricId: value,
+                }));
+              }}
+            >
               <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
-                <SelectValue placeholder="Selecione" />
+                <SelectValue
+                  placeholder={
+                    carregandoMetricas ? "Carregando métricas..." : "Selecione"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="aprovador">GPT-4.1 nano</SelectItem>
+                {metricas.map((metrica) => (
+                  <SelectItem key={metrica.id} value={metrica.id}>
+                    {metrica.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -126,7 +272,7 @@ export default function resultados() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col w-full">
+          {/* <div className="flex flex-col w-full">
             <Label>Passou:</Label>
             <Select>
               <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
@@ -137,22 +283,38 @@ export default function resultados() {
                 <SelectItem value="saprovador">Não</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
           <div className="flex flex-col w-full">
-            <Label>Ordenar por:</Label>
-            <Select>
+            <Label>Ordem:</Label>
+
+            <Select
+              value={filtros.sortOrder ?? ""}
+              onValueChange={(value) =>
+                setFiltros((prev) => ({
+                  ...prev,
+                  sortOrder: value as "asc" | "desc",
+                }))
+              }
+            >
               <SelectTrigger className="w-full cursor-pointer mt-2 py-5">
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
+
               <SelectContent>
-                <SelectItem value="aprovador">Data de criação</SelectItem>
-                <SelectItem value="saprovador">Maior nota</SelectItem>
+                <SelectItem value="desc">Mais recentes</SelectItem>
+                <SelectItem value="asc">Mais antigos</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         <div className="flex justify-end">
-          <Button className="bg-gray-400 hover:bg-gray-300">
+          <Button
+            className="bg-gray-400 hover:bg-gray-300"
+            onClick={() => {
+              setFiltros(FILTROS_DEFAULT);
+              setStatusFiltro(undefined);
+            }}
+          >
             Limpar Filtros
           </Button>
         </div>
