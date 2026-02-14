@@ -8,7 +8,7 @@ import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
-import { Expand, Menu, SidebarCloseIcon, SidebarOpenIcon, UserIcon } from "lucide-react";
+import {  UserIcon } from "lucide-react";
 import { motion } from "motion/react";
 
 export default function RootLayout({
@@ -53,7 +53,7 @@ export default function RootLayout({
               layout
               className="flex top-14 left-0 h-[calc(100vh-4rem)] bg-zinc-100 z-10 overflow-hidden"
               style={{ boxShadow: "4px 0 3px rgba(0, 0, 0, .2)"}}
-              animate={{ width: barraLateralAberta ? 260 : 0 }}
+              animate={{ width: barraLateralAberta ? 260 : 60, transition: { duration: 0.2 } }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               <div className={`w-[300px] flex flex-col justify-between`}>
@@ -61,16 +61,20 @@ export default function RootLayout({
                   <ul>
                     {items.map((item) => (
                       <li key={item.url}>
-                        <Link href={item.url} className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-200 ${pathname === item.url ? "bg-gray-300 font-bold" : ""}`}>
-                          <item.icon size={20} />
-                          {barraLateralAberta && <span>{item.title}</span>}
+                        <Link href={item.url}
+                          className={`flex items-center gap-3 px-3 py-0.5`}
+                        >
+                          <span className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} text-sm items-center gap-2 p-2 rounded-md ${pathname === item.url ? "bg-vermelho font-bold text-white" : ""}`}>
+                            <item.icon size={20} />
+                            {barraLateralAberta && <span>{item.title}</span>}
+                          </span>
                         </Link>
                       </li>
                     ))}
                   </ul>
                 </nav>
 
-                <div className="flex items-center gap-4 w-full p-4">
+                <div className="flex items-center gap-4 w-full p-3">
                   <div className={`flex items-center justify-center transition-all duration-100 w-full ${barraLateralAberta ? "h-12" : "h-9"} min-w-8 max-w-12  bg-verde rounded-full`}>
                     
                     {
@@ -109,7 +113,7 @@ export default function RootLayout({
                 </div>
               </div>
 
-              <Tooltip>
+              {/* <Tooltip>
                   <TooltipTrigger asChild className="hover:cursor-pointer">
                     <motion.button
                       animate={{ x: barraLateralAberta ? 0 : -20 }}
@@ -126,17 +130,17 @@ export default function RootLayout({
                   <TooltipContent>
                     { barraLateralAberta ? "Recolher menu" : "Expandir menu" }
                   </TooltipContent>
-                </Tooltip>
+                </Tooltip> */}
                 
             </motion.div>
 
             <motion.div
               layout
-              className="flex-1 px-10"
+              className="px-10 w-full min-w-0"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               <div className="h-10" />
-                  {children}
+                {children}
             </motion.div>
 
           </div>

@@ -1,10 +1,10 @@
 'use client'
 
 import useUsuario from "@/data/hooks/useUsuario";
-import { IconLogin, IconLogout, IconSignLeft } from "@tabler/icons-react";
+import { IconLogin, IconLogout, IconMenu, IconMenu4, IconSignLeft } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
-import { UserCog2Icon } from "lucide-react";
+import { Menu, UserCog2Icon } from "lucide-react";
 import { Unidade } from "@/core/unidade";
 import { useEffect, useState } from "react";
 import { getUnidadePorId } from "@/service/unidade";
@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 
 export default function Cabecalho() {
-    const { usuario, deslogar, mensagemLogin } = useUsuario();
+    const { usuario, deslogar, mensagemLogin, mudarEstadoBarraLateral, barraLateralAberta } = useUsuario();
     const router = useRouter();
 
     const [montado, setMontado] = useState<boolean>(false);
@@ -51,7 +51,16 @@ export default function Cabecalho() {
         <header className="w-full bg-[#F5F5F5] px-4 flex justify-between items-center"
             style={{ boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)" }}
         >
+
             <div className="flex justify-start items-center gap-2">
+                <button
+                    onClick={() => mudarEstadoBarraLateral()}
+                    className={`rounded-full bg-zinc-200 p-2 -ml-1.5 hover:cursor-pointer`}
+                    title={`${barraLateralAberta ? "Recolher menu" : "Expandir menu"}`}
+                >
+                    <Menu size={25} />
+                </button>
+
                 <Link href="/">
                     <img
                         src="/logo_ia_editais.png"
@@ -60,6 +69,7 @@ export default function Cabecalho() {
                         className="inline-block ml-2"
                     />
                 </Link>
+
                 <img
                     src="/logo_fiocruz.png"
                     alt="Logo"
