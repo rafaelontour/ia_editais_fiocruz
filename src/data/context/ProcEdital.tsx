@@ -68,9 +68,9 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
                     try {
                         const edital: EditalArquivo | undefined = await getEditalArquivoService(id);
 
-                        const checkTree = edital?.releases?.[0]?.check_tree;
+                        const descricao = edital?.releases?.[0]?.description;
 
-                        if (checkTree == null || (Array.isArray(checkTree) && checkTree.length === 0)) {
+                        if (descricao == null) {
                             idsRestantes.push(id);
                         } else {
                             const e: Edital = await getEditalPorIdService(id) as Edital;

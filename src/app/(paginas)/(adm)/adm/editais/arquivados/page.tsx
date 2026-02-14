@@ -92,13 +92,13 @@ export default function EditaisArquivados() {
     function traduzirStatusEdital(status: string | undefined) {
         switch (status) {
             case "PENDING":
-                return <p className="flex items-center gap-2 bg-[#99A1AF] px-2 py-1 rounded-sm w-fit">Rascunho <Copy /></p>;
+                return <p className="flex items-center gap-2 bg-[#99A1AF] px-3 py-1 rounded-sm w-fit">Rascunho <Copy /></p>;
             case "IN_REVIEW":
-                return <p className="flex items-center gap-2 bg-[#FF0000] px-2 py-1 rounded-sm w-fit">Em construção</p>
+                return <p className="flex items-center gap-2 bg-[#FF0000] px-3 py-1 rounded-sm w-fit">Em construção</p>
             case "UNDER_CONSTRUCTION":
-                return <p className="flex items-center gap-2 bg-[#656149] px-2 py-1 rounded-sm w-fit">Em construção</p>;
+                return <p className="flex items-center gap-2 bg-[#656149] px-3 py-1 rounded-sm w-fit">Em construção</p>;
             case "COMPLETED":
-                return <p className="flex items-center gap-2 bg-[#006400] px-2 py-1 rounded-sm w-fit"><Check />Concluído</p>;
+                return <p className="flex items-center gap-2 bg-[#006400] px-3 py-1 rounded-sm w-fit"><Check />Concluído</p>;
             default:
                 return <p></p>; 
         }
