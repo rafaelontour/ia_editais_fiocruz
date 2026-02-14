@@ -136,10 +136,10 @@ export default function RootLayout({
 
             <motion.div
               layout
-              className="px-10 w-full min-w-0"
+              className="px-8 w-full min-w-0"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <div className="h-10" />
+              <div className="h-8" />
                 {children}
             </motion.div>
 
