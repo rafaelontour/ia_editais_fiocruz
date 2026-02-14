@@ -34,8 +34,12 @@ export default function EditaisArquivados() {
             return
         }
 
-        setEditaisArquivados(res.documents);
-        setEditaisArquivadosFiltrados(res.documents);
+        const ordenados = [...res.documents].sort(
+            (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        )
+
+        setEditaisArquivados(ordenados);
+        setEditaisArquivadosFiltrados(ordenados);
         setCarregando(false);
     }
 
@@ -92,15 +96,15 @@ export default function EditaisArquivados() {
     function traduzirStatusEdital(status: string | undefined) {
         switch (status) {
             case "PENDING":
-                return <p className="flex items-center gap-2 bg-[#99A1AF] px-3 py-1 rounded-sm w-fit">Rascunho <Copy /></p>;
+                return <span className="flex items-center gap-2 bg-[#99A1AF] px-3 py-1 rounded-sm w-fit"><Copy /> Rascunho </span>;
             case "IN_REVIEW":
-                return <p className="flex items-center gap-2 bg-[#FF0000] px-3 py-1 rounded-sm w-fit">Em construção</p>
+                return <span className="flex items-center gap-2 bg-[#FF0000] px-3 py-1 rounded-sm w-fit">Em construção</span>
             case "UNDER_CONSTRUCTION":
-                return <p className="flex items-center gap-2 bg-[#656149] px-3 py-1 rounded-sm w-fit">Em construção</p>;
+                return <span className="flex items-center gap-2 bg-[#656149] px-3 py-1 rounded-sm w-fit">Em construção</span>;
             case "COMPLETED":
-                return <p className="flex items-center gap-2 bg-[#006400] px-3 py-1 rounded-sm w-fit"><Check />Concluído</p>;
+                return <span className="flex items-center gap-2 bg-[#006400] px-3 py-1 rounded-sm w-fit"><Check />Concluído</span>;
             default:
-                return <p></p>; 
+                return <span>Desconhecido</span>; 
         }
     }
 
@@ -164,7 +168,7 @@ export default function EditaisArquivados() {
 
 
                                                 <td className=" text-white">
-                                                    <p className="">
+                                                    <p className="" >
                                                         {traduzirStatusEdital(edital.history && edital.history[0].status)}
                                                     </p>
                                                 </td>
