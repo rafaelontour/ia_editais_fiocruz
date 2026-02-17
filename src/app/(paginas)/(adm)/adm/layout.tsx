@@ -75,14 +75,14 @@ export default function RootLayout({
                 </nav>
 
                 <div className="flex items-center gap-4 w-full p-3">
-                  <div className={`flex items-center justify-center transition-all duration-100 w-full ${barraLateralAberta ? "h-12" : "h-9"} min-w-8 max-w-12  bg-verde rounded-full`}>
+                  <div className={`flex items-center justify-center h-9 min-w-8.5 max-w-full bg-verde rounded-full `}>
                     
                     {
                       usuario && (
                         usuario.icon ? (
                           <img src={urlBase + usuario.icon.file_path} className={`w-8 h-8 rounded-full`} />
                         ) : (
-                          <UserIcon size={20} />
+                          <UserIcon size={18} />
                         )
                       )
                     }
@@ -105,10 +105,10 @@ export default function RootLayout({
                     style={{
                       display: barraLateralAberta ? "flex" : "none"
                     }}
-                    className={`flex flex-col min-w-[120px]`}
+                    className={`flex flex-col gap-0 min-w-[120px]`}
                   >
                     <span className="text-sm font-bold">{usuario?.username}</span>
-                    <Link href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
+                    <Link className="h-fit" href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
                   </motion.div>
                 </div>
               </div>
@@ -136,10 +136,10 @@ export default function RootLayout({
 
             <motion.div
               layout
-              className="px-8 w-full min-w-0"
+              className="px-6 w-full min-w-0"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <div className="h-8" />
+              <div className="h-5" />
                 {children}
             </motion.div>
 

@@ -9,7 +9,7 @@ import { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
 import { getTipificacoesService, adicionarTipificacaoService, excluirTipificacaoService, atualizarTipificacaoService } from "@/service/tipificacao";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, Loader2, PencilLine, Plus, Share2, View } from "lucide-react";
+import { Calendar, Loader2, PencilLine, Plus, View } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
@@ -292,133 +292,86 @@ export default function Tipificacoes() {
 
             </div>
 
-            <Masonry
-                breakpointCols={breakpointColumns}
-                className="flex gap-5 mb-10 py-1 px-3 h-[calc(100vh-280px)] overflow-y-auto"
-            >
-                {
-                    carregandoTipificacoes ? (
-                        <div className="flex justify-center items-center gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-                            <p className="animate-pulse">Carregando tipificações...</p>
-                            <Loader2 className="animate-spin" />
+           <div className="h-[calc(100vh-240px)] overflow-y-auto px-3 py-1">
+                <Masonry
+                    breakpointCols={breakpointColumns}
+                    className="flex gap-5"
+                >
+                    {carregandoTipificacoes ? (
+                    <div className="flex justify-center items-center gap-2 w-full py-10">
+                        <p className="animate-pulse">Carregando tipificações...</p>
+                        <Loader2 className="animate-spin" />
+                    </div>
+                    ) : tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? (
+                    tipificacoesFiltradas.map((tipificacao) => (
+                        <div key={tipificacao.id} className="mb-5">
+                        <Div>
+                            <div data-cy="item-nome-tip" className="flex flex-col gap-2">
+                            <h2 className="text-2xl font-semibold wrap-break-word">
+                                {tipificacao.name}
+                            </h2>
+                            </div>
+
+                            <div data-cy="item-tipificacao" className="flex justify-between items-center mt-3">
+                            <p className="flex items-center gap-2 text-sm text-gray-400">
+                                <Calendar size={18} />
+                                <span className="flex flex-col">
+                                <span className="text-[10px] font-semibold mb-[-5px] mt-1">
+                                    Criada em
+                                </span>
+                                <span>{formatarData(tipificacao.created_at)}</span>
+                                </span>
+                            </p>
+
+                            <div className="flex gap-2">
+                                <Button
+                                onClick={() => baixarTipificacao(tipificacao.id)}
+                                className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco"
+                                title="Baixar PDF desta tipificação"
+                                >
+                                <IconDownload size={20} color="black" />
+                                </Button>
+
+                                {usuario?.access_level !== "ADMIN" ? (
+                                <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
+                                    <Button
+                                    className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco"
+                                    title="Ver dados desta tipificação"
+                                    >
+                                    <View size={20} color="black" />
+                                    </Button>
+                                </Link>
+                                ) : (
+                                <>
+                                    <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
+                                    <Button
+                                        className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco"
+                                        title="Taxonomias desta tipificação"
+                                    >
+                                        <IconHierarchy2 size={20} color="black" />
+                                    </Button>
+                                    </Link>
+
+                                    <BotaoExcluir
+                                    funcExcluir={excluirTipificacao}
+                                    item={tipificacao}
+                                    tipo="tipificação"
+                                    />
+                                </>
+                                )}
+                            </div>
+                            </div>
+                        </Div>
                         </div>
+                    ))
                     ) : (
-                        tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? tipificacoesFiltradas.map((tipificacao, index) => (
-                            <Div key={index}>
-                                <div data-cy="item-nome-tip" className="flex flex-col gap-2">
-                                    <h2 className="text-2xl font-semibold wrap-break-word">{tipificacao.name}</h2>
-                                </div>
+                    <p className="text-gray-400 text-2xl text-center py-10 animate-pulse">
+                        Nenhuma tipificação encontrada.
+                    </p>
+                    )}
+                </Masonry>
+                </div>
 
-                                <div data-cy="item-tipificacao" className="flex justify-between items-center mt-3">
-                                    <p className="flex items-center gap-2 text-sm text-gray-400">
-                                        <Calendar size={18} />
-                                        <span className="flex justify-center flex-col">
-                                            <span className="text-[10px] font-semibold mb-[-5px] mt-1">Criada em</span>
-                                            <span>{formatarData(tipificacao.created_at)}</span>
-                                        </span>
-                                    </p>
-
-                                    <div className="flex">
-
-                                        <div className="flex gap-2">
-                                            <Button
-                                                onClick={() => baixarTipificacao(tipificacao.id)}
-                                                className={`
-                                                    h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
-                                                    bg-branco hover:bg-branco
-                                                `}
-                                                title="Baixar PDF desta tipificação"
-                                            >
-                                                <IconDownload size={20} color="black" />
-                                            </Button>
-                                            {
-                                                usuario?.access_level !== "ADMIN" ? (
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
-                                                                <Button
-                                                                    className={`
-                                                                        h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
-                                                                        bg-branco hover:bg-branco
-                                                                    `}
-                                                                    title="Ver dados desta tipificação"
-                                                                >
-                                                                    <View size={20} color="black" />
-                                                                </Button>
-                                                            </Link>
-                                                        </DialogTrigger>
-                                                    </Dialog>
-                                                ) : (
-                                                    <>
-                                                        <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
-                                                            <Button
-                                                                className={`
-                                                                    h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
-                                                                    bg-branco hover:bg-branco
-                                                                `}
-                                                                title="Taxonomias desta tipificação"
-                                                            >
-                                                                <IconHierarchy2 size={20} color="black" />
-                                                            </Button>
-                                                        </Link>
-                                                        <Dialog open={idDialogEditar === tipificacao.id} onOpenChange={(open) => setIdDialogEditar(open ? tipificacao.id : null)}>
-                                                            <DialogTrigger asChild>
-                                                                <Button
-                                                                    onClick={() => {
-                                                                        const idsFontes = tipificacao.sources?.map((f: Fonte) => f.id);
-                                                                        const fontesDaTaxonomia = filtrarPraEdicao(idsFontes);
-                                                                        setFontesSelecionadas(fontesDaTaxonomia)
-                                                                        setValue("fontesSelecionadas", fontesDaTaxonomia.map(f => f.id))
-                                                                    }}
-                                                                    title="Editar tipificação"
-                                                                    className={`
-                                                                        h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300
-                                                                        bg-branco hover:bg-branco
-                                                                    `}
-                                                                    size={"icon"}
-                                                                >
-                                                                    <PencilLine color="black" />
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent onCloseAutoFocus={limparCampos}>
-                                                                <DialogHeader>
-                                                                    <DialogTitle className="text-3xl font-bold">
-                                                                        Editar tipificação
-                                                                    </DialogTitle>
-                                                                    <DialogDescription className="text-md pb-4">
-                                                                        Atualize os dados da tipificação selecionada
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-                                                                <Formulario
-                                                                    fontes={fontes}
-                                                                    fontesSelecionadas={fontesSelecionadas}
-                                                                    setFontesSelecionadas={setFontesSelecionadas}
-                                                                    control={control}
-                                                                    setValue={setValue}
-                                                                    register={register}
-                                                                    errors={errors}
-                                                                />
-                                                                <DialogFooter>
-                                                                    <DialogClose>
-                                                                        <BotaoCancelar />
-                                                                    </DialogClose>
-                                                                    <BotaoSalvar onClick={handleSubmit(atualizarTipificacao)} />
-                                                                </DialogFooter>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                        <BotaoExcluir funcExcluir={excluirTipificacao} item={tipificacao} tipo="tipificação" />
-                                                    </>
-                                                )
-                                            }
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </Div>
-                        )) : <p className="absolute left-1/2 top-10 translate-x-[-50%] text-gray-400 text-2xl text-center animate-pulse">Nenhuma tipificação encontrada.</p>
-                    )
-                }
-            </Masonry>
 
         </div>
         
