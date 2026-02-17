@@ -18,12 +18,12 @@ import { UsuarioUnidade } from "@/core/usuario";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { toast } from "sonner";
-import { adicionarEditalService, atualizarEditalService } from "@/service/edital";
+import { atualizarEditalService } from "@/service/edital";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { enviarArquivoService, getEditalArquivoService } from "@/service/editalArquivo";
 import { EditalArquivo } from "@/core/edital/Edital";
 import { IconFile } from "@tabler/icons-react";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 
 interface Props {
     edital: Edital
@@ -89,6 +89,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [responsaveisEdital, setResponsaveisEdital] = useState<UsuarioUnidade[]>([]);
     const [usuariosDaUnidade, setUsuariosDaUnidade] = useState<UsuarioUnidade[] | undefined>([]);
     const [sheetOpen, setSheetOpen] = useState<boolean>(false);
+    const [editarComArquivo, setEditarComArquivo] = useState<boolean>(false);
 
     async function filtrarTipificacoesSelectionadas() {
         const t = edital.typifications?.map(tipificacao => tipificacoes.find(tip => tip.id === tipificacao.id)) as Tipificacao[]
@@ -120,13 +121,18 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             editors_ids: responsaveisEdital.map(usuario => usuario.id)
         }
 
-        console.log(dados)
-
         const r = await atualizarEditalService(dados);
-
 
         if (r !== 200) {
             toast.error("Erro ao atualizar os dados do edital!", { description: "O arquivo não foi atualizado, pois ocorreu um erro ao atualizar as informações do edital!!" });
+            return
+        }
+
+        toast.success("Dados do edital atualizados com sucesso!");
+
+        if (!editarComArquivo) {
+            setSheetOpen(!sheetOpen);
+            atualizarEditais(!flagEdital);
             return
         }
 
@@ -137,10 +143,11 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             return
         }
 
-        toast.success("Edital atualizado com sucesso!");
+        toast.success("Arquivo enviado com sucesso!");
         atualizarEditais(!flagEdital);
         setSheetOpen(!sheetOpen);
         limparCampos();
+        setEditarComArquivo(false);
     }
 
     useEffect(() => {
@@ -435,7 +442,9 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                     </div>
                                                 </DialogTrigger>
 
-                                                <DialogContent className="p-10 w-[80%] h-[90%]">
+                                                <DialogContent className="flex flex-col gap-0 p-10 w-[80%] h-[90%]">
+                                                    <DialogTitle className="text-xl mb-5">Documento do edital: {edital.name}</DialogTitle>
+                                                    <DialogDescription></DialogDescription>
                                                     <iframe
                                                         src={urlBase + urlCaminhoArquivoEdital}
                                                         width="100%"
@@ -455,6 +464,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                 <FileUpload
                                                     onChange={(files: File[]) => {
                                                         field.onChange(files[0]);
+                                                        setEditarComArquivo(true);
                                                     }}
                                                 />
                                             )}

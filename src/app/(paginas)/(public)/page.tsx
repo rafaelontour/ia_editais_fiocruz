@@ -91,8 +91,8 @@ export default function Home() {
     return (
         <div className="flex flex-col">
             <div className="bg-[url(/backgroundImg.png)] bg-repeat bg-contain px-12 pb-4 rounded-md w-full flex justify-center items-center gap-12 flex-col">
-                <h1 className="text-5xl font-bold mt-12 w-1/2 text-center leading-tight">Centralize, organize e otimize seus
-                    <span className="bg-red-600 text-white px-2 rounded-md font-semibold">editais</span> em um só lugar.</h1>
+                <h1 className="text-5xl font-bold mt-12 w-1/2 text-center leading-tight">Centralize, organize e otimize seus 
+                    <span className="bg-red-600 text-white px-2 ml-4 rounded-md font-semibold">editais</span> em um só lugar.</h1>
 
                 <div className="flex text-xl gap-4 font-medium">
                     <button className="text-vermelho border-vermelho border-solid border-2 px-8 py-2 rounded-md cursor-pointer">Base de conhecimento</button>

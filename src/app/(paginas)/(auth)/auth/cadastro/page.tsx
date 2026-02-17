@@ -21,7 +21,6 @@ const cadastroSchema = z.object({
     senha: z.string(),
     whatsapp: z.string().min(11, "O número de WhatsAapp é obrigatório"),
     unidade: z.string().min(1, "Selecione pelo menos uma unidade"),
-    
 })
 export default function Cadastro() {
 
@@ -32,6 +31,7 @@ export default function Cadastro() {
         handleSubmit,
         formState: { errors },
         control,
+        setError,
         watch,
     } = useForm<formData>({
         resolver: zodResolver(cadastroSchema),
@@ -41,6 +41,7 @@ export default function Cadastro() {
     })
 
     const [unidades, setUnidades] = useState<Unidade[]>([])
+    const [confirmarSenha, setConfirmarSenha] = useState<string>("")
     const router = useRouter()
 
     async function buscarUnidades() {
@@ -62,6 +63,16 @@ export default function Cadastro() {
     };
 
     async function cadastrarUsuario(formData: formData) {
+
+        if (formData.senha.length < 8) {
+            toast.info("Siga as instruções para criação de senha");
+        }
+
+        if (formData.senha !== confirmarSenha) {
+            setError("senha", { message: "Senhas não coincidem" });
+            return;
+        }
+
         const usuario: UsuarioUnidade = {
             username: formData.nomeCompleto,
             email: formData.email,
@@ -86,7 +97,7 @@ export default function Cadastro() {
 
     return(
         <div className="flex items-center bg-gray-100 h-full justify-center">
-            <div className="w-[80%] flex flex-col gap-4 2xl:gap-6">
+            <div className="w-[80%] flex flex-col gap-4 2xl:gap-4">
 
                 <div className="w-full flex flex-col items-center gap-2">
                     <h2 className="text-cinza text-4xl font-bold">Criar Conta</h2>
@@ -174,6 +185,14 @@ export default function Cadastro() {
                             <p className="text-[18px]">Senha</p>
                             <input {...register("senha")} name="senha" type="password" className="bg-branco rounded-md border-gray-300 border py-2 px-2 w-full" />
                         </label>
+
+                        <label htmlFor="confirmar_senha" className="flex flex-col w-full gap-2">
+                            <p className="text-[18px]">Confirmar senha</p>
+                            <input onChange={(e) => setConfirmarSenha(e.target.value)} name="confirmar_senha" type="password" className="bg-branco rounded-md border-gray-300 border py-2 px-2 w-full" />
+                            {
+                                errors.senha && <span className="text-red-500 text-sm italic">{errors.senha.message}</span>
+                            }
+                        </label>
                     </div>
 
                     <div className="text-sm">
@@ -201,6 +220,9 @@ export default function Cadastro() {
                         A senha deve ter pelo menos um número
                       </p>
                     </div>
+
+                    
+
 
                     <button type="submit" className="bg-vermelho text-branco rounded-md px-6 py-3 text-xl hover:cursor-pointer">Criar Conta</button>
                     

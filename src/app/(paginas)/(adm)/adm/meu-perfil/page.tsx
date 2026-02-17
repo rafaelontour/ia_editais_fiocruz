@@ -125,7 +125,7 @@ export default function MeuPerfil() {
       case "ADMIN": return "Administrador";
       case "ANALYST": return "Analista";
       case "AUDITOR": return "Auditor";
-      default: return "Não definido";
+      default: return "Cargo não definido";
     }
   }
 
