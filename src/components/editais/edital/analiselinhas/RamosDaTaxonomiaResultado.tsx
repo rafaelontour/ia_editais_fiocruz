@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Branch } from "@/core/tipificacao/Tipificacao";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { DetalhesRamoDialog } from "./DetalhesRamoDialog";
 import { useParams } from "next/navigation";
 
@@ -31,37 +31,23 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
     }
   }, [ramos]);
 
-  const refs = useRef<(HTMLButtonElement | null)[]>([]);
-
-  const scrollToIndex = (index: number) => {
-    const el = refs.current[index];
-    if (el) {
-      el.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "start",
-      });
-    }
-  };
-
   return (
-    <div className="w-full flex flex-col flex-1 border border-gray-300 rounded-sm p-4">
+    <div className="w-full flex flex-col flex-1 border border-gray-300 rounded-sm px-4 pt-2 pb-4 bg-white ">
       <Tabs
         defaultValue="tabRamo0"
         value={abaSelecionada}
         onValueChange={(val) => setAbaSelecionada(val)}
       >
-        <h3 className="font-bold text-2xl text-black text-left">Ramos</h3>
-
-        <hr className="mt-2 mb-4 border-gray-300 w-full" />
-
-        <div className="flex w-min-0 justify-between items-center gap-2">
+        <div className="flex w-min-0 justify-between items-center gap-2 ">
+          <h3 className="font-bold text-xl text-black whitespace-nowrap ">
+            Ramos:
+          </h3>
           <Button
             className={`
                             ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
                             hover:cursor-pointer
                         `}
-            title={`${primeiraTab ? "Você está na primeira aba" : "Tipificação anterior"}`}
+            title={`${primeiraTab ? "Você está na primeira aba" : "Ramo anterior"}`}
             variant={"outline"}
             size={"icon"}
             onClick={() => {
@@ -77,7 +63,6 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
               }));
 
               setAbaSelecionada("tabRamo" + indexAnterior);
-              scrollToIndex(indexAnterior);
               setPrimeiraTab(indexAnterior === 0);
               setUltimaTab(indexAnterior === ramos.length - 1);
             }}
@@ -87,56 +72,16 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
             />
           </Button>
 
-          <TabsList className="w-full flex overflow-x-auto no-scrollbar">
-            <div className="flex gap-2 items-center mx-3 overflow-x-hidden">
-              <div className="flex w-max">
-                {ramos.map((ramo, index) => (
-                  <div key={index} className="flex items-center">
-                    <TabsTrigger
-                      title={ramo.title}
-                      ref={(el) => {
-                        refs.current[index] = el;
-                      }}
-                      onClick={() => {
-                        setRamoSelecionado((anterior) => ({
-                          ...anterior,
-                          index: index,
-                          ramo: ramo,
-                        }));
-                        if (index === 0) {
-                          setPrimeiraTab(true);
-                        } else {
-                          setPrimeiraTab(false);
-                        }
-                        if (index === ramos.length - 1) {
-                          setUltimaTab(true);
-                        } else {
-                          setUltimaTab(false);
-                        }
-                      }}
-                      className="hover:cursor-pointer rounded-sm text-lg"
-                      key={index}
-                      value={"tabRamo" + index}
-                    >
-                      <div>
-                        <p className="max-w-96 truncate">{ramo.title}</p>
-                      </div>
-                    </TabsTrigger>
-                    {index < ramos.length - 1 && (
-                      <span className="text-xs text-zinc-500 mx-4">|</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </TabsList>
+          <span className="text-lg font-semibold text-black">
+            {ramoSelecionado.ramo?.title}
+          </span>
 
           <Button
             className={`
                             ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
                             hover:cursor-pointer text-lg
                         `}
-            title={`${!ultimaTab ? "Tipificação seguinte" : "Você está na última aba"}`}
+            title={`${!ultimaTab ? "Ramo seguinte" : "Você está na última aba"}`}
             variant={"outline"}
             size={"icon"}
             onClick={() => {
@@ -155,7 +100,6 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
                 });
                 setAbaSelecionada("tabRamo" + proximoIndex.toString());
               }
-              scrollToIndex(proximoIndex);
               setPrimeiraTab(proximoIndex === 0);
               setUltimaTab(proximoIndex === ramos.length - 1);
             }}
@@ -169,6 +113,7 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
         {ramos.map((ramo, index) => (
           <TabsContent value={"tabRamo" + index} className="" key={ramo.id}>
             <div className="flex flex-col gap-2 text-black">
+              <hr className=" border-gray-300 w-full" />
               <div className="flex flex-row gap-7 px-3 w-full">
                 {/* <div className="flex flex-col gap-2 w-1/3">
                   <h3 className="text-lg font-semibold">Items</h3>

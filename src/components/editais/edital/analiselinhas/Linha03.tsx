@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, ChevronRight, Stars } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import TaxonommiasResultado from "./TaxonomiasResultado";
 import { EditalArquivo } from "@/core/edital/Edital";
 
@@ -19,7 +19,6 @@ interface Props {
 export default function Linha03({ edital, resumoIA }: Props) {
   const tipificacoes = (edital && edital?.releases[0].check_tree) || [];
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
-  const refs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const [modoVisualizacao, setModoVisualizacao] = useState<
     "resumo" | "tipificacoes"
@@ -30,17 +29,6 @@ export default function Linha03({ edital, resumoIA }: Props) {
       setHtmlSeguro(DOMPurify.sanitize(resumoIA));
     }
   }, [resumoIA]);
-
-  const scrollToIndex = (index: number) => {
-    const el = refs.current[index];
-    if (el) {
-      el.scrollIntoView({
-        behavior: "smooth",
-        inline: "nearest",
-        block: "nearest",
-      });
-    }
-  };
 
   useEffect(() => {
     if (tipificacoes.length === 1) {
@@ -98,7 +86,7 @@ export default function Linha03({ edital, resumoIA }: Props) {
         >
           <TabsList className="w-full flex items-start flex-col gap-4 p-3 border border-gray-300 flex-1">
             <div className="w-full flex flex-col gap-2 rounded-md  flex-1 min-h-0 ">
-              <div className="flex items-center justify-between py-3 px-4 bg-white rounded-md">
+              <div className="flex items-center justify-between py-2 px-4 bg-white rounded-md border border-gray-300 ">
                 <h3 className="text-2xl font-semibold text-black flex items-center gap-2">
                   OiacIA
                   {/* <Stars color="blue" size={18} /> */}
@@ -127,7 +115,7 @@ export default function Linha03({ edital, resumoIA }: Props) {
                     Média de todos os ramos: {media?.toFixed(2)}
                   </p>
                   {/* teste */}
-                  <div className="flex items-center justify-between py-3 px-4 bg-white rounded-md">
+                  <div className="flex items-center justify-between py-2 px-4 bg-white rounded-md ">
                     <div className="flex gap-4 items-center">
                       <button
                         onClick={() =>
@@ -147,7 +135,7 @@ export default function Linha03({ edital, resumoIA }: Props) {
                   </div>
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto py-3 px-4 bg-white rounded-md min-h-0">
+              <div className="flex-1 overflow-y-auto min-h-0  ">
                 {modoVisualizacao === "resumo" ? (
                   <div
                     className={style.resumoIA}
@@ -155,11 +143,10 @@ export default function Linha03({ edital, resumoIA }: Props) {
                   />
                 ) : (
                   <>
-                    <h3 className="font-bold self-start text-2xl text-black">
-                      Tipificações
-                    </h3>
-
-                    <div className="w-full flex justify-between items-center gap-2">
+                    <div className="w-full flex justify-between items-center gap-2 bg-white px-4 py-2 border border-gray-300 rounded-sm mb-2">
+                      <h3 className="font-bold text-xl text-black whitespace-nowrap">
+                        Tipificações:
+                      </h3>
                       <Button
                         className={`
                                     ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
@@ -181,7 +168,6 @@ export default function Linha03({ edital, resumoIA }: Props) {
                           }));
 
                           setAbaSelecionada("tab" + indexAnterior);
-                          scrollToIndex(indexAnterior);
                           setPrimeiraTab(indexAnterior === 0);
                           setUltimaTab(
                             indexAnterior === tipificacoes.length - 1,
@@ -193,38 +179,9 @@ export default function Linha03({ edital, resumoIA }: Props) {
                         />
                       </Button>
 
-                      <div className="flex gap-2 items-center mx-3 overflow-x-hidden">
-                        <div className="flex w-max">
-                          {tipificacoes.map((tip, index) => (
-                            <div key={tip.id} className="flex items-center">
-                              <TabsTrigger
-                                ref={(el) => {
-                                  refs.current[index] = el;
-                                }} // ← aqui conecta cada aba ao array de refs
-                                value={"tab" + index}
-                                key={tip.id}
-                              >
-                                <span
-                                  title={tip.name}
-                                  className="
-                                                        hover:cursor-pointer
-                                                        text-lg px-2 w-fit
-                                                        block
-                                                    "
-                                >
-                                  {tip.name}
-                                </span>
-                              </TabsTrigger>
-
-                              {index < tipificacoes.length - 1 && (
-                                <span className="text-xs text-zinc-500 mx-4">
-                                  |
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                      <span className="text-lg font-semibold text-black">
+                        {tipificacaoSelecionada.tipificacao?.name}
+                      </span>
 
                       <Button
                         className={`
@@ -249,7 +206,6 @@ export default function Linha03({ edital, resumoIA }: Props) {
                             });
                             setAbaSelecionada("tab" + proximoIndex.toString());
                           }
-                          scrollToIndex(proximoIndex);
                           setPrimeiraTab(proximoIndex === 0);
                           setUltimaTab(
                             proximoIndex === tipificacoes.length - 1,
