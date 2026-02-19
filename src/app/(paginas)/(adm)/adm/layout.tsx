@@ -64,7 +64,7 @@ export default function RootLayout({
                         <Link href={item.url}
                           className={`flex items-center gap-3 px-3 py-0.5`}
                         >
-                          <span className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} text-sm items-center gap-2 p-2 rounded-md ${pathname === item.url ? "bg-vermelho font-bold text-white" : ""}`}>
+                          <span className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} text-sm mb-1 items-center gap-2 p-2 rounded-md ${pathname === item.url ? "bg-vermelho font-bold text-white" : "bg-zinc-300"}`}>
                             <item.icon size={20} />
                             {barraLateralAberta && <span>{item.title}</span>}
                           </span>
