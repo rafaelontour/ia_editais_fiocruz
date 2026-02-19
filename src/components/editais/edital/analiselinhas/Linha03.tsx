@@ -143,79 +143,87 @@ export default function Linha03({ edital, resumoIA }: Props) {
                   />
                 ) : (
                   <>
-                    <div className="w-full flex justify-between items-center gap-2 bg-white px-4 py-2 border border-gray-300 rounded-sm mb-2">
+                    <div className="w-full grid grid-cols-[auto_48px_1fr_48px] items-center gap-2 bg-white px-4 py-2 border border-gray-300 rounded-sm mb-2">
                       <h3 className="font-bold text-xl text-black whitespace-nowrap">
                         Tipificações:
                       </h3>
-                      <Button
-                        className={`
-                                    ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
-                                    hover:cursor-pointer
-                                `}
-                        title={`${primeiraTab ? "Você está na primeira aba" : "Tipificação anterior"}`}
-                        variant={"outline"}
-                        size={"icon"}
-                        onClick={() => {
-                          if (tipificacaoSelecionada.index === null) return;
-                          const indexAnterior =
-                            tipificacaoSelecionada.index - 1;
-                          if (indexAnterior < 0) return;
 
-                          setTipificacaoSelecionada((anterior) => ({
-                            ...anterior,
-                            index: indexAnterior,
-                            tipificacao: tipificacoes[indexAnterior],
-                          }));
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className={`
+                                      ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
+                                      hover:cursor-pointer
+                                  `}
+                          title={`${primeiraTab ? "Você está na primeira aba" : "Tipificação anterior"}`}
+                          variant={"outline"}
+                          size={"icon"}
+                          onClick={() => {
+                            if (tipificacaoSelecionada.index === null) return;
+                            const indexAnterior =
+                              tipificacaoSelecionada.index - 1;
+                            if (indexAnterior < 0) return;
 
-                          setAbaSelecionada("tab" + indexAnterior);
-                          setPrimeiraTab(indexAnterior === 0);
-                          setUltimaTab(
-                            indexAnterior === tipificacoes.length - 1,
-                          );
-                        }}
-                      >
-                        <ChevronLeft
-                          className={`${primeiraTab ? "text-gray-400" : "text-white"}`}
-                        />
-                      </Button>
+                            setTipificacaoSelecionada((anterior) => ({
+                              ...anterior,
+                              index: indexAnterior,
+                              tipificacao: tipificacoes[indexAnterior],
+                            }));
 
-                      <span className="text-lg font-semibold text-black">
+                            setAbaSelecionada("tab" + indexAnterior);
+                            setPrimeiraTab(indexAnterior === 0);
+                            setUltimaTab(
+                              indexAnterior === tipificacoes.length - 1,
+                            );
+                          }}
+                        >
+                          <ChevronLeft
+                            className={`${primeiraTab ? "text-gray-400" : "text-white"}`}
+                          />
+                        </Button>
+                      </div>
+
+                      <span className="text-lg font-semibold text-black truncate text-center">
                         {tipificacaoSelecionada.tipificacao?.name}
                       </span>
 
-                      <Button
-                        className={`
-                                    ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
-                                    hover:cursor-pointer
-                                `}
-                        title={`${!ultimaTab ? "Tipificação seguinte" : "Você está na última aba"}`}
-                        variant={"outline"}
-                        size={"icon"}
-                        onClick={() => {
-                          if (
-                            tipificacaoSelecionada.index === null ||
-                            tipificacaoSelecionada.index ===
-                              tipificacoes.length - 1
-                          )
-                            return;
-                          const proximoIndex = tipificacaoSelecionada.index + 1;
-                          if (proximoIndex < tipificacoes.length) {
-                            setTipificacaoSelecionada({
-                              tipificacao: tipificacoes[proximoIndex],
-                              index: proximoIndex,
-                            });
-                            setAbaSelecionada("tab" + proximoIndex.toString());
-                          }
-                          setPrimeiraTab(proximoIndex === 0);
-                          setUltimaTab(
-                            proximoIndex === tipificacoes.length - 1,
-                          );
-                        }}
-                      >
-                        <ChevronRight
-                          className={`${ultimaTab ? "text-gray-400" : "text-white"}`}
-                        />
-                      </Button>
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className={`
+                                      ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
+                                      hover:cursor-pointer
+                                  `}
+                          title={`${!ultimaTab ? "Tipificação seguinte" : "Você está na última aba"}`}
+                          variant={"outline"}
+                          size={"icon"}
+                          onClick={() => {
+                            if (
+                              tipificacaoSelecionada.index === null ||
+                              tipificacaoSelecionada.index ===
+                                tipificacoes.length - 1
+                            )
+                              return;
+                            const proximoIndex =
+                              tipificacaoSelecionada.index + 1;
+                            if (proximoIndex < tipificacoes.length) {
+                              setTipificacaoSelecionada({
+                                tipificacao: tipificacoes[proximoIndex],
+                                index: proximoIndex,
+                              });
+                              setAbaSelecionada(
+                                "tab" + proximoIndex.toString(),
+                              );
+                            }
+                            setPrimeiraTab(proximoIndex === 0);
+                            setUltimaTab(
+                              proximoIndex === tipificacoes.length - 1,
+                            );
+                          }}
+                        >
+                          <ChevronRight
+                            className={`${ultimaTab ? "text-gray-400" : "text-white"}`}
+                          />
+                        </Button>
+                      </div>
                     </div>
 
                     {tipificacoes.map((tipificacao, index) => (

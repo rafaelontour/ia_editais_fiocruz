@@ -38,76 +38,81 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
         value={abaSelecionada}
         onValueChange={(val) => setAbaSelecionada(val)}
       >
-        <div className="flex w-min-0 justify-between items-center gap-2 ">
-          <h3 className="font-bold text-xl text-black whitespace-nowrap ">
+        <div className="w-full grid grid-cols-[auto_48px_1fr_48px] items-center gap-2">
+          <h3 className="font-bold text-xl text-black whitespace-nowrap mr-13.5">
             Ramos:
           </h3>
-          <Button
-            className={`
-                            ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
-                            hover:cursor-pointer
-                        `}
-            title={`${primeiraTab ? "Você está na primeira aba" : "Ramo anterior"}`}
-            variant={"outline"}
-            size={"icon"}
-            onClick={() => {
-              if (ramos.length === 1) return;
-              if (ramoSelecionado.index === null) return;
-              const indexAnterior = ramoSelecionado.index - 1;
-              if (indexAnterior < 0) return;
 
-              setRamoSelecionado((anterior) => ({
-                ...anterior,
-                index: indexAnterior,
-                ramo: ramos[indexAnterior],
-              }));
+          <div className="flex items-center justify-center">
+            <Button
+              className={`
+                              ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
+                              hover:cursor-pointer
+                          `}
+              title={`${primeiraTab ? "Você está na primeira aba" : "Ramo anterior"}`}
+              variant={"outline"}
+              size={"icon"}
+              onClick={() => {
+                if (ramos.length === 1) return;
+                if (ramoSelecionado.index === null) return;
+                const indexAnterior = ramoSelecionado.index - 1;
+                if (indexAnterior < 0) return;
 
-              setAbaSelecionada("tabRamo" + indexAnterior);
-              setPrimeiraTab(indexAnterior === 0);
-              setUltimaTab(indexAnterior === ramos.length - 1);
-            }}
-          >
-            <ChevronLeft
-              className={`${primeiraTab ? "text-gray-400" : "text-white"}`}
-            />
-          </Button>
+                setRamoSelecionado((anterior) => ({
+                  ...anterior,
+                  index: indexAnterior,
+                  ramo: ramos[indexAnterior],
+                }));
 
-          <span className="text-lg font-semibold text-black">
+                setAbaSelecionada("tabRamo" + indexAnterior);
+                setPrimeiraTab(indexAnterior === 0);
+                setUltimaTab(indexAnterior === ramos.length - 1);
+              }}
+            >
+              <ChevronLeft
+                className={`${primeiraTab ? "text-gray-400" : "text-white"}`}
+              />
+            </Button>
+          </div>
+
+          <span className="text-lg font-semibold text-black truncate text-center">
             {ramoSelecionado.ramo?.title}
           </span>
 
-          <Button
-            className={`
-                            ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
-                            hover:cursor-pointer text-lg
-                        `}
-            title={`${!ultimaTab ? "Ramo seguinte" : "Você está na última aba"}`}
-            variant={"outline"}
-            size={"icon"}
-            onClick={() => {
-              if (ramos.length === 1) return;
+          <div className="flex items-center justify-center">
+            <Button
+              className={`
+                              ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
+                              hover:cursor-pointer text-lg
+                          `}
+              title={`${!ultimaTab ? "Ramo seguinte" : "Você está na última aba"}`}
+              variant={"outline"}
+              size={"icon"}
+              onClick={() => {
+                if (ramos.length === 1) return;
 
-              if (
-                ramoSelecionado.index === null ||
-                ramoSelecionado.index === ramos.length - 1
-              )
-                return;
-              const proximoIndex = ramoSelecionado.index + 1;
-              if (proximoIndex < ramos.length) {
-                setRamoSelecionado({
-                  ramo: ramos[proximoIndex],
-                  index: proximoIndex,
-                });
-                setAbaSelecionada("tabRamo" + proximoIndex.toString());
-              }
-              setPrimeiraTab(proximoIndex === 0);
-              setUltimaTab(proximoIndex === ramos.length - 1);
-            }}
-          >
-            <ChevronRight
-              className={`${ultimaTab ? "text-gray-400" : "text-white"}`}
-            />
-          </Button>
+                if (
+                  ramoSelecionado.index === null ||
+                  ramoSelecionado.index === ramos.length - 1
+                )
+                  return;
+                const proximoIndex = ramoSelecionado.index + 1;
+                if (proximoIndex < ramos.length) {
+                  setRamoSelecionado({
+                    ramo: ramos[proximoIndex],
+                    index: proximoIndex,
+                  });
+                  setAbaSelecionada("tabRamo" + proximoIndex.toString());
+                }
+                setPrimeiraTab(proximoIndex === 0);
+                setUltimaTab(proximoIndex === ramos.length - 1);
+              }}
+            >
+              <ChevronRight
+                className={`${ultimaTab ? "text-gray-400" : "text-white"}`}
+              />
+            </Button>
+          </div>
         </div>
 
         {ramos.map((ramo, index) => (

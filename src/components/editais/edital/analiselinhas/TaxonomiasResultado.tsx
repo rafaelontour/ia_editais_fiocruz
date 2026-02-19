@@ -36,76 +36,80 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
           value={abaSelecionada}
           onValueChange={(val) => setAbaSelecionada(val)}
         >
-          <div className="flex items-center justify-between gap-2 bg-white px-4 py-2 border border-gray-300 rounded-sm">
+          <div className="w-full grid grid-cols-[auto_48px_1fr_48px] items-center gap-2 bg-white px-4 py-2 border border-gray-300 rounded-sm">
             <h3 className="font-bold text-xl text-black whitespace-nowrap">
               Taxonomias:
             </h3>
 
-            <Button
-              className={`
-                                ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
-                                hover:cursor-pointer
-                            `}
-              title={`${primeiraTab ? "Você está na primeira aba" : "Taxonomia anterior"}`}
-              variant={"outline"}
-              size={"icon"}
-              onClick={() => {
-                if (taxonomiaSelecionada.index === null) return;
-                const indexAnterior = taxonomiaSelecionada.index - 1;
-                if (indexAnterior < 0) return;
+            <div className="flex items-center justify-center">
+              <Button
+                className={`
+                                  ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
+                                  hover:cursor-pointer
+                              `}
+                title={`${primeiraTab ? "Você está na primeira aba" : "Taxonomia anterior"}`}
+                variant={"outline"}
+                size={"icon"}
+                onClick={() => {
+                  if (taxonomiaSelecionada.index === null) return;
+                  const indexAnterior = taxonomiaSelecionada.index - 1;
+                  if (indexAnterior < 0) return;
 
-                setTaxonomiaSelecionada((anterior) => ({
-                  ...anterior,
-                  index: indexAnterior,
-                  taxonomia: taxonomias[indexAnterior],
-                }));
+                  setTaxonomiaSelecionada((anterior) => ({
+                    ...anterior,
+                    index: indexAnterior,
+                    taxonomia: taxonomias[indexAnterior],
+                  }));
 
-                setAbaSelecionada("tabTax" + indexAnterior);
-                setPrimeiraTab(indexAnterior === 0);
-                setUltimaTab(indexAnterior === taxonomias.length - 1);
-              }}
-            >
-              <ChevronLeft
-                className={`${primeiraTab ? "text-gray-400" : "text-white"}`}
-              />
-            </Button>
+                  setAbaSelecionada("tabTax" + indexAnterior);
+                  setPrimeiraTab(indexAnterior === 0);
+                  setUltimaTab(indexAnterior === taxonomias.length - 1);
+                }}
+              >
+                <ChevronLeft
+                  className={`${primeiraTab ? "text-gray-400" : "text-white"}`}
+                />
+              </Button>
+            </div>
 
-            <span className="text-lg font-semibold text-black">
+            <span className="text-lg font-semibold text-black truncate text-center">
               {taxonomiaSelecionada.taxonomia?.title}
             </span>
 
-            <Button
-              className={`
-                                ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"} hover:cursor-pointer
-                                `}
-              title={`${!ultimaTab ? "Taxonomia seguinte" : "Você está na última aba"}`}
-              variant={"outline"}
-              size={"icon"}
-              onClick={() => {
-                if (
-                  taxonomiaSelecionada.index === null ||
-                  taxonomiaSelecionada.index === taxonomias.length - 1
-                )
-                  return;
+            <div className="flex items-center justify-center">
+              <Button
+                className={`
+                                  ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"} hover:cursor-pointer
+                                  `}
+                title={`${!ultimaTab ? "Taxonomia seguinte" : "Você está na última aba"}`}
+                variant={"outline"}
+                size={"icon"}
+                onClick={() => {
+                  if (
+                    taxonomiaSelecionada.index === null ||
+                    taxonomiaSelecionada.index === taxonomias.length - 1
+                  )
+                    return;
 
-                const proximoIndex = taxonomiaSelecionada.index + 1;
+                  const proximoIndex = taxonomiaSelecionada.index + 1;
 
-                if (proximoIndex < taxonomias.length) {
-                  setTaxonomiaSelecionada({
-                    taxonomia: taxonomias[proximoIndex],
-                    index: proximoIndex,
-                  });
-                  setAbaSelecionada("tabTax" + proximoIndex.toString());
-                }
+                  if (proximoIndex < taxonomias.length) {
+                    setTaxonomiaSelecionada({
+                      taxonomia: taxonomias[proximoIndex],
+                      index: proximoIndex,
+                    });
+                    setAbaSelecionada("tabTax" + proximoIndex.toString());
+                  }
 
-                setPrimeiraTab(proximoIndex === 0);
-                setUltimaTab(proximoIndex === taxonomias.length - 1);
-              }}
-            >
-              <ChevronRight
-                className={`${ultimaTab ? "text-gray-400" : "text-white"}`}
-              />
-            </Button>
+                  setPrimeiraTab(proximoIndex === 0);
+                  setUltimaTab(proximoIndex === taxonomias.length - 1);
+                }}
+              >
+                <ChevronRight
+                  className={`${ultimaTab ? "text-gray-400" : "text-white"}`}
+                />
+              </Button>
+            </div>
           </div>
 
           {taxonomias.map((taxonomia, index) => (
