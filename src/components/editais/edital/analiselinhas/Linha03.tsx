@@ -345,7 +345,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                     ))}
                     <button
                       onClick={alternarModo}
-                      className="text-sm font-semibold bg-vermelho text-white rounded-md cursor-pointer px-3 py-2 mb-2 mt-2"
+                      className="text-sm font-semibold bg-vermelho text-white rounded-md cursor-pointer px-3 py-2 mt-2"
                     >
                       Ver análise resumida
                     </button>
