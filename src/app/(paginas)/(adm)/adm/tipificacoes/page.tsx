@@ -295,13 +295,18 @@ export default function Tipificacoes() {
            <div className="h-[calc(100vh-240px)] overflow-y-auto px-3 py-1">
                 <Masonry
                     breakpointCols={breakpointColumns}
-                    className="flex gap-5"
+                    className="flex gap-5 w-full"
                 >
                     {carregandoTipificacoes ? (
-                    <div className="flex justify-center items-center gap-2 w-full py-10">
-                        <p className="animate-pulse">Carregando tipificações...</p>
-                        <Loader2 className="animate-spin" />
-                    </div>
+                    <div
+                        className="
+                            flex justify-center items-center gap-2
+                            absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2
+                        "
+                    >
+                            <p className="animate-pulse">Carregando tipificações...</p>
+                            <Loader2 className="animate-spin" />
+                        </div>
                     ) : tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? (
                     tipificacoesFiltradas.map((tipificacao) => (
                         <div key={tipificacao.id} className="mb-5">

@@ -195,7 +195,10 @@ export default function Fontes() {
 
             {
                 carregando ? (
-                    <div className="flex justify-center items-center gap-2 text-sm text-gray-400">
+                    <div className="
+                            flex justify-center items-center gap-2
+                            absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2
+                        ">
                         <span>Carregando fontes...</span>
                         <Loader2 className="animate-spin ml-2" />
                     </div>
