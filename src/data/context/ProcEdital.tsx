@@ -16,16 +16,35 @@ export const ProcEditalContexto =
 
 const STORAGE_KEY = "editais_processando";
 
+/** 🔒 Normaliza qualquer lixo vindo do localStorage */
+function normalizarLista(valor: string | null): string[] {
+    if (!valor) return [];
+
+    try {
+        const parsed = JSON.parse(valor);
+
+        if (!Array.isArray(parsed)) return [];
+
+        return parsed.filter(
+            (id): id is string =>
+                typeof id === "string" && id.trim().length > 0
+        );
+    } catch {
+        return [];
+    }
+}
+
 export function ProcEditalProvider({ children }: { children: ReactNode }) {
 
     const [lista, setLista] = useState<string[]>([]);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const isRunning = useRef(false);
 
-    // 🔹 Carrega do localStorage ao montar
+    // 🔹 Carrega do localStorage ao montar (sanitizado)
     useEffect(() => {
-        const dados = localStorage.getItem(STORAGE_KEY);
-        const inicial: string[] = dados ? JSON.parse(dados) : [];
+        const inicial = normalizarLista(
+            localStorage.getItem(STORAGE_KEY)
+        );
         setLista(inicial);
     }, []);
 
@@ -42,8 +61,12 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
     }, [lista]);
 
     function salvarLista(ids: string[]) {
-        setLista(ids);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+        const limpa = ids.filter(
+            id => typeof id === "string" && id.trim().length > 0
+        );
+
+        setLista(limpa);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(limpa));
     }
 
     function startPolling() {
