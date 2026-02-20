@@ -1,30 +1,32 @@
 /* CSS para o texto da IA na página de análise de edital */
 
 .resumoIA {
-    color: black;
-    max-height: 450px;
-    overflow-y: auto;
+  color: black;
+  overflow-y: auto;
+
+  padding-right: 16px;
+  padding-left: 16px;
 }
 
 .resumoIA h3 {
-    font-size: 1.2em;
+  font-size: 1.2em;
 }
 
 .resumoIA ol {
-    padding-left: 10px;
-    font-size: large;
+  padding-left: 10px;
+  font-size: large;
 }
 
 .resumoIA ul {
-    padding-left: 40px;
-    list-style-type: disc;
+  padding-left: 40px;
+  list-style-type: disc;
 }
 
 .resumoIA p {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .resumoIA p::before {
-    content: "❗";
-    font-weight: bold;
+  content: "❗";
+  font-weight: bold;
 }
