@@ -40,6 +40,7 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
 
     async function buscarComentariosEdital() {
         const edital = await buscarComentariosPorIdEditalService(idEditalString!);
+        console.log("comentarios: ", edital);
         setComentariosEdital(edital?.messages);
     }
 

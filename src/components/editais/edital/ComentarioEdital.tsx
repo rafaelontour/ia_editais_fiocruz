@@ -144,7 +144,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
     return (
         montado &&
         <div className="flex flex-col gap-10 h-full">
-            <div className="bg-white sticky top-0 z-10">
+            <div className="sticky top-0 z-10">
                 <div className="flex items-center justify-between rounded-md p-3">
                     <h2 className="text-3xl font-bold">Comentários</h2>
 

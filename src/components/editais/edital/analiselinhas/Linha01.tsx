@@ -38,7 +38,7 @@ export default function Linha01 ({ edital }: Props) {
                             size="sm"
                             style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }}
                         >
-                            <span className="flex gap-[6px] items-center">
+                            <span className="flex gap-1.5 items-center">
                                 <p>Comentários</p>
                                 <IconNotes className="w-4 h-4" />
                             </span>

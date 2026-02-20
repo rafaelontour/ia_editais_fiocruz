@@ -27,7 +27,7 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
     const [mensagemLogin, setMensagemLogin] = useState<string>("");
     const [montado, setMontado] = useState<boolean>(false);
     const [barraLateralAberta, setBarraLateralAberta] = useState<boolean>(false);
-
+    
     function mudarEstadoBarraLateral() {
         setBarraLateralAberta(prev => {
             const novoEstado = !prev;
@@ -36,16 +36,17 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
         });
         
     }
-
+    
     useEffect(() => {
         const estadoBarra = localStorage.getItem("barraLateralAberta")
-
+        
         if (estadoBarra === "aberta") {
             setBarraLateralAberta(true)
         } else {
             setBarraLateralAberta(false)
         }
-        getUsuarioLogado()
+
+        logarUsuario()
         setMontado(true)
     }, [])
 
@@ -96,9 +97,6 @@ export const UsuarioContextoProvider = ({ children }: { children: React.ReactNod
         logout()
     }
 
-    useEffect(() => {
-        logarUsuario()
-    }, [])
 
     return (
         <UsuarioContexto.Provider
