@@ -9,13 +9,12 @@ export interface Comentarios {
 export interface Comentario {
     id?: string;
     content?: string;
-    mentions?: [
-        {
-            id: string;
-            type: string;
-            label: string;
-        }
-    ]
+    mentions?: {
+        id: string;
+        type: string;
+        label: string;
+    }[];
+    
     quoted_message?: {
         id: string;
         content_preview: string;
