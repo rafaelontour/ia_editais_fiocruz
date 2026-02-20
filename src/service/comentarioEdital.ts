@@ -53,7 +53,7 @@ async function atualizarComentarioEditalService(comentario: Comentario): Promise
             body: JSON.stringify({
                 id: comentario.id,
                 content: comentario.content,
-                mentions: []
+                mentions: comentario.mentions
             })
         })
 

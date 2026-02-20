@@ -80,6 +80,7 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
         setAbrirDialogAdicionar(false);
         setNovoComentario("");
         buscarComentariosEdital();
+        resetComentario();
         
         setTimeout(() => {
             setEnviandoComentario(false);
@@ -87,12 +88,21 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
 
     }
 
-    async function atualizarComentario() {
+    async function atualizarComentario(item: Comentario) {
+
+        if (!item) {
+            return;
+        }
+
         setEnviandoComentario(true);
 
         const comentario: Comentario = {
             id: dialogEditarComentario!,
-            content: watchComentario("content")
+            content: watchComentario("content"),
+        }
+
+        if (item.mentions && item.mentions.length > 0) {
+            comentario.mentions = item.mentions;
         }
 
         const resposta = await atualizarComentarioEditalService(comentario);
@@ -119,6 +129,15 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
 
         toast.success("Comentário excluido com sucesso!");
         buscarComentariosEdital();
+    }
+
+    function verificarTipo(tipo: string) {
+        switch (tipo) {
+            case "BRANCH":
+                return "ao ramo";
+            default:
+                return "CARGO NÃO DEFINIDO";
+        }
     }
 
 
@@ -276,133 +295,277 @@ export default function ComentarioEdital({ edital, comentarios, buscarComentario
                         </div>
                     )
                 ) : (
-                    <div className="flex flex-col gap-6 pr-5">
-                        {comentarios.map((item) => (
-                            <div key={item.id} className="flex flex-row gap-5 bg-slate-50 rounded-xl p-5 border border-gray-10">
-                                <div>
-                                    <div className="flex rounded-full w-14 h-14 bg-gray-300 justify-center items-center">
-                                        {
-                                            item.author?.icon ? (
-                                                <img src={urlBase + item.author.icon.file_path} alt="Foto de perfil" className="rounded-full w-14 h-14 object-cover" />
-                                            ) : (
-                                                <User size={32} color="#6B7280" />
-                                            )
-                                        }
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-3 relative w-full">
-                                    <div>
-                                        <h2 className="text-lg font-bold">{item.author?.username}</h2>
-                                        <p className="text-sm font-semibold text-gray-400">
-                                            {formatarData(item.created_at)}
-                                        </p>
-                                    </div>
-
-                                    <p className="text-sm font-semibold text-gray-400 max-h-24 overflow-y-auto">
-                                        {item.content}
-                                    </p>
-                                    {
-                                        (usuario?.access_level === "ADMIN" ||
-                                            item.author?.id === usuario?.id) && (
-
-                                            <div className="flex items-center gap-2 absolute right-0 top-0">
-                                                <Dialog open={dialogEditarComentario === item.id} onOpenChange={(open) => setDialogEditarComentario(open ? item.id! : null)}>
-                                                    <DialogTrigger asChild>
-                                                        <Button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setDialogEditarComentario(item.id!);
-                                                                setValueComentario("content", item.content!)
-                                                            }}
-                                                            title="Editar comentário"
-                                                            variant={"outline"}
-                                                            size={"icon"}
-                                                            className="h-6 w-6 p-3.5 border-gray-300 rounded-sm hover:cursor-pointer"
-                                                        >
-                                                            <PencilLine />
-                                                        </Button>
-                                                    </DialogTrigger>
-
-                                                    <DialogContent className={`${enviandoComentario && "cursor-not-allowed"}`} onCloseAutoFocus={() => resetComentario()}>
-                                                        <DialogHeader>
-                                                            <DialogTitle>Editar comentário</DialogTitle>
-                                                            <DialogDescription>
-                                                                Edite o comentário abaixo:
-                                                            </DialogDescription>
-                                                        </DialogHeader>
-
-                                                        <div className="flex flex-col">
-                                                            <Textarea
-                                                                value={watchComentario("content")}
-                                                                onChange={(e) => setValueComentario("content", e.target.value)}
-                                                            />
-
-                                                            {errorsComentario.content && (
-                                                                <p className="text-red-500 text-sm">
-                                                                    {errorsComentario.content.message}
-                                                                </p>
-                                                            )}
-                                                        </div>
-
-                                                        <DialogFooter className={`${enviandoComentario && "pointer-events-none"}`}>
-                                                            <DialogClose>
-                                                                <BotaoCancelar />
-                                                            </DialogClose>
-
-                                                            <BotaoSalvar onClick={handleSubmitComentario(atualizarComentario)} />
-
-                                                        </DialogFooter>
-                                                    </DialogContent>
-                                                </Dialog>
-
-                                                <Dialog
-                                                    open={dialogComentario === item.id}
-                                                    onOpenChange={(open) => setDialogComentario(open ? item.id! : null)}
-                                                >
-                                                    <DialogTrigger asChild>
-                                                        <Button
-                                                            title="Remover comentário"
-                                                            size={"icon"}
-                                                            className="
-                                                                h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
-                                                                text-white transition-all rounded-sm p-3.5
-                                                            ">
-                                                            <Trash />
-                                                        </Button>
-                                                    </DialogTrigger>
-
-                                                    <DialogContent>
-                                                        <DialogHeader>
-                                                            <DialogTitle>Excluir comentário</DialogTitle>
-                                                            <DialogDescription>
-                                                                Tem certeza que deseja excluir este comentário?
-                                                            </DialogDescription>
-                                                        </DialogHeader>
-
-                                                        <DialogFooter>
-                                                            <DialogClose asChild>
-                                                                <Button variant="outline">Cancelar</Button>
-                                                            </DialogClose>
-
-                                                            <Button
-                                                                variant="destructive"
-                                                                className="hover:cursor-pointer bg-vermelho"
-                                                                onClick={async () => {
-                                                                    await excluirComentario(item.id);
-                                                                    setDialogComentario(null); // fecha só o atual
-                                                                }}
-                                                            >
-                                                                Excluir
-                                                            </Button>
-
-
-                                                        </DialogFooter>
-                                                    </DialogContent>
-                                                </Dialog>
+                    <div className="flex flex-col gap-6">
+                        {comentarios.map((item, index) => (
+                            <div
+                                key={item.id}
+                                className={`
+                                    flex flex-col gap-5 rounded-xl p-5 border border-gray-10
+                                    ${item.mentions && item.mentions.length > 0 ? "bg-yellow-50" : "bg-white"}
+                                `}
+                            >
+                                {
+                                    item.mentions && item.mentions.length > 0 ? item.mentions.map((mention, index) => (
+                                        <div key={index} className="flex flex-col gap-2">
+                                            <div className="italic">
+                                                Comentário referente { verificarTipo(mention.type)} <strong>{ mention.label.split(":")[1].trim() }</strong>
                                             </div>
-                                        )
-                                    }
-                                </div>
+
+                                            <div className="flex items-center gap-5">
+                                                <div className="flex rounded-full min-w-14 h-14 bg-gray-300 justify-center items-center">
+                                                    {
+                                                        item.author?.icon ? (
+                                                            <img src={urlBase + item.author.icon.file_path} alt="Foto de perfil" className="rounded-full w-14 h-14 object-cover" />
+                                                        ) : (
+                                                            <User size={32} color="#6B7280" />
+                                                        )
+                                                    }
+                                                </div>
+
+                                                <div className="flex flex-col gap-2 relative w-full">
+                                                    <div>
+                                                        <h2 className="text-lg font-bold">{item.author?.username}</h2>
+                                                        <p className="text-sm font-semibold text-gray-400">
+                                                            {formatarData(item.created_at)}
+                                                        </p>
+                                                    </div>
+
+                                                    <p className="text-sm font-semibold text-gray-400 max-h-24 overflow-y-auto">
+                                                        {item.content}
+                                                    </p>
+                                                    {
+                                                        (usuario?.access_level === "ADMIN" ||
+                                                            item.author?.id === usuario?.id) && (
+
+                                                            <div className="flex items-center gap-2 absolute right-0 top-0">
+                                                                <Dialog open={dialogEditarComentario === item.id} onOpenChange={(open) => setDialogEditarComentario(open ? item.id! : null)}>
+                                                                    <DialogTrigger asChild>
+                                                                        <Button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                setDialogEditarComentario(item.id!);
+                                                                                setValueComentario("content", item.content!)
+                                                                            }}
+                                                                            title="Editar comentário"
+                                                                            variant={"outline"}
+                                                                            size={"icon"}
+                                                                            className="h-6 w-6 p-3.5 border-gray-300 rounded-sm hover:cursor-pointer"
+                                                                        >
+                                                                            <PencilLine />
+                                                                        </Button>
+                                                                    </DialogTrigger>
+
+                                                                    <DialogContent className={`${enviandoComentario && "cursor-not-allowed"}`} onCloseAutoFocus={() => resetComentario()}>
+                                                                        <DialogHeader>
+                                                                            <DialogTitle>Editar comentário</DialogTitle>
+                                                                            <DialogDescription>
+                                                                                Edite o comentário abaixo:
+                                                                            </DialogDescription>
+                                                                        </DialogHeader>
+
+                                                                        <div className="flex flex-col">
+                                                                            <Textarea
+                                                                                value={watchComentario("content")}
+                                                                                onChange={(e) => setValueComentario("content", e.target.value)}
+                                                                            />
+
+                                                                            {errorsComentario.content && (
+                                                                                <p className="text-red-500 text-sm">
+                                                                                    {errorsComentario.content.message}
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <DialogFooter className={`${enviandoComentario && "pointer-events-none"}`}>
+                                                                            <DialogClose>
+                                                                                <BotaoCancelar />
+                                                                            </DialogClose>
+
+                                                                            <BotaoSalvar onClick={handleSubmitComentario(() => atualizarComentario(item))} />
+
+                                                                        </DialogFooter>
+                                                                    </DialogContent>
+                                                                </Dialog>
+
+                                                                <Dialog
+                                                                    open={dialogComentario === item.id}
+                                                                    onOpenChange={(open) => setDialogComentario(open ? item.id! : null)}
+                                                                >
+                                                                    <DialogTrigger asChild>
+                                                                        <Button
+                                                                            title="Remover comentário"
+                                                                            size={"icon"}
+                                                                            className="
+                                                                                h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
+                                                                                text-white transition-all rounded-sm p-3.5
+                                                                            ">
+                                                                            <Trash />
+                                                                        </Button>
+                                                                    </DialogTrigger>
+
+                                                                    <DialogContent>
+                                                                        <DialogHeader>
+                                                                            <DialogTitle>Excluir comentário</DialogTitle>
+                                                                            <DialogDescription>
+                                                                                Tem certeza que deseja excluir este comentário?
+                                                                            </DialogDescription>
+                                                                        </DialogHeader>
+
+                                                                        <DialogFooter>
+                                                                            <DialogClose asChild>
+                                                                                <Button variant="outline">Cancelar</Button>
+                                                                            </DialogClose>
+
+                                                                            <Button
+                                                                                variant="destructive"
+                                                                                className="hover:cursor-pointer bg-vermelho"
+                                                                                onClick={async () => {
+                                                                                    await excluirComentario(item.id);
+                                                                                    setDialogComentario(null); // fecha só o atual
+                                                                                }}
+                                                                            >
+                                                                                Excluir
+                                                                            </Button>
+
+
+                                                                        </DialogFooter>
+                                                                    </DialogContent>
+                                                                </Dialog>
+                                                            </div>
+                                                        )
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <div key={item.id} className="flex items-center gap-5">
+                                            <div className="flex rounded-full min-w-14 h-14 bg-gray-300 justify-center items-center">
+                                                {
+                                                    item.author?.icon ? (
+                                                        <img src={urlBase + item.author.icon.file_path} alt="Foto de perfil" className="rounded-full w-14 h-14 object-cover" />
+                                                    ) : (
+                                                        <User size={32} color="#6B7280" />
+                                                    )
+                                                }
+                                            </div>
+
+                                            <div className="flex flex-col gap-2 relative w-full">
+                                                <div>
+                                                    <h2 className="text-lg font-bold">{item.author?.username}</h2>
+                                                    <p className="text-sm font-semibold text-gray-400">
+                                                        {formatarData(item.created_at)}
+                                                    </p>
+                                                </div>
+
+                                                <p className="text-sm font-semibold text-gray-400 max-h-24 overflow-y-auto">
+                                                    {item.content}
+                                                </p>
+                                                {
+                                                    (usuario?.access_level === "ADMIN" ||
+                                                        item.author?.id === usuario?.id) && (
+
+                                                        <div className="flex items-center gap-2 absolute right-0 top-0">
+                                                            <Dialog open={dialogEditarComentario === item.id} onOpenChange={(open) => setDialogEditarComentario(open ? item.id! : null)}>
+                                                                <DialogTrigger asChild>
+                                                                    <Button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setDialogEditarComentario(item.id!);
+                                                                            setValueComentario("content", item.content!)
+                                                                        }}
+                                                                        title="Editar comentário"
+                                                                        variant={"outline"}
+                                                                        size={"icon"}
+                                                                        className="h-6 w-6 p-3.5 border-gray-300 rounded-sm hover:cursor-pointer"
+                                                                    >
+                                                                        <PencilLine />
+                                                                    </Button>
+                                                                </DialogTrigger>
+
+                                                                <DialogContent className={`${enviandoComentario && "cursor-not-allowed"}`} onCloseAutoFocus={() => resetComentario()}>
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>Editar comentário</DialogTitle>
+                                                                        <DialogDescription>
+                                                                            Edite o comentário abaixo:
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+
+                                                                    <div className="flex flex-col">
+                                                                        <Textarea
+                                                                            value={watchComentario("content")}
+                                                                            onChange={(e) => setValueComentario("content", e.target.value)}
+                                                                        />
+
+                                                                        {errorsComentario.content && (
+                                                                            <p className="text-red-500 text-sm">
+                                                                                {errorsComentario.content.message}
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+
+                                                                    <DialogFooter className={`${enviandoComentario && "pointer-events-none"}`}>
+                                                                        <DialogClose>
+                                                                            <BotaoCancelar />
+                                                                        </DialogClose>
+
+                                                                        <BotaoSalvar onClick={handleSubmitComentario(atualizarComentario)} />
+
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                            </Dialog>
+
+                                                            <Dialog
+                                                                open={dialogComentario === item.id}
+                                                                onOpenChange={(open) => setDialogComentario(open ? item.id! : null)}
+                                                            >
+                                                                <DialogTrigger asChild>
+                                                                    <Button
+                                                                        title="Remover comentário"
+                                                                        size={"icon"}
+                                                                        className="
+                                                                            h-6 w-6 border-gray-300 bg-vermelho hover:cursor-pointer
+                                                                            text-white transition-all rounded-sm p-3.5
+                                                                        ">
+                                                                        <Trash />
+                                                                    </Button>
+                                                                </DialogTrigger>
+
+                                                                <DialogContent>
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>Excluir comentário</DialogTitle>
+                                                                        <DialogDescription>
+                                                                            Tem certeza que deseja excluir este comentário?
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+
+                                                                    <DialogFooter>
+                                                                        <DialogClose asChild>
+                                                                            <Button variant="outline">Cancelar</Button>
+                                                                        </DialogClose>
+
+                                                                        <Button
+                                                                            variant="destructive"
+                                                                            className="hover:cursor-pointer bg-vermelho"
+                                                                            onClick={async () => {
+                                                                                await excluirComentario(item.id);
+                                                                                setDialogComentario(null); // fecha só o atual
+                                                                            }}
+                                                                        >
+                                                                            Excluir
+                                                                        </Button>
+
+
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        </div>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                                
                             </div>
                         ))}
                     </div>

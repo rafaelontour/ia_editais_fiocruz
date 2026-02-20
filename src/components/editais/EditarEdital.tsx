@@ -24,6 +24,7 @@ import { enviarArquivoService, getEditalArquivoService } from "@/service/editalA
 import { EditalArquivo } from "@/core/edital/Edital";
 import { IconFile } from "@tabler/icons-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import useEditalProc from "@/data/hooks/useProcEdital";
 
 interface Props {
     edital: Edital
@@ -56,6 +57,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
     const [cliqueEditar, setCliqueEditar] = useState<boolean>(false);
     const [urlCaminhoArquivoEdital, setUrlArquivoEdital] = useState<string>("");
+    const { lista, salvarLista } = useEditalProc();
 
     async function buscarCaminhoEdital() {
         const arquivo: EditalArquivo = await getEditalArquivoService(edital.id!) as EditalArquivo;
@@ -90,6 +92,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [usuariosDaUnidade, setUsuariosDaUnidade] = useState<UsuarioUnidade[] | undefined>([]);
     const [sheetOpen, setSheetOpen] = useState<boolean>(false);
     const [editarComArquivo, setEditarComArquivo] = useState<boolean>(false);
+    const [alterouDados, setAlterouDados] = useState<boolean>(false);
 
     async function filtrarTipificacoesSelectionadas() {
         const t = edital.typifications?.map(tipificacao => tipificacoes.find(tip => tip.id === tipificacao.id)) as Tipificacao[]
@@ -112,23 +115,31 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
     async function atualizarEdital(data: formData) {
 
-        const dados = {
-            id: edital.id,
-            name: data.nome,
-            identifier: data.identificador,
-            description: data.descricao,
-            typification_ids: data.tipificacoes,
-            editors_ids: responsaveisEdital.map(usuario => usuario.id)
+        if (!lista.includes(edital.id)) {
+            lista.push(edital.id);
+            salvarLista(lista);
         }
 
-        const r = await atualizarEditalService(dados);
-
-        if (r !== 200) {
-            toast.error("Erro ao atualizar os dados do edital!", { description: "O arquivo não foi atualizado, pois ocorreu um erro ao atualizar as informações do edital!!" });
-            return
+        if (alterouDados) {
+            const dados = {
+                id: edital.id,
+                name: data.nome,
+                identifier: data.identificador,
+                description: data.descricao,
+                typification_ids: data.tipificacoes,
+                editors_ids: responsaveisEdital.map(usuario => usuario.id)
+            }
+    
+            const r = await atualizarEditalService(dados);
+    
+            if (r !== 200) {
+                toast.error("Erro ao atualizar os dados do edital!", { description: "O arquivo não foi atualizado, pois ocorreu um erro ao atualizar as informações do edital!!" });
+                return
+            }
+    
+            toast.success("Dados do edital atualizados com sucesso!");
         }
 
-        toast.success("Dados do edital atualizados com sucesso!");
 
         if (!editarComArquivo) {
             setSheetOpen(!sheetOpen);
@@ -147,7 +158,6 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
         atualizarEditais(!flagEdital);
         setSheetOpen(!sheetOpen);
         limparCampos();
-        setEditarComArquivo(false);
     }
 
     useEffect(() => {
@@ -156,6 +166,8 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     }, [])
 
     function limparCampos() {
+        setAlterouDados(false);
+        setEditarComArquivo(false);
         reset();
         setTipificacoesSelecionadas([]);
         setResponsaveisEdital([]);
@@ -192,6 +204,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                     <Label htmlFor="name" className="text-lg">Nome do edital</Label>
                                     <Input
                                         {...register("nome")}
+                                        onChange={() => setAlterouDados(true)}
                                         id="name"
                                         placeholder="Insira o nome do edital"
                                         defaultValue={edital.name}
@@ -209,6 +222,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                             <Select
                                                 value=""
                                                 onValueChange={(value) => {
+                                                    setAlterouDados(true);
                                                     field.onChange([...(field.value ?? []), value]); // Adiciona o novo valor ao arrayvalue);
                                                     const tipificacaoEncontrada = tipificacoes.find((t) => t.id === value);
                                                     if (tipificacaoEncontrada) {
@@ -255,6 +269,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                 tipificacoesSelecionadas.map((t: Tipificacao) => (
                                                     <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
                                                         <button className="h-full" onClick={() => {
+                                                            setAlterouDados(true);
                                                             const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
                                                             setTipificacoesSelecionadas(novaLista);
                                                             setValue("tipificacoes", novaLista.map((tp) => tp.id));
@@ -262,10 +277,10 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                             <div className="flex items-center h-full" title="Remover tipificação">
                                                                 <span
                                                                     className="
-                                                                            bg-red-200 p-3.5 h-full flex items-center
-                                                                            hover:bg-red-400 hover:cursor-pointer hover:text-white
-                                                                            transition-all duration-200 ease-in-out
-                                                                        "
+                                                                        bg-red-200 p-3.5 h-full flex items-center
+                                                                        hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                        transition-all duration-200 ease-in-out
+                                                                    "
                                                                 >
                                                                     <X className="w-4 h-4" />
                                                                 </span>
@@ -291,6 +306,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                 value=""
                                                 defaultValue="Selecione um usuário"
                                                 onValueChange={(value) => {
+                                                    setAlterouDados(true);
                                                     field.onChange([...(field.value ?? []), value]); // Adiciona o novo valor ao arrayvalue);
                                                     if (responsaveisEdital.find((u) => u.id === value)) return
                                                     setResponsaveisEdital((anteriores) => [...anteriores, usuariosDaUnidade?.find((u) => u.id === value)!]);
@@ -345,6 +361,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                         {...register("identificador")}
                                         id="data"
                                         placeholder="Informe o número do edital"
+                                        onChange={() => setAlterouDados(true)}
                                     />
                                     {
                                         errors.identificador && (
@@ -366,6 +383,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                     responsaveisEdital.map((responsavel: UsuarioUnidade) => (
                                                         <div key={responsavel?.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
                                                             <button onClick={() => {
+                                                                setAlterouDados(true);
                                                                 const novaLista = responsaveisEdital.filter((u) => u.id !== responsavel?.id)
                                                                 setResponsaveisEdital(novaLista);
                                                                 setValue("responsavel", [...novaLista.map((u) => u.id!)]);
@@ -401,6 +419,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                         id="descricao"
                                         placeholder="Descreva o edital"
                                         className="min-h-[154px]"
+                                        onChange={() => setAlterouDados(true)}
                                     />
                                     {
                                         errors.descricao && (

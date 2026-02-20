@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Edital, EditalArquivo } from "@/core/edital/Edital";
 import { getEditalPorIdService } from "@/service/edital";
@@ -27,77 +27,67 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
         const dados = localStorage.getItem(STORAGE_KEY);
         const inicial: string[] = dados ? JSON.parse(dados) : [];
         setLista(inicial);
+    }, []);
 
-        if (inicial.length > 0) {
-            startPolling();
+    // 🔹 Controla o ciclo de vida do polling
+    useEffect(() => {
+        if (lista.length === 0) {
+            stopPolling();
+            return;
         }
 
+        startPolling();
+
         return () => stopPolling();
-    }, []);
+    }, [lista]);
 
     function salvarLista(ids: string[]) {
         setLista(ids);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-
-        // 🔹 Se adicionou novos IDs e não está rodando → inicia
-        if (ids.length > 0 && !intervalRef.current) {
-            startPolling();
-        }
     }
 
     function startPolling() {
-        if (intervalRef.current) return; // já está rodando
+        if (intervalRef.current) return;
 
         intervalRef.current = setInterval(async () => {
-
             if (isRunning.current) return;
             isRunning.current = true;
 
             try {
-                const dados = localStorage.getItem(STORAGE_KEY);
-                const listaAtual: string[] = dados ? JSON.parse(dados) : [];
-
-                if (listaAtual.length === 0) {
-                    stopPolling(); // para completamente
-                    return;
-                }
+                if (lista.length === 0) return;
 
                 const idsRestantes: string[] = [];
 
-                for (const id of listaAtual) {
+                for (const id of lista) {
                     try {
-                        const edital: EditalArquivo | undefined = await getEditalArquivoService(id);
+                        const edital: EditalArquivo | undefined =
+                            await getEditalArquivoService(id);
 
                         const descricao = edital?.releases?.[0]?.description;
 
-                        if (descricao == null) {
+                        if (!descricao) {
                             idsRestantes.push(id);
                         } else {
-                            const e: Edital = await getEditalPorIdService(id) as Edital;
+                            const e = await getEditalPorIdService(id) as Edital;
 
                             toast.success(
-                                `Edital ${e.name} processado!`, {
-                                    description: "O resultado do edital processado já está disponível para visualização."
+                                `Edital ${e.name} processado!`,
+                                {
+                                    description:
+                                        "O resultado do edital processado já está disponível para visualização."
                                 }
                             );
                         }
-
                     } catch {
                         idsRestantes.push(id);
                     }
                 }
 
-                setLista(idsRestantes);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(idsRestantes));
-
-                if (idsRestantes.length === 0) {
-                    stopPolling(); // 🔴 para quando terminar tudo
-                }
+                salvarLista(idsRestantes);
 
             } finally {
                 isRunning.current = false;
             }
-
         }, 10000);
     }
 
@@ -109,9 +99,7 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <ProcEditalContexto.Provider
-            value={{ lista, salvarLista }}
-        >
+        <ProcEditalContexto.Provider value={{ lista, salvarLista }}>
             {children}
         </ProcEditalContexto.Provider>
     );
