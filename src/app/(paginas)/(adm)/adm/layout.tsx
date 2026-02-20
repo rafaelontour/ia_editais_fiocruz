@@ -40,113 +40,127 @@ export default function RootLayout({
   }, [pathname]);
 
   return (
-    usuario && (
-      <div className="flex flex-col overflow-hidden w-full scrollbar-hidden">
-      
-        <Cabecalho />
+    <div className="flex flex-col overflow-hidden w-full scrollbar-hidden">
+    
+      <Cabecalho />
 
-        <div className="overflow-hidden">
+      <div className="overflow-hidden">
 
-          <div className="flex">
+        <div className="flex">
 
-            <motion.div
-              layout
-              className="flex top-14 left-0 h-[calc(100vh-4rem)] bg-zinc-100 z-10 overflow-hidden"
-              style={{ boxShadow: "4px 0 3px rgba(0, 0, 0, .2)"}}
-              animate={{ width: barraLateralAberta ? 260 : 60, transition: { duration: 0.2 } }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              <div className={`w-[300px] flex flex-col justify-between`}>
-                <nav className={``}>
-                  <ul>
-                    {items.map((item) => (
+          <motion.div
+            layout
+            className="flex top-14 left-0 h-[calc(100vh-4rem)] bg-zinc-100 z-10 overflow-hidden"
+            style={{ boxShadow: "4px 0 3px rgba(0, 0, 0, .2)"}}
+            animate={{ width: barraLateralAberta ? 260 : 60, transition: { duration: 0.2 } }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <div className={`w-[300px] flex flex-col justify-between`}>
+              <nav className={``}>
+                <ul>
+                  {items.map((item) => (
+                    barraLateralAberta ? (
                       <li key={item.url}>
                         <Link href={item.url}
                           className={`flex items-center gap-3 px-3 py-0.5`}
                         >
-                          <span className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} text-sm mb-1 items-center gap-2 p-2 rounded-md ${pathname === item.url ? "bg-vermelho font-bold text-white" : "bg-zinc-300"}`}>
-                            <item.icon size={20} />
+                          <span className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} hover:bg-vermelho hover:text-white text-sm mb-1 items-center gap-2 p-2 rounded-md ${pathname === item.url ? "bg-vermelho font-bold text-white" : "bg-zinc-300"}`}>
+                            <item.icon size={18} />
                             {barraLateralAberta && <span>{item.title}</span>}
                           </span>
                         </Link>
                       </li>
-                    ))}
-                  </ul>
-                </nav>
+                    ) : (
+                      <Tooltip key={item.url}>
+                        <TooltipTrigger asChild>
+                          <Link className="flex items-center gap-3 px-3 py-0.5" href={item.url}>
+                            <span className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} hover:bg-vermelho hover:text-white text-sm mb-1 items-center gap-2 p-2 rounded-md ${pathname === item.url ? "bg-vermelho font-bold text-white" : "bg-zinc-300"}`}>
+                            <item.icon size={18} />
+                          </span>
+                          </Link>
+                        </TooltipTrigger>
 
-                <div className="flex items-center gap-4 w-full p-3">
-                  <div className={`flex items-center justify-center h-9 min-w-8.5 max-w-full bg-verde rounded-full `}>
-                    
-                    {
-                      usuario && (
-                        usuario.icon ? (
-                          <img src={urlBase + usuario.icon.file_path} className={`w-8 h-8 rounded-full`} />
-                        ) : (
-                          <UserIcon size={18} />
-                        )
+                        <TooltipContent side="right">
+                          {item.title}
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  ))}
+                </ul>
+              </nav>
+
+              <div className="flex items-center gap-4 w-full p-3">
+                <div className={`flex items-center justify-center h-9 min-w-8.5 max-w-full bg-verde rounded-full `}>
+                  
+                  {
+                    usuario && (
+                      usuario.icon ? (
+                        <img src={urlBase + usuario.icon.file_path} className={`w-8 h-8 rounded-full`} />
+                      ) : (
+                        <UserIcon size={18} />
                       )
-                    }
-                  </div>
-
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      opacity: barraLateralAberta ? 1 : 0,
-                      pointerEvents: barraLateralAberta ? "auto" : "none",
-                      transition: {
-                        delay: barraLateralAberta ? 0.3 : 0,
-                        duration: 0.2,
-                        ease: "easeOut"
-                      }
-                    }}
-                    exit={{
-                      display: barraLateralAberta ? "flex" : "none"
-                    }}
-                    style={{
-                      display: barraLateralAberta ? "flex" : "none"
-                    }}
-                    className={`flex flex-col gap-0 min-w-[120px]`}
-                  >
-                    <span className="text-sm font-bold">{usuario?.username}</span>
-                    <Link className="h-fit" href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
-                  </motion.div>
+                    )
+                  }
                 </div>
+
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: barraLateralAberta ? 1 : 0,
+                    pointerEvents: barraLateralAberta ? "auto" : "none",
+                    transition: {
+                      delay: barraLateralAberta ? 0.3 : 0,
+                      duration: 0.2,
+                      ease: "easeOut"
+                    }
+                  }}
+                  exit={{
+                    display: barraLateralAberta ? "flex" : "none"
+                  }}
+                  style={{
+                    display: barraLateralAberta ? "flex" : "none"
+                  }}
+                  className={`flex flex-col gap-0 min-w-[120px]`}
+                >
+                  <span className="text-sm font-bold">{usuario?.username}</span>
+                  <Link className="h-fit" href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
+                </motion.div>
               </div>
+            </div>
 
-              {/* <Tooltip>
-                  <TooltipTrigger asChild className="hover:cursor-pointer">
-                    <motion.button
-                      animate={{ x: barraLateralAberta ? 0 : -20 }}
-                      className={`
-                        fixed bg-red-500 text-white rounded-md
-                        w-8 h-8 p-2 z-20 top-18 ${barraLateralAberta ? "left-[275px]" : "left-8"}
-                        opacity-30 hover:opacity-85 transition-opacity
-                      `}
-                      onClick={mudarEstadoBarraLateral}
-                    >
-                      { barraLateralAberta ? <SidebarCloseIcon size={16} /> : <SidebarOpenIcon size={16} />}
-                    </motion.button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    { barraLateralAberta ? "Recolher menu" : "Expandir menu" }
-                  </TooltipContent>
-                </Tooltip> */}
-                
-            </motion.div>
+            {/* <Tooltip>
+                <TooltipTrigger asChild className="hover:cursor-pointer">
+                  <motion.button
+                    animate={{ x: barraLateralAberta ? 0 : -20 }}
+                    className={`
+                      fixed bg-red-500 text-white rounded-md
+                      w-8 h-8 p-2 z-20 top-18 ${barraLateralAberta ? "left-[275px]" : "left-8"}
+                      opacity-30 hover:opacity-85 transition-opacity
+                    `}
+                    onClick={mudarEstadoBarraLateral}
+                  >
+                    { barraLateralAberta ? <SidebarCloseIcon size={16} /> : <SidebarOpenIcon size={16} />}
+                  </motion.button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  { barraLateralAberta ? "Recolher menu" : "Expandir menu" }
+                </TooltipContent>
+              </Tooltip> */}
+              
+          </motion.div>
 
-            <motion.div
-              layout
-              className="px-6 w-full min-w-0"
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              <div className="h-5" />
-                {children}
-            </motion.div>
+          <motion.div
+            layout
+            className="px-6 w-full min-w-0"
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <div className="h-5" />
+              {children}
+          </motion.div>
 
-          </div>
         </div>
-        
       </div>
-    )
-  );
+      
+    </div>
+  )
 }

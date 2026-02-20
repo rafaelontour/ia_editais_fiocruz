@@ -58,7 +58,7 @@ export default function Cabecalho() {
                     className={`rounded-full bg-zinc-200 p-2 -ml-1.5 hover:cursor-pointer`}
                     title={`${barraLateralAberta ? "Recolher menu" : "Expandir menu"}`}
                 >
-                    <Menu size={25} />
+                    <Menu size={23} />
                 </button>
 
                 <Link href="/">
@@ -117,7 +117,7 @@ export default function Cabecalho() {
                 {
                     montado && (
                         !usuario ? (
-                            <div className="">
+                            <div className="flex items-center gap-2">
                                 <Button
                                     type="button"
                                     onClick={() => router.push("/auth/cadastro")}
