@@ -31,6 +31,11 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
+  const alternarModo = () =>
+    setModoVisualizacao((prev) =>
+      prev === "resumo" ? "tipificacoes" : "resumo",
+    );
+
   const responsaveis: {
     id: number;
     name: string;
@@ -161,90 +166,81 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                     Média de todos os ramos: {media?.toFixed(2)}
                   </p>
                   {/* teste */}
-                  <div className="flex items-center justify-between py-2 px-4 bg-white rounded-md ">
-                    <div className="flex gap-4 items-center">
-                      <button
-                        onClick={() =>
-                          setModoVisualizacao(
-                            modoVisualizacao === "resumo"
-                              ? "tipificacoes"
-                              : "resumo",
-                          )
-                        }
-                        className="text-sm font-semibold text-blue-600 hover:underline"
-                      >
-                        {modoVisualizacao === "resumo"
-                          ? "Ver tipificações"
-                          : "Ver resumo"}
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto min-h-0  ">
-                <div className="flex flex-row gap-2 mb-2">
-                  <div className="flex justify-between flex-1 py-3 px-4 rounded-md bg-white border border-gray-300 ">
-                    <h3 className="text-xl font-semibold text-black">
-                      {(editalInfo?.editors ?? []).length > 1
-                        ? "Responsáveis:"
-                        : "Responsável:"}
-                    </h3>
-
-                    {editalInfo?.editors && editalInfo.editors.length > 0 ? (
-                      // <ul className="ml-5" style={{ listStyleType: "disc" }}>
-                      //   {editalInfo.editors.map((editor) => (
-                      //     <li key={editor.id} className="text-lg text-black">
-                      //       {editor.username}
-                      //     </li>
-                      //   ))}
-                      // </ul>
-                      <div className="flex items-center mr-2">
-                        <span className="ml-1">-</span>
-                        <AnimatedTooltip items={responsaveis} />
-                      </div>
-                    ) : (
-                      <p className="text-sm text-white bg-red-400 px-2 pb-0.5 pt-1.5 rounded-sm">
-                        Falha ao buscar informação
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex flex-1 justify-between bg-white border border-gray-300 py-3 px-4 rounded-md">
-                    <h3 className="text-xl font-semibold text-black">Data:</h3>
-                    <p className="text-lg">
-                      {formatarData(editalInfo?.created_at)}
-                    </p>
-                  </div>
-                </div>
                 {modoVisualizacao === "resumo" ? (
-                  <div className="h-full flex flex-col">
+                  <div className="h-full flex flex-col ">
+                    <div className="flex flex-row gap-2 mb-2">
+                      <div className="flex justify-between flex-1 py-3 px-4 rounded-md bg-white border border-gray-300 ">
+                        <h3 className="text-xl font-semibold text-black">
+                          {(editalInfo?.editors ?? []).length > 1
+                            ? "Responsáveis:"
+                            : "Responsável:"}
+                        </h3>
+
+                        {editalInfo?.editors &&
+                        editalInfo.editors.length > 0 ? (
+                          // <ul className="ml-5" style={{ listStyleType: "disc" }}>
+                          //   {editalInfo.editors.map((editor) => (
+                          //     <li key={editor.id} className="text-lg text-black">
+                          //       {editor.username}
+                          //     </li>
+                          //   ))}
+                          // </ul>
+                          <div className="flex items-center mr-2">
+                            <AnimatedTooltip items={responsaveis} />
+                          </div>
+                        ) : (
+                          <p className="text-sm text-white bg-red-400 px-2 pb-0.5 pt-1.5 rounded-sm">
+                            Falha ao buscar informação
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex flex-1 justify-between bg-white border border-gray-300 py-3 px-4 rounded-md">
+                        <h3 className="text-xl font-semibold text-black">
+                          Data:
+                        </h3>
+                        <p className="text-lg">
+                          {formatarData(editalInfo?.created_at)}
+                        </p>
+                      </div>
+                    </div>
                     <div className="border border-gray-300 rounded-md bg-white flex-1 flex flex-col">
                       <div
                         className={`${style.resumoIA} ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
                         dangerouslySetInnerHTML={{
                           __html: isExpanded
                             ? htmlSeguro
-                            : truncateText(htmlSeguro, 175), // Aproximadamente 150 palavras
+                            : truncateText(htmlSeguro, 150), // Aproximadamente 150 palavras
                         }}
                       />
+                      {htmlSeguro.split(" ").length > 150 && (
+                        <button
+                          onClick={() => setIsExpanded(!isExpanded)}
+                          className="cursor-pointer mt-2 ml-1 italic text-blue-600 hover:underline text-sm font-semibold self-start flex items-center gap-1"
+                        >
+                          {isExpanded ? (
+                            <div className="flex p-4">
+                              <ChevronUp size={16} />
+                              Recolher texto
+                            </div>
+                          ) : (
+                            <div className="flex px-4 pb-4">
+                              <ChevronDown size={16} />
+                              Expandir o texto
+                            </div>
+                          )}
+                        </button>
+                      )}
                     </div>
-                    {htmlSeguro.split(" ").length > 175 && (
-                      <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="cursor-pointer mt-2 ml-1 bg-vermelho py-2 px-3 border border-gray-300 rounded-sm text-white text-sm font-semibold self-start flex items-center gap-1"
-                      >
-                        {isExpanded ? (
-                          <>
-                            <ChevronUp size={16} />
-                            Recolher texto
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown size={16} />
-                            Expandir o texto
-                          </>
-                        )}
-                      </button>
-                    )}
+
+                    <button
+                      onClick={alternarModo}
+                      className="text-sm w-fit font-semibold bg-vermelho text-white rounded-md cursor-pointer py-2 px-3 mt-2"
+                    >
+                      Ver análise detalhada
+                    </button>
                   </div>
                 ) : (
                   <>
@@ -347,6 +343,12 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                         />
                       </TabsContent>
                     ))}
+                    <button
+                      onClick={alternarModo}
+                      className="text-sm font-semibold bg-vermelho text-white rounded-md cursor-pointer px-3 py-2 mb-2 mt-2"
+                    >
+                      Ver análise resumida
+                    </button>
                   </>
                 )}
               </div>
