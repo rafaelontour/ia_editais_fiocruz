@@ -13,7 +13,7 @@ export default function Linha01 ({ edital }: Props) {
     return(
         <div className="flex w-full flex-row justify-between">
             <div className=" flex flex-col">
-                <h2 className="text-3xl font-bold">Análise do edital</h2>
+                <h2 className="text-3xl font-bold">Análise do documento</h2>
                 <p className="text-sm font-semibold text-gray-400">versão 1.0.1</p>
             </div>
             
