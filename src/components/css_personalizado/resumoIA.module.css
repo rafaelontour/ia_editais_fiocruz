@@ -3,10 +3,9 @@
 .resumoIA {
   color: black;
   overflow-y: auto;
-  background-color: white;
-  border: 1px solid #d1d5db;
-  border-radius: 2px;
-  padding: 16px;
+
+  padding-right: 16px;
+  padding-left: 16px;
 }
 
 .resumoIA h3 {

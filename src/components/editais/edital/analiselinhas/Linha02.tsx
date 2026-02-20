@@ -11,7 +11,7 @@ export default function Linha02({ edital, editalArquivo }: Props) {
   return (
     <></>
     // <div className="flex flex-col gap-3">
-    //   {/* <div className="flex flex-wrap gap-4">
+    //   <div className="flex flex-wrap gap-4">
     //             <div className="flex flex-col justify-between flex-1 border-2 border-black border-dotted py-3 px-4 rounded-md">
     //                 <h3 className="text-xl font-semibold">{(edital?.editors ?? []).length > 1 ? "Responsáveis" : "Responsável"}</h3>
     //                 {
@@ -37,7 +37,7 @@ export default function Linha02({ edital, editalArquivo }: Props) {
     //                 <h3 className="text-xl font-semibold">Nº</h3>
     //                 <p className="text-lg text-black">{edital?.identifier}</p>
     //             </div>
-    //         </div> */}
+    //         </div>
     // </div>
   );
 }

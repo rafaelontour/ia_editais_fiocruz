@@ -21,7 +21,11 @@ export default function AnaliseEdital({
 
       <div className="flex flex-col gap-4 flex-1 min-h-0">
         <Linha02 edital={edital} editalArquivo={editalArquivo} />
-        <Linha03 edital={editalArquivo} resumoIA={resumoIA} />
+        <Linha03
+          edital={editalArquivo}
+          editalInfo={edital}
+          resumoIA={resumoIA}
+        />
       </div>
     </div>
   );

@@ -2,27 +2,73 @@
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, ChevronRight, Stars } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Stars,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import TaxonommiasResultado from "./TaxonomiasResultado";
 import { EditalArquivo } from "@/core/edital/Edital";
+import { Edital } from "@/core";
+import { formatarData } from "@/lib/utils";
 
 import style from "@/components/css_personalizado/resumoIA.module.css";
 
 import DOMPurify from "dompurify";
+import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 
 interface Props {
   edital: EditalArquivo | undefined;
+  editalInfo: Edital | undefined;
   resumoIA?: string | undefined;
 }
 
-export default function Linha03({ edital, resumoIA }: Props) {
+export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
   const tipificacoes = (edital && edital?.releases[0].check_tree) || [];
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
+  const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
+
+  const responsaveis: {
+    id: number;
+    name: string;
+    designation: string;
+    image: string;
+  }[] =
+    editalInfo?.editors?.map((editor, index) => ({
+      // id precisa ser number (se vier string, converte; se vier undefined/NaN, usa index)
+      id:
+        typeof editor.id === "number"
+          ? editor.id
+          : Number.isFinite(Number(editor.id))
+            ? Number(editor.id)
+            : index,
+
+      // name precisa ser string (nunca undefined)
+      name: editor.username?.split(" ")[0] ?? "Usuário",
+
+      designation: "Analista",
+
+      // image continua igual, só com base segura
+      image: editor.icon?.file_path
+        ? urlBase + editor.icon.file_path
+        : "/user.png",
+    })) ?? [];
 
   const [modoVisualizacao, setModoVisualizacao] = useState<
     "resumo" | "tipificacoes"
   >("resumo");
+
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Função para truncar texto por palavras
+  const truncateText = (text: string, maxWords: number): string => {
+    const words = text.split(" ");
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(" ") + "...";
+  };
 
   useEffect(() => {
     if (resumoIA) {
@@ -136,11 +182,70 @@ export default function Linha03({ edital, resumoIA }: Props) {
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto min-h-0  ">
+                <div className="flex flex-row gap-2 mb-2">
+                  <div className="flex justify-between flex-1 py-3 px-4 rounded-md bg-white border border-gray-300 ">
+                    <h3 className="text-xl font-semibold text-black">
+                      {(editalInfo?.editors ?? []).length > 1
+                        ? "Responsáveis:"
+                        : "Responsável:"}
+                    </h3>
+
+                    {editalInfo?.editors && editalInfo.editors.length > 0 ? (
+                      // <ul className="ml-5" style={{ listStyleType: "disc" }}>
+                      //   {editalInfo.editors.map((editor) => (
+                      //     <li key={editor.id} className="text-lg text-black">
+                      //       {editor.username}
+                      //     </li>
+                      //   ))}
+                      // </ul>
+                      <div className="flex items-center mr-2">
+                        <span className="ml-1">-</span>
+                        <AnimatedTooltip items={responsaveis} />
+                      </div>
+                    ) : (
+                      <p className="text-sm text-white bg-red-400 px-2 pb-0.5 pt-1.5 rounded-sm">
+                        Falha ao buscar informação
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-1 justify-between bg-white border border-gray-300 py-3 px-4 rounded-md">
+                    <h3 className="text-xl font-semibold text-black">Data:</h3>
+                    <p className="text-lg">
+                      {formatarData(editalInfo?.created_at)}
+                    </p>
+                  </div>
+                </div>
                 {modoVisualizacao === "resumo" ? (
-                  <div
-                    className={style.resumoIA}
-                    dangerouslySetInnerHTML={{ __html: htmlSeguro }}
-                  />
+                  <div className="h-full flex flex-col">
+                    <div className="border border-gray-300 rounded-md bg-white flex-1 flex flex-col">
+                      <div
+                        className={`${style.resumoIA} ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
+                        dangerouslySetInnerHTML={{
+                          __html: isExpanded
+                            ? htmlSeguro
+                            : truncateText(htmlSeguro, 175), // Aproximadamente 150 palavras
+                        }}
+                      />
+                    </div>
+                    {htmlSeguro.split(" ").length > 175 && (
+                      <button
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="cursor-pointer mt-2 ml-1 bg-vermelho py-2 px-3 border border-gray-300 rounded-sm text-white text-sm font-semibold self-start flex items-center gap-1"
+                      >
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp size={16} />
+                            Recolher texto
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown size={16} />
+                            Expandir o texto
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 ) : (
                   <>
                     <div className="w-full grid grid-cols-[auto_48px_1fr_48px] items-center gap-2 bg-white px-4 py-2 border border-gray-300 rounded-sm mb-2">

@@ -1,7 +1,8 @@
 "use client";
 
-import { InfoIcon, Play } from "lucide-react";
+import { InfoIcon, Play, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import AnaliseEdital from "@/components/editais/edital/AnaliseEdital";
 import {
   ResizableHandle,
@@ -250,6 +251,22 @@ export default function VisualizarEditalCliente({
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      <Link
+        className="absolute bottom-10 right-12"
+        href={`/adm/editais/${edital?.id}/comentarios`}
+      >
+        <Button
+          variant={"destructive"}
+          className=" text-md px-4 py-3 hover:cursor-pointer bg-vermelho text-white rounded-full shadow-lg hover:bg-red-600 "
+          style={{ boxShadow: "2px 2px 8px rgba(0, 0, 0, .3)" }}
+        >
+          <span className="flex gap-2 items-center">
+            <MessageCircle className="w-5 h-5" />
+            <p>Comentários</p>
+          </span>
+        </Button>
+      </Link>
     </div>
   );
 }
