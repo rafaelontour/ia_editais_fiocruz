@@ -203,7 +203,7 @@ export default function Fontes() {
                         <Loader2 className="animate-spin ml-2" />
                     </div>
                 ) : fontesFiltradas.length > 0 ? (
-                    <div className="h-[calc(100vh-240px)] overflow-y-auto px-3 py-1">
+                    <div className="h-[calc(100vh-248px)] overflow-y-auto px-3 py-1">
                         <Masonry
                             breakpointCols={breakpointColumnsObj}
                             className={'flex gap-5'}

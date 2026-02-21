@@ -59,7 +59,7 @@ export default function VisualizarComentariosEditalCliente({ idEdital, urlBase }
     }, []);
 
     return (
-        <div className="flex flex-col h-full">  
+        <div className="flex flex-col h-[calc(100vh-73px)]">  
             <div className="flex flex-row gap-7 pb-6">
                 <BotaoVoltar />
 

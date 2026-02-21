@@ -449,7 +449,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                 <Loader2 className="animate-spin" />
                             </div>
                         ) : (
-                            <div className="overflow-y-auto h-full">
+                            <div className="overflow-y-auto h-[calc(100vh-270px)]">
                                 {
                                     taxFiltradas && taxFiltradas.length > 0 ? taxFiltradas.map((item, index) => (
                                         <Card
@@ -623,7 +623,7 @@ export default function Taxonomias({ id }: { id: string }) {
                         <CardContent className="flex flex-col h-[calc(100%-70px)]">
                             {taxonomiaSelecionada ? (
                                 ramosDaTaxonomia.length > 0 ? (
-                                    <div className="flex flex-col h-full border rounded " ref={(e) => { divRefs.current["tabela_ramos_wrapper"] = e; }}>
+                                    <div className="flex flex-col  border rounded " ref={(e) => { divRefs.current["tabela_ramos_wrapper"] = e; }}>
 
                                         {/* Tabela só com o cabeçalho */}
                                         <table className="w-full table-fixed border-collapse">
@@ -661,7 +661,7 @@ export default function Taxonomias({ id }: { id: string }) {
                                         </table>
 
                                         {/* Tabela só com o corpo e scroll */}
-                                        <div className="h-auto overflow-y-auto">
+                                        <div className=" overflow-y-auto h-[calc(100vh-385px)]">
                                             <table className="w-full table-fixed border-collapse">
                                                 <tbody>
                                                     {ramosDaTaxonomia.map((ramo) => (

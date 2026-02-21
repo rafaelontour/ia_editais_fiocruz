@@ -292,7 +292,7 @@ export default function Tipificacoes() {
 
             </div>
 
-           <div className="h-[calc(100vh-240px)] overflow-y-auto px-3 py-1">
+           <div className="h-[calc(100vh-248px)] overflow-y-auto px-3 py-1">
                 <Masonry
                     breakpointCols={breakpointColumns}
                     className="flex gap-5 w-full"

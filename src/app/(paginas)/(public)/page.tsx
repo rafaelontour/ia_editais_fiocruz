@@ -126,13 +126,13 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className='flex gap-6 h-screen  w-full items-center text-center justify-between p-4'>
+            {/* <div className='flex gap-6 h-screen  w-full items-center text-center justify-between p-4'>
                 <h2 className='w-3/4 text-3xl 2xl:text-5xl leading-tight'>
                     <strong className=' px-2 py-2 bg-red-600 rounded-xl text-white'>Pesquise</strong>
                     por editais por unidades da FioCruz
                 </h2>
                 <Map />
-            </div>
+            </div> */}
         </div>
     );
 }
