@@ -97,7 +97,7 @@ export default function VisualizarEditalCliente({
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-108px)] gap-6">
+    <div className="flex flex-col h-[calc(100vh-108px)] gap-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center flex-row gap-4 w-full justify-between">
           <div className="flex items-baseline gap-4 ">
@@ -146,7 +146,7 @@ export default function VisualizarEditalCliente({
                     <Button
                       disabled={enviouAnaliseOuConcluido}
                       // onClick={enviarEditalParaEmContrucao}
-                      className="hover:cursor-pointer text-[16px] text-white bg-vermelho hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60"
+                      className="hover:cursor-pointer text-[16px] text-white bg-vermelho hover:bg-red-900 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60 ml-2.5"
                     >
                       Rejeitar
                     </Button>
