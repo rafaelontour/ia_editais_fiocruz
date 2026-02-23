@@ -115,8 +115,9 @@ export default function Editais() {
     }, [usuario?.unit_id]);
     
     useEffect(() => {
+        if (!usuario) return
         getEditais();
-    }, [adicionouNovoEdital, getEditais])
+    }, [usuario?.unit_id, adicionouNovoEdital, getEditais])
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
     const [activeId, setActiveId] = useState<string | null>(null);

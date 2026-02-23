@@ -294,7 +294,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                             usuario?.access_level !== "AUDITOR" && (
                                                 <div className="flex items-center gap-2">
                                                     {
-                                                        (edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && (
+                                                        (edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && edital && (
                                                             <EditarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} edital={edital} />
                                                         )
                                                     }

@@ -331,7 +331,7 @@ export default function ComentarioEdital({
                       <div key={index} className="flex flex-col gap-2">
                         <div className="italic">
                           Comentário referente {verificarTipo(mention.type)}{" "}
-                          <strong>{mention.label.split(":")[1].trim()}</strong>
+                          <strong>{mention.label.split(":")[1]}</strong>
                         </div>
 
                         <div className="flex items-center gap-5">
