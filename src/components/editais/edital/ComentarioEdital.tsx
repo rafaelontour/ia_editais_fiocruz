@@ -27,7 +27,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-import { en } from "zod/v4/locales";
 
 interface Props {
   edital: Edital | undefined;
@@ -55,6 +54,8 @@ export default function ComentarioEdital({
     string | null
   >(null);
   const [enviandoComentario, setEnviandoComentario] = useState<boolean>(false);
+
+  console.log("comentarios: ", comentarios);
 
   type FormComentario = z.infer<typeof schemaComentario>;
   const {
@@ -158,6 +159,15 @@ export default function ComentarioEdital({
       default:
         return "CARGO NÃO DEFINIDO";
     }
+  }
+
+  function extrairDescricao(label?: string) {
+    if (!label) return "";
+
+    const idx = label.indexOf(":");
+    if (idx === -1) return label;
+
+    return label.slice(idx + 1).trim();
   }
 
   return (
@@ -330,8 +340,8 @@ export default function ComentarioEdital({
                     item.mentions.map((mention, index) => (
                       <div key={index} className="flex flex-col gap-2">
                         <div className="italic">
-                          Comentário referente {verificarTipo(mention.type)}{" "}
-                          <strong>{mention.label.split(":")[1]}</strong>
+                          Comentário referente { verificarTipo(mention.type)}{" "}
+                          <strong>{extrairDescricao(mention.label)}</strong>
                         </div>
 
                         <div className="flex items-center gap-5">

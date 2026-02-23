@@ -58,7 +58,6 @@ export default function VisualizarComentariosEditalCliente({
 
   async function buscarComentariosEdital() {
     const edital = await buscarComentariosPorIdEditalService(idEditalString!);
-    console.log("comentarios: ", edital);
     setComentariosEdital(edital?.messages);
   }
 
