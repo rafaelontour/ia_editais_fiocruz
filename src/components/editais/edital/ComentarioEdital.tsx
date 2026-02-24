@@ -55,8 +55,6 @@ export default function ComentarioEdital({
   >(null);
   const [enviandoComentario, setEnviandoComentario] = useState<boolean>(false);
 
-  console.log("comentarios: ", comentarios);
-
   type FormComentario = z.infer<typeof schemaComentario>;
   const {
     register: registerComentario,
@@ -332,9 +330,9 @@ export default function ComentarioEdital({
                 <div
                   key={item.id}
                   className={`
-                                    flex flex-col gap-5 rounded-xl p-5 border border-gray-10
-                                    ${item.mentions && item.mentions.length > 0 ? "bg-yellow-50" : "bg-white"}
-                                `}
+                    flex flex-col gap-5 rounded-xl p-5 border border-gray-10
+                    ${item.mentions && item.mentions.length > 0 ? "bg-yellow-50" : "bg-white"}
+                `}
                 >
                   {item.mentions && item.mentions.length > 0 ? (
                     item.mentions.map((mention, index) => (

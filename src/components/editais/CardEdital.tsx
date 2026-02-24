@@ -134,9 +134,12 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
                     <div className="relative w-full my-2 flex justify-between">
                         {
-                            edital.history &&
-                            edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 1 &&
-                            edital.history.filter((h) => h.status === "WAITING_FOR_REVIEW").length >= 1 && (
+                            (edital.history &&
+                            edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 2 &&
+                            edital.history.filter((h) => h.status === "WAITING_FOR_REVIEW").length >= 1) || 
+                            (edital.history && edital.history.filter((h) => h.status === "PENDING").length >= 1
+                            && edital.history.filter((h) => h.status === "WAITING_FOR_REVIEW").length >= 1 &&
+                            edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 1) && (
                                 <Tooltip>
                                     <div className="flex items-center bg-black pl-3 pr-2 py-1 rounded-md" style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}>
                                         <TooltipTrigger>
