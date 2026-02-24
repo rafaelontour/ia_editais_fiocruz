@@ -111,7 +111,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     return (
         <div
             ref={setNodeRef}
-        title={lista.includes(edital.id) ? "Aguarde o processamento do edital para ver o resultado" : edital.name}
+            title={lista.includes(edital.id) ? "Aguarde o processamento do edital para ver o resultado" : edital.name}
             style={style}
             className={`
                 bg-white rounded-md shadow-sm wrap-break-word
@@ -294,7 +294,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
                                         {
                                             usuario?.access_level !== "AUDITOR" && editalPronto && (
-                                                <div className="flex items-center gap-2">
+                                                <div className={`flex items-center gap-2 ${editalPronto ? "flex" : "hidden"} `}>
                                                     {   
                                                         (editalPronto && edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && edital && (
                                                             <EditarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} edital={edital} />
