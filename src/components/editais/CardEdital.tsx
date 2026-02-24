@@ -106,6 +106,8 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
         )
     )
 
+    const editalPronto = !!edital && !!edital.id && Array.isArray(edital.history) && edital.history.length >= 0
+
     return (
         <div
             ref={setNodeRef}
@@ -291,7 +293,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                         }
 
                                         {
-                                            usuario?.access_level !== "AUDITOR" && (
+                                            usuario?.access_level !== "AUDITOR" && editalPronto && (
                                                 <div className="flex items-center gap-2">
                                                     {
                                                         (edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && edital && (
