@@ -51,6 +51,7 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
 
       <div className="space-y-3 overflow-y-auto px-1 scrollbar-style pb-2">
           {editais.map((edital) => (
+            edital &&
             // PASSA containerId para o cartão (necessário para usar data.containerId no useSortable)
             <CardEdital funcaoAtualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} key={edital.id} edital={edital} containerId={status} />
           ))}

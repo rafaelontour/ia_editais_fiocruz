@@ -58,6 +58,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [cliqueEditar, setCliqueEditar] = useState<boolean>(false);
     const [urlCaminhoArquivoEdital, setUrlArquivoEdital] = useState<string>("");
     const { lista, salvarLista } = useEditalProc();
+    const [carregando, setCarregando] = useState<boolean>(true);
 
     async function buscarCaminhoEdital() {
         const arquivo: EditalArquivo = await getEditalArquivoService(edital.id!) as EditalArquivo;
@@ -66,7 +67,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
     useEffect(() => {
         buscarCaminhoEdital();
-    }, [cliqueEditar]);
+    }, [cliqueEditar]); 
 
     type formData = z.infer<typeof schemaEdital>;
     const {
@@ -94,16 +95,27 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [editarComArquivo, setEditarComArquivo] = useState<boolean>(false);
     const [alterouDados, setAlterouDados] = useState<boolean>(false);
 
-    async function filtrarTipificacoesSelectionadas() {
-        const t = edital.typifications?.map(tipificacao => tipificacoes.find(tip => tip.id === tipificacao.id)) as Tipificacao[]
+    function filtrarTipificacoesSelectionadas() {
+        if (!tipificacoes.length || !edital.typifications?.length) return;
+
+        const t = edital.typifications
+            .map(tipificacao =>
+            tipificacoes.find(tip => tip.id === tipificacao.id)
+            )
+            .filter(Boolean) as Tipificacao[];
+
         setTipificacoesSelecionadas(t);
-        setValue("tipificacoes", t.map(tipificacao => tipificacao.id));
+        setValue("tipificacoes", t.map(t => t.id));
     }
 
     async function buscarUsuariosPorUnidade(id: string | undefined) {
         const usuarios = await getUsuariosPorUnidade(id);
         setUsuariosDaUnidade(usuarios);
     }
+
+    useEffect(() => {
+        setCarregando(false);
+    }, [tipificacoes]);
 
     function buscarResponsaveisEdital() {
         const re = (usuariosDaUnidade ?? []).filter((u) =>
@@ -174,6 +186,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     }
 
     return (
+        !carregando &&
         <div>
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger asChild>
@@ -212,8 +225,9 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
                                     {errors.nome && <p className="text-red-500 text-xs italic">{errors.nome.message}</p>}
                                 </div>
-
-                                <div className="flex w-1/2 flex-col gap-3">
+                                {
+                                    tipificacoes && (
+                                        <div className="flex w-1/2 flex-col gap-3">
                                     <Label htmlFor="tipe" className="text-lg">Tipificações</Label>
                                     <Controller
                                         name="tipificacoes"
@@ -237,7 +251,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                                     <SelectGroup>
                                                         <SelectLabel>Tipificações</SelectLabel>
                                                         {
-                                                            tipificacoes.filter(t => !field.value?.includes(t.id)).map((tipificacao) => (
+                                                            tipificacoes && tipificacoes.filter(t => !field.value?.includes(t.id)).map((tipificacao) => (
                                                                 <SelectItem
                                                                     key={tipificacao.id}
                                                                     value={tipificacao.id}
@@ -258,6 +272,10 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                         </span>
                                     )}
                                 </div>
+                                    )
+                                }
+
+                                
                             </div>
 
                             {
