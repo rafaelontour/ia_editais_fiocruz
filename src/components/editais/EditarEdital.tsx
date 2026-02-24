@@ -95,7 +95,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [alterouDados, setAlterouDados] = useState<boolean>(false);
 
     async function filtrarTipificacoesSelectionadas() {
-        const t = edital.typifications?.map(tipificacao => tipificacoes.find(tip => tip.id === tipificacao.id)) as Tipificacao[]
+        const t = edital.typifications?.map(tipificacao => tipificacoes.find(tip => tip.id === tipificacao.id)).filter(Boolean) as Tipificacao[]
         setTipificacoesSelecionadas(t);
         setValue("tipificacoes", t.map(tipificacao => tipificacao.id));
     }
@@ -186,7 +186,9 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                     onOpenAutoFocus={() => {
                         buscarResponsaveisEdital();
                         setCliqueEditar(!cliqueEditar);
-                        filtrarTipificacoesSelectionadas();
+                        if (tipificacoes.length > 0) {
+                            filtrarTipificacoesSelectionadas();
+                        }
                     }}
                     onCloseAutoFocus={limparCampos}
                     side="right"
@@ -267,27 +269,29 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                         <div className="grid grid-cols-3 gap-3 border-gray-200 rounded-md border p-3">
                                             {
                                                 tipificacoesSelecionadas.map((t: Tipificacao) => (
-                                                    <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
-                                                        <button className="h-full" onClick={() => {
-                                                            setAlterouDados(true);
-                                                            const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
-                                                            setTipificacoesSelecionadas(novaLista);
-                                                            setValue("tipificacoes", novaLista.map((tp) => tp.id));
-                                                        }}>
-                                                            <div className="flex items-center h-full" title="Remover tipificação">
-                                                                <span
-                                                                    className="
-                                                                        bg-red-200 p-3.5 h-full flex items-center
-                                                                        hover:bg-red-400 hover:cursor-pointer hover:text-white
-                                                                        transition-all duration-200 ease-in-out
-                                                                    "
-                                                                >
-                                                                    <X className="w-4 h-4" />
-                                                                </span>
-                                                            </div>
-                                                        </button>
-                                                        <p className=" w-full text-sm">{t.name}</p>
-                                                    </div>
+                                                    t && (
+                                                        <div key={t.id} className="flex w-fit gap-3 items-center border-gray-200 rounded-sm border pr-3 overflow-hidden">
+                                                            <button className="h-full" onClick={() => {
+                                                                setAlterouDados(true);
+                                                                const novaLista = tipificacoesSelecionadas.filter((tp) => tp.id !== t.id)
+                                                                setTipificacoesSelecionadas(novaLista);
+                                                                setValue("tipificacoes", novaLista.map((tp) => tp.id));
+                                                            }}>
+                                                                <div className="flex items-center h-full" title="Remover tipificação">
+                                                                    <span
+                                                                        className="
+                                                                            bg-red-200 p-3.5 h-full flex items-center
+                                                                            hover:bg-red-400 hover:cursor-pointer hover:text-white
+                                                                            transition-all duration-200 ease-in-out
+                                                                        "
+                                                                    >
+                                                                        <X className="w-4 h-4" />
+                                                                    </span>
+                                                                </div>
+                                                            </button>
+                                                            <p className=" w-full text-sm">{t.name}</p>
+                                                        </div>
+                                                    )
                                                 ))
                                             }
                                         </div>
