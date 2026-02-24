@@ -38,15 +38,15 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
         >
           <div className="w-full grid grid-cols-[auto_48px_1fr_48px] items-center gap-2 bg-white px-4 py-2 border border-gray-300 rounded-sm">
             <h3 className="font-bold text-xl text-black whitespace-nowrap">
-              Taxonomias:
+              Taxonomia:
             </h3>
 
             <div className="flex items-center justify-center">
               <Button
                 className={`
-                                  ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
-                                  hover:cursor-pointer
-                              `}
+                  ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
+                  hover:cursor-pointer
+                `}
                 title={`${primeiraTab ? "Você está na primeira aba" : "Taxonomia anterior"}`}
                 variant={"outline"}
                 size={"icon"}
@@ -72,15 +72,15 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
               </Button>
             </div>
 
-            <span className="text-lg font-semibold text-black truncate text-center">
+            <span title={taxonomiaSelecionada.taxonomia?.title} className="text-lg font-semibold text-black truncate text-center">
               {taxonomiaSelecionada.taxonomia?.title}
             </span>
 
             <div className="flex items-center justify-center">
               <Button
                 className={`
-                                  ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"} hover:cursor-pointer
-                                  `}
+                  ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"} hover:cursor-pointer
+                `}
                 title={`${!ultimaTab ? "Taxonomia seguinte" : "Você está na última aba"}`}
                 variant={"outline"}
                 size={"icon"}

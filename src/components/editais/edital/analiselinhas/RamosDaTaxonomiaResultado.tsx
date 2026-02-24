@@ -40,15 +40,15 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
       >
         <div className="w-full grid grid-cols-[auto_48px_1fr_48px] items-center gap-2">
           <h3 className="font-bold text-xl text-black whitespace-nowrap mr-13.5">
-            Ramos:
+            Ramo:
           </h3>
 
           <div className="flex items-center justify-center">
             <Button
               className={`
-                              ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
-                              hover:cursor-pointer
-                          `}
+                ${primeiraTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
+                hover:cursor-pointer
+              `}
               title={`${primeiraTab ? "Você está na primeira aba" : "Ramo anterior"}`}
               variant={"outline"}
               size={"icon"}
@@ -75,7 +75,7 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
             </Button>
           </div>
 
-          <span className="text-lg font-semibold text-black truncate text-center">
+          <span title={ramoSelecionado.ramo?.title} className="text-lg font-semibold text-black truncate text-center">
             {ramoSelecionado.ramo?.title}
           </span>
 

@@ -31,8 +31,6 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
-  console.log("REsumo IA:", resumoIA);
-
   const alternarModo = () =>
     setModoVisualizacao((prev) =>
       prev === "resumo" ? "tipificacoes" : "resumo",
@@ -151,19 +149,19 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                   <p
                     style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }}
                     className={`
-                                            text-sm font-semibold px-3 py-1 rounded-md text-white
-                                            ${
-                                              typeof media === "number"
-                                                ? media < 5
-                                                  ? "bg-red-500"
-                                                  : media < 7
-                                                    ? "bg-yellow-600"
-                                                    : media < 8
-                                                      ? "bg-green-600"
-                                                      : "bg-green-800"
-                                                : "bg-gray-200"
-                                            }
-                                        `}
+                      text-sm font-semibold px-3 py-1 rounded-md text-white
+                      ${
+                        typeof media === "number"
+                          ? media < 5
+                            ? "bg-red-500"
+                            : media < 7
+                              ? "bg-yellow-600"
+                              : media < 8
+                                ? "bg-green-600"
+                                : "bg-green-800"
+                          : "bg-gray-200"
+                      }
+                  `}
                   >
                     Média de todos os ramos: {media?.toFixed(2)}
                   </p>
@@ -174,7 +172,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                 {modoVisualizacao === "resumo" ? (
                   <div className="h-full flex flex-col ">
                     <div className="flex flex-row gap-2 mb-2">
-                      <div className="flex justify-between flex-1 py-3 px-4 rounded-md bg-white border border-gray-300 ">
+                      <div className="flex justify-between items-center flex-1 py-2 px-5 rounded-md bg-white border border-gray-300 ">
                         <h3 className="text-xl font-semibold text-black">
                           {(editalInfo?.editors ?? []).length > 1
                             ? "Responsáveis:"
@@ -199,7 +197,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                           </p>
                         )}
                       </div>
-                      <div className="flex flex-1 justify-between bg-white border border-gray-300 py-3 px-4 rounded-md">
+                      <div className="flex flex-1 justify-between items-center bg-white border border-gray-300 py-2 px-5 rounded-md">
                         <h3 className="text-xl font-semibold text-black">
                           Data:
                         </h3>
@@ -208,9 +206,10 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                         </p>
                       </div>
                     </div>
-                    <div className="border border-gray-300 rounded-md bg-white flex-1 flex flex-col">
+
+                    <div className="border p-1 border-gray-300 rounded-md bg-white flex-1 flex flex-col gap-3">
                       <div
-                        className={`${style.resumoIA} ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
+                        className={`${style.resumoIA} italic ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
                         dangerouslySetInnerHTML={{
                           __html: isExpanded
                             ? htmlSeguro
@@ -220,15 +219,15 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                       {htmlSeguro.split(" ").length > 150 && (
                         <button
                           onClick={() => setIsExpanded(!isExpanded)}
-                          className="cursor-pointer mt-2 ml-1 italic text-blue-600 hover:underline text-sm font-semibold self-start flex items-center gap-1"
+                          className="cursor-pointer mt-2 ml-1 italic text-blue-600 hover:underline text-sm font-semibold self-start flex items-center gap-1 hover:cursor-pointer"
                         >
                           {isExpanded ? (
-                            <div className="flex p-4">
+                            <div className="flex items-center gap-2 px-4 pb-4">
                               <ChevronUp size={16} />
-                              Recolher texto
+                              <span>Recolher texto</span>
                             </div>
                           ) : (
-                            <div className="flex px-4 pb-4">
+                            <div className="flex items-center gap-2 px-4 pb-4">
                               <ChevronDown size={16} />
                               Expandir o texto
                             </div>
@@ -248,7 +247,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                   <>
                     <div className="w-full grid grid-cols-[auto_48px_1fr_48px] items-center gap-2 bg-white px-4 py-2 border border-gray-300 rounded-sm mb-2">
                       <h3 className="font-bold text-xl text-black whitespace-nowrap">
-                        Tipificações:
+                        Tipificação:
                       </h3>
 
                       <div className="flex items-center justify-center">
@@ -285,16 +284,16 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                         </Button>
                       </div>
 
-                      <span className="text-lg font-semibold text-black truncate text-center">
+                      <span title={tipificacaoSelecionada.tipificacao?.name} className="text-lg font-semibold text-black truncate text-center">
                         {tipificacaoSelecionada.tipificacao?.name}
                       </span>
 
                       <div className="flex items-center justify-center">
                         <Button
                           className={`
-                                      ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
-                                      hover:cursor-pointer
-                                  `}
+                              ${ultimaTab ? "bg-gray-100 hover:bg-gray-100" : "bg-vermelho hover:bg-vermelho"}
+                              hover:cursor-pointer
+                          `}
                           title={`${!ultimaTab ? "Tipificação seguinte" : "Você está na última aba"}`}
                           variant={"outline"}
                           size={"icon"}
