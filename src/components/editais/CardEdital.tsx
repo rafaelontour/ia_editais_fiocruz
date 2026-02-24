@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
@@ -37,6 +37,10 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
         id: edital.id,
         data: { containerId },
     });
+
+    useEffect(() => {
+        if (!!edital) return
+    }, [])
 
     const style: React.CSSProperties = {
         transform: CSS.Transform.toString(transform),
@@ -107,6 +111,8 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     )
 
     const editalPronto = !!edital && !!edital.id && Array.isArray(edital.history) && edital.history.length > 0
+
+    const podeEditarEdital = edital.history && editalPronto && edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history && edital.history[0].status === "PENDING"
 
     return (
         <div
@@ -293,10 +299,10 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                         }
 
                                         {
-                                            usuario?.access_level !== "AUDITOR" && editalPronto && (
+                                            usuario?.access_level !== "AUDITOR" && ( 
                                                 <div className={`flex items-center gap-2 ${editalPronto ? "flex" : "hidden"} `}>
                                                     {   
-                                                        (editalPronto && edital.history && (edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history[0].status === "PENDING")) && edital && (
+                                                        podeEditarEdital && (
                                                             <EditarEdital atualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} edital={edital} />
                                                         )
                                                     }

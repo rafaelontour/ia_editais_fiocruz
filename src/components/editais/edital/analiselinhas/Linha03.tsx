@@ -31,6 +31,8 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
+  console.log("REsumo IA:", resumoIA);
+
   const alternarModo = () =>
     setModoVisualizacao((prev) =>
       prev === "resumo" ? "tipificacoes" : "resumo",
