@@ -1,13 +1,26 @@
-"use client"
+"use client";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
-import { getTipificacoesService, adicionarTipificacaoService, excluirTipificacaoService, atualizarTipificacaoService } from "@/service/tipificacao";
+import {
+  getTipificacoesService,
+  adicionarTipificacaoService,
+  excluirTipificacaoService,
+  atualizarTipificacaoService,
+} from "@/service/tipificacao";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Calendar, Loader2, PencilLine, Plus, View } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -26,359 +39,381 @@ import Div from "@/components/Div";
 import useUsuario from "@/data/hooks/useUsuario";
 
 const schemaTipificacao = z.object({
-    nome: z.string().min(1, "O nome da tipificação é obrigatório"),
-    fontesSelecionadas: z
-        .array(z.string().min(0)).min(0, "Selecione pelo menos uma fonte")
-})
+  nome: z.string().min(1, "O nome da tipificação é obrigatório"),
+  fontesSelecionadas: z
+    .array(z.string().min(0))
+    .min(0, "Selecione pelo menos uma fonte"),
+});
 
 export default function Tipificacoes() {
-    type FormData = z.infer<typeof schemaTipificacao>;
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        control,
-        setValue,
-        reset
-    } = useForm<FormData>({
-        resolver: zodResolver(schemaTipificacao),
-        defaultValues: {
-            fontesSelecionadas: []
-        }
-    });
+  type FormData = z.infer<typeof schemaTipificacao>;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+    setValue,
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(schemaTipificacao),
+    defaultValues: {
+      fontesSelecionadas: [],
+    },
+  });
 
-    const termoBusca = useRef<string>("");
+  const termoBusca = useRef<string>("");
 
-    const { usuario } = useUsuario();
+  const { usuario } = useUsuario();
 
-    const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
-    const [fontes, setFontes] = useState<Fonte[]>([]);
+  const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
+  const [fontes, setFontes] = useState<Fonte[]>([]);
 
-    const [dialogTipificacao, setDialogTipificacao] = useState(false);
-    const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
+  const [dialogTipificacao, setDialogTipificacao] = useState(false);
+  const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
 
-    const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
+  const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
 
-    const [tipificacoesFiltradas, setTipificacoesFiltradas] = useState<Tipificacao[]>([]);
+  const [tipificacoesFiltradas, setTipificacoesFiltradas] = useState<
+    Tipificacao[]
+  >([]);
 
-    const [carregandoTipificacoes, setCarregandoTipificacoes] = useState<boolean>(true);
+  const [carregandoTipificacoes, setCarregandoTipificacoes] =
+    useState<boolean>(true);
 
-    const breakpointColumns = {
-        default: 3,
-        1100: 3,
-        700: 2,
-        500: 1
+  const breakpointColumns = {
+    default: 3,
+    1100: 3,
+    700: 2,
+    500: 1,
+  };
+
+  useEffect(() => {
+    async function carregarTudo() {
+      await getFontes();
+      await getTipificacoes();
+      setCarregandoTipificacoes(false);
+    }
+
+    carregarTudo();
+  }, []);
+
+  useEffect(() => {
+    if (idDialogEditar) {
+      const tipificacaoParaEditar = tipificacoes.find(
+        (t) => t.id === idDialogEditar,
+      );
+      if (tipificacaoParaEditar) {
+        setValue("nome", tipificacaoParaEditar.name ?? "");
+        setValue(
+          "fontesSelecionadas",
+          tipificacaoParaEditar.sources?.map((f: Fonte) => f.id) ?? [],
+        );
+      }
+    }
+  }, [idDialogEditar, tipificacoes, setValue]);
+
+  const getTipificacoes = async () => {
+    const dados = await getTipificacoesService();
+
+    if (dados === null) {
+      toast.error("Erro ao buscar tipificacoes");
+      return;
+    }
+
+    setTipificacoes(dados ?? []);
+    setTipificacoesFiltradas(dados ?? []);
+    setCarregandoTipificacoes(false);
+  };
+
+  const getFontes = async () => {
+    const dados = await getFontesService();
+
+    if (dados == null) {
+      toast.error("Erro ao buscar fontes");
+      return;
+    }
+
+    setFontes(dados);
+  };
+
+  const adicionarTipificacao = async (data: FormData) => {
+    setCarregandoTipificacoes(true);
+    const dados = await adicionarTipificacaoService(
+      data.nome,
+      fontesSelecionadas,
+    );
+
+    if (dados == null) {
+      toast.error("Erro ao adicionar tipificação");
+      setCarregandoTipificacoes(false);
+      return;
+    }
+
+    toast.success("Tipificacao adicionada com sucesso!");
+
+    await getTipificacoes();
+    setDialogTipificacao(false);
+    limparCampos();
+  };
+
+  const atualizarTipificacao = async (data: FormData) => {
+    setCarregandoTipificacoes(true);
+
+    const tip: Tipificacao = {
+      id: idDialogEditar as string,
+      name: data.nome,
+      source_ids: data.fontesSelecionadas,
     };
 
-    useEffect(() => {
-        async function carregarTudo() {
-            await getFontes();
-            await getTipificacoes();
-            setCarregandoTipificacoes(false);
-        }
+    const resposta = await atualizarTipificacaoService(tip);
 
-        carregarTudo();
-    }, []);
-
-    useEffect(() => {
-        if (idDialogEditar) {
-            const tipificacaoParaEditar = tipificacoes.find(t => t.id === idDialogEditar);
-            if (tipificacaoParaEditar) {
-                setValue("nome", tipificacaoParaEditar.name ?? "");
-                setValue("fontesSelecionadas", tipificacaoParaEditar.sources?.map((f: Fonte) => f.id) ?? []);
-            }
-        }
-    }, [idDialogEditar, tipificacoes, setValue]);
-
-
-    const getTipificacoes = async () => {
-        const dados = await getTipificacoesService();
-
-        if (dados === null) {
-            toast.error("Erro ao buscar tipificacoes")
-            return
-        }
-
-        setTipificacoes(dados ?? []);
-        setTipificacoesFiltradas(dados ?? []);
-        setCarregandoTipificacoes(false);
+    if (resposta !== 200) {
+      toast.error("Erro ao atualizar tipificação");
+      setCarregandoTipificacoes(false);
+      return;
     }
 
-    const getFontes = async () => {
-        const dados = await getFontesService();
+    toast.success("Tipificacao atualizada com sucesso!");
 
-        if (dados == null) {
-            toast.error("Erro ao buscar fontes")
-            return
-        }
+    await getTipificacoes();
+    limparCampos();
+    setIdDialogEditar(null);
+  };
 
-        setFontes(dados)
+  const excluirTipificacao = async (id: string) => {
+    setCarregandoTipificacoes(true);
+
+    const resposta = await excluirTipificacaoService(id);
+
+    if (resposta !== 204) {
+      toast.error("Erro ao excluir tipificação!");
+      return;
     }
 
-    const adicionarTipificacao = async (data: FormData) => {
-        setCarregandoTipificacoes(true);
-        const dados = await adicionarTipificacaoService(data.nome, fontesSelecionadas);
+    toast.success("Tipificacao excluida com sucesso!");
 
-        if (dados == null) {
-            toast.error("Erro ao adicionar tipificação")
-            setCarregandoTipificacoes(false);
-            return
-        }
+    await getTipificacoes();
+  };
 
-        toast.success("Tipificacao adicionada com sucesso!")
+  const filtrarPraEdicao = (ids: string[] | undefined): Fonte[] => {
+    return fontes.filter((fonte) => ids?.includes(fonte.id));
+  };
 
-        await getTipificacoes();
-        setDialogTipificacao(false);
-        limparCampos();
+  function limparCampos() {
+    reset();
+    setFontesSelecionadas([]);
+  }
+
+  function filtrarTipificacao() {
+    if (termoBusca.current.trim() === "") {
+      setTipificacoesFiltradas(tipificacoes);
+      return;
     }
 
-    const atualizarTipificacao = async (data: FormData) => {
-        setCarregandoTipificacoes(true);
+    const tf = tipificacoes.filter(
+      (tipificacao) =>
+        tipificacao.name &&
+        tipificacao.name
+          .toLowerCase()
+          .startsWith(termoBusca.current.toLowerCase()),
+    );
 
-        const tip: Tipificacao = {
-            id: idDialogEditar as string,
-            name: data.nome,
-            source_ids: data.fontesSelecionadas
-        }
+    setTipificacoesFiltradas(tf);
+  }
 
-        const resposta = await atualizarTipificacaoService(tip);
+  function baixarTipificacao(id?: string) {
+    const url = process.env.NEXT_PUBLIC_URL_BASE;
 
-        if (resposta !== 200) {
-            toast.error("Erro ao atualizar tipificação")
-            setCarregandoTipificacoes(false);
-            return
-        }
-
-        toast.success("Tipificacao atualizada com sucesso!")
-
-        await getTipificacoes();
-        limparCampos();
-        setIdDialogEditar(null);
+    if (!url) {
+      toast.error("Endereço do servidor não encontrado para baixar o arquivo!");
+      return;
     }
 
-    const excluirTipificacao = async (id: string) => {
-        setCarregandoTipificacoes(true);
+    const enderecoDonwload = id
+      ? `${url}/typification/export/pdf?typification_id=${id}`
+      : `${url}/typification/export/pdf`;
+    window.location.href = enderecoDonwload;
+  }
 
-        const resposta = await excluirTipificacaoService(id);
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 sticky justify-between items-center">
+        <div className="flex items-center justify-between w-full">
+          <p className="text-4xl font-bold">Gestão de tipificações</p>
 
-        if (resposta !== 204) {
-            toast.error("Erro ao excluir tipificação!")
-            return
-        }
-
-        toast.success("Tipificacao excluida com sucesso!");
-
-        await getTipificacoes();
-    }
-
-    const filtrarPraEdicao = (ids: string[] | undefined): Fonte[] => {
-        return fontes.filter(fonte => ids?.includes(fonte.id));
-    }
-
-    function limparCampos() {
-        reset();
-        setFontesSelecionadas([]);
-    }
-
-    function filtrarTipificacao() {
-        if (termoBusca.current.trim() === "") {
-            setTipificacoesFiltradas(tipificacoes);
-            return
-        }
-
-        const tf = tipificacoes.filter(
-            tipificacao => tipificacao.name && tipificacao.name.toLowerCase().startsWith(termoBusca.current.toLowerCase())
-        )
-
-        setTipificacoesFiltradas(tf);
-    }
-
-    function baixarTipificacao(id?: string) {
-        const url = process.env.NEXT_PUBLIC_URL_BASE;
-
-        if (!url) {
-            toast.error("Endereço do servidor não encontrado para baixar o arquivo!");
-            return    
-        }
-
-        const enderecoDonwload = id ? `${url}/typification/export/pdf?typification_id=${id}` : `${url}/typification/export/pdf`;
-        window.location.href = enderecoDonwload;
-    }
-
-    return (
-    
-        <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-5 sticky justify-between items-center">
-                <div className="flex items-center justify-between w-full">
-                    <p className="text-4xl font-bold">Gestão de tipificações</p>
-
-                    <div className="flex items-center gap-2">
-                        {
-                            tipificacoes.length > 0 && (
-                                <Button
-                                    onClick={() => baixarTipificacao()}
-                                    variant={"destructive"}
-                                    style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
-                                    className={`
+          <div className="flex items-center gap-2">
+            {tipificacoes.length > 0 && (
+              <Button
+                onClick={() => baixarTipificacao()}
+                variant={"destructive"}
+                style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
+                className={`
                                         flex rounded-md gap-2 items-center px-4 py-2
                                         transition duration-100
                                         bg-vermelho text-white
-                                        hover:cursor-pointer
+                                        cursor-pointer
                                     `}
-                                    title="Download de um PDF contendo todas tipificações com suas respectivas taxonomias e ramos"
-                                >
-                                    <span>Baixar todas tipificações</span>
-                                    <IconDownload size={18} />
-                                </Button>
-                            )
-                        }
-                        
+                title="Download de um PDF contendo todas tipificações com suas respectivas taxonomias e ramos"
+              >
+                <span>Baixar todas tipificações</span>
+                <IconDownload size={18} />
+              </Button>
+            )}
 
-                        {usuario?.access_level === "ADMIN" && (
-                            <Dialog open={dialogTipificacao} onOpenChange={setDialogTipificacao}>
-                                <DialogTrigger asChild>
-                                    <Button
-                                        variant={"destructive"}
-                                        style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
-                                        className={`
+            {usuario?.access_level === "ADMIN" && (
+              <Dialog
+                open={dialogTipificacao}
+                onOpenChange={setDialogTipificacao}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant={"destructive"}
+                    style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
+                    className={`
                                             flex rounded-md gap-2 items-center px-4 py-2
                                             transition duration-100
                                             bg-vermelho text-white
                                             hover:cursor-pointer
                                         `}
-                                    >
-                                        <Plus size={18} />
-                                        <p className="text-white text-sm">Adicionar tipificação</p>
-                                    </Button>
-                                </DialogTrigger>
-                                
-                                <DialogContent onCloseAutoFocus={limparCampos}>
-                                    <DialogHeader>
-                                        <DialogTitle className="text-3xl font-bold">
-                                            Adicionar tipificação
-                                        </DialogTitle>
-                                        <DialogDescription className="text-md pb-4">
-                                            Preencha os campos abaixo para adicionar uma nova tipificação
-                                        </DialogDescription>
-                                    </DialogHeader>
+                  >
+                    <Plus size={18} />
+                    <p className="text-white text-sm">Adicionar tipificação</p>
+                  </Button>
+                </DialogTrigger>
 
-                                    <Formulario
-                                        fontes={fontes}
-                                        fontesSelecionadas={fontesSelecionadas}
-                                        setFontesSelecionadas={setFontesSelecionadas}
-                                        control={control}
-                                        setValue={setValue}
-                                        register={register}
-                                        errors={errors}
-                                    />
+                <DialogContent onCloseAutoFocus={limparCampos}>
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl font-bold">
+                      Adicionar tipificação
+                    </DialogTitle>
+                    <DialogDescription className="text-md pb-4">
+                      Preencha os campos abaixo para adicionar uma nova
+                      tipificação
+                    </DialogDescription>
+                  </DialogHeader>
 
-                                    <DialogFooter>
-                                        <DialogClose>
-                                            <BotaoCancelar />
-                                        </DialogClose>
-                                        <BotaoSalvar onClick={handleSubmit(adicionarTipificacao)} />
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                        )}
-                    </div>
-                </div>
+                  <Formulario
+                    fontes={fontes}
+                    fontesSelecionadas={fontesSelecionadas}
+                    setFontesSelecionadas={setFontesSelecionadas}
+                    control={control}
+                    setValue={setValue}
+                    register={register}
+                    errors={errors}
+                  />
 
-                {
-                    tipificacoes.length !== 0 && (
-                        <BarraDePesquisa className="w-full" refInput={termoBusca} funcFiltrar={filtrarTipificacao} />
-                    )
-                }
+                  <DialogFooter>
+                    <DialogClose>
+                      <BotaoCancelar />
+                    </DialogClose>
+                    <BotaoSalvar onClick={handleSubmit(adicionarTipificacao)} />
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+        </div>
 
-            </div>
+        {tipificacoes.length !== 0 && (
+          <BarraDePesquisa
+            className="w-full"
+            refInput={termoBusca}
+            funcFiltrar={filtrarTipificacao}
+          />
+        )}
+      </div>
 
-           <div className="h-[calc(100vh-248px)] overflow-y-auto px-3 py-1">
-                <Masonry
-                    breakpointCols={breakpointColumns}
-                    className="flex gap-5 w-full"
-                >
-                    {carregandoTipificacoes ? (
-                    <div
-                        className="
+      <div className="h-[calc(100vh-248px)] overflow-y-auto px-3 py-1">
+        <Masonry
+          breakpointCols={breakpointColumns}
+          className="flex gap-5 w-full"
+        >
+          {carregandoTipificacoes ? (
+            <div
+              className="
                             flex justify-center items-center gap-2
                             absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2
                         "
-                    >
-                            <p className="animate-pulse">Carregando tipificações...</p>
-                            <Loader2 className="animate-spin" />
-                        </div>
-                    ) : tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? (
-                    tipificacoesFiltradas.map((tipificacao) => (
-                        <div key={tipificacao.id} className="mb-5">
-                        <Div>
-                            <div data-cy="item-nome-tip" className="flex flex-col gap-2">
-                            <h2 className="text-2xl font-semibold wrap-break-word">
-                                {tipificacao.name}
-                            </h2>
-                            </div>
+            >
+              <p className="animate-pulse">Carregando tipificações...</p>
+              <Loader2 className="animate-spin" />
+            </div>
+          ) : tipificacoesFiltradas && tipificacoesFiltradas.length > 0 ? (
+            tipificacoesFiltradas.map((tipificacao) => (
+              <div key={tipificacao.id} className="mb-5">
+                <Div>
+                  <div data-cy="item-nome-tip" className="flex flex-col gap-2">
+                    <h2 className="text-2xl font-semibold wrap-break-word">
+                      {tipificacao.name}
+                    </h2>
+                  </div>
 
-                            <div data-cy="item-tipificacao" className="flex justify-between items-center mt-3">
-                            <p className="flex items-center gap-2 text-sm text-gray-400">
-                                <Calendar size={18} />
-                                <span className="flex flex-col">
-                                <span className="text-[10px] font-semibold mb-[-5px] mt-1">
-                                    Criada em
-                                </span>
-                                <span>{formatarData(tipificacao.created_at)}</span>
-                                </span>
-                            </p>
-
-                            <div className="flex gap-2">
-                                <Button
-                                onClick={() => baixarTipificacao(tipificacao.id)}
-                                className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco"
-                                title="Baixar PDF desta tipificação"
-                                >
-                                <IconDownload size={20} color="black" />
-                                </Button>
-
-                                {usuario?.access_level !== "ADMIN" ? (
-                                <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
-                                    <Button
-                                    className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco"
-                                    title="Ver dados desta tipificação"
-                                    >
-                                    <View size={20} color="black" />
-                                    </Button>
-                                </Link>
-                                ) : (
-                                <>
-                                    <Link href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}>
-                                    <Button
-                                        className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco"
-                                        title="Taxonomias desta tipificação"
-                                    >
-                                        <IconHierarchy2 size={20} color="black" />
-                                    </Button>
-                                    </Link>
-
-                                    <BotaoExcluir
-                                    funcExcluir={excluirTipificacao}
-                                    item={tipificacao}
-                                    tipo="tipificação"
-                                    />
-                                </>
-                                )}
-                            </div>
-                            </div>
-                        </Div>
-                        </div>
-                    ))
-                    ) : (
-                    <p className="text-gray-400 text-2xl text-center py-10 animate-pulse">
-                        Nenhuma tipificação encontrada.
+                  <div
+                    data-cy="item-tipificacao"
+                    className="flex justify-between items-center mt-3"
+                  >
+                    <p className="flex items-center gap-2 text-sm text-gray-400">
+                      <Calendar size={18} />
+                      <span className="flex flex-col">
+                        <span className="text-[10px] font-semibold mb-[-5px] mt-1">
+                          Criada em
+                        </span>
+                        <span>{formatarData(tipificacao.created_at)}</span>
+                      </span>
                     </p>
-                    )}
-                </Masonry>
-                </div>
 
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => baixarTipificacao(tipificacao.id)}
+                        className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco cursor-pointer"
+                        title="Baixar PDF desta tipificação"
+                      >
+                        <IconDownload size={20} color="black" />
+                      </Button>
 
-        </div>
-        
-    )
+                      {usuario?.access_level !== "ADMIN" ? (
+                        <Link
+                          href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}
+                        >
+                          <Button
+                            className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco"
+                            title="Ver dados desta tipificação"
+                          >
+                            <View size={20} color="black" />
+                          </Button>
+                        </Link>
+                      ) : (
+                        <>
+                          <Link
+                            href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}
+                          >
+                            <Button
+                              className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco cursor-pointer"
+                              title="Taxonomias desta tipificação"
+                            >
+                              <IconHierarchy2 size={20} color="black" />
+                            </Button>
+                          </Link>
+
+                          <BotaoExcluir
+                            funcExcluir={excluirTipificacao}
+                            item={tipificacao}
+                            tipo="tipificação"
+                          />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400 text-2xl text-center py-10 animate-pulse">
+              Nenhuma tipificação encontrada.
+            </p>
+          )}
+        </Masonry>
+      </div>
+    </div>
+  );
 }
