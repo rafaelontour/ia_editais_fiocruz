@@ -40,7 +40,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
     useEffect(() => {
         if (!!edital) return
-    }, [])
+    }, [edital])
 
     const style: React.CSSProperties = {
         transform: CSS.Transform.toString(transform),
