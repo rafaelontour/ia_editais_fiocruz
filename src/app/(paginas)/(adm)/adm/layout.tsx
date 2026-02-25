@@ -126,26 +126,6 @@ export default function RootLayout({
                 </motion.div>
               </div>
             </div>
-
-            {/* <Tooltip>
-                <TooltipTrigger asChild className="hover:cursor-pointer">
-                  <motion.button
-                    animate={{ x: barraLateralAberta ? 0 : -20 }}
-                    className={`
-                      fixed bg-red-500 text-white rounded-md
-                      w-8 h-8 p-2 z-20 top-18 ${barraLateralAberta ? "left-[275px]" : "left-8"}
-                      opacity-30 hover:opacity-85 transition-opacity
-                    `}
-                    onClick={mudarEstadoBarraLateral}
-                  >
-                    { barraLateralAberta ? <SidebarCloseIcon size={16} /> : <SidebarOpenIcon size={16} />}
-                  </motion.button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  { barraLateralAberta ? "Recolher menu" : "Expandir menu" }
-                </TooltipContent>
-              </Tooltip> */}
-              
           </motion.div>
 
           <motion.div

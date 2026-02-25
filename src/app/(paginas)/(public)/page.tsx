@@ -17,16 +17,17 @@ import {
     IInfoBarItem,
     IChartData
 } from "@/core";
+import { IChartDataUnidade } from "@/core/stats/Stats";
 
-const Map = dynamic(() => import("@/components/Map"), {
-    loading: () => <p>Carregando..</p>,
-    ssr: false
-})
+// const Map = dynamic(() => import("@/components/Map"), {
+//     loading: () => <p>Carregando...</p>,
+//     ssr: false
+// })
 
 export default function Home() {
     const [infoBarData, setInfoBarData] = useState<IInfoBarItem[]>([]);
     const [typificationChartData, setTypificationChartData] = useState<IChartData[]>([]);
-    const [docsByUnitChartData, setDocsByUnitChartData] = useState<IChartData[]>([]);
+    const [docsByUnitChartData, setDocsByUnitChartData] = useState<IChartDataUnidade[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -59,7 +60,7 @@ export default function Home() {
                     const data: TypificationUsageList = typificationResult;
                     const mappedData: IChartData[] = data.stats.map(item => ({
                         tipo: item.typification_name, // O nome da tipificação será o eixo X
-                        valor: item.usage_count      // A contagem será o valor da barra
+                        uso: item.usage_count      // A contagem será o valor da barra
                     }));
                     setTypificationChartData(mappedData);
                 }
@@ -68,9 +69,9 @@ export default function Home() {
                 // (Mapeia a resposta da API para o formato {tipo, valor} esperado pelo Chart)
                 if (docsByUnitResult) {
                     const data: DocumentCountByUnitList = docsByUnitResult;
-                    const mappedData: IChartData[] = data.stats.map(item => ({
+                    const mappedData: IChartDataUnidade[] = data.stats.map(item => ({
                         tipo: item.unit_name,         // O nome da unidade será o eixo X
-                        valor: item.document_count    // A contagem será o valor da barra
+                        documentos: item.document_count    // A contagem será o valor da barra
                     }));
                     setDocsByUnitChartData(mappedData);
                 }
@@ -90,7 +91,7 @@ export default function Home() {
     // 4. Renderizar os componentes com os dados do estado
     return (
         <div className="flex flex-col">
-            <div className="bg-[url(/backgroundImg.png)] bg-repeat bg-contain px-12 pb-4 rounded-md w-full flex justify-center items-center gap-12 flex-col">
+            <div className="bg-[url(/backgroundImg.png)] bg-repeat bg-contain px-12 pb-4 rounded-md w-full flex justify-center items-center gap-10 flex-col">
                 <h1 className="text-5xl font-bold mt-12 w-1/2 text-center leading-tight">Centralize, organize e otimize seus 
                     <span className="bg-red-600 text-white px-2 ml-4 rounded-md font-semibold">editais</span> em um só lugar.</h1>
 
@@ -99,7 +100,7 @@ export default function Home() {
                     <button className="text-branco bg-vermelho px-6  rounded-md cursor-pointer">Análise de editais</button>
                 </div>
 
-                <div className="flex flex-col w-full gap-4 h-1/2">
+                <div className="flex flex-col w-full gap-6 h-1/2">
 
                     {/* Exibe 'Carregando...' ou o componente com dados */}
                     {isLoading ? (
@@ -108,12 +109,13 @@ export default function Home() {
                         <>
                             <InfoBar data={infoBarData} /> {/* <-- Dado real */}
 
-                            <div className="w-full flex gap-8 ">
+                            <div className="w-full flex gap-6 ">
                                 <Chart
                                     data={typificationChartData} // <-- Dado real
-                                    titulo="Tipificações mais utilizadas"
+                                    titulo="Tipificações mais utilizadas (Passe o mouse sobre as barras)" // <-- Título atualizado
                                     className="w-[60%]"
                                 />
+
                                 <Chart
                                     data={docsByUnitChartData} // <-- Dado real
                                     titulo="Documentos por Unidade" // <-- Título atualizado

@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { DetalhesRamoDialog } from "./DetalhesRamoDialog";
 import { useParams } from "next/navigation";
 
+import style from "@/components/css_personalizado/resumoIA.module.css";
+
 interface Props {
   ramos: Branch[];
   taxonomia: string | undefined;
@@ -127,9 +129,9 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
 
                 <div className="flex flex-col bg-zinc-400 gap-2 w-px" /> */}
 
-                <div className="flex flex-col gap-2 w-full">
-                  <h3 className="text-lg font-semibold">Detalhamento</h3>
-                  <p className="max-h-[220px] overflow-y-auto pr-1">
+                <div className="flex flex-col gap-2 w-full h-[calc(100vh-570px)]">
+                  <h3 className="text-lg font-semibold mt-3">Detalhamento</h3>
+                  <p className={`h-full overflow-y-auto pr-1 font-serif ${style.detalhamento}`}>
                     {ramo.evaluation?.feedback}
                   </p>
                 </div>

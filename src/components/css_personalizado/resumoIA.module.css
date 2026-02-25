@@ -15,7 +15,6 @@
 
 .resumoIA h1 {
   font-size: 1.3em;
-  font-weight: bold;
   border-radius: 8px;
   margin: 18 0px;
   padding: 5px 18px 5px 5px;
@@ -66,4 +65,10 @@
   font-size: 1.2em;
   font-weight: bold;
   margin: 10px 0;
+}
+
+.detalhamento {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(12px, 1.2vw, 18px);
+  margin: 0px;
 }

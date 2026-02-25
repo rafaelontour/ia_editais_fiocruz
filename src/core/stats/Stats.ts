@@ -30,6 +30,12 @@ export interface IInfoBarItem {
 
 export interface IChartData {
     tipo: string;
-    valor: number;
+    uso: number;
     fill?: string;
+}
+
+export interface IChartDataUnidade {
+    tipo: string,
+    documentos: number,
+    fill?: string
 }

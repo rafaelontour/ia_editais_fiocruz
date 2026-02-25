@@ -1,12 +1,10 @@
 'use client'
 
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Cabecalho from "@/components/Cabecalho";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
 import {  UserIcon } from "lucide-react";
 import { motion } from "motion/react";
@@ -46,7 +44,7 @@ export default function RootLayout({
 
       <div className="overflow-hidden">
 
-        <div className="flex">
+        <div className="flex h-[calc(100vh-4rem)]">
 
           <motion.div
             layout
@@ -88,35 +86,55 @@ export default function RootLayout({
                   ))}
                 </ul>
               </nav>
-            </div>
-
-            {/* <Tooltip>
-                <TooltipTrigger asChild className="hover:cursor-pointer">
-                  <motion.button
-                    animate={{ x: barraLateralAberta ? 0 : -20 }}
-                    className={`
-                      fixed bg-red-500 text-white rounded-md
-                      w-8 h-8 p-2 z-20 top-18 ${barraLateralAberta ? "left-[275px]" : "left-8"}
-                      opacity-30 hover:opacity-85 transition-opacity
-                    `}
-                    onClick={mudarEstadoBarraLateral}
-                  >
-                    { barraLateralAberta ? <SidebarCloseIcon size={16} /> : <SidebarOpenIcon size={16} />}
-                  </motion.button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  { barraLateralAberta ? "Recolher menu" : "Expandir menu" }
-                </TooltipContent>
-              </Tooltip> */}
               
+              
+
+              <div className="flex items-center gap-4 w-full p-3">
+                <div className={`flex items-center justify-center h-9 min-w-8.5 max-w-full bg-verde rounded-full `}>
+                  
+                  {
+                    usuario && (
+                      usuario.icon ? (
+                        <img src={urlBase + usuario.icon.file_path} className={`w-8 h-8 rounded-full`} />
+                      ) : (
+                        <UserIcon size={18} />
+                      )
+                    )
+                  }
+                </div>
+
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: barraLateralAberta ? 1 : 0,
+                    pointerEvents: barraLateralAberta ? "auto" : "none",
+                    transition: {
+                      delay: barraLateralAberta ? 0.3 : 0,
+                      duration: 0.2,
+                      ease: "easeOut"
+                    }
+                  }}
+                  exit={{
+                    display: barraLateralAberta ? "flex" : "none"
+                  }}
+                  style={{
+                    display: barraLateralAberta ? "flex" : "none"
+                  }}
+                  className={`flex flex-col gap-0 min-w-[120px]`}
+                >
+                  <span className="text-sm font-bold">{usuario?.username}</span>
+                  <Link className="h-fit" href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
+                </motion.div>
+              </div>
+            </div>
           </motion.div>
 
           <motion.div
             layout
-            className="px-6 w-full min-w-0"
+            className="px-6 w-full min-w-0 h-[calc(100vh-4rem)] overflow-y-auto"
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
-            <div className="h-5" />
+            <div className="h-5 overflow-y-auto" />
               {children}
           </motion.div>
 

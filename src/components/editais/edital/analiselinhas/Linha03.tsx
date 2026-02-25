@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
 import {
   ChevronDown,
   ChevronLeft,
@@ -170,7 +170,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
               </div>
               <div className="flex-1 overflow-y-auto min-h-0  ">
                 {modoVisualizacao === "resumo" ? (
-                  <div className="h-full flex flex-col ">
+                  <div className="h-full flex flex-col">
                     <div className="flex flex-row gap-2 mb-2">
                       <div className="flex justify-between items-center flex-1 py-2 px-5 rounded-md bg-white border border-gray-300 ">
                         <h3 className="text-xl font-semibold text-black">
@@ -209,7 +209,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
 
                     <div className="border p-1 border-gray-300 rounded-md bg-white flex-1 flex flex-col gap-3">
                       <div
-                        className={`${style.resumoIA} italic ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
+                        className={`${style.resumoIA} ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
                         dangerouslySetInnerHTML={{
                           __html: isExpanded
                             ? htmlSeguro
