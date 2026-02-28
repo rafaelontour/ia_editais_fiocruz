@@ -29,6 +29,10 @@ interface Props {
 export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
   const tipificacoes = (edital && edital?.releases[0].check_tree) || [];
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
+  const [secoes, setSecoes] = useState<
+    { title: string; content: string; rawText: string }[]
+  >([]);
+  const [secaoExpandida, setSecaoExpandida] = useState<boolean[]>([]);
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
   const alternarModo = () =>
@@ -66,7 +70,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
     "resumo" | "tipificacoes"
   >("resumo");
 
-  const [isExpanded, setIsExpanded] = useState(false);
+  // cada seção (definida por um <h1>) terá seu próprio estado de expansão
 
   // Função para truncar texto por palavras
   const truncateText = (text: string, maxWords: number): string => {
@@ -75,9 +79,72 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
     return words.slice(0, maxWords).join(" ") + "...";
   };
 
+  const stripTags = (html: string) => {
+    try {
+      const el = document.createElement("div");
+      el.innerHTML = html;
+      return el.innerText || el.textContent || "";
+    } catch (e) {
+      return html.replace(/<[^>]*>/g, "");
+    }
+  };
+
   useEffect(() => {
     if (resumoIA) {
-      setHtmlSeguro(DOMPurify.sanitize(resumoIA));
+      const safe = DOMPurify.sanitize(resumoIA);
+      setHtmlSeguro(safe);
+
+      // split the sanitized HTML into sections at every <h1> tag, no matter where it appears
+      const parts = safe.split(/(?=<h1[^>]*>)/i);
+      const novasSecoes: { title: string; content: string; rawText: string }[] = [];
+
+      parts.forEach((part) => {
+        const match = part.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+        if (match) {
+          const title = match[1];
+          const content = part.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, "");
+          novasSecoes.push({ title, content, rawText: stripTags(content) });
+        } else {
+          // content before the first h1 or stray HTML
+          if (novasSecoes.length === 0) {
+            novasSecoes.push({ title: "Resumo", content: part, rawText: stripTags(part) });
+          } else {
+            // append to previous section
+            novasSecoes[novasSecoes.length - 1].content += part;
+            novasSecoes[novasSecoes.length - 1].rawText += stripTags(part);
+          }
+        }
+      });
+
+      if (novasSecoes.length === 0) {
+        novasSecoes.push({ title: "Resumo", content: safe, rawText: stripTags(safe) });
+      }
+
+      // if we only found one section but it contains a long list, split by <li> as secondary sections
+      if (novasSecoes.length === 1) {
+        const only = novasSecoes[0];
+        if (/\<li[^>]*\>/i.test(only.content)) {
+          const items = only.content.split(/\<li[^>]*\>/i).slice(1);
+          const byLi: typeof novasSecoes = items.map((itemHtml, idx) => {
+            const inner = itemHtml.replace(/\<\/li\>/i, "");
+            let titleText = stripTags(inner).trim().split("\n")[0];
+            if (!titleText) titleText = `Item ${idx + 1}`;
+            return {
+              title: titleText,
+              content: `<ul><li>${inner}</li></ul>`,
+              rawText: stripTags(inner),
+            };
+          });
+          if (byLi.length > 1) {
+            setSecoes(byLi);
+            setSecaoExpandida(byLi.map(() => false));
+            return;
+          }
+        }
+      }
+
+      setSecoes(novasSecoes);
+      setSecaoExpandida(novasSecoes.map(() => false));
     }
   }, [resumoIA]);
 
@@ -208,32 +275,57 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                     </div>
 
                     <div className="border p-1 border-gray-300 rounded-md bg-white flex-1 flex flex-col gap-3">
-                      <div
-                        className={`${style.resumoIA} ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
-                        dangerouslySetInnerHTML={{
-                          __html: isExpanded
-                            ? htmlSeguro
-                            : truncateText(htmlSeguro, 150), // Aproximadamente 150 palavras
-                        }}
-                      />
-                      {htmlSeguro.split(" ").length > 150 && (
-                        <button
-                          onClick={() => setIsExpanded(!isExpanded)}
-                          className="cursor-pointer mt-2 ml-1 italic text-blue-600 hover:underline text-sm font-semibold self-start flex items-center gap-1 hover:cursor-pointer"
-                        >
-                          {isExpanded ? (
-                            <div className="flex items-center gap-2 px-4 pb-4">
-                              <ChevronUp size={16} />
-                              <span>Recolher texto</span>
+                      <div className={`${style.resumoIA} flex-1`}>
+                        {secoes.length === 0 ? (
+                          <div
+                            dangerouslySetInnerHTML={{ __html: htmlSeguro }}
+                          />
+                        ) : (
+                          secoes.map((s, idx) => (
+                            <div key={idx} className="mb-4 w-full">
+                              <div className="secaoHeader">
+                                <h1
+                                  className="text-xl font-semibold flex items-center justify-between w-full cursor-pointer"
+                                  onClick={() =>
+                                    setSecaoExpandida((prev) => {
+                                      const copy = [...prev];
+                                      copy[idx] = !copy[idx];
+                                      return copy;
+                                    })
+                                  }
+                                  aria-expanded={secaoExpandida[idx]}
+                                >
+                                  <span>{s.title}</span>
+                                  <span className="ml-2 flex items-center">
+                                    {secaoExpandida[idx] ? (
+                                      <ChevronUp size={16} />
+                                    ) : (
+                                      <ChevronDown size={16} />
+                                    )}
+                                  </span>
+                                </h1>
+                              </div>
+
+                              <div className="mt-2">
+                                {secaoExpandida[idx] ? (
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: s.content,
+                                    }}
+                                  />
+                                ) : (
+                                  <p className="text-gray-800">
+                                    {truncateText(
+                                      s.rawText || stripTags(s.content),
+                                      150,
+                                    )}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          ) : (
-                            <div className="flex items-center gap-2 px-4 pb-4">
-                              <ChevronDown size={16} />
-                              Expandir o texto
-                            </div>
-                          )}
-                        </button>
-                      )}
+                          ))
+                        )}
+                      </div>
                     </div>
 
                     <button
@@ -284,7 +376,10 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                         </Button>
                       </div>
 
-                      <span title={tipificacaoSelecionada.tipificacao?.name} className="text-lg font-semibold text-black truncate text-center">
+                      <span
+                        title={tipificacaoSelecionada.tipificacao?.name}
+                        className="text-lg font-semibold text-black truncate text-center"
+                      >
                         {tipificacaoSelecionada.tipificacao?.name}
                       </span>
 
