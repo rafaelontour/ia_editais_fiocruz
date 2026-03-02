@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";

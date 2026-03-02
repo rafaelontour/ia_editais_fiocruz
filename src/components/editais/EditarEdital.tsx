@@ -127,7 +127,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
     async function atualizarEdital(data: formData) {
 
-        if (!lista.includes(edital.id)) {
+        if (!lista.includes(edital.id) && editarComArquivo) {
             lista.push(edital.id);
             salvarLista(lista);
         }
@@ -152,7 +152,6 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             toast.success("Dados do edital atualizados com sucesso!");
         }
 
-
         if (!editarComArquivo) {
             setSheetOpen(!sheetOpen);
             atualizarEditais(!flagEdital);
@@ -167,6 +166,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
         }
 
         toast.success("Arquivo enviado com sucesso!");
+        toast.info("Edital enviado!", { description: "O edital está sendo processado e em breve você poderá ver o resultado!" });
         atualizarEditais(!flagEdital);
         setSheetOpen(!sheetOpen);
         limparCampos();

@@ -6,7 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import EditarEdital from "./EditarEdital";
 import { Button } from "../ui/button";
-import { Archive, Check, CheckIcon, Info, Logs, LogsIcon, Send, Trash, View } from "lucide-react";
+import { Archive, Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { arquivarEditalService, excluirEditalService } from "@/service/edital";
 import { toast } from "sonner";
@@ -14,9 +14,11 @@ import Link from "next/link";
 import { formatarData } from "@/lib/utils";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { IconLoaderQuarter, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
+import { IconLoaderQuarter, IconLogs, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
 import useEditalProc from "@/data/hooks/useProcEdital";
 import { AnimatedTooltip } from "../ui/animated-tooltip";
+import { buscarLogsEditalService } from "@/service/logs";
+import { Log } from "@/core/log/Log";
 
 
 interface Props {
@@ -31,6 +33,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     const { usuario } = useUsuario();
     const { lista } = useEditalProc();
     const [openExcluirEdital, setOpenExcluirEdital] = useState<boolean>(false);
+    const [logs, setLogs] = useState<Log[]>([]);
 
     // passa data.containerId para o hook
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -88,13 +91,6 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
         toast.success("Edital arquivado!");
     }
 
-    type Item = {
-        id: string;
-        name: string;
-        designation: string;
-        image: string;
-    };
-
     const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
     const responsaveis: any[] = []
@@ -113,6 +109,13 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     const editalPronto = !!edital && !!edital.id && Array.isArray(edital.history) && edital.history.length > 0
 
     const podeEditarEdital = edital.history && editalPronto && edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history && edital.history[0].status === "PENDING"
+
+    async function buscarLogs(id: string) {
+        const resposta = await buscarLogsEditalService(id);
+        console.log("resposta: ", resposta);
+        setLogs(resposta);
+
+    }
 
     return (
         <div
@@ -174,8 +177,8 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                             )
                         }
                             
-                        {/* <Dialog>
-                            <DialogTrigger asChild>
+                        <Dialog>
+                            <DialogTrigger onClick={() => buscarLogs(edital.id)} asChild>
                                 <div
                                     className="
                                         bg-zinc-200 rounded-sm px-2 py-0.5
@@ -193,35 +196,19 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
                             <DialogContent className="w-[60%]">
                                 <DialogHeader>
-                                    <DialogTitle className="text-3xl">Historico de atualização do estado do edital</DialogTitle>
+                                    <DialogTitle className="text-3xl">Logs do documento <strong>{edital.name}</strong></DialogTitle>
                                 </DialogHeader>
 
-                                <DialogDescription className="text-md mb-8">
+                                <DialogDescription className="text-lg mb-8">
                                     Ações, editores e estados do edital
                                 </DialogDescription>
 
                                 {
-                                    edital.history &&
-                                    edital.history.map((h, index) => (
-                                        <div key={index} className="flex flex-col justify-between">
-                                            {  
-                                                index === 0 ? (
-                                                    <div className="w-full flex justify-center items-center gap-2">
-                                                        <CheckIcon className="text-green-500" size={25} /> 
-                                                        <span className="font-semibold text-lg">Edital enviado em {formatarData(h.created_at)}</span>
-                                                    </div>
-                                                ) : (
-                                                    <div>
-                                                        <span>{formatarData(h.created_at)}</span>
-                                                        <span>{h.status}</span>
-                                                        {index}
-
-                                                    </div>
-                                                )
-                                            }
-                                            
+                                    logs && (
+                                        <div>
+                                            funcionando
                                         </div>
-                                    ))
+                                    )
                                 }
 
                             </DialogContent>
@@ -234,7 +221,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                     </DialogClose>
                                 </DialogFooter>
                             }
-                        </Dialog> */}
+                        </Dialog>
                         
                     </div>
                 </div>
