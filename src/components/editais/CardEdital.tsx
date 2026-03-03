@@ -265,60 +265,68 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                 </div>
                             </DialogTrigger>
 
-                            <DialogContent className="w-[60%] max-h-[80%] overflow-y-auto no-scrollbar">
-                                <DialogHeader>
-                                    <DialogTitle className="text-3xl">Logs do documento <strong>{edital.name}</strong></DialogTitle>
-                                </DialogHeader>
+                            <DialogContent className="flex flex-col w-[60%] max-h-[85%] overflow-hidden no-scrollbar">
+                                <div className="flex flex-col gap-2">
+                                    <DialogHeader>
+                                        <DialogTitle className="text-3xl">Logs do documento <strong>{edital.name}</strong></DialogTitle>
+                                    </DialogHeader>
+                                    <DialogDescription className="text-lg">
+                                        Ações realizadas no documento desde sua cração.
+                                    </DialogDescription>
+                                </div>
 
-                                <DialogDescription className="text-lg mb-8">
-                                    Ações, editores e estados do edital
-                                </DialogDescription>
+                                <div className="flex-1 overflow-y-auto no-scrollbar">
+                                    {
+                                        !carregandoLogs ? (
+                                            logsPorData && Object.keys(logsPorData).length > 0 ? (
+                                                Object.entries(logsPorData).map(([data, logs]) => (
+                                                    <div key={data} className="">
+                                                        <span className="flex sticky w-full top-0 items-center gap-2 font-semibold py-2 bg-white z-10">
+                                                            <Calendar size={18} />
+                                                            {data}
+                                                        </span>
 
-                                {
-                                    !carregandoLogs ? (
-                                        logsPorData && Object.keys(logsPorData).length > 0 ? (
-                                            Object.entries(logsPorData).map(([data, logs]) => (
-                                                <div key={data} className="">
-                                                    <span className="flex items-center gap-2 font-semibold">
-                                                        <Calendar size={18} />
-                                                        {data}
-                                                    </span>
-                                                    {logs.map((log: Log) => (
-                                                        <div key={log.id}
-                                                        className={`
-                                                            flex items-center gap-4 pl-5 overflow-hidden m-4 mt-6 ${log.action === "CREATE" ? "bg-green-100" : "bg-zinc-200"} rounded-md
-                                                        `}
-                                                    >
-                                                            <div title="Ação realizada">
-                                                                {verificarAcao(log.action)}
-                                                            </div>
-
-                                                            <div className="flex w-full items-center justify-between">
-                                                                <div className="p-5 w-full" title="Ação realizada">{verificarTextoAcao(log.action, log)}</div>
-                                                                <div
-                                                                    className="
-                                                                        flex items-center gap-2 text-zinc-600 bg-zinc-50 border-2
-                                                                        rounded-br-md rounded-tr-md p-5
-                                                                    "
-                                                                    title="Horário que a ação foi realizada"
-                                                                >
-                                                                    <span className="italic">{formatarData(log.created_at, false, true)}</span>
-                                                                    <Clock size={14} />
-                                                                </div>
+                                                        <div className="flex w-full relative">
+                                                            <div className="absolute ml-[7px] w-1 h-full bg-zinc-600 rounded-full" />
+                                                            <div className="w-full">
+                                                                {logs.map((log: Log) => (
+                                                                    <div key={log.id}
+                                                                        className={`
+                                                                            flex items-center pl-5 overflow-hidden m-4 mt-5 ${log.action === "CREATE" ? "bg-green-100" : "bg-zinc-200"} rounded-md ml-10
+                                                                        `}
+                                                                    >
+                                                                        <div title="Ação realizada">
+                                                                            {verificarAcao(log.action)}
+                                                                        </div>
+                                                                        <div className="flex w-full items-center justify-between">
+                                                                            <div className="p-5 w-full" title="Ação realizada">{verificarTextoAcao(log.action, log)}</div>
+                                                                            <div
+                                                                                className="
+                                                                                    flex items-center gap-2 text-zinc-600 bg-zinc-50 border-2
+                                                                                    rounded-br-md rounded-tr-md p-5
+                                                                                "
+                                                                                title="Horário que a ação foi realizada"
+                                                                            >
+                                                                                <span className="italic">{formatarData(log.created_at, false, true)}</span>
+                                                                                <Clock size={14} />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
                                                             </div>
                                                         </div>
-                                                    ))}
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="h-12 w-full flex items-center bg-zinc-300 p-2 rounded-md justify-center">
+                                                    <span className="text-md pointer-events-none italic">Nenhum log encontrado para este edital</span>
                                                 </div>
-                                            ))
+                                            )
                                         ) : (
-                                            <div className="h-12 w-full flex items-center bg-zinc-300 p-2 rounded-md justify-center">
-                                                <span className="text-md pointer-events-none italic">Nenhum log encontrado para este edital</span>
-                                            </div>
+                                            <div>Carregando...</div>
                                         )
-                                    ) : (
-                                        <div>Carregando...</div>
-                                    )
-                                }
+                                    }
+                                </div>
 
                             </DialogContent>
 
@@ -408,7 +416,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                                             <DialogTrigger asChild>
                                                                 <Button
                                                                     size={"icon"}
-                                                                    title="Arquivar edital "
+                                                                    title="Arquivar edital"
                                                                     variant={"outline"}
                                                                     className="
                                                                         h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5
