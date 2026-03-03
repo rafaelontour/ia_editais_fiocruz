@@ -157,7 +157,6 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     async function buscarLogs(id: string) {
         const resposta = await buscarLogsEditalService(id);
         const logsPorData = filtrarLogsPorData(resposta.audit_logs);
-        console.log("resposta: ", logsPorData);
         setLogsPorData(logsPorData);
         setCarregandoLogs(false);
     }
@@ -178,11 +177,41 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     function verificarTextoAcao(acao: string, log: Log) {
         switch (acao) {
             case "CREATE":
-                return `O documento foi criado por ${log.user.username?.split(" ")[0]}`
+                return <p>O documento foi criado pelo usuário <i>{log.user.username?.split(" ")[0]}</i></p>
             case "UPDATE":
-                return `O documento foi editado por ${log.user.username?.split(" ")[0]}`
+                 return <ul className="list-disc ml-6">
+                    {log.description.includes("Alterou Nome") && (
+                        <li>
+                            O usuário <i>{log.user.username?.split(" ")[0]}</i> alterou o nome do edital {log.description.split("Alterou Nome")[1].split(";")[0]}.
+                        </li>
+                    )}
+
+                    {log.description.includes("Typifications") && (
+                        <li>
+                            O usuário <i>{log.user.username?.split(" ")[0]}</i> modificou as tipificações.
+                        </li>
+                    )}
+
+                    {log.description.includes("Identifier") && (
+                        <li>
+                            O usuário <i>{log.user.username?.split(" ")[0]}</i> alterou o identificador do edital.
+                        </li>
+                    )}
+
+                    {log.description.includes("Editors") && (
+                        <li>
+                            O usuário <i>{log.user.username?.split(" ")[0]}</i> alterou os responsáveis do edital.
+                        </li>
+                    )}
+
+                    {log.description.includes("Salvo sem") && (
+                        <li>
+                            O usuário <i>{log.user.username?.split(" ")[0]}</i> salvou sem alterações.
+                        </li>
+                    )}
+                </ul>
             case "DELETE":
-                return `O documento foi excluído por ${log.user.username?.split(" ")[0]}`           
+                return <p>O documento foi excluído pelo usuário <i>{log.user.username?.split(" ")[0]}</i></p>
             default:
                 return acao
         }
@@ -211,139 +240,145 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             </div>
 
             <div className="grid grid-cols-1 relative p-3 overflow-x-hidden">
-                <div className="flex flex-col-reverse items-start justify-between min-w-0 wrap-break-word">
+                <div className="flex flex-col-reverse items-start justify-between min-w-0 wrap-break-word relative">
                     <h3 style={{ maxWidth: "-webkit-fill-available"}} className="font-semibold text-xl min-w-0 wrap-break-word">{edital.name}</h3>
 
-                    <div className="relative w-full my-2 flex justify-between">
+                    <div className="relative w-full flex justify-between">
                         {
                             (edital.history &&
                             edital.history.filter((h) => h.status === "UNDER_CONSTRUCTION").length >= 2 &&
                             edital.history.filter((h) => h.status === "WAITING_FOR_REVIEW").length >= 1) && (
-                                <Tooltip>
-                                    <div className="flex items-center bg-black pl-3 pr-2 py-1 rounded-md" style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}>
-                                        <TooltipTrigger>
-                                            {
-                                                edital.history[0].status !== "COMPLETED" ? (
-                                                    <span className="flex items-center gap-1 text-sm font-bold text-white" >
-                                                        Retrabalhando <IconProgressHelp className="mt-0.5" size={17} />
-                                                    </span>
-                                                ) : (
-                                                    <span className="flex items-center gap-1 text-sm font-bold text-white" >
-                                                        Retrabalhado <IconProgressCheck color="green" className="mt-0.5" size={17} />
-                                                    </span>
-                                                )
-                                            }
-                                        </TooltipTrigger>
-                                        <TooltipContent className="text-md">
-                                            {
-                                                edital.history[0].status !== "COMPLETED" ? (
-                                                    <span>Este edital já esteve em fase de análise e voltou para fase de construção em algum momento</span>
-                                                ) : (
-                                                    <span>Este edital esteve em análise, mas voltou para construção pelo menos 1 vez</span>
-                                                )
-                                            }
-                                        </TooltipContent>
-                                    </div>
-                                </Tooltip>
+                                <div className="mt-1 mb-2">
+                                    <Tooltip>
+                                        <div className="flex items-center bg-black pl-3 pr-2 py-1 rounded-md" style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}>
+                                            <TooltipTrigger>
+                                                {
+                                                    edital.history[0].status !== "COMPLETED" ? (
+                                                        <span className="flex items-center gap-1 text-sm font-bold text-white" >
+                                                            Retrabalhando <IconProgressHelp className="mt-0.5" size={17} />
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1 text-sm font-bold text-white" >
+                                                            Retrabalhado <IconProgressCheck color="green" className="mt-0.5" size={17} />
+                                                        </span>
+                                                    )
+                                                }
+                                            </TooltipTrigger>
+                                            <TooltipContent className="text-md">
+                                                {
+                                                    edital.history[0].status !== "COMPLETED" ? (
+                                                        <span>Este edital já esteve em fase de análise e voltou para fase de construção em algum momento</span>
+                                                    ) : (
+                                                        <span>Este edital esteve em análise, mas voltou para construção pelo menos 1 vez</span>
+                                                    )
+                                                }
+                                            </TooltipContent>
+                                        </div>
+                                    </Tooltip>
+                                </div>
                             )
                         }
                             
-                        <Dialog>
-                            <DialogTrigger onClick={() => buscarLogs(edital.id)} asChild>
-                                <div
-                                    className="
-                                        bg-zinc-200 rounded-sm px-2 py-0.5
-                                        flex items-center gap-1
-                                        absolute right-1
-                                        hover:cursor-pointer
-                                    "
-                                    title="Ver histórico de atualização do edital"
-                                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}
-                                >
-                                    <p className="text-sm italic">Logs</p>
-                                    <IconLogs size={18} />
-                                </div>
-                            </DialogTrigger>
-
-                            <DialogContent className="flex flex-col w-[60%] max-h-[85%] overflow-hidden no-scrollbar">
-                                <div className="flex flex-col gap-2">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-3xl">Logs do documento <strong>{edital.name}</strong></DialogTitle>
-                                    </DialogHeader>
-                                    <DialogDescription className="text-lg">
-                                        Ações realizadas no documento desde sua cração.
-                                    </DialogDescription>
-                                </div>
-
-                                <div className="flex-1 overflow-y-auto no-scrollbar">
-                                    {
-                                        !carregandoLogs ? (
-                                            logsPorData && Object.keys(logsPorData).length > 0 ? (
-                                                Object.entries(logsPorData).map(([data, logs]) => (
-                                                    <div key={data} className="">
-                                                        <span className="flex sticky w-full top-0 items-center gap-2 font-semibold py-2 bg-white z-10">
-                                                            <Calendar size={18} />
-                                                            {data}
-                                                        </span>
-
-                                                        <div className="flex w-full relative">
-                                                            <div className="absolute ml-[7px] w-1 h-full bg-zinc-600 rounded-full" />
-                                                            <div className="w-full">
-                                                                {logs.map((log: Log) => (
-                                                                    <div key={log.id}
-                                                                        className={`
-                                                                            flex items-center pl-5 overflow-hidden m-4 mt-5 ${log.action === "CREATE" ? "bg-green-100" : "bg-zinc-200"} rounded-md ml-10
-                                                                        `}
-                                                                    >
-                                                                        <div title="Ação realizada">
-                                                                            {verificarAcao(log.action)}
-                                                                        </div>
-                                                                        <div className="flex w-full items-center justify-between">
-                                                                            <div className="p-5 w-full" title="Ação realizada">{verificarTextoAcao(log.action, log)}</div>
-                                                                            <div
-                                                                                className="
-                                                                                    flex items-center gap-2 text-zinc-600 bg-zinc-50 border-2
-                                                                                    rounded-br-md rounded-tr-md p-5
-                                                                                "
-                                                                                title="Horário que a ação foi realizada"
-                                                                            >
-                                                                                <span className="italic">{formatarData(log.created_at, false, true)}</span>
-                                                                                <Clock size={14} />
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="h-12 w-full flex items-center bg-zinc-300 p-2 rounded-md justify-center">
-                                                    <span className="text-md pointer-events-none italic">Nenhum log encontrado para este edital</span>
-                                                </div>
-                                            )
-                                        ) : (
-                                            <div>Carregando...</div>
-                                        )
-                                    }
-                                </div>
-
-                            </DialogContent>
-
-                            {
-                                edital.status === "COMPLETED" && 
-                                <DialogFooter>
-                                    <DialogClose asChild>
-                                        <Button onClick={() => arquivarEdital(edital.id)}>Arquivar edital</Button>
-                                    </DialogClose>
-                                </DialogFooter>
-                            }
-                        </Dialog>
-                        
                     </div>
                 </div>
 
-                <hr className="my-1" />
+                <div className="relative py-5">
+                    <div className="h-0.5 w-full bg-zinc-300" />
+                    <Dialog>
+                        <DialogTrigger onClick={() => buscarLogs(edital.id)} asChild>
+                            <div
+                                className="
+                                    bg-zinc-200 rounded-sm px-2 py-0.5
+                                    flex items-center gap-1 absolute left-1/2 -translate-x-1/2 top-2
+                                    hover:cursor-pointer
+                                "
+                                title="Ver histórico de atualização do edital"
+                                style={{ boxShadow: "0 0 3px rgba(0,0,0,.7)" }}
+                            >
+                                <p className="text-sm italic">Logs</p>
+                                <IconLogs size={18} />
+                            </div>
+                        </DialogTrigger>
+
+                        <DialogContent className="flex flex-col w-[60%] max-h-[85%] overflow-hidden no-scrollbar">
+                            <div className="flex flex-col gap-2">
+                                <DialogHeader>
+                                    <DialogTitle className="text-3xl">Logs do documento <strong>{edital.name}</strong></DialogTitle>
+                                </DialogHeader>
+                                <DialogDescription className="text-lg">
+                                    Ações realizadas no documento desde sua cração.
+                                </DialogDescription>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto no-scrollbar">
+                                {
+                                    !carregandoLogs ? (
+                                        logsPorData && Object.keys(logsPorData).length > 0 ? (
+                                            Object.entries(logsPorData).map(([data, logs]) => (
+                                                <div key={data} className="">
+                                                    <span className="flex sticky w-full top-0 items-center gap-2 font-semibold py-2 bg-white z-10">
+                                                        <Calendar size={18} />
+                                                        {data}
+                                                    </span>
+
+                                                    <div className="flex w-full relative">
+                                                        <div className="absolute ml-[7px] w-1 h-full bg-zinc-600 rounded-full" />
+                                                        <div className="w-full">
+                                                            {logs.map((log: Log) => (
+                                                                <div key={log.id}
+                                                                    className={`
+                                                                        flex items-center pl-5 overflow-hidden m-4 mt-5 ${log.action === "CREATE" ? "bg-green-100" : "bg-zinc-200"} rounded-md ml-10
+                                                                    `}
+                                                                >
+                                                                    <div title="Ação realizada">
+                                                                        {verificarAcao(log.action)}
+                                                                    </div>
+
+                                                                    <div className="flex w-full h-full items-stretch justify-between">
+                                                                        <div className="p-5 w-full" title="Ação realizada">
+                                                                            {verificarTextoAcao(log.action, log)}
+                                                                        </div>
+
+                                                                        <div
+                                                                            className="
+                                                                                flex min-h-max items-center gap-2 text-zinc-600 bg-zinc-50 border-2
+                                                                                rounded-br-md rounded-tr-md p-5
+                                                                            "
+                                                                            title="Horário que a ação foi realizada"
+                                                                        >
+                                                                            <span className="italic">{formatarData(log.created_at, false, true)}</span>
+                                                                            <Clock size={14} />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="h-12 w-full flex items-center bg-zinc-300 p-2 rounded-md justify-center">
+                                                <span className="text-md pointer-events-none italic">Nenhum log encontrado para este edital</span>
+                                            </div>
+                                        )
+                                    ) : (
+                                        <div>Carregando...</div>
+                                    )
+                                }
+                            </div>
+
+                        </DialogContent>
+
+                        {
+                            edital.status === "COMPLETED" && 
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button onClick={() => arquivarEdital(edital.id)}>Arquivar edital</Button>
+                                </DialogClose>
+                            </DialogFooter>
+                        }
+                    </Dialog>
+                </div>
 
                 <div
                     className="

@@ -11,4 +11,5 @@ export interface Log {
     }
     user: UsuarioUnidade
     created_at: string
+    description: string
 }
