@@ -9,18 +9,31 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-function formatarData(data: any): string {
+function formatarData(data: any, log?: boolean, somenteHora?: boolean): string {
   const date = new Date(data || "");
 
-  const formatado = date.toLocaleString("pt-BR", {
+  if (somenteHora) {
+    return date.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+  }
+
+  const formatado = !log ? 
+  date.toLocaleString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit"
-  });
-
+  }) : date.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+  
   return formatado;
 }
 

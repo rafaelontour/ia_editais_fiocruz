@@ -6,7 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import EditarEdital from "./EditarEdital";
 import { Button } from "../ui/button";
-import { Archive, Trash, View } from "lucide-react";
+import { Archive, Calendar, Clock, Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { arquivarEditalService, excluirEditalService } from "@/service/edital";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import Link from "next/link";
 import { formatarData } from "@/lib/utils";
 import useUsuario from "@/data/hooks/useUsuario";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { IconLoaderQuarter, IconLogs, IconProgressCheck, IconProgressHelp } from "@tabler/icons-react";
+import { IconCheck, IconEdit, IconLoaderQuarter, IconLogs, IconProgressCheck, IconProgressHelp, IconTrash } from "@tabler/icons-react";
 import useEditalProc from "@/data/hooks/useProcEdital";
 import { AnimatedTooltip } from "../ui/animated-tooltip";
 import { buscarLogsEditalService } from "@/service/logs";
@@ -110,11 +110,61 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
     const podeEditarEdital = edital.history && editalPronto && edital.history[0].status === "UNDER_CONSTRUCTION" || edital.history && edital.history[0].status === "PENDING"
 
+    interface LogsPorData {
+        [key: string]: Log[]
+    }
+    const [carregandoLogs, setCarregandoLogs] = useState<boolean>(true);
+    const [logsPorData, setLogsPorData] = useState<LogsPorData>({});
+
+    function filtrarLogsPorData(logs: Log[]) {
+        const logsPorData: LogsPorData = {};
+        logs.forEach((log) => {
+            const data = formatarData(log.created_at, true);
+            if (!logsPorData[data]) {
+                logsPorData[data] = [];
+            }
+            logsPorData[data].push(log);
+        });
+
+        const datasEmArray = Object.entries(logsPorData)
+        const datasInvertidas = datasEmArray.reverse()
+        const datasEmOrdem = Object.fromEntries(datasInvertidas)
+
+        return datasEmOrdem;
+    }
+
     async function buscarLogs(id: string) {
         const resposta = await buscarLogsEditalService(id);
-        console.log("resposta: ", resposta);
-        setLogs(resposta);
+        const logsPorData = filtrarLogsPorData(resposta.audit_logs);
+        console.log("resposta: ", logsPorData);
+        setLogsPorData(logsPorData);
+        setCarregandoLogs(false);
+    }
 
+    function verificarAcao(acao: string) {
+        switch (acao) {
+            case "CREATE":
+                return <IconCheck className="text-green-500" />
+            case "UPDATE":
+                return <IconEdit className="" />
+            case "DELETE":
+                return <IconTrash className="text-red-500" />
+            default:
+                return acao
+        }
+    }
+
+    function verificarTextoAcao(acao: string, log: Log) {
+        switch (acao) {
+            case "CREATE":
+                return `O documento foi criado por ${log.user.username?.split(" ")[0]}`
+            case "UPDATE":
+                return `O documento foi editado por ${log.user.username?.split(" ")[0]}`
+            case "DELETE":
+                return `O documento foi excluído por ${log.user.username?.split(" ")[0]}`           
+            default:
+                return acao
+        }
     }
 
     return (
@@ -194,7 +244,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                 </div>
                             </DialogTrigger>
 
-                            <DialogContent className="w-[60%]">
+                            <DialogContent className="w-[60%] max-h-[80%] overflow-y-auto no-scrollbar">
                                 <DialogHeader>
                                     <DialogTitle className="text-3xl">Logs do documento <strong>{edital.name}</strong></DialogTitle>
                                 </DialogHeader>
@@ -204,10 +254,47 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                 </DialogDescription>
 
                                 {
-                                    logs && (
-                                        <div>
-                                            funcionando
-                                        </div>
+                                    !carregandoLogs ? (
+                                        logsPorData && Object.keys(logsPorData).length > 0 ? (
+                                            Object.entries(logsPorData).map(([data, logs]) => (
+                                                <div key={data} className="">
+                                                    <span className="flex items-center gap-2 font-semibold">
+                                                        <Calendar size={18} />
+                                                        {data}
+                                                    </span>
+                                                    {logs.map((log: Log) => (
+                                                        <div key={log.id}
+                                                        className={`
+                                                            flex items-center gap-4 pl-5 overflow-hidden m-4 mt-6 ${log.action === "CREATE" ? "bg-green-100" : "bg-zinc-200"} rounded-md
+                                                        `}
+                                                    >
+                                                            <div>
+                                                                {verificarAcao(log.action)}
+                                                            </div>
+
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <div>{verificarTextoAcao(log.action, log)}</div>
+                                                                <div
+                                                                    className="
+                                                                        flex items-center gap-2 text-zinc-600 bg-zinc-50 p-5 border-2
+                                                                        rounded-br-md rounded-tr-md
+                                                                    "
+                                                                >
+                                                                    <span className="italic">{formatarData(log.created_at, false, true)}</span>
+                                                                    <Clock size={14} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="h-12 w-full flex items-center bg-zinc-300 p-2 rounded-md justify-center">
+                                                <span className="text-md pointer-events-none italic">Nenhum log encontrado para este edital</span>
+                                            </div>
+                                        )
+                                    ) : (
+                                        <div>Carregando...</div>
                                     )
                                 }
 

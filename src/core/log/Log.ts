@@ -6,7 +6,9 @@ export interface Log {
     record_id: string
     action: string
     user_id: string
-    old_data: {}
+    old_data: {
+        name: string
+    }
     user: UsuarioUnidade
     created_at: string
 }
