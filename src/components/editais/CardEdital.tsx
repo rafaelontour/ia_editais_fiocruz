@@ -118,19 +118,40 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
 
     function filtrarLogsPorData(logs: Log[]) {
         const logsPorData: LogsPorData = {};
+
         logs.forEach((log) => {
-            const data = formatarData(log.created_at, true);
+            const data = formatarData(log.created_at.split("T")[0], true);
+
             if (!logsPorData[data]) {
                 logsPorData[data] = [];
             }
+
             logsPorData[data].push(log);
         });
 
-        const datasEmArray = Object.entries(logsPorData)
-        const datasInvertidas = datasEmArray.reverse()
-        const datasEmOrdem = Object.fromEntries(datasInvertidas)
+        // Ordena logs internos
+        Object.keys(logsPorData).forEach((data) => {
+            logsPorData[data].sort(
+                (a, b) =>
+                    new Date(a.created_at).getTime() -
+                    new Date(b.created_at).getTime()
+            );
+        });
 
-        return datasEmOrdem;
+        // Ordena as chaves corretamente
+        const datasOrdenadas = Object.keys(logsPorData).sort(
+            (a, b) =>
+                new Date(a.split('/').reverse().join('-')).getTime() -
+                new Date(b.split('/').reverse().join('-')).getTime()
+        );
+
+        const resultado: LogsPorData = {};
+
+        datasOrdenadas.forEach((data) => {
+            resultado[data] = logsPorData[data];
+        });
+
+        return resultado;
     }
 
     async function buscarLogs(id: string) {
@@ -144,11 +165,11 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     function verificarAcao(acao: string) {
         switch (acao) {
             case "CREATE":
-                return <IconCheck className="text-green-500" />
+                return <IconCheck size={24} className="text-green-500" />
             case "UPDATE":
-                return <IconEdit className="" />
+                return <IconEdit size={24} className="" />
             case "DELETE":
-                return <IconTrash className="text-red-500" />
+                return <IconTrash size={24} className="text-red-500" />
             default:
                 return acao
         }
@@ -268,17 +289,18 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                                             flex items-center gap-4 pl-5 overflow-hidden m-4 mt-6 ${log.action === "CREATE" ? "bg-green-100" : "bg-zinc-200"} rounded-md
                                                         `}
                                                     >
-                                                            <div>
+                                                            <div title="Ação realizada">
                                                                 {verificarAcao(log.action)}
                                                             </div>
 
                                                             <div className="flex w-full items-center justify-between">
-                                                                <div>{verificarTextoAcao(log.action, log)}</div>
+                                                                <div className="p-5 w-full" title="Ação realizada">{verificarTextoAcao(log.action, log)}</div>
                                                                 <div
                                                                     className="
-                                                                        flex items-center gap-2 text-zinc-600 bg-zinc-50 p-5 border-2
-                                                                        rounded-br-md rounded-tr-md
+                                                                        flex items-center gap-2 text-zinc-600 bg-zinc-50 border-2
+                                                                        rounded-br-md rounded-tr-md p-5
                                                                     "
+                                                                    title="Horário que a ação foi realizada"
                                                                 >
                                                                     <span className="italic">{formatarData(log.created_at, false, true)}</span>
                                                                     <Clock size={14} />
