@@ -2,7 +2,7 @@ const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
 async function buscarLogsEditalService(id: string) {
     try {
-        const resposta = await fetch(`${urlBase}/audit-log/?record_id=${id}`, {
+        const resposta = await fetch(`${urlBase}/audit-log?record_id=${id}`, {
             method: "GET",
             credentials: "include",
             headers: {
