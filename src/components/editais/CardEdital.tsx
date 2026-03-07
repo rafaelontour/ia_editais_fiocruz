@@ -6,7 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import EditarEdital from "./EditarEdital";
 import { Button } from "../ui/button";
-import { Archive, Calendar, Clock, Trash, View } from "lucide-react";
+import { AlertCircle, Archive, Calendar, Clock, Trash, View } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { arquivarEditalService, excluirEditalService } from "@/service/edital";
 import { toast } from "sonner";
@@ -157,6 +157,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     async function buscarLogs(id: string) {
         const resposta = await buscarLogsEditalService(id);
         const logsPorData = filtrarLogsPorData(resposta.audit_logs);
+        console.log(logsPorData);
         setLogsPorData(logsPorData);
         setCarregandoLogs(false);
     }
@@ -164,11 +165,11 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     function verificarAcao(acao: string) {
         switch (acao) {
             case "CREATE":
-                return <IconCheck size={24} className="text-green-500" />
+                return <IconCheck size={14} className="text-green-500" />
             case "UPDATE":
-                return <IconEdit size={24} className="" />
+                return <IconEdit size={14} className="" />
             case "DELETE":
-                return <IconTrash size={24} className="text-red-500" />
+                return <IconTrash size={14} className="text-red-500" />
             default:
                 return acao
         }
@@ -179,7 +180,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
             case "CREATE":
                 return <p>O documento foi criado pelo usuário <i>{log.user.username?.split(" ")[0]}</i></p>
             case "UPDATE":
-                 return <ul className="list-disc ml-6">
+                 return <ul className="flex flex-col gap-1 list-none">
                     {log.description.includes("Alterou Nome") && (
                         <li>
                             O usuário <i>{log.user.username?.split(" ")[0]}</i> alterou o nome do edital {log.description.split("Alterou Nome")[1].split(";")[0]}.
@@ -207,6 +208,21 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                     {log.description.includes("Salvo sem") && (
                         <li>
                             O usuário <i>{log.user.username?.split(" ")[0]}</i> salvou sem alterações.
+                        </li>
+                    )}
+
+                    {log.description.split("para")[0].includes("Moveu") && (
+                        <li 
+                            className={`
+                                flex flex-col list-none rounded-md text-white gap-4
+                            `}
+                        >
+                            <p className="flex items-center gap-2 font-bold">
+                                {/* <AlertCircle size={16} /> */}
+                                <span className="text-lg">Mudança de coluna</span>
+                            </p>
+
+                            <p>O usuário <i>{log.user.username?.split(" ")[0]}</i> moveu {log.description.split("Moveu")[1]}.</p>
                         </li>
                     )}
                 </ul>
@@ -327,21 +343,31 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                                             {logs.map((log: Log) => (
                                                                 <div key={log.id}
                                                                     className={`
-                                                                        flex items-center pl-5 overflow-hidden m-4 mt-5 ${log.action === "CREATE" ? "bg-green-100" : "bg-zinc-200"} rounded-md ml-10
+                                                                        flex items-center pl-5 overflow-hidden m-4 mt-5 rounded-md ml-10 relative
+                                                                        ${log.description.split("para")[1]?.includes("Em construção") ? "bg-[#fa9292]" :
+                                                                        log.description.split("para")[1]?.includes("Pendente") ? "bg-[#a1a5ad]" :
+                                                                        log.description.split("para")[1]?.includes("Aguardando revisão") ? "bg-[#afa780]" :
+                                                                        log.description.split("para")[1]?.includes("Concluído") ? "bg-[#6ed36e]" : "bg-[#f2f2f2]"}
                                                                     `}
                                                                 >
-                                                                    <div title="Ação realizada">
+                                                                    <div
+                                                                        className={`
+                                                                            ${log.action !== "CREATE" && "absolute top-1/2 -translate-y-1/2"} flex items-center justify-center rounded-full p-2 bg-white
+                                                                        `}
+                                                                        title={`${log.action === "CREATE" ? "Criação do documento" : log.action === "UPDATE" ? "Atualização do documento" : "Exclusão do documento"}`}
+                                                                    >
                                                                         {verificarAcao(log.action)}
                                                                     </div>
+                                                                    <div />
 
                                                                     <div className="flex w-full h-full items-stretch justify-between">
-                                                                        <div className="p-5 w-full" title="Ação realizada">
+                                                                        <div className={`p-5 ${log.action !== "CREATE" && "ml-7"} w-full`} title="Ação realizada">
                                                                             {verificarTextoAcao(log.action, log)}
                                                                         </div>
 
                                                                         <div
                                                                             className="
-                                                                                flex min-h-max items-center gap-2 text-zinc-600 bg-zinc-50 border-2
+                                                                                flex min-h-max items-center gap-2 text-zinc-600 border-[#f2f2f2] bg-zinc-50 border-2
                                                                                 rounded-br-md rounded-tr-md p-5
                                                                             "
                                                                             title="Horário que a ação foi realizada"
