@@ -322,7 +322,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                     <DialogTitle className="text-3xl">Logs do documento <strong>{edital.name}</strong></DialogTitle>
                                 </DialogHeader>
                                 <DialogDescription className="text-lg">
-                                    Ações realizadas no documento desde sua cração.
+                                    Ações realizadas no documento desde sua criação.
                                 </DialogDescription>
                             </div>
 
