@@ -11,7 +11,7 @@ import { formatarData } from "@/lib/utils";
 import { arquivarEditalService, excluirEditalService, getEditaisArquivadosService, getEditalPorIdService } from "@/service/edital";
 import { getEditalArquivoService } from "@/service/editalArquivo";
 import { IconArchive } from "@tabler/icons-react";
-import { Check, Copy, Loader2, Trash, View } from "lucide-react";
+import { Check, Copy, Edit, Loader2, Trash, View } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -96,13 +96,13 @@ export default function EditaisArquivados() {
     function traduzirStatusEdital(status: string | undefined) {
         switch (status) {
             case "PENDING":
-                return <span className="flex items-center gap-2 bg-[#99A1AF] px-3 py-1 rounded-sm w-fit"><Copy /> Rascunho </span>;
+                return <span className="flex items-center gap-2 bg-[#99A1AF] px-3 py-1 rounded-sm w-fit"><Copy size={14} /> Rascunho </span>;
             case "IN_REVIEW":
-                return <span className="flex items-center gap-2 bg-[#FF0000] px-3 py-1 rounded-sm w-fit">Em construção</span>
+                return <span className="flex items-center gap-2 bg-[#FF0000] px-3 py-1 rounded-sm w-fit"><Edit size={14} /> Em construção</span>
             case "UNDER_CONSTRUCTION":
-                return <span className="flex items-center gap-2 bg-[#656149] px-3 py-1 rounded-sm w-fit">Em construção</span>;
+                return <span className="flex items-center gap-2 bg-[#656149] px-3 py-1 rounded-sm w-fit"><Edit size={14} /> Em construção</span>;
             case "COMPLETED":
-                return <span className="flex items-center gap-2 bg-[#006400] px-3 py-1 rounded-sm w-fit"><Check />Concluído</span>;
+                return <span className="flex items-center gap-2 bg-[#006400] px-3 py-1 rounded-sm w-fit"><Check size={14} />Concluído</span>;
             default:
                 return <span>Desconhecido</span>; 
         }
@@ -122,7 +122,7 @@ export default function EditaisArquivados() {
                     editaisArquivadosFiltrados.length > 0 ? (
                         <div className="w-full flex flex-col gap-10 overflow-hidden">
 
-                            <div className="max-h-[600px] overflow-y-auto border rounded-md">
+                            <div className="h-[calc(100vh-240px)] overflow-y-auto border rounded-md">
                                 <table className="w-full border-separate border-spacing-0">
                                     <thead>
                                         <tr className="bg-gray-100">
@@ -167,8 +167,8 @@ export default function EditaisArquivados() {
                                                 </td>
 
 
-                                                <td className=" text-white">
-                                                    <p className="" >
+                                                <td className="text-white">
+                                                    <p className="text-sm" >
                                                         {traduzirStatusEdital(edital.history && edital.history[0].status)}
                                                     </p>
                                                 </td>

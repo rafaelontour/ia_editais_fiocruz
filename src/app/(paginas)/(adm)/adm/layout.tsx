@@ -51,6 +51,7 @@ export default function RootLayout({
           <motion.div
             layout
             className="flex top-14 left-0 h-[calc(100vh-4rem)] bg-zinc-100 z-10 overflow-hidden"
+            style={{ boxShadow: "4px 0 2px rgba(0, 0, 0, .12)"}}
             animate={{ width: barraLateralAberta ? 260 : 60, transition: { duration: 0.2 } }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >

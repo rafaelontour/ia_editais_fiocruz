@@ -178,36 +178,36 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
     function verificarTextoAcao(acao: string, log: Log) {
         switch (acao) {
             case "CREATE":
-                return <p>O documento foi criado pelo usuário <i>{log.user.username?.split(" ")[0]}</i></p>
+                return <p>O documento foi criado pelo usuário <i className="font-bold">{log.user.username?.split(" ")[0]}</i></p>
             case "UPDATE":
                  return <ul className="flex flex-col gap-1 list-none">
                     {log.description.includes("Alterou Nome") && (
                         <li>
-                            O usuário <i>{log.user.username?.split(" ")[0]}</i> alterou o nome do edital {log.description.split("Alterou Nome")[1].split(";")[0]}.
+                            O usuário <i className="font-bold">{log.user.username?.split(" ")[0]}</i> alterou o nome do edital {log.description.split("Alterou Nome")[1].split(";")[0]}.
                         </li>
                     )}
 
                     {log.description.includes("Typifications") && (
                         <li>
-                            O usuário <i>{log.user.username?.split(" ")[0]}</i> modificou as tipificações.
+                            O usuário <i className="font-bold">{log.user.username?.split(" ")[0]}</i> modificou as tipificações.
                         </li>
                     )}
 
                     {log.description.includes("Identifier") && (
                         <li>
-                            O usuário <i>{log.user.username?.split(" ")[0]}</i> alterou o identificador do edital.
+                            O usuário <i className="font-bold">{log.user.username?.split(" ")[0]}</i> alterou o identificador do edital.
                         </li>
                     )}
 
                     {log.description.includes("Editors") && (
                         <li>
-                            O usuário <i>{log.user.username?.split(" ")[0]}</i> alterou os responsáveis do edital.
+                            O usuário <i className="font-bold">{log.user.username?.split(" ")[0]}</i> alterou os responsáveis do edital.
                         </li>
                     )}
 
                     {log.description.includes("Salvo sem") && (
                         <li>
-                            O usuário <i>{log.user.username?.split(" ")[0]}</i> salvou sem alterações.
+                            O usuário <i className="font-bold">{log.user.username?.split(" ")[0]}</i> salvou sem alterações.
                         </li>
                     )}
 
@@ -222,12 +222,12 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                 <span className="text-lg">Mudança de coluna</span>
                             </p>
 
-                            <p>O usuário <i>{log.user.username?.split(" ")[0]}</i> moveu {log.description.split("Moveu")[1]}.</p>
+                            <p>O usuário <i className="font-bold">{log.user.username?.split(" ")[0]}</i> moveu {log.description.split("Moveu")[1]}.</p>
                         </li>
                     )}
                 </ul>
             case "DELETE":
-                return <p>O documento foi excluído pelo usuário <i>{log.user.username?.split(" ")[0]}</i></p>
+                return <p>O documento foi excluído pelo usuário <i className="font-bold">{log.user.username?.split(" ")[0]}</i></p>
             default:
                 return acao
         }
@@ -326,7 +326,7 @@ export default function CardEdital({ edital, containerId, funcaoAtualizarEditais
                                 </DialogDescription>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto no-scrollbar">
+                            <div className="flex-1 overflow-y-auto">
                                 {
                                     !carregandoLogs ? (
                                         logsPorData && Object.keys(logsPorData).length > 0 ? (

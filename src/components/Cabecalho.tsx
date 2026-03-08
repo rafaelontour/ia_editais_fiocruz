@@ -127,16 +127,22 @@ export default function Cabecalho() {
                                 >
                                     <p className="text-branco text-sm my-1">Criar conta</p>
                                 </Button>
-                                <Button
-                                    type="button"
-                                    onClick={() => router.push("/auth/login")}
-                                    variant="destructive"
-                                    className="flex  mr-2 px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
-                                    style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
-                                >
-                                    <IconLogin color="white" size={26} />
-                                    <p className="text-branco text-sm ">{mensagemLogin}</p>
-                                </Button>
+
+                                {
+                                    mensagemLogin && (
+                                        <Button
+                                            type="button"
+                                            onClick={() => router.push("/auth/login")}
+                                            variant="destructive"
+                                            className="flex  mr-2 px-4 items-center gap-1 bg-vermelho rounded-sm hover:cursor-pointer"
+                                            style={{ boxShadow: "3px 3px 4px rgba(0, 0, 0, 0.25)" }}
+                                        >
+                                            <IconLogin color="white" size={26} />
+                                            <p className="text-branco text-sm ">{mensagemLogin}</p>
+                                        </Button>
+
+                                    )
+                                }
                             </div>
                         ) : (
                             <Button

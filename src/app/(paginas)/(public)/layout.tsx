@@ -49,7 +49,7 @@ export default function RootLayout({
           <motion.div
             layout
             className="flex top-14 left-0 h-[calc(100vh-4rem)] bg-zinc-100 z-10 overflow-hidden"
-            style={{ boxShadow: "4px 0 3px rgba(0, 0, 0, .2)"}}
+            style={{ boxShadow: "4px 0 2px rgba(0, 0, 0, .12)"}}
             animate={{ width: barraLateralAberta ? 260 : 60, transition: { duration: 0.2 } }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
@@ -89,43 +89,51 @@ export default function RootLayout({
               
               
 
-              <div className="flex items-center gap-4 w-full p-3">
-                <div className={`flex items-center justify-center h-9 min-w-8.5 max-w-full bg-verde rounded-full `}>
-                  
-                  {
-                    usuario && (
-                      usuario.icon ? (
-                        <img src={urlBase + usuario.icon.file_path} className={`w-8 h-8 rounded-full`} />
-                      ) : (
-                        <UserIcon size={18} />
-                      )
-                    )
-                  }
-                </div>
+              
 
-                <motion.div
-                  initial={false}
-                  animate={{
-                    opacity: barraLateralAberta ? 1 : 0,
-                    pointerEvents: barraLateralAberta ? "auto" : "none",
-                    transition: {
-                      delay: barraLateralAberta ? 0.3 : 0,
-                      duration: 0.2,
-                      ease: "easeOut"
-                    }
-                  }}
-                  exit={{
-                    display: barraLateralAberta ? "flex" : "none"
-                  }}
-                  style={{
-                    display: barraLateralAberta ? "flex" : "none"
-                  }}
-                  className={`flex flex-col gap-0 min-w-[120px]`}
-                >
-                  <span className="text-sm font-bold">{usuario?.username}</span>
-                  <Link className="h-fit" href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
-                </motion.div>
-              </div>
+                {
+                  usuario?.id && (
+                    <div className="flex items-center gap-4 w-full p-4 pl-3 pb-4">
+                      <div className={`flex items-center justify-center h-9 min-w-8.5 max-w-full rounded-full gap-3`}>
+                        <div className="bg-verde rounded-full p-0.5">
+                          {
+                            usuario && (
+                              usuario.icon ? (
+                                <img src={urlBase + usuario.icon.file_path} className={`w-8 h-8 rounded-full`} />
+                              ) : (
+                                <UserIcon size={18} />
+                              )
+                            )
+                          }
+                        </div>
+
+                        <motion.div
+                          initial={false}
+                          animate={{
+                            opacity: barraLateralAberta ? 1 : 0,
+                            pointerEvents: barraLateralAberta ? "auto" : "none",
+                            transition: {
+                              delay: barraLateralAberta ? 0.3 : 0,
+                              duration: 0.2,
+                              ease: "easeOut"
+                            }
+                          }}
+                          exit={{
+                            display: barraLateralAberta ? "flex" : "none"
+                          }}
+                          style={{
+                            display: barraLateralAberta ? "flex" : "none"
+                          }}
+                          className={`flex flex-col gap-0 min-w-[120px]`}
+                        >
+                          <span className="text-sm font-bold">{usuario?.username}</span>
+                          <Link className="h-fit" href="/adm/meu-perfil"><span className="text-xs font-medium hover:underline">Meu perfil</span></Link>
+                        </motion.div>
+                      </div>
+                    </div>
+                  )
+                }
+
             </div>
           </motion.div>
 

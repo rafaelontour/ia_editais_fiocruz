@@ -1,15 +1,11 @@
 import {
   Building,
   FilePen,
-  Gauge,
   Home,
   IdCard,
   InboxIcon,
   Sheet,
   Type,
-  TypeOutline,
-  University,
-  Wrench,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -39,11 +35,11 @@ const itemsAdm = [
     url: "/adm/fontes",
     icon: FilePen,
   },
-  {
-    title: "Unidades",
-    url: "/adm/unidades",
-    icon: Building,
-  },
+  // {
+  //   title: "Unidades",
+  //   url: "/adm/unidades",
+  //   icon: Building,
+  // },
   {
     title: "Atribuição de cargo",
     url: "/adm/cargos",
