@@ -153,7 +153,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                       ${
                         typeof media === "number"
                           ? media < 5
-                            ? "bg-red-500"
+                            ? "bg-orange-500"
                             : media < 7
                               ? "bg-yellow-600"
                               : media < 8
@@ -284,7 +284,10 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                         </Button>
                       </div>
 
-                      <span title={tipificacaoSelecionada.tipificacao?.name} className="text-lg font-semibold text-black truncate text-center">
+                      <span
+                        title={tipificacaoSelecionada.tipificacao?.name}
+                        className="text-lg font-semibold text-black truncate text-center"
+                      >
                         {tipificacaoSelecionada.tipificacao?.name}
                       </span>
 
