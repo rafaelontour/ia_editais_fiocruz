@@ -7,7 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Stars,
+  Download,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import TaxonommiasResultado from "./TaxonomiasResultado";
@@ -117,6 +117,11 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
     index: 0,
   });
 
+  const baixarResumoIA = () => {
+    const url = process.env.NEXT_PUBLIC_URL_BASE + "/export/release/pdf?document_release_id=" + edital?.releases[0].id;
+    window.location.href = url;
+  }
+
   return (
     <div className="flex flex-row gap-4 items-stretch min-h-0 flex-1">
       <div className="flex w-full gap-4 relative">
@@ -207,7 +212,19 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                       </div>
                     </div>
 
-                    <div className="border p-1 border-gray-300 rounded-md bg-white flex-1 flex flex-col gap-3">
+                    <div className="border p-1 border-gray-300 rounded-md bg-white flex-1 flex flex-col gap-3 relative">
+                      <Button
+                        variant={"destructive"}
+                        size={"icon"}
+                        className="hover:cursor-pointer bg-vermelho w-fit px-4 py-2 mx-auto mt-3 text-white top-2 self-center opacity-60 hover:opacity-80 transition-opacity text-md"
+                        title="Fazer download deste resumo"
+                        onClick={baixarResumoIA}
+                      >
+                        <span>Baixar resumo da IA</span>
+                        <Download className="ml-2" />
+                      </Button>
+
+                      <div className="h-0.5 bg-zinc-200 w-[85%] mx-auto" /> 
                       <div
                         className={`${style.resumoIA} ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
                         dangerouslySetInnerHTML={{

@@ -2,8 +2,25 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { buscarVersaoPlataformaService } from "@/service/versao";
 
 export default function Logos() {
+
+    const [versaoPlataforma, setVersaoPlataforma] = useState<string>("");
+
+    async function buscarVersaoPlataforma() {
+        const resposta = await buscarVersaoPlataformaService();
+
+        if (resposta) {
+            setVersaoPlataforma(resposta.version);
+        }
+    }
+
+    useEffect(() => {
+        buscarVersaoPlataforma();
+    }, []);
+
     return (
         <div className="flex flex-col items-center">
             {/* Logo 1 com fade in */}
@@ -42,7 +59,7 @@ export default function Logos() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 2.0, ease: "easeOut" }}
             >
-                Versão da platarforma: {process.env.NEXT_PUBLIC_VERSAO_PLATAFORMA}
+                Versão da platarforma: {versaoPlataforma}
             </motion.div>
         </div>
     )

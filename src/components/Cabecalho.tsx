@@ -11,6 +11,7 @@ import { getUnidadePorId } from "@/service/unidade";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { buscarVersaoPlataformaService } from "@/service/versao";
 
 export default function Cabecalho() {
     const { usuario, deslogar, mensagemLogin, mudarEstadoBarraLateral, barraLateralAberta } = useUsuario();
@@ -20,7 +21,7 @@ export default function Cabecalho() {
 
     const [unidade, setUnidade] = useState<Unidade | null>(null);
     const [cargo, setCargo] = useState<string | null>(null);
-    const versaoPlataforma: string | undefined = process.env.NEXT_PUBLIC_VERSAO_PLATAFORMA;
+    const [versaoPlataforma, setVersaoPlataforma] = useState<string>("")
 
     // Função para buscar dados da unidade e definir cargo
     async function carregarInfoUsuario() {
@@ -39,7 +40,16 @@ export default function Cabecalho() {
         setCargo(c);
     }
 
+    async function buscarVersaoPlataforma() {
+        const resposta = await buscarVersaoPlataformaService();
+
+        if (resposta) {
+            setVersaoPlataforma(resposta.version);
+        }
+    }
+
     useEffect(() => {
+        buscarVersaoPlataforma()
         setMontado(true);
     }, []);
 
@@ -99,7 +109,7 @@ export default function Cabecalho() {
                         </div>
                         
                         <motion.div
-                            className="italic text-xs relative left-2 top-3.5"
+                            className={`italic text-xs relative left-2 top-3.5 ${versaoPlataforma ? "opacity-100" : "opacity-0"}`}
                             animate={{ opacity: 1, y: 0 }}
                             initial={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.5, delay: 0.5 }}
