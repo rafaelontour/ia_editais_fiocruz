@@ -33,7 +33,7 @@ interface Props {
 }
 
 const schemaEdital = z.object({
-    nome: z.string().min(5, "O nome do edital é obrigatório"),
+    nome: z.string().min(5, "O nome do documento é obrigatório"),
     tipificacoes: z.array(z.string().min(1)).min(1, "Selecione pelo menos uma tipificação"),
     responsavel: z.array(z.string().min(1)).min(1, "Selecione pelo menos um responsável para este edital"),
     identificador: z.string().min(1, "O número de identificação do edital é obrigatório"),
@@ -214,12 +214,12 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                         <div className="space-y-6">
                             <div className="flex gap-3">
                                 <div className="flex flex-col gap-3 w-1/2">
-                                    <Label htmlFor="name" className="text-lg">Nome do edital</Label>
+                                    <Label htmlFor="name" className="text-lg">Nome do documento</Label>
                                     <Input
                                         {...register("nome")}
                                         onChange={() => setAlterouDados(true)}
                                         id="name"
-                                        placeholder="Insira o nome do edital"
+                                        placeholder="Insira o nome do documento"
                                         defaultValue={edital.name}
                                     />
 
@@ -373,12 +373,12 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                 </div>
 
                                 <div className="flex flex-col gap-3 w-full">
-                                    <Label htmlFor="data" className="text-lg">Número do edital</Label>
+                                    <Label htmlFor="data" className="text-lg">Número do documento</Label>
                                     <Input
                                         defaultValue={edital?.identifier}
                                         {...register("identificador")}
                                         id="data"
-                                        placeholder="Informe o número do edital"
+                                        placeholder="Informe o número do documento"
                                         onChange={() => setAlterouDados(true)}
                                     />
                                     {

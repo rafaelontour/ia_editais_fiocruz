@@ -118,9 +118,12 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
   });
 
   const baixarResumoIA = () => {
-    const url = process.env.NEXT_PUBLIC_URL_BASE + "/export/release/pdf?document_release_id=" + edital?.releases[0].id;
+    const url =
+      process.env.NEXT_PUBLIC_URL_BASE +
+      "/export/release/pdf?document_release_id=" +
+      edital?.releases[0].id;
     window.location.href = url;
-  }
+  };
 
   return (
     <div className="flex flex-row gap-4 items-stretch min-h-0 flex-1">
@@ -216,15 +219,15 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                       <Button
                         variant={"destructive"}
                         size={"icon"}
-                        className="hover:cursor-pointer bg-vermelho w-fit px-4 py-2 mx-auto mt-3 text-white top-2 self-center opacity-60 hover:opacity-80 transition-opacity text-md"
+                        className="bg-vermelho hover:cursor-pointer  w-fit px-4 py-2 mx-auto mt-3 text-white top-2 self-center  text-md hover:bg-red-600"
                         title="Fazer download deste resumo"
                         onClick={baixarResumoIA}
                       >
-                        <span>Baixar resumo da IA</span>
+                        <span>Baixar análise da IA</span>
                         <Download className="ml-2" />
                       </Button>
 
-                      <div className="h-0.5 bg-zinc-200 w-[85%] mx-auto" /> 
+                      <div className="h-0.5 bg-zinc-200 w-[85%] mx-auto" />
                       <div
                         className={`${style.resumoIA} ${!isExpanded ? "flex-1 overflow-hidden" : "flex-1"}`}
                         dangerouslySetInnerHTML={{
