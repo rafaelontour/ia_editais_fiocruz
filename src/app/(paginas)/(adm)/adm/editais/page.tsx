@@ -147,6 +147,12 @@ export default function Editais() {
         const activeContainer = active.data.current?.containerId as StatusEdital | undefined;
         const overContainer = over.data.current?.containerId as StatusEdital | undefined;
 
+        // Analista não pode mover para COMPLETED
+        if (overContainer === "COMPLETED" && usuario?.access_level === "ANALYST") {
+            toast.info("Analista não pode mover editais para concluído.");
+            return;
+        }
+
         if ( // Somente ADM e ANALIST podem mover de RASCUNHO -> EM CONSTRUÇÃO -> EM ANALISE
             (
                 activeContainer === "PENDING" && (overContainer === "UNDER_CONSTRUCTION" || overContainer === "WAITING_FOR_REVIEW" || overContainer === "COMPLETED") ||
