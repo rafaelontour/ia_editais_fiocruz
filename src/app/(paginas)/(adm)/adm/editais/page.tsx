@@ -147,6 +147,12 @@ export default function Editais() {
         const activeContainer = active.data.current?.containerId as StatusEdital | undefined;
         const overContainer = over.data.current?.containerId as StatusEdital | undefined;
 
+        // Não permitir mover de RASCUNHO direto para EM ANÁLISE
+        if (activeContainer === "PENDING" && overContainer === "WAITING_FOR_REVIEW") {
+            toast.info("Não é permitido mover de rascunho direto para em análise. É necessário passar por em construção primeiro.");
+            return;
+        }
+
         // Analista não pode mover para COMPLETED
         if (overContainer === "COMPLETED" && usuario?.access_level === "ANALYST") {
             toast.info("Analista não pode mover editais para concluído.");
