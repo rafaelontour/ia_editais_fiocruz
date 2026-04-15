@@ -604,19 +604,21 @@ export default function CardEdital({
                     </Button>
                   )}
 
-                  {usuario?.access_level !== "AUDITOR" && (
+                  {usuario && (
                     <div
-                      className={`flex items-center gap-2 ${editalPronto ? "flex" : "hidden"} `}
+                      className={`flex items-center gap-2 ${editalPronto ? "flex" : "hidden"}`}
                     >
-                      {podeEditarEdital && (
-                        <EditarEdital
-                          atualizarEditais={funcaoAtualizarEditais}
-                          flagEdital={flagEdital}
-                          edital={edital}
-                        />
-                      )}
+                      {podeEditarEdital &&
+                        usuario?.access_level !== "AUDITOR" && (
+                          <EditarEdital
+                            atualizarEditais={funcaoAtualizarEditais}
+                            flagEdital={flagEdital}
+                            edital={edital}
+                          />
+                        )}
 
-                      {usuario?.access_level === "ADMIN" &&
+                      {(usuario?.access_level === "ADMIN" ||
+                        usuario?.access_level === "AUDITOR") &&
                         edital.history &&
                         edital.history[0].status === "COMPLETED" && (
                           <Dialog>
