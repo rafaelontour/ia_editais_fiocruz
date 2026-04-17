@@ -46,7 +46,7 @@ const itemsAdm = [
     icon: IdCard,
   },
   {
-    title: "Documentos arquivados",
+    title: "Docs. Arquivados",
     url: "/adm/editais/arquivados",
     icon: InboxIcon,
   }
@@ -69,7 +69,7 @@ const itemsAuditorAnalista = [
     icon: Type,
   },
   {
-    title: "Documentos arquivados",
+    title: "Docs. Arquivados",
     url: "/adm/editais/arquivados",
     icon: InboxIcon,
   }
