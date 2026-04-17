@@ -46,7 +46,7 @@ export default function EditaisArquivados() {
     const res = await getEditaisArquivadosService(usuario?.unit_id);
 
     if (!res) {
-      toast.error("Erro ao buscar os editais arquivados!");
+      toast.error("Erro ao buscar os documentos arquivados!");
       return;
     }
 
@@ -149,7 +149,7 @@ export default function EditaisArquivados() {
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-6">
         <BotaoVoltar />
-        <h2 className="text-4xl font-bold">Editais arquivados</h2>
+        <h2 className="text-4xl font-bold">Documentos arquivados</h2>
       </div>
 
       <BarraDePesquisa
@@ -345,7 +345,7 @@ export default function EditaisArquivados() {
         )
       ) : (
         <div className="flex justify-center items-center gap-2 text-sm text-gray-400">
-          <span>Carregando editais arquivados...</span>
+          <span>Carregando documentos arquivados...</span>
           <Loader2 className="animate-spin ml-2" />
         </div>
       )}
