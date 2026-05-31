@@ -6,6 +6,8 @@ import {
   InboxIcon,
   Sheet,
   Type,
+  FolderOpenDot,
+  Settings,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -21,6 +23,11 @@ const itemsAdm = [
     icon: Home,
   },
   {
+    title: "Projetos",
+    url: "/adm/projetos",
+    icon: FolderOpenDot,
+  },
+  {
     title: "Meus documentos",
     url: "/adm/editais",
     icon: Sheet,
@@ -29,6 +36,11 @@ const itemsAdm = [
     title: "Tipificações",
     url: "/adm/tipificacoes",
     icon: Type,
+  },
+  {
+    title: "Configurador",
+    url: "/adm/configurador",
+    icon: Settings,
   },
   {
     title: "Fontes",
@@ -49,7 +61,7 @@ const itemsAdm = [
     title: "Docs. Arquivados",
     url: "/adm/editais/arquivados",
     icon: InboxIcon,
-  }
+  },
 ];
 
 const itemsAuditorAnalista = [
@@ -57,6 +69,11 @@ const itemsAuditorAnalista = [
     title: "Página Inicial",
     url: "/",
     icon: Home,
+  },
+  {
+    title: "Projetos",
+    url: "/adm/projetos",
+    icon: FolderOpenDot,
   },
   {
     title: "Meus documentos",
@@ -72,7 +89,7 @@ const itemsAuditorAnalista = [
     title: "Docs. Arquivados",
     url: "/adm/editais/arquivados",
     icon: InboxIcon,
-  }
+  },
 ];
 
 const itemsUsuarioComum = [

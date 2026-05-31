@@ -59,7 +59,7 @@ export default function Logos() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 2.0, ease: "easeOut" }}
             >
-                Versão da platarforma: {versaoPlataforma}
+                 Versão da platarforma: 3.0.0{/* {versaoPlataforma}} */}
             </motion.div>
         </div>
     )
