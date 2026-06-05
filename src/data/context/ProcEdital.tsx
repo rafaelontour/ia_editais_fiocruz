@@ -9,6 +9,7 @@ import { toast } from "sonner";
 export interface ProcEditalProps {
     lista: string[];
     salvarLista: (ids: string[]) => void;
+    limparLista: () => void;
 }
 
 export const ProcEditalContexto =
@@ -121,8 +122,21 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    function limparLista() {
+        setLista([]);
+        localStorage.removeItem(STORAGE_KEY);
+        stopPolling();
+    }
+
+    // Expõe globalmente para debug no console
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            (window as any).__limparFilaProcessamento = limparLista;
+        }
+    }, []);
+
     return (
-        <ProcEditalContexto.Provider value={{ lista, salvarLista }}>
+        <ProcEditalContexto.Provider value={{ lista, salvarLista, limparLista }}>
             {children}
         </ProcEditalContexto.Provider>
     );

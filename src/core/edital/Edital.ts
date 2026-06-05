@@ -57,6 +57,7 @@ export interface Edital {
     typifications?: EditalTypification[];
     created_at?: string;
     updated_at?: string | null;
+    isMock?: boolean;
 }
 
 export interface EditalArquivo {

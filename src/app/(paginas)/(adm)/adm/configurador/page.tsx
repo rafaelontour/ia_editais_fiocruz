@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2 } from "lucide-react";
+import { Pencil, PencilLine, Plus, Trash, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Masonry from "react-masonry-css";
 import Div from "@/components/Div";
@@ -206,7 +206,7 @@ export default function ConfiguradorPage() {
                 disabled={carregando}
                 className="bg-verde cursor-pointer hover:bg-verde text-white"
               >
-                Salvar grupo
+                Salvar
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -225,16 +225,16 @@ export default function ConfiguradorPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Adicionar novo documento</DialogTitle>
+            <DialogTitle>Adicionar novo tipo de documento</DialogTitle>
             <DialogDescription>
-              Informe o nome do documento que será associado ao grupo
+              Informe o nome do tipo de documento que será associado ao grupo
               selecionado.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="documentoNome">Nome do documento</Label>
+              <Label htmlFor="documentoNome">Nome </Label>
               <Input
                 id="documentoNome"
                 value={newDocumentoNome}
@@ -257,7 +257,7 @@ export default function ConfiguradorPage() {
               onClick={adicionarDocumentoAoGrupo}
               className="bg-verde text-white hover:bg-verde cursor-pointer"
             >
-              Salvar documento
+              Salvar
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -299,7 +299,7 @@ export default function ConfiguradorPage() {
                           <span className="text-sm">{item.name}</span>
                           <Button
                             variant="ghost"
-                            className="text-sm"
+                            className="text-xs border border-gray-300 rounded-md hover:bg-gray-100 px-2 cursor-pointer"
                             onClick={() =>
                               excluirDocumentoDoGrupo(grupo.id, item.id)
                             }
@@ -318,21 +318,33 @@ export default function ConfiguradorPage() {
                   <div className="flex flex-col gap-2 mt-4">
                     <div className="flex items-center justify-between gap-2 text-sm text-gray-400">
                       <span>
-                        Criado em {new Date(grupo.created_at ?? "").toLocaleDateString()}
+                        Criado em{" "}
+                        {new Date(grupo.created_at ?? "").toLocaleDateString()}
                       </span>
                       <div className="flex items-center gap-2">
                         <Button
-                          variant="destructive"
-                          className="flex items-center gap-2 bg-vermelho text-white hover:bg-vermelho cursor-pointer"
-                          onClick={() => excluirGrupo(grupo.id)}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                        <Button
-                          className="bg-verde text-white hover:bg-verde cursor-pointer"
+                          title="Adicionar documento"
+                          className="h-8 w-8 bg-verde text-white hover:bg-verde cursor-pointer rounded-sm"
                           onClick={() => abrirModalDocumento(grupo.id)}
                         >
-                          Adicionar documento
+                          <Plus size={16} />
+                        </Button>
+                        <Button
+                          title="Editar grupo"
+                          className={`
+                                                                h-8 w-8 hover:cursor-pointer border border-gray-300 rounded-sm
+                                                                bg-branco hover:bg-branco
+                                                            `}
+                        >
+                          <PencilLine size={16} color="black" />
+                        </Button>
+                        <Button
+                          title="Excluir grupo"
+                          variant="destructive"
+                          className="h-8 w-8 bg-vermelho hover:bg-vermelho hover:cursor-pointer rounded-sm"
+                          onClick={() => excluirGrupo(grupo.id)}
+                        >
+                          <Trash size={16} />
                         </Button>
                       </div>
                     </div>

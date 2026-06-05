@@ -1,16 +1,18 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import type { Edital } from "@/core/edital/Edital";
-import { Projeto, DocumentoProjeto } from "@/core/projeto/Projeto";
+import type { Edital, StatusEdital } from "@/core/edital/Edital";
 
-type StatusEdital =
-  | "PENDING"
-  | "UNDER_CONSTRUCTION"
-  | "WAITING_FOR_REVIEW"
-  | "COMPLETED";
+type KanbanColumns = Record<StatusEdital, Edital[]>;
 
-type KanbanColumns = Record<StatusEdital, any[]>;
+interface KanbanContextType {
+  columns: KanbanColumns;
+  setColumns: React.Dispatch<React.SetStateAction<KanbanColumns>>;
+  addDocumentToRascunho: (doc: Edital) => void;
+  mergeInitial: (cols: KanbanColumns) => void;
+}
+
+const KanbanContext = createContext<KanbanContextType | null>(null);
 
 const KEY = "ia_kanban_v1";
 
@@ -39,8 +41,6 @@ function save(cols: KanbanColumns) {
   localStorage.setItem(KEY, JSON.stringify(cols));
 }
 
-const KanbanContext = createContext<any>(null);
-
 export function KanbanProvider({ children }: { children: React.ReactNode }) {
   const [columns, setColumns] = useState<KanbanColumns>(load);
 
@@ -48,9 +48,9 @@ export function KanbanProvider({ children }: { children: React.ReactNode }) {
     save(columns);
   }, [columns]);
 
-  function addDocumentToRascunho(doc: any) {
+  function addDocumentToRascunho(doc: Edital) {
     setColumns((prev) => {
-      const copy = structuredClone(prev);
+      const copy = structuredClone(prev) as KanbanColumns;
       copy.PENDING.unshift(doc);
       return copy;
     });
@@ -66,10 +66,10 @@ export function KanbanProvider({ children }: { children: React.ReactNode }) {
         COMPLETED: [],
       };
       (Object.keys(merged) as StatusEdital[]).forEach((k) => {
-        const server = (cols as any)[k] ?? [];
-        const local = (prev as any)[k] ?? [];
-        const ids = new Set(local.map((i: any) => i.id));
-        merged[k] = [...server.filter((s: any) => !ids.has(s.id)), ...local];
+        const server = cols[k] ?? [];
+        const local = prev[k] ?? [];
+        const ids = new Set(local.map((i) => i.id));
+        merged[k] = [...server.filter((s) => !ids.has(s.id)), ...local];
       });
       return merged;
     });

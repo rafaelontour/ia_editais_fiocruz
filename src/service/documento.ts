@@ -82,6 +82,17 @@ export async function marcarEnviadoAoKanban(
   return 200;
 }
 
+export async function desmarcarEnviadoAoKanban(
+  documentId: string,
+): Promise<number> {
+  const list = _load();
+  const idx = list.findIndex((d) => d.id === documentId);
+  if (idx === -1) return 404;
+  list[idx].sent_to_kanban = false;
+  _save(list);
+  return 200;
+}
+
 export async function excluirDocumentoService(
   documentId: string,
 ): Promise<number> {

@@ -19,7 +19,6 @@ import {
 } from "@dnd-kit/sortable";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
-import type { BundleSummary } from "@/core/bundle/Bundle";
 import SuperiorEditais from "@/components/editais/SuperiorEditais";
 import {
   definirStatusConcluido,
@@ -41,6 +40,7 @@ import { Button } from "@/components/ui/button";
 import useUsuario from "@/data/hooks/useUsuario";
 import { formatarData } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import useEditalProc from "@/data/hooks/useProcEdital";
 
 export default function Editais() {
   const [adicionouNovoEdital, setAdicionouNovoEdital] =
@@ -54,8 +54,9 @@ export default function Editais() {
   ];
   const { usuario } = useUsuario();
   const { mergeInitial } = useKanban();
+  const { limparLista, lista } = useEditalProc();
 
-  type KanbanItem = Edital | BundleSummary;
+  type KanbanItem = Edital;
 
   const { columns, setColumns } = useKanban();
 
@@ -125,9 +126,9 @@ export default function Editais() {
       });
 
       // merge with any local/mock kanban state
-      mergeInitial(novasColunas as any);
+      mergeInitial(novasColunas);
     } catch (e) {
-      toast.error("Erro ao buscar editais e bundles!");
+      toast.error("Erro ao buscar editais!");
     }
 
     setCarregandoEditais(false);
@@ -343,10 +344,25 @@ export default function Editais() {
 
   return (
     <div className="flex flex-col h-full relative gap-4">
-      <SuperiorEditais
-        funcaoAtualizarEditais={setAdicionouNovoEdital}
-        flagEdital={adicionouNovoEdital}
-      />
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex-1">
+          <SuperiorEditais
+            funcaoAtualizarEditais={setAdicionouNovoEdital}
+            flagEdital={adicionouNovoEdital}
+          />
+        </div>
+        {lista.length > 0 && (
+          <Button
+            onClick={limparLista}
+            variant="destructive"
+            size="sm"
+            className="text-xs"
+            title={`Limpar fila de ${lista.length} documento(s) em processamento`}
+          >
+            Limpar fila ({lista.length})
+          </Button>
+        )}
+      </div>
 
       <DndContext
         sensors={sensors}
@@ -397,7 +413,7 @@ export default function Editais() {
             <div className="bg-white p-3 rounded shadow-l teste2">
               {(() => {
                 const item = findItem(activeId);
-                if (!item || "bundleId" in item) return null;
+                if (!item) return null;
                 return (
                   <div>
                     <div className="h-16 bg-gray-200 rounded-sm mb-2 wrap-break-words whitespace-normal" />

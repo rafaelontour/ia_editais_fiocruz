@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Projeto, DocumentoProjeto } from "@/core/projeto/Projeto";
+import { StatusEdital } from "@/core/edital/Edital";
 import { DocumentGroupItem } from "@/core/configurador/GrupoDocumento";
 import { getProjetosService } from "@/service/projeto";
 import {
@@ -22,10 +23,12 @@ import {
   marcarEnviadoAoKanban,
   excluirDocumentoService,
 } from "@/service/documento";
+import { adicionarEditalService } from "@/service/edital";
 import { getDocumentGroupItemsService } from "@/service/configurador";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import AdicionarDocumentoProjeto from "@/components/projetos/AdicionarDocumentoProjeto";
 import { useKanban } from "@/data/context/kanban";
+import useEditalProc from "@/data/hooks/useProcEdital";
 import { toast } from "sonner";
 import useUsuario from "@/data/hooks/useUsuario";
 import Calendario from "@/components/Calendario";
@@ -47,6 +50,7 @@ export default function ProjetoInternoPage() {
 
   const { addDocumentToRascunho } = useKanban();
   const { usuario } = useUsuario();
+  const { lista, salvarLista } = useEditalProc();
   const [openAddSameTypeDocumento, setOpenAddSameTypeDocumento] =
     useState(false);
   const [defaultTipoDocumento, setDefaultTipoDocumento] = useState<
@@ -150,16 +154,45 @@ export default function ProjetoInternoPage() {
   };
 
   const enviarParaKanban = async (doc: DocumentoProjeto) => {
-    // cria card mockado no kanban
-    addDocumentToRascunho({
-      id: doc.id,
+    const [resposta, idEdital] = (await adicionarEditalService({
       name: doc.name,
+      identifier: doc.number ?? doc.id,
+      description: doc.type ?? "",
+      typification_ids: [],
+      editors_ids: doc.responsible ? [doc.responsible] : [],
+    })) ?? [];
+
+    if (resposta !== 201 || !idEdital) {
+      toast.error("Erro ao enviar documento para o Kanban");
+      return;
+    }
+
+    addDocumentToRascunho({
+      id: idEdital,
+      name: doc.name,
+      identifier: doc.number ?? doc.id,
+      description: doc.type ?? "",
+      status: "PENDING" as StatusEdital,
       created_at: doc.created_at,
+      editors: doc.responsible_name
+        ? [
+            {
+              id: doc.responsible,
+              username: doc.responsible_name,
+              icon: doc.responsible_icon ?? undefined,
+            },
+          ]
+        : undefined,
     });
+
+    if (!lista.includes(idEdital)) {
+      lista.push(idEdital);
+      salvarLista(lista);
+    }
+
     await marcarEnviadoAoKanban(doc.id);
-    toast.success("Documento enviado para Kanban (Rascunho)");
+    toast.success("Documento enviado para Kanban");
     fetch();
-    // navegar para Kanban
     router.push("/adm/editais");
   };
 
