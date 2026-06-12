@@ -39,6 +39,7 @@ export default function RootLayout({
   const titulosMap: Record<string, string> = {
     "/adm": "Início",
     "/adm/editais": "Meus documentos",
+    "/adm/assistente": "Assistente IA",
     "/adm/tipificacoes": "Tipificações",
     "/adm/taxonomias": "Taxonomias",
     "/adm/fontes": "Fontes",
@@ -160,7 +161,7 @@ export default function RootLayout({
 
           <motion.div
             layout
-            className="px-7.5 w-full h-[calc(100vh-63px)] min-w-0 bg-white"
+            className={`w-full h-[calc(100vh-63px)] min-w-0 bg-white ${pathname === "/adm/assistente" ? "px-0" : "px-7.5"}`}
             style={{ boxShadow: "inset 0 2px 5px rgba(0,0,0,.4)" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >

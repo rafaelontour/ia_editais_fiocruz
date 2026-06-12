@@ -13,6 +13,7 @@ import {
   User,
   Plus,
   Trash2,
+  Bot,
 } from "lucide-react";
 import { Projeto, DocumentoProjeto } from "@/core/projeto/Projeto";
 import { StatusEdital } from "@/core/edital/Edital";
@@ -183,6 +184,10 @@ export default function ProjetoInternoPage() {
             },
           ]
         : undefined,
+      isMock: true,
+      grupo: projeto?.document_group_name ?? "",
+      tipo_documento: doc.type ?? "",
+      projeto_nome: projeto?.name ?? "",
     });
 
     if (!lista.includes(idEdital)) {
@@ -408,10 +413,10 @@ export default function ProjetoInternoPage() {
                   ) : doc.sent_to_kanban ? (
                     <Button
                       onClick={() => router.push("/adm/editais")}
-                      title="Visualizar"
+                      title="Visualizar análise do OiacIA"
                       className="h-10 w-10 hover:cursor-pointer border border-gray-300 rounded-sm bg-branco hover:bg-branco"
                     >
-                      <View color="black" />
+                      <Bot color="black" />
                     </Button>
                   ) : (
                     <>

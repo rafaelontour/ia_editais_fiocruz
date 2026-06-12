@@ -50,8 +50,9 @@ export default function CardLista({ status, categoria, editais, funcaoAtualizarE
       </div>
 
       <div className="space-y-3 overflow-y-auto px-1 scrollbar-style pb-2">
-          {editais.map((edital) => (
-            edital &&
+          {editais.filter(
+            (e, i, self) => e && self.findIndex((x) => x.id === e.id) === i,
+          ).map((edital) => (
             // PASSA containerId para o cartão (necessário para usar data.containerId no useSortable)
             <CardEdital funcaoAtualizarEditais={funcaoAtualizarEditais} flagEdital={flagEdital} key={edital.id} edital={edital} containerId={status} />
           ))}

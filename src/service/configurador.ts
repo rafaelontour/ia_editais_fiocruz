@@ -87,15 +87,23 @@ export async function getDocumentGroupItemsService(
   return items.filter((item) => item.group_id === groupId);
 }
 
+export async function getAllDocumentGroupItemsService(): Promise<
+  DocumentGroupItem[]
+> {
+  return loadItems();
+}
+
 export async function adicionarDocumentoConfiguravelService(
   groupId: string,
   name: string,
+  icon_path?: string,
 ): Promise<[number, string]> {
   const items = loadItems();
   const novo: DocumentGroupItem = {
     id: String(Date.now()),
     group_id: groupId,
     name,
+    icon_path,
     created_at: new Date().toISOString(),
   };
   items.unshift(novo);
@@ -106,11 +114,12 @@ export async function adicionarDocumentoConfiguravelService(
 export async function atualizarDocumentoConfiguravelService(
   itemId: string,
   name: string,
+  icon_path?: string,
 ): Promise<number> {
   const items = loadItems();
   const index = items.findIndex((item) => item.id === itemId);
   if (index === -1) return 404;
-  items[index] = { ...items[index], name };
+  items[index] = { ...items[index], name, icon_path };
   saveItems(items);
   return 200;
 }

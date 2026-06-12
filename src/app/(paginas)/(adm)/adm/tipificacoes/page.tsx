@@ -28,6 +28,7 @@ import {
 import {
   getDocumentGroupsService,
   getDocumentGroupItemsService,
+  getAllDocumentGroupItemsService,
 } from "@/service/configurador";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Calendar, Loader2, PencilLine, Plus, View } from "lucide-react";
@@ -86,6 +87,10 @@ export default function Tipificacoes() {
     DocumentGroupItem[]
   >([]);
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
+  const [selectedTipoFilter, setSelectedTipoFilter] = useState<string>("");
+  const [allDocumentGroupItems, setAllDocumentGroupItems] = useState<
+    DocumentGroupItem[]
+  >([]);
 
   const [dialogTipificacao, setDialogTipificacao] = useState(false);
   const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
@@ -113,6 +118,8 @@ export default function Tipificacoes() {
       await getFontes();
       await getDocumentGroups();
       await getTipificacoes();
+      const allItems = await getAllDocumentGroupItemsService();
+      setAllDocumentGroupItems(allItems ?? []);
       setCarregandoTipificacoes(false);
     }
 
@@ -200,6 +207,13 @@ export default function Tipificacoes() {
       );
     }
 
+    if (selectedTipoFilter) {
+      resultado = resultado.filter(
+        (tipificacao) =>
+          tipificacao.document_group_item_id === selectedTipoFilter,
+      );
+    }
+
     if (termoBusca.current.trim() === "") {
       setTipificacoesFiltradas(resultado);
       return;
@@ -215,6 +229,12 @@ export default function Tipificacoes() {
 
     setTipificacoesFiltradas(tf);
   }
+
+  const filteredTipoItems = selectedGroupFilter
+    ? allDocumentGroupItems.filter(
+        (item) => item.group_id === selectedGroupFilter,
+      )
+    : allDocumentGroupItems;
   const getFontes = async () => {
     const dados = await getFontesService();
 
@@ -411,40 +431,83 @@ export default function Tipificacoes() {
                 funcFiltrar={filtrarTipificacao}
               />
 
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium">Grupo:</label>
-                <select
-                  className="border rounded-md px-2 py-1"
-                  value={selectedGroupFilter}
-                  onChange={(event) => {
-                    const nextValue = event.target.value;
-                    setSelectedGroupFilter(nextValue);
-                    let resultado = tipificacoes;
-                    if (nextValue) {
-                      resultado = resultado.filter(
-                        (tipificacao) =>
-                          tipificacao.document_group_id === nextValue,
-                      );
-                    }
-                    if (termoBusca.current.trim() !== "") {
-                      resultado = resultado.filter(
-                        (tipificacao) =>
-                          tipificacao.name &&
-                          tipificacao.name
-                            .toLowerCase()
-                            .startsWith(termoBusca.current.toLowerCase()),
-                      );
-                    }
-                    setTipificacoesFiltradas(resultado);
-                  }}
-                >
-                  <option value="">Todos</option>
-                  {documentGroups.map((grupo) => (
-                    <option key={grupo.id} value={grupo.id}>
-                      {grupo.name}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex  gap-5 items-center">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium">Grupo:</label>
+                  <select
+                    className="border rounded-md px-2 py-1"
+                    value={selectedGroupFilter}
+                    onChange={(event) => {
+                      const nextValue = event.target.value;
+                      setSelectedGroupFilter(nextValue);
+                      setSelectedTipoFilter("");
+                      let resultado = nextValue
+                        ? tipificacoes.filter(
+                            (t) => t.document_group_id === nextValue,
+                          )
+                        : tipificacoes;
+                      if (termoBusca.current.trim() !== "") {
+                        resultado = resultado.filter(
+                          (tipificacao) =>
+                            tipificacao.name &&
+                            tipificacao.name
+                              .toLowerCase()
+                              .startsWith(termoBusca.current.toLowerCase()),
+                        );
+                      }
+                      setTipificacoesFiltradas(resultado);
+                    }}
+                  >
+                    <option value="">Todos</option>
+                    {documentGroups.map((grupo) => (
+                      <option key={grupo.id} value={grupo.id}>
+                        {grupo.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium">Tipo:</label>
+                  <select
+                    className="border rounded-md px-2 py-1"
+                    value={selectedTipoFilter}
+                    onChange={(event) => {
+                      const nextValue = event.target.value;
+                      setSelectedTipoFilter(nextValue);
+                      let resultado = tipificacoes;
+                      if (selectedGroupFilter) {
+                        resultado = resultado.filter(
+                          (tipificacao) =>
+                            tipificacao.document_group_id ===
+                            selectedGroupFilter,
+                        );
+                      }
+                      if (nextValue) {
+                        resultado = resultado.filter(
+                          (tipificacao) =>
+                            tipificacao.document_group_item_id === nextValue,
+                        );
+                      }
+                      if (termoBusca.current.trim() !== "") {
+                        resultado = resultado.filter(
+                          (tipificacao) =>
+                            tipificacao.name &&
+                            tipificacao.name
+                              .toLowerCase()
+                              .startsWith(termoBusca.current.toLowerCase()),
+                        );
+                      }
+                      setTipificacoesFiltradas(resultado);
+                    }}
+                  >
+                    <option value="">Todos</option>
+                    {filteredTipoItems.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>

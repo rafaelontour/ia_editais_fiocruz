@@ -1,4 +1,5 @@
 import {
+  Bot,
   Building,
   FilePen,
   Home,
@@ -21,6 +22,11 @@ const itemsAdm = [
     title: "Página Inicial",
     url: "/",
     icon: Home,
+  },
+  {
+    title: "OiacIA",
+    url: "/adm/assistente",
+    icon: Bot,
   },
   {
     title: "Projetos",
@@ -69,6 +75,11 @@ const itemsAuditorAnalista = [
     title: "Página Inicial",
     url: "/",
     icon: Home,
+  },
+  {
+    title: "OiacIA",
+    url: "/adm/assistente",
+    icon: Bot,
   },
   {
     title: "Projetos",

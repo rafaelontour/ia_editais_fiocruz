@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import {
   AlertCircle,
   Archive,
+  Bot,
   Calendar,
   Clock,
   Trash,
@@ -92,34 +93,31 @@ export default function CardEdital({
   };
 
   async function excluirEdital() {
-    if (edital.isMock) {
-      const resposta = await desmarcarEnviadoAoKanban(edital.id);
-      if (resposta !== 200) {
-        toast.error("Erro ao remover edital mock do Kanban!");
-        return;
-      }
+    // FUTURO: quando o backend suportar DELETE /doc/:id, descomentar o bloco abaixo
+    // e remover a mock atual.
+    //
+    // if (!edital.isMock) {
+    //   const resposta = await excluirEditalService(edital.id);
+    //   if (resposta !== 204) {
+    //     toast.error("Erro ao excluir edital!");
+    //     return;
+    //   }
+    // } else {
+    //   await desmarcarEnviadoAoKanban(edital.id);
+    // }
 
-      setColumns((prev) => {
-        const next = structuredClone(prev) as KanbanColumns;
-        (Object.keys(next) as StatusEdital[]).forEach((status) => {
-          next[status] = next[status].filter((item) => item.id !== edital.id);
-        });
-        return next;
+    // Mock atual — remove do state local + localStorage independente de isMock
+    await desmarcarEnviadoAoKanban(edital.id);
+
+    setColumns((prev) => {
+      const next = structuredClone(prev) as KanbanColumns;
+      (Object.keys(next) as StatusEdital[]).forEach((status) => {
+        next[status] = next[status].filter((item) => item.id !== edital.id);
       });
+      return next;
+    });
 
-      toast.success("Documento removido do Kanban");
-      funcaoAtualizarEditais(!flagEdital);
-      return;
-    }
-
-    const resposta = await excluirEditalService(edital.id);
-
-    if (resposta !== 204) {
-      toast.error("Erro ao excluir edital!");
-      return;
-    }
-
-    toast.success("Edital excluido com sucesso!");
+    toast.success("Edital excluído do Kanban");
     funcaoAtualizarEditais(!flagEdital);
   }
 
@@ -171,11 +169,12 @@ export default function CardEdital({
   const editalPronto =
     !!edital &&
     !!edital.id &&
-    (Array.isArray(edital.history) ? edital.history.length > 0 : !!edital.status);
+    (Array.isArray(edital.history)
+      ? edital.history.length > 0
+      : !!edital.status);
 
   const podeEditarEdital =
-    currentStatus === "UNDER_CONSTRUCTION" ||
-    currentStatus === "PENDING";
+    currentStatus === "UNDER_CONSTRUCTION" || currentStatus === "PENDING";
 
   interface LogsPorData {
     [key: string]: Log[];
@@ -571,6 +570,21 @@ export default function CardEdital({
                         flex flex-col items-start gap-1 mt-2
                     "
         >
+          {(edital.grupo || edital.tipo_documento) && (
+            <div className="flex gap-2 mt-1 text-sm ">
+              {edital.grupo && (
+                <p className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
+                  <strong>Grupo</strong>: {edital.grupo}
+                </p>
+              )}
+              {edital.tipo_documento && (
+                <p className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
+                  <strong>Tipo</strong>: {edital.tipo_documento}
+                </p>
+              )}
+            </div>
+          )}
+
           <p>
             <strong>Número do edital</strong>: {edital.identifier}
           </p>
@@ -612,7 +626,7 @@ export default function CardEdital({
                         size={"icon"}
                         className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5"
                       >
-                        <View />
+                        <Bot />
                       </Button>
                     </Link>
                   )}

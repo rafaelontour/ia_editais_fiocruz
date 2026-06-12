@@ -84,23 +84,32 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
 
                 for (const id of lista) {
                     try {
-                        const edital: EditalArquivo | undefined =
-                            await getEditalArquivoService(id);
+                        const [editalArquivo, doc] = await Promise.all([
+                            getEditalArquivoService(id),
+                            getEditalPorIdService(id) as Promise<Edital | undefined>,
+                        ]);
 
-                        const descricao = edital?.releases?.[0]?.description;
+                        const descricao = editalArquivo?.releases?.[0]?.description;
+                        const procStatus = doc?.processing_status;
 
-                        if (!descricao) {
-                            idsRestantes.push(id);
-                        } else {
-                            const e = await getEditalPorIdService(id) as Edital;
-
-                            toast.success(
-                                `Edital ${e.name} processado!`,
+                        if (procStatus === "FAILED") {
+                            toast.error(
+                                `Falha no processamento do documento!`,
                                 {
                                     description:
-                                        "O resultado do edital processado já está disponível para visualização."
+                                        "Ocorreu um erro ao processar o documento. Entre em contato com o suporte."
                                 }
                             );
+                        } else if (descricao) {
+                            toast.success(
+                                `Edital ${doc?.name ?? id} processado!`,
+                                {
+                                    description:
+                                        "O resultado do processamento já está disponível para visualização."
+                                }
+                            );
+                        } else {
+                            idsRestantes.push(id);
                         }
                     } catch {
                         idsRestantes.push(id);

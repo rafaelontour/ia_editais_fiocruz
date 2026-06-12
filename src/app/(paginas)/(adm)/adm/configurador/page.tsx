@@ -14,7 +14,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, PencilLine, Plus, Trash, Trash2 } from "lucide-react";
+import {
+  ImageIcon,
+  Pencil,
+  PencilLine,
+  Plus,
+  Trash,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import Masonry from "react-masonry-css";
 import Div from "@/components/Div";
@@ -28,6 +36,7 @@ import {
   excluirGrupoDocumentoService,
   getDocumentGroupItemsService,
   adicionarDocumentoConfiguravelService,
+  atualizarDocumentoConfiguravelService,
   excluirDocumentoConfiguravelService,
 } from "@/service/configurador";
 
@@ -41,10 +50,16 @@ export default function ConfiguradorPage() {
   const [documentDialogAberto, setDocumentDialogAberto] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [newDocumentoNome, setNewDocumentoNome] = useState("");
+  const [newDocumentoImagem, setNewDocumentoImagem] = useState<string>("");
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {},
   );
   const [carregando, setCarregando] = useState(false);
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [editDialogAberto, setEditDialogAberto] = useState(false);
+  const [editItem, setEditItem] = useState<DocumentGroupItem | null>(null);
+  const [editDocumentoNome, setEditDocumentoNome] = useState("");
+  const [editDocumentoImagem, setEditDocumentoImagem] = useState<string>("");
 
   const breakpointColumnsObj = { default: 3, 1500: 3, 1000: 2, 700: 1 };
 
@@ -108,6 +123,7 @@ export default function ConfiguradorPage() {
     setDocumentDialogAberto(false);
     setSelectedGroupId(null);
     setNewDocumentoNome("");
+    setNewDocumentoImagem("");
   };
 
   const adicionarDocumentoAoGrupo = async () => {
@@ -125,6 +141,7 @@ export default function ConfiguradorPage() {
     const [status] = await adicionarDocumentoConfiguravelService(
       selectedGroupId,
       name,
+      newDocumentoImagem || undefined,
     );
     if (status !== 201) {
       toast.error("Erro ao adicionar documento no grupo.");
@@ -133,9 +150,52 @@ export default function ConfiguradorPage() {
 
     toast.success("Documento adicionado ao grupo.");
     setNewDocumentoNome("");
+    setNewDocumentoImagem("");
     setDocumentDialogAberto(false);
     const items = await getDocumentGroupItemsService(selectedGroupId);
     setItemsByGroup((m) => ({ ...m, [selectedGroupId]: items ?? [] }));
+  };
+
+  const abrirModalEditarDocumento = (item: DocumentGroupItem) => {
+    setEditItem(item);
+    setEditDocumentoNome(item.name);
+    setEditDocumentoImagem(item.icon_path ?? "");
+    setEditDialogAberto(true);
+  };
+
+  const fecharModalEditarDocumento = () => {
+    setEditDialogAberto(false);
+    setEditItem(null);
+    setEditDocumentoNome("");
+    setEditDocumentoImagem("");
+  };
+
+  const atualizarDocumentoNoGrupo = async () => {
+    if (!editItem) {
+      toast.error("Item não selecionado.");
+      return;
+    }
+
+    const name = editDocumentoNome.trim();
+    if (!name) {
+      toast.error("Informe o nome do documento.");
+      return;
+    }
+
+    const status = await atualizarDocumentoConfiguravelService(
+      editItem.id,
+      name,
+      editDocumentoImagem || undefined,
+    );
+    if (status !== 200) {
+      toast.error("Erro ao atualizar documento.");
+      return;
+    }
+
+    toast.success("Documento atualizado.");
+    fecharModalEditarDocumento();
+    const items = await getDocumentGroupItemsService(editItem.group_id);
+    setItemsByGroup((m) => ({ ...m, [editItem.group_id]: items ?? [] }));
   };
 
   const excluirDocumentoDoGrupo = async (groupId: string, itemId: string) => {
@@ -220,6 +280,7 @@ export default function ConfiguradorPage() {
           if (!open) {
             setSelectedGroupId(null);
             setNewDocumentoNome("");
+            setNewDocumentoImagem("");
           }
         }}
       >
@@ -234,13 +295,63 @@ export default function ConfiguradorPage() {
 
           <div className="space-y-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="documentoNome">Nome </Label>
+              <Label htmlFor="documentoNome">Nome</Label>
               <Input
                 id="documentoNome"
                 value={newDocumentoNome}
                 onChange={(event) => setNewDocumentoNome(event.target.value)}
                 placeholder="Ex: Contrato social"
               />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>Imagem (opcional)</Label>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="relative cursor-pointer"
+                  onClick={() => {
+                    const input = document.createElement("input");
+                    input.type = "file";
+                    input.accept = "image/*";
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        setNewDocumentoImagem(ev.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    };
+                    input.click();
+                  }}
+                >
+                  <ImageIcon size={16} className="mr-1" />
+                  Escolher imagem
+                </Button>
+
+                {newDocumentoImagem && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-red-500 cursor-pointer"
+                    onClick={() => setNewDocumentoImagem("")}
+                  >
+                    <X size={16} />
+                  </Button>
+                )}
+              </div>
+
+              {newDocumentoImagem && (
+                <div className="relative mt-2 inline-block">
+                  <img
+                    src={newDocumentoImagem}
+                    alt="Preview"
+                    className="h-20 w-20 object-cover rounded border"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -255,6 +366,104 @@ export default function ConfiguradorPage() {
             </DialogClose>
             <Button
               onClick={adicionarDocumentoAoGrupo}
+              className="bg-verde text-white hover:bg-verde cursor-pointer"
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={editDialogAberto}
+        onOpenChange={(open) => {
+          setEditDialogAberto(open);
+          if (!open) {
+            fecharModalEditarDocumento();
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar tipo de documento</DialogTitle>
+            <DialogDescription>
+              Altere o nome ou a imagem do tipo de documento.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="editDocumentoNome">Nome</Label>
+              <Input
+                id="editDocumentoNome"
+                value={editDocumentoNome}
+                onChange={(event) => setEditDocumentoNome(event.target.value)}
+                placeholder="Ex: Contrato social"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>Imagem (opcional)</Label>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="relative cursor-pointer"
+                  onClick={() => {
+                    const input = document.createElement("input");
+                    input.type = "file";
+                    input.accept = "image/*";
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        setEditDocumentoImagem(ev.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    };
+                    input.click();
+                  }}
+                >
+                  <ImageIcon size={16} className="mr-1" />
+                  {editDocumentoImagem ? "Trocar imagem" : "Escolher imagem"}
+                </Button>
+
+                {editDocumentoImagem && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-red-500 cursor-pointer"
+                    onClick={() => setEditDocumentoImagem("")}
+                  >
+                    <X size={16} />
+                  </Button>
+                )}
+              </div>
+
+              {editDocumentoImagem && (
+                <div className="relative mt-2 inline-block">
+                  <img
+                    src={editDocumentoImagem}
+                    alt="Preview"
+                    className="h-20 w-20 object-cover rounded border"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose>
+              <Button
+                variant="secondary"
+                className="cursor-pointer bg-vermelho hover:bg-vermelho text-white"
+              >
+                Cancelar
+              </Button>
+            </DialogClose>
+            <Button
+              onClick={atualizarDocumentoNoGrupo}
               className="bg-verde text-white hover:bg-verde cursor-pointer"
             >
               Salvar
@@ -294,18 +503,43 @@ export default function ConfiguradorPage() {
                       {documentosVisiveis.map((item) => (
                         <li
                           key={item.id}
-                          className="flex items-center justify-between"
+                          className="flex items-center justify-between gap-2"
                         >
-                          <span className="text-sm">{item.name}</span>
-                          <Button
-                            variant="ghost"
-                            className="text-xs border border-gray-300 rounded-md hover:bg-gray-100 px-2 cursor-pointer"
-                            onClick={() =>
-                              excluirDocumentoDoGrupo(grupo.id, item.id)
-                            }
-                          >
-                            Excluir
-                          </Button>
+                          <div className="flex items-center gap-2 min-w-0">
+                            {item.icon_path && (
+                              <img
+                                src={item.icon_path}
+                                alt=""
+                                className="h-6 w-6 rounded object-cover cursor-pointer flex-shrink-0 hover:opacity-80"
+                                title="Clique para ampliar"
+                                onClick={() =>
+                                  setExpandedImage(item.icon_path ?? null)
+                                }
+                              />
+                            )}
+                            <span className="text-sm truncate">
+                              {item.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              className="text-xs border border-gray-300 rounded-md hover:bg-gray-100 px-2 cursor-pointer"
+                              onClick={() => abrirModalEditarDocumento(item)}
+                              title="Editar"
+                            >
+                              Editar
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              className="text-xs border border-gray-300 rounded-md hover:bg-gray-100 px-2 cursor-pointer"
+                              onClick={() =>
+                                excluirDocumentoDoGrupo(grupo.id, item.id)
+                              }
+                            >
+                              Excluir
+                            </Button>
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -365,6 +599,26 @@ export default function ConfiguradorPage() {
             );
           })}
         </Masonry>
+      )}
+      {expandedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          onClick={() => setExpandedImage(null)}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh]">
+            <img
+              src={expandedImage}
+              alt="Imagem ampliada"
+              className="max-w-full max-h-[90vh] rounded shadow-2xl"
+            />
+            <button
+              className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow cursor-pointer"
+              onClick={() => setExpandedImage(null)}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

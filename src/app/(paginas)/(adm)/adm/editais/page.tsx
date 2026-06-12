@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useKanban } from "@/data/context/kanban";
 import {
   DndContext,
@@ -41,6 +41,16 @@ import useUsuario from "@/data/hooks/useUsuario";
 import { formatarData } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import useEditalProc from "@/data/hooks/useProcEdital";
+import { Projeto } from "@/core/projeto/Projeto";
+import {
+  DocumentGroup,
+  DocumentGroupItem,
+} from "@/core/configurador/GrupoDocumento";
+import {
+  getDocumentGroupsService,
+  getAllDocumentGroupItemsService,
+} from "@/service/configurador";
+import { getProjetosService } from "@/service/projeto";
 
 export default function Editais() {
   const [adicionouNovoEdital, setAdicionouNovoEdital] =
@@ -59,6 +69,84 @@ export default function Editais() {
   type KanbanItem = Edital;
 
   const { columns, setColumns } = useKanban();
+
+  const [documentGroups, setDocumentGroups] = useState<DocumentGroup[]>([]);
+  const [documentGroupItems, setDocumentGroupItems] = useState<
+    DocumentGroupItem[]
+  >([]);
+  const [projetos, setProjetos] = useState<Projeto[]>([]);
+  const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
+  const [selectedProjectFilter, setSelectedProjectFilter] =
+    useState<string>("");
+  const [selectedTipoFilter, setSelectedTipoFilter] = useState<string>("");
+
+  const filteredColumns = useMemo(() => {
+    if (
+      !selectedGroupFilter &&
+      !selectedProjectFilter &&
+      !selectedTipoFilter
+    )
+      return columns;
+
+    const result: Record<StatusEdital, KanbanItem[]> = {
+      PENDING: [],
+      UNDER_CONSTRUCTION: [],
+      WAITING_FOR_REVIEW: [],
+      COMPLETED: [],
+    };
+
+    for (const status of statuses) {
+      result[status] = columns[status].filter((edital) => {
+        if (selectedGroupFilter && edital.grupo !== selectedGroupFilter)
+          return false;
+        if (
+          selectedProjectFilter &&
+          edital.projeto_nome !== selectedProjectFilter
+        )
+          return false;
+        if (
+          selectedTipoFilter &&
+          edital.tipo_documento !== selectedTipoFilter
+        )
+          return false;
+        return true;
+      });
+    }
+
+    return result;
+  }, [columns, selectedGroupFilter, selectedProjectFilter, selectedTipoFilter]);
+
+  useEffect(() => {
+    async function fetchFilters() {
+      const groups = await getDocumentGroupsService();
+      setDocumentGroups(groups ?? []);
+      const items = await getAllDocumentGroupItemsService();
+      setDocumentGroupItems(items ?? []);
+      const projs = await getProjetosService();
+      setProjetos(projs ?? []);
+
+      // Backfill projeto_nome for existing documents that have grupo/tipo
+      // mas foram criados antes da adição desse campo
+      setColumns((prev) => {
+        const next = structuredClone(prev) as Record<StatusEdital, KanbanItem[]>;
+        for (const status of Object.keys(next) as StatusEdital[]) {
+          next[status] = next[status].map((edital) => {
+            if (!edital.projeto_nome && edital.grupo && edital.tipo_documento) {
+              const match = projs.find(
+                (p) => p.document_group_name === edital.grupo,
+              );
+              if (match) {
+                return { ...edital, projeto_nome: match.name };
+              }
+            }
+            return edital;
+          });
+        }
+        return next;
+      });
+    }
+    fetchFilters();
+  }, []);
 
   // NOVO: estado para guardar movimentação pendente
   const [pendingMove, setPendingMove] = useState<{
@@ -364,6 +452,87 @@ export default function Editais() {
         )}
       </div>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium">Grupo:</label>
+          <select
+            className="border rounded-md px-2 py-1 text-sm"
+            value={selectedGroupFilter}
+            onChange={(e) => {
+              setSelectedGroupFilter(e.target.value);
+              setSelectedProjectFilter("");
+              setSelectedTipoFilter("");
+            }}
+          >
+            <option value="">Todos</option>
+            {documentGroups.map((grupo) => (
+              <option key={grupo.id} value={grupo.name}>
+                {grupo.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {selectedGroupFilter && (
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Projeto:</label>
+            <select
+              className="border rounded-md px-2 py-1 text-sm"
+              value={selectedProjectFilter}
+              onChange={(e) => {
+                setSelectedProjectFilter(e.target.value);
+                setSelectedTipoFilter("");
+              }}
+            >
+              <option value="">Todos</option>
+              {projetos
+                .filter(
+                  (p) => p.document_group_name === selectedGroupFilter,
+                )
+                .map((p) => (
+                  <option key={p.id} value={p.name}>
+                    {p.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
+
+        {selectedProjectFilter && (
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Tipo:</label>
+            <select
+              className="border rounded-md px-2 py-1 text-sm"
+              value={selectedTipoFilter}
+              onChange={(e) => {
+                setSelectedTipoFilter(e.target.value);
+              }}
+            >
+              <option value="">Todos</option>
+              {(() => {
+                const projeto = projetos.find(
+                  (p) => p.name === selectedProjectFilter,
+                );
+                const groupId = projeto
+                  ? documentGroups.find(
+                      (g) => g.name === projeto.document_group_name,
+                    )?.id
+                  : undefined;
+                return groupId
+                  ? documentGroupItems
+                      .filter((item) => item.group_id === groupId)
+                      .map((item) => (
+                        <option key={item.id} value={item.name}>
+                          {item.name}
+                        </option>
+                      ))
+                  : [];
+              })()}
+            </select>
+          </div>
+        )}
+      </div>
+
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -376,10 +545,10 @@ export default function Editais() {
               <p className="text-xl animate-pulse">Buscando editais...</p>
               <Loader2 className="animate-spin mr-2 h-6 w-6 text-gray-600" />
             </div>
-          ) : columns["PENDING"].length === 0 &&
-            columns["UNDER_CONSTRUCTION"].length === 0 &&
-            columns["WAITING_FOR_REVIEW"].length === 0 &&
-            columns["COMPLETED"].length === 0 ? (
+          ) : filteredColumns["PENDING"].length === 0 &&
+            filteredColumns["UNDER_CONSTRUCTION"].length === 0 &&
+            filteredColumns["WAITING_FOR_REVIEW"].length === 0 &&
+            filteredColumns["COMPLETED"].length === 0 ? (
             <div className="flex justify-center items-center h-80 w-full">
               <p className="text-xl animate-pulse">Nenhum edital cadastrado</p>
             </div>
@@ -387,7 +556,7 @@ export default function Editais() {
             statuses.map((status) => (
               <div className="w-full" key={status}>
                 <SortableContext
-                  items={columns[status].map((c) => c.id)}
+                  items={[...new Set(filteredColumns[status].map((c) => c.id))]}
                   strategy={verticalListSortingStrategy}
                 >
                   <CardLista
@@ -400,7 +569,7 @@ export default function Editais() {
                         color: getStatusColor(status),
                       },
                     ]}
-                    editais={columns[status]}
+                    editais={filteredColumns[status]}
                   />
                 </SortableContext>
               </div>

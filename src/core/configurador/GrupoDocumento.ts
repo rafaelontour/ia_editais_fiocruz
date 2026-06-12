@@ -3,6 +3,7 @@ export interface DocumentGroupItem {
   group_id: string;
   name: string;
   created_at?: string;
+  icon_path?: string;
 }
 
 export interface DocumentGroup {
