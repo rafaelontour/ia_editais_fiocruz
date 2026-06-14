@@ -50,7 +50,7 @@ jobs:
 
           cd /home/ubuntu/apps/prod/v3
 
-          if [ ! -d "iaEditais-front" ]; then
+          if [ ! -d "iaEditais-front-v3" ]; then
             git clone -b develop-v3.x https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-front-v3
             cd iaEditais-front-v3
           else
