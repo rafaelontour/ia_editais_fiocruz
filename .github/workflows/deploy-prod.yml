@@ -2,7 +2,7 @@ name: CI/CD - IaEditais
 
 on:
   push:
-    branches: ["main"]
+    branches: ["develop-v3.x"]
 
 jobs:
 
@@ -48,15 +48,15 @@ jobs:
 
           echo "🚀 Iniciando deploy via docker-compose..."
 
-          cd /home/ubuntu/apps/prod
+          cd /home/ubuntu/apps/prod/v3
 
           if [ ! -d "iaEditais-front" ]; then
-            git clone -b main https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-front
-            cd iaEditais-front
+            git clone -b develop-v3.x https://github.com/rafaelontour/ia_editais_fiocruz.git iaEditais-front-v3
+            cd iaEditais-front-v3
           else
-            cd iaEditais-front
-            git fetch origin main
-            git reset --hard origin/main
+            cd iaEditais-front-v3
+            git fetch origin develop-v3.x
+            git reset --hard origin/develop-v3.x
           fi
 
           export DOCKER_BUILDKIT=1
