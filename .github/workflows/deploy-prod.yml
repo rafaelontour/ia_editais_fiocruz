@@ -48,7 +48,7 @@ jobs:
 
           echo "🚀 Iniciando deploy via docker-compose..."
 
-          mkdir /home/ubuntu/apps/prod/v3
+          mkdir -p /home/ubuntu/apps/prod/v3
           cd /home/ubuntu/apps/prod/v3
 
           if [ ! -d "iaEditais-front-v3" ]; then
