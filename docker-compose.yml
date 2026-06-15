@@ -9,5 +9,5 @@ services:
     environment:
       NEXT_PUBLIC_VERSAO_PLATAFORMA: "beta-3.0.x"
     ports:
-      - "5000:5000"
+      - "4002:4000"
     restart: unless-stopped
