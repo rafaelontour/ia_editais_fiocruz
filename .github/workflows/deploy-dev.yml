@@ -1,0 +1,53 @@
+name: CI/CD - IaEditais DEV
+
+on:
+  push:
+    branches: ["develop-v3.x"]
+
+jobs:
+
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Rodar build para validar
+        run: npm run build
+
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar chave SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.IA_EDITAIS_SSH }}
+
+      - name: Deploy DEV
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.IP_HOST_IAEDITAIS }} << 'EOF'
+            set -e
+
+            echo "🚀 Deploy DEV"
+
+            cd /home/ubuntu/apps/develop/iaEditais-front
+
+            git fetch origin develop-v3.x
+            git reset --hard origin/develop-v3.x
+
+            export DOCKER_BUILDKIT=1
+
+            docker compose down || true
+            docker compose up -d --build
+
+            echo "✅ Deploy concluído"
+          EOF
