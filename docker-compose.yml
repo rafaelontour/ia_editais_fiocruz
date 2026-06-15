@@ -1,13 +1,15 @@
 services:
-  fiotec-front-v3:
+  fiotec-front:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_VERSAO_PLATAFORMA: "beta-3.0.x"
-    container_name: fiotec-front-v3
+        NEXT_PUBLIC_VERSAO_PLATAFORMA: "beta-2.5.x"
+
     environment:
-      NEXT_PUBLIC_VERSAO_PLATAFORMA: "beta-3.0.x"
+      NEXT_PUBLIC_VERSAO_PLATAFORMA: "beta-2.5.x"
+
     ports:
       - "4002:4000"
+
     restart: unless-stopped
