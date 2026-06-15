@@ -34,7 +34,7 @@ COPY --from=builder /app/package-lock.json ./package-lock.json
 RUN npm install --omit=dev
 
 # Expondo a porta que a aplicação vai rodar
-EXPOSE 4000
+EXPOSE 5000
 
 # Comando para rodar a aplicação
 CMD ["npx", "pm2-runtime", "npm", "--name", "app", "--", "start"]
