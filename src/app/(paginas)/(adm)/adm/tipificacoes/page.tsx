@@ -21,6 +21,15 @@ import {
   excluirTipificacaoService,
   atualizarTipificacaoService,
 } from "@/service/tipificacao";
+import {
+  DocumentGroup,
+  DocumentGroupItem,
+} from "@/core/configurador/GrupoDocumento";
+import {
+  getDocumentGroupsService,
+  getDocumentGroupItemsService,
+  getAllDocumentGroupItemsService,
+} from "@/service/configurador";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Calendar, Loader2, PencilLine, Plus, View } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -43,10 +52,13 @@ const schemaTipificacao = z.object({
   fontesSelecionadas: z
     .array(z.string().min(0))
     .min(0, "Selecione pelo menos uma fonte"),
+  grupoDocumento: z.string().optional(),
+  tipoDocumento: z.string().min(1, "Selecione o tipo de documento"),
 });
 
+type FormData = z.infer<typeof schemaTipificacao>;
+
 export default function Tipificacoes() {
-  type FormData = z.infer<typeof schemaTipificacao>;
   const {
     register,
     handleSubmit,
@@ -54,10 +66,13 @@ export default function Tipificacoes() {
     control,
     setValue,
     reset,
+    watch,
   } = useForm<FormData>({
     resolver: zodResolver(schemaTipificacao),
     defaultValues: {
       fontesSelecionadas: [],
+      grupoDocumento: "",
+      tipoDocumento: "",
     },
   });
 
@@ -67,6 +82,15 @@ export default function Tipificacoes() {
 
   const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
   const [fontes, setFontes] = useState<Fonte[]>([]);
+  const [documentGroups, setDocumentGroups] = useState<DocumentGroup[]>([]);
+  const [documentGroupItems, setDocumentGroupItems] = useState<
+    DocumentGroupItem[]
+  >([]);
+  const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
+  const [selectedTipoFilter, setSelectedTipoFilter] = useState<string>("");
+  const [allDocumentGroupItems, setAllDocumentGroupItems] = useState<
+    DocumentGroupItem[]
+  >([]);
 
   const [dialogTipificacao, setDialogTipificacao] = useState(false);
   const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
@@ -87,15 +111,38 @@ export default function Tipificacoes() {
     500: 1,
   };
 
+  const grupoDocumentoSelecionado = watch("grupoDocumento");
+
   useEffect(() => {
     async function carregarTudo() {
       await getFontes();
+      await getDocumentGroups();
       await getTipificacoes();
+      const allItems = await getAllDocumentGroupItemsService();
+      setAllDocumentGroupItems(allItems ?? []);
       setCarregandoTipificacoes(false);
     }
 
     carregarTudo();
   }, []);
+
+  useEffect(() => {
+    async function carregarItensDoGrupo() {
+      if (!grupoDocumentoSelecionado) {
+        setDocumentGroupItems([]);
+        setValue("tipoDocumento", "");
+        return;
+      }
+
+      const items = await getDocumentGroupItemsService(
+        grupoDocumentoSelecionado,
+      );
+      setDocumentGroupItems(items ?? []);
+      setValue("tipoDocumento", "");
+    }
+
+    carregarItensDoGrupo();
+  }, [grupoDocumentoSelecionado, setValue]);
 
   useEffect(() => {
     if (idDialogEditar) {
@@ -107,6 +154,14 @@ export default function Tipificacoes() {
         setValue(
           "fontesSelecionadas",
           tipificacaoParaEditar.sources?.map((f: Fonte) => f.id) ?? [],
+        );
+        setValue(
+          "grupoDocumento",
+          tipificacaoParaEditar.document_group_id ?? "",
+        );
+        setValue(
+          "tipoDocumento",
+          tipificacaoParaEditar.document_group_item_id ?? "",
         );
       }
     }
@@ -120,11 +175,66 @@ export default function Tipificacoes() {
       return;
     }
 
-    setTipificacoes(dados ?? []);
-    setTipificacoesFiltradas(dados ?? []);
+    // Enriquecer com nome do grupo caso não venha do serviço
+    const groupsLocal =
+      documentGroups && documentGroups.length > 0
+        ? documentGroups
+        : ((await getDocumentGroupsService()) ?? []);
+
+    const enriched = (dados ?? []).map((t) => ({
+      ...t,
+      document_group_name:
+        t.document_group_name ||
+        groupsLocal.find((g) => g.id === t.document_group_id)?.name ||
+        t.document_group_name,
+    }));
+
+    setTipificacoes(enriched);
+    setTipificacoesFiltradas(enriched);
     setCarregandoTipificacoes(false);
   };
+  const getDocumentGroups = async () => {
+    const dados = await getDocumentGroupsService();
+    setDocumentGroups(dados ?? []);
+  };
 
+  function filtrarTipificacao() {
+    let resultado = tipificacoes;
+
+    if (selectedGroupFilter) {
+      resultado = resultado.filter(
+        (tipificacao) => tipificacao.document_group_id === selectedGroupFilter,
+      );
+    }
+
+    if (selectedTipoFilter) {
+      resultado = resultado.filter(
+        (tipificacao) =>
+          tipificacao.document_group_item_id === selectedTipoFilter,
+      );
+    }
+
+    if (termoBusca.current.trim() === "") {
+      setTipificacoesFiltradas(resultado);
+      return;
+    }
+
+    const tf = resultado.filter(
+      (tipificacao) =>
+        tipificacao.name &&
+        tipificacao.name
+          .toLowerCase()
+          .startsWith(termoBusca.current.toLowerCase()),
+    );
+
+    setTipificacoesFiltradas(tf);
+  }
+
+  const filteredTipoItems = selectedGroupFilter
+    ? allDocumentGroupItems.filter(
+        (item) => item.group_id === selectedGroupFilter,
+      )
+    : allDocumentGroupItems;
   const getFontes = async () => {
     const dados = await getFontesService();
 
@@ -138,9 +248,15 @@ export default function Tipificacoes() {
 
   const adicionarTipificacao = async (data: FormData) => {
     setCarregandoTipificacoes(true);
+    const group = documentGroups.find((g) => g.id === data.grupoDocumento);
+    const item = documentGroupItems.find((i) => i.id === data.tipoDocumento);
     const dados = await adicionarTipificacaoService(
       data.nome,
       fontesSelecionadas,
+      data.grupoDocumento,
+      group?.name,
+      data.tipoDocumento,
+      item?.name,
     );
 
     if (dados == null) {
@@ -158,11 +274,17 @@ export default function Tipificacoes() {
 
   const atualizarTipificacao = async (data: FormData) => {
     setCarregandoTipificacoes(true);
+    const group = documentGroups.find((g) => g.id === data.grupoDocumento);
+    const item = documentGroupItems.find((i) => i.id === data.tipoDocumento);
 
     const tip: Tipificacao = {
       id: idDialogEditar as string,
       name: data.nome,
       source_ids: data.fontesSelecionadas,
+      document_group_id: data.grupoDocumento,
+      document_group_name: group?.name,
+      document_group_item_id: data.tipoDocumento,
+      document_group_item_name: item?.name,
     };
 
     const resposta = await atualizarTipificacaoService(tip);
@@ -202,23 +324,7 @@ export default function Tipificacoes() {
   function limparCampos() {
     reset();
     setFontesSelecionadas([]);
-  }
-
-  function filtrarTipificacao() {
-    if (termoBusca.current.trim() === "") {
-      setTipificacoesFiltradas(tipificacoes);
-      return;
-    }
-
-    const tf = tipificacoes.filter(
-      (tipificacao) =>
-        tipificacao.name &&
-        tipificacao.name
-          .toLowerCase()
-          .startsWith(termoBusca.current.toLowerCase()),
-    );
-
-    setTipificacoesFiltradas(tf);
+    setValue("grupoDocumento", "");
   }
 
   function baixarTipificacao(id?: string) {
@@ -300,6 +406,8 @@ export default function Tipificacoes() {
                     setValue={setValue}
                     register={register}
                     errors={errors}
+                    documentGroups={documentGroups}
+                    documentGroupItems={documentGroupItems}
                   />
 
                   <DialogFooter>
@@ -315,11 +423,94 @@ export default function Tipificacoes() {
         </div>
 
         {tipificacoes.length !== 0 && (
-          <BarraDePesquisa
-            className="w-full"
-            refInput={termoBusca}
-            funcFiltrar={filtrarTipificacao}
-          />
+          <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-wrap items-center gap-3 justify-between">
+              <BarraDePesquisa
+                className="w-full"
+                refInput={termoBusca}
+                funcFiltrar={filtrarTipificacao}
+              />
+
+              <div className="flex  gap-5 items-center">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium">Grupo:</label>
+                  <select
+                    className="border rounded-md px-2 py-1"
+                    value={selectedGroupFilter}
+                    onChange={(event) => {
+                      const nextValue = event.target.value;
+                      setSelectedGroupFilter(nextValue);
+                      setSelectedTipoFilter("");
+                      let resultado = nextValue
+                        ? tipificacoes.filter(
+                            (t) => t.document_group_id === nextValue,
+                          )
+                        : tipificacoes;
+                      if (termoBusca.current.trim() !== "") {
+                        resultado = resultado.filter(
+                          (tipificacao) =>
+                            tipificacao.name &&
+                            tipificacao.name
+                              .toLowerCase()
+                              .startsWith(termoBusca.current.toLowerCase()),
+                        );
+                      }
+                      setTipificacoesFiltradas(resultado);
+                    }}
+                  >
+                    <option value="">Todos</option>
+                    {documentGroups.map((grupo) => (
+                      <option key={grupo.id} value={grupo.id}>
+                        {grupo.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium">Tipo:</label>
+                  <select
+                    className="border rounded-md px-2 py-1"
+                    value={selectedTipoFilter}
+                    onChange={(event) => {
+                      const nextValue = event.target.value;
+                      setSelectedTipoFilter(nextValue);
+                      let resultado = tipificacoes;
+                      if (selectedGroupFilter) {
+                        resultado = resultado.filter(
+                          (tipificacao) =>
+                            tipificacao.document_group_id ===
+                            selectedGroupFilter,
+                        );
+                      }
+                      if (nextValue) {
+                        resultado = resultado.filter(
+                          (tipificacao) =>
+                            tipificacao.document_group_item_id === nextValue,
+                        );
+                      }
+                      if (termoBusca.current.trim() !== "") {
+                        resultado = resultado.filter(
+                          (tipificacao) =>
+                            tipificacao.name &&
+                            tipificacao.name
+                              .toLowerCase()
+                              .startsWith(termoBusca.current.toLowerCase()),
+                        );
+                      }
+                      setTipificacoesFiltradas(resultado);
+                    }}
+                  >
+                    <option value="">Todos</option>
+                    {filteredTipoItems.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
@@ -346,6 +537,15 @@ export default function Tipificacoes() {
                     <h2 className="text-2xl font-semibold wrap-break-word">
                       {tipificacao.name}
                     </h2>
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                      <span className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg">
+                        Grupo: {tipificacao.document_group_name ?? "Sem grupo"}
+                      </span>
+                      <span className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg">
+                        Tipo:{" "}
+                        {tipificacao.document_group_item_name ?? "Sem tipo"}
+                      </span>
+                    </div>
                   </div>
 
                   <div
