@@ -50,12 +50,10 @@ export function KanbanProvider({ children }: { children: React.ReactNode }) {
 
   function addDocumentToRascunho(doc: Edital) {
     console.log('[kanban] addDocumentToRascunho chamado com:', doc);
-    setColumns((prev) => {
-      const copy = structuredClone(prev) as KanbanColumns;
-      copy.PENDING.unshift(doc);
-      console.log('[kanban] colunas apos adicionar:', copy.PENDING[0]);
-      return copy;
-    });
+    const novaColunas: KanbanColumns = structuredClone(columns) as KanbanColumns;
+    novaColunas.PENDING.unshift(doc);
+    setColumns(novaColunas);
+    save(novaColunas);
   }
 
   function mergeInitial(cols: KanbanColumns) {
