@@ -155,7 +155,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
       getDocumentGroupsService(),
     ]);
     if (tips) setTipificacoes(tips);
-    setGruposDocumento(grupos);
+    if (grupos) setGruposDocumento(grupos);
   }
 
   useEffect(() => {
