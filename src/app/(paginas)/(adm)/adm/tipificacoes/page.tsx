@@ -116,11 +116,7 @@ export default function Tipificacoes() {
   useEffect(() => {
     async function carregarTudo() {
       await getFontes();
-      await getDocumentGroups();
       await getTipificacoes();
-      const allItems = await getAllDocumentGroupItemsService();
-      setAllDocumentGroupItems(allItems ?? []);
-      setCarregandoTipificacoes(false);
     }
 
     carregarTudo();
@@ -168,40 +164,34 @@ export default function Tipificacoes() {
   }, [idDialogEditar, tipificacoes, setValue]);
 
   const getTipificacoes = async () => {
-    const dados = await getTipificacoesService();
+    const [dados, groupsLocal, itemsLocal] = await Promise.all([
+      getTipificacoesService(),
+      getDocumentGroupsService(),
+      getAllDocumentGroupItemsService(),
+    ]);
 
     if (dados === null) {
       toast.error("Erro ao buscar tipificacoes");
       return;
     }
 
-    const groupsLocal =
-      documentGroups && documentGroups.length > 0
-        ? documentGroups
-        : ((await getDocumentGroupsService()) ?? []);
-
-    const itemsLocal =
-      allDocumentGroupItems && allDocumentGroupItems.length > 0
-        ? allDocumentGroupItems
-        : ((await getAllDocumentGroupItemsService()) ?? []);
+    setDocumentGroups(groupsLocal ?? []);
+    setAllDocumentGroupItems(itemsLocal ?? []);
 
     const enriched = (dados ?? []).map((t) => ({
       ...t,
       document_group_name:
-        groupsLocal.find((g) => g.id === t.document_group_id)?.name ?? t.document_group_name,
+        (groupsLocal ?? []).find((g) => g.id === t.document_group_id)?.name
+          ?? t.document_group_name,
       document_group_item_name:
-        itemsLocal.find((i) => i.id === t.document_group_item_id)?.name ?? t.document_group_item_name,
+        (itemsLocal ?? []).find((i) => i.id === t.document_group_item_id)?.name
+          ?? t.document_group_item_name,
     }));
 
     setTipificacoes(enriched);
     setTipificacoesFiltradas(enriched);
     setCarregandoTipificacoes(false);
   };
-  const getDocumentGroups = async () => {
-    const dados = await getDocumentGroupsService();
-    setDocumentGroups(dados ?? []);
-  };
-
   function filtrarTipificacao() {
     let resultado = tipificacoes;
 
