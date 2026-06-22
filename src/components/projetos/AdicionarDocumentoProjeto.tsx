@@ -251,9 +251,12 @@ export default function AdicionarDocumentoProjeto({
       ? tipificacoes.filter((t) => t.document_group_id === projectGroupId)
       : tipificacoes;
 
-    const filteredByType = tipoSelecionado
+    const tipoSelecionadoItem = documentGroupItems.find(
+      (i) => i.name === tipoSelecionado,
+    );
+    const filteredByType = tipoSelecionado && tipoSelecionadoItem
       ? filteredByGroup.filter(
-          (t) => t.document_group_item_name === tipoSelecionado,
+          (t) => t.document_group_item_id === tipoSelecionadoItem.id,
         )
       : filteredByGroup;
 

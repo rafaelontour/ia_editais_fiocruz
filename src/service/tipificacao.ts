@@ -1,76 +1,6 @@
 import { Fonte, Tipificacao } from "@/core";
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE;
-const TYPIFICATION_GROUPS_KEY = "ia_typification_groups_v1";
-
-type TipificacaoGroupMock = {
-  id: string;
-  document_group_id?: string;
-  document_group_name?: string;
-  document_group_item_id?: string;
-  document_group_item_name?: string;
-};
-
-function loadTipificacaoGroupMocks(): TipificacaoGroupMock[] {
-  try {
-    const raw = localStorage.getItem(TYPIFICATION_GROUPS_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as TipificacaoGroupMock[];
-  } catch (error) {
-    return [];
-  }
-}
-
-function saveTipificacaoGroupMocks(mocks: TipificacaoGroupMock[]) {
-  localStorage.setItem(TYPIFICATION_GROUPS_KEY, JSON.stringify(mocks));
-}
-
-function mergeTipificacaoGroupMock(tipificacao: Tipificacao): Tipificacao {
-  const mocks = loadTipificacaoGroupMocks();
-  const mock = mocks.find((item) => item.id === tipificacao.id);
-  if (!mock) return tipificacao;
-
-  return {
-    ...tipificacao,
-    document_group_id: tipificacao.document_group_id ?? mock.document_group_id,
-    document_group_name:
-      tipificacao.document_group_name ?? mock.document_group_name,
-    document_group_item_id:
-      tipificacao.document_group_item_id ?? mock.document_group_item_id,
-    document_group_item_name:
-      tipificacao.document_group_item_name ?? mock.document_group_item_name,
-  };
-}
-
-function addTipificacaoGroupMock(
-  tipificacao: Tipificacao,
-  document_group_id?: string,
-  document_group_name?: string,
-  document_group_item_id?: string,
-  document_group_item_name?: string,
-) {
-  if (!tipificacao?.id) return;
-  const mocks = loadTipificacaoGroupMocks();
-  const existingIndex = mocks.findIndex((item) => item.id === tipificacao.id);
-  const nextMock: TipificacaoGroupMock = {
-    id: tipificacao.id,
-    document_group_id,
-    document_group_name,
-    document_group_item_id,
-    document_group_item_name,
-  };
-  if (existingIndex === -1) {
-    mocks.push(nextMock);
-  } else {
-    mocks[existingIndex] = nextMock;
-  }
-  saveTipificacaoGroupMocks(mocks);
-}
-
-function removeTipificacaoGroupMock(id: string) {
-  const mocks = loadTipificacaoGroupMocks();
-  saveTipificacaoGroupMocks(mocks.filter((item) => item.id !== id));
-}
 
 async function getTipificacoesService(): Promise<Tipificacao[] | undefined> {
   const url = `${urlBase}/typification`;
@@ -89,8 +19,7 @@ async function getTipificacoesService(): Promise<Tipificacao[] | undefined> {
     }
 
     const json = await response.json();
-    const tipifications: Tipificacao[] = json.typifications ?? [];
-    return tipifications.map(mergeTipificacaoGroupMock);
+    return json.typifications ?? [];
   } catch (e) {
     return;
   }
@@ -114,8 +43,7 @@ async function getTipificacaoPorIdService(
       return null;
     }
 
-    const json = await response.json();
-    return json ? mergeTipificacaoGroupMock(json) : null;
+    return await response.json();
   } catch (error) {
     return null;
   }
@@ -153,26 +81,7 @@ async function adicionarTipificacaoService(
       return null;
     }
 
-    const tipificacao = await dados.json();
-    if (tipificacao) {
-      const merged = mergeTipificacaoGroupMock({
-        ...tipificacao,
-        document_group_id,
-        document_group_name,
-        document_group_item_id,
-        document_group_item_name,
-      });
-      addTipificacaoGroupMock(
-        merged,
-        document_group_id,
-        document_group_name,
-        document_group_item_id,
-        document_group_item_name,
-      );
-      return merged;
-    }
-
-    return null;
+    return await dados.json();
   } catch (error) {
     return null;
   }
@@ -192,10 +101,6 @@ async function excluirTipificacaoService(
       },
     });
 
-    if (dados.status === 204) {
-      removeTipificacaoGroupMock(id);
-    }
-
     return dados.status;
   } catch (error) {
     throw new Error("Erro ao excluir tipificacao no arquivo ts: " + error);
@@ -214,18 +119,14 @@ async function atualizarTipificacaoService(
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify(tipificacao),
+      body: JSON.stringify({
+        id: tipificacao.id,
+        name: tipificacao.name,
+        source_ids: tipificacao.source_ids ?? tipificacao.sources?.map((s) => s.id),
+        document_group_id: tipificacao.document_group_id,
+        document_group_item_id: tipificacao.document_group_item_id,
+      }),
     });
-
-    if (dados.status === 200 && tipificacao.id) {
-      addTipificacaoGroupMock(
-        tipificacao,
-        tipificacao.document_group_id,
-        tipificacao.document_group_name,
-        tipificacao.document_group_item_id,
-        tipificacao.document_group_item_name,
-      );
-    }
 
     return dados.status;
   } catch (error) {

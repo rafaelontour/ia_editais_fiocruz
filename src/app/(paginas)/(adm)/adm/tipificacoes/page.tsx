@@ -175,18 +175,22 @@ export default function Tipificacoes() {
       return;
     }
 
-    // Enriquecer com nome do grupo caso não venha do serviço
     const groupsLocal =
       documentGroups && documentGroups.length > 0
         ? documentGroups
         : ((await getDocumentGroupsService()) ?? []);
 
+    const itemsLocal =
+      allDocumentGroupItems && allDocumentGroupItems.length > 0
+        ? allDocumentGroupItems
+        : ((await getAllDocumentGroupItemsService()) ?? []);
+
     const enriched = (dados ?? []).map((t) => ({
       ...t,
       document_group_name:
-        t.document_group_name ||
-        groupsLocal.find((g) => g.id === t.document_group_id)?.name ||
-        t.document_group_name,
+        groupsLocal.find((g) => g.id === t.document_group_id)?.name ?? t.document_group_name,
+      document_group_item_name:
+        itemsLocal.find((i) => i.id === t.document_group_item_id)?.name ?? t.document_group_item_name,
     }));
 
     setTipificacoes(enriched);

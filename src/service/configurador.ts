@@ -1,96 +1,124 @@
 import { DocumentGroup, DocumentGroupItem } from "@/core/configurador/GrupoDocumento";
 
-const GROUPS_KEY = "ia_document_groups_v1";
-const ITEMS_KEY = "ia_document_group_items_v1";
+const urlBase = process.env.NEXT_PUBLIC_URL_BASE;
 
-function loadGroups(): DocumentGroup[] {
+export async function getDocumentGroupsService(): Promise<DocumentGroup[] | undefined> {
   try {
-    const raw = localStorage.getItem(GROUPS_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as DocumentGroup[];
-  } catch (error) {
-    return [];
+    const res = await fetch(`${urlBase}/document-group`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) return;
+
+    const { groups } = await res.json();
+    return groups;
+  } catch {
+    return;
   }
-}
-
-function saveGroups(groups: DocumentGroup[]) {
-  localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
-}
-
-function loadItems(): DocumentGroupItem[] {
-  try {
-    const raw = localStorage.getItem(ITEMS_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as DocumentGroupItem[];
-  } catch (error) {
-    return [];
-  }
-}
-
-function saveItems(items: DocumentGroupItem[]) {
-  localStorage.setItem(ITEMS_KEY, JSON.stringify(items));
-}
-
-export async function getDocumentGroupsService(): Promise<DocumentGroup[]> {
-  return loadGroups();
 }
 
 export async function getDocumentGroupByIdService(
   groupId: string,
 ): Promise<DocumentGroup | null> {
-  const groups = loadGroups();
-  return groups.find((group) => group.id === groupId) ?? null;
+  try {
+    const res = await fetch(`${urlBase}/document-group/${groupId}`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) return null;
+
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 export async function adicionarGrupoDocumentoService(
   name: string,
 ): Promise<[number, string]> {
-  const groups = loadGroups();
-  const novo: DocumentGroup = {
-    id: String(Date.now()),
-    name,
-    created_at: new Date().toISOString(),
-  };
-  groups.unshift(novo);
-  saveGroups(groups);
-  return [201, novo.id];
+  try {
+    const res = await fetch(`${urlBase}/document-group`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+
+    const json = await res.json();
+    return [res.status, json.id];
+  } catch {
+    return [500, ""];
+  }
 }
 
 export async function atualizarGrupoDocumentoService(
   id: string,
   name: string,
 ): Promise<number> {
-  const groups = loadGroups();
-  const index = groups.findIndex((group) => group.id === id);
-  if (index === -1) return 404;
-  groups[index] = { ...groups[index], name };
-  saveGroups(groups);
-  return 200;
+  try {
+    const res = await fetch(`${urlBase}/document-group`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, name }),
+    });
+
+    return res.status;
+  } catch {
+    return 500;
+  }
 }
 
 export async function excluirGrupoDocumentoService(id: string): Promise<number> {
-  const groups = loadGroups();
-  const nextGroups = groups.filter((group) => group.id !== id);
-  saveGroups(nextGroups);
+  try {
+    const res = await fetch(`${urlBase}/document-group/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
 
-  const items = loadItems();
-  const remainingItems = items.filter((item) => item.group_id !== id);
-  saveItems(remainingItems);
-
-  return 204;
+    return res.status;
+  } catch {
+    return 500;
+  }
 }
 
 export async function getDocumentGroupItemsService(
   groupId: string,
 ): Promise<DocumentGroupItem[]> {
-  const items = loadItems();
-  return items.filter((item) => item.group_id === groupId);
+  try {
+    const res = await fetch(`${urlBase}/document-group/${groupId}/items`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) return [];
+
+    return await res.json();
+  } catch {
+    return [];
+  }
 }
 
 export async function getAllDocumentGroupItemsService(): Promise<
   DocumentGroupItem[]
 > {
-  return loadItems();
+  try {
+    const groups = await getDocumentGroupsService();
+    if (!groups) return [];
+
+    const all = await Promise.all(
+      groups.map((g) => getDocumentGroupItemsService(g.id)),
+    );
+    return all.flat();
+  } catch {
+    return [];
+  }
 }
 
 export async function adicionarDocumentoConfiguravelService(
@@ -98,17 +126,19 @@ export async function adicionarDocumentoConfiguravelService(
   name: string,
   icon_path?: string,
 ): Promise<[number, string]> {
-  const items = loadItems();
-  const novo: DocumentGroupItem = {
-    id: String(Date.now()),
-    group_id: groupId,
-    name,
-    icon_path,
-    created_at: new Date().toISOString(),
-  };
-  items.unshift(novo);
-  saveItems(items);
-  return [201, novo.id];
+  try {
+    const res = await fetch(`${urlBase}/document-group/${groupId}/item`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, icon_path }),
+    });
+
+    const json = await res.json();
+    return [res.status, json.id];
+  } catch {
+    return [500, ""];
+  }
 }
 
 export async function atualizarDocumentoConfiguravelService(
@@ -116,19 +146,32 @@ export async function atualizarDocumentoConfiguravelService(
   name: string,
   icon_path?: string,
 ): Promise<number> {
-  const items = loadItems();
-  const index = items.findIndex((item) => item.id === itemId);
-  if (index === -1) return 404;
-  items[index] = { ...items[index], name, icon_path };
-  saveItems(items);
-  return 200;
+  try {
+    const res = await fetch(`${urlBase}/document-group/item`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: itemId, name, icon_path }),
+    });
+
+    return res.status;
+  } catch {
+    return 500;
+  }
 }
 
 export async function excluirDocumentoConfiguravelService(
   itemId: string,
 ): Promise<number> {
-  const items = loadItems();
-  const nextItems = items.filter((item) => item.id !== itemId);
-  saveItems(nextItems);
-  return 204;
+  try {
+    const res = await fetch(`${urlBase}/document-group/item/${itemId}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    return res.status;
+  } catch {
+    return 500;
+  }
 }

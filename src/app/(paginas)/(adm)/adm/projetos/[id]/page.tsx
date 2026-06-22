@@ -25,7 +25,7 @@ import {
   excluirDocumentoService,
 } from "@/service/documento";
 import { adicionarEditalService } from "@/service/edital";
-import { getDocumentGroupItemsService } from "@/service/configurador";
+import { getDocumentGroupItemsService, getDocumentGroupsService } from "@/service/configurador";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import AdicionarDocumentoProjeto from "@/components/projetos/AdicionarDocumentoProjeto";
 import { useKanban } from "@/data/context/kanban";
@@ -44,6 +44,7 @@ export default function ProjetoInternoPage() {
   const [documentGroupItems, setDocumentGroupItems] = useState<
     DocumentGroupItem[]
   >([]);
+  const [documentGroups, setDocumentGroups] = useState<any[]>([]);
   const [removedGroupItemIds, setRemovedGroupItemIds] = useState<string[]>([]);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -65,6 +66,9 @@ export default function ProjetoInternoPage() {
     setProjeto(p);
     const docs = await getDocumentosPorProjetoService(id);
     setDocumentos(docs);
+
+    const groups = await getDocumentGroupsService();
+    setDocumentGroups(groups ?? []);
 
     if (p?.document_group_id) {
       const items = await getDocumentGroupItemsService(p.document_group_id);
@@ -185,7 +189,7 @@ export default function ProjetoInternoPage() {
           ]
         : undefined,
       isMock: true,
-      grupo: projeto?.document_group_name ?? "",
+      grupo: documentGroups.find((g) => g.id === projeto?.document_group_id)?.name ?? "",
       tipo_documento: doc.type ?? "",
       projeto_nome: projeto?.name ?? "",
     });
