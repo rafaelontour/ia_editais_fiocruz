@@ -154,7 +154,9 @@ export default function CardEdital({
 
   const responsaveis: any[] = [];
 
-  edital.editors?.map((editor) =>
+  console.log('[CardEdital] edital.editors:', edital.editors);
+  edital.editors?.map((editor) => {
+    console.log('[CardEdital] editor sendo mapeado:', editor);
     responsaveis.push({
       id: editor.id,
       name: editor.username?.split(" ")[0],
@@ -163,8 +165,9 @@ export default function CardEdital({
         editor.icon?.file_path !== undefined
           ? urlBase + editor.icon.file_path
           : "/user.png",
-    }),
-  );
+    });
+  });
+  console.log('[CardEdital] responsaveis final:', responsaveis);
 
   const editalPronto =
     !!edital &&

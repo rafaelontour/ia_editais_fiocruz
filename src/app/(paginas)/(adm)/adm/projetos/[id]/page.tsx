@@ -161,20 +161,26 @@ export default function ProjetoInternoPage() {
   };
 
   const enviarParaKanban = async (doc: DocumentoProjeto) => {
-    const [resposta, idEdital] = (await adicionarEditalService({
+    console.log('[enviarParaKanban] doc original:', doc);
+
+    const payload = {
       name: doc.name,
       identifier: doc.number ?? doc.id,
       description: doc.type ?? "",
       typification_ids: [],
       editors_ids: doc.responsible ? [doc.responsible] : [],
-    })) ?? [];
+    };
+    console.log('[enviarParaKanban] payload para API:', payload);
+
+    const [resposta, idEdital] = (await adicionarEditalService(payload)) ?? [];
+    console.log('[enviarParaKanban] resposta da API:', { resposta, idEdital });
 
     if (resposta !== 201 || !idEdital) {
       toast.error("Erro ao enviar documento para o Kanban");
       return;
     }
 
-    addDocumentToRascunho({
+    const docKanban = {
       id: idEdital,
       name: doc.name,
       identifier: doc.number ?? doc.id,
@@ -194,7 +200,10 @@ export default function ProjetoInternoPage() {
       grupo: documentGroups.find((g) => g.id === projeto?.document_group_id)?.name ?? "",
       tipo_documento: doc.type ?? "",
       projeto_nome: projeto?.name ?? "",
-    });
+    };
+    console.log('[enviarParaKanban] docKanban adicionado:', docKanban);
+
+    addDocumentToRascunho(docKanban);
 
     if (!lista.includes(idEdital)) {
       lista.push(idEdital);
