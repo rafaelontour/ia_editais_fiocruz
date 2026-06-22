@@ -29,6 +29,7 @@ import { getDocumentGroupItemsService, getDocumentGroupsService } from "@/servic
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import AdicionarDocumentoProjeto from "@/components/projetos/AdicionarDocumentoProjeto";
 import { useKanban } from "@/data/context/kanban";
+
 import useEditalProc from "@/data/hooks/useProcEdital";
 import { toast } from "sonner";
 import useUsuario from "@/data/hooks/useUsuario";
@@ -53,6 +54,7 @@ export default function ProjetoInternoPage() {
   const { addDocumentToRascunho } = useKanban();
   const { usuario } = useUsuario();
   const { lista, salvarLista } = useEditalProc();
+
   const [openAddSameTypeDocumento, setOpenAddSameTypeDocumento] =
     useState(false);
   const [defaultTipoDocumento, setDefaultTipoDocumento] = useState<

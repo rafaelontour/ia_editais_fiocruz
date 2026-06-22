@@ -46,11 +46,13 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
         const inicial = normalizarLista(
             localStorage.getItem(STORAGE_KEY)
         );
+        console.log('[ProcEdital] localStorage carregado:', inicial);
         setLista(inicial);
     }, []);
 
     // 🔹 Controla o ciclo de vida do polling
     useEffect(() => {
+        console.log('[ProcEdital] lista mudou:', lista, 'iniciando polling:', lista.length > 0);
         if (lista.length === 0) {
             stopPolling();
             return;
@@ -73,6 +75,7 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
     function startPolling() {
         if (intervalRef.current) return;
 
+        console.log('[ProcEdital] INICIANDO polling a cada 10s, lista:', lista);
         intervalRef.current = setInterval(async () => {
             if (isRunning.current) return;
             isRunning.current = true;
@@ -89,10 +92,19 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
                             getEditalPorIdService(id) as Promise<Edital | undefined>,
                         ]);
 
+                        console.log(`[ProcEdital] id=${id}`, {
+                            editalArquivo,
+                            doc,
+                            releases: editalArquivo?.releases,
+                            descricao: editalArquivo?.releases?.[0]?.description,
+                            procStatus: doc?.processing_status,
+                        });
+
                         const descricao = editalArquivo?.releases?.[0]?.description;
                         const procStatus = doc?.processing_status;
 
                         if (procStatus === "FAILED") {
+                            console.log(`[ProcEdital] id=${id} -> FAILED`);
                             toast.error(
                                 `Falha no processamento do documento!`,
                                 {
@@ -101,6 +113,7 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
                                 }
                             );
                         } else if (descricao) {
+                            console.log(`[ProcEdital] id=${id} -> DESCRICAO ENCONTRADA`);
                             toast.success(
                                 `Edital ${doc?.name ?? id} processado!`,
                                 {
@@ -109,9 +122,11 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
                                 }
                             );
                         } else {
+                            console.log(`[ProcEdital] id=${id} -> AINDA PROCESSANDO (descricao=${typeof descricao}, procStatus=${procStatus})`);
                             idsRestantes.push(id);
                         }
-                    } catch {
+                    } catch (err) {
+                        console.error(`[ProcEdital] id=${id} -> ERRO:`, err);
                         idsRestantes.push(id);
                     }
                 }
@@ -126,6 +141,7 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
 
     function stopPolling() {
         if (intervalRef.current) {
+            console.log('[ProcEdital] PARANDO polling');
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }

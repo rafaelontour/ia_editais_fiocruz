@@ -27,7 +27,7 @@ interface Props {
 }
 
 export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
-  const tipificacoes = (edital && edital?.releases[0].check_tree) || [];
+  const tipificacoes = edital?.releases?.[0]?.check_tree ?? [];
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
@@ -98,7 +98,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
   //     .map((ramo: any) => ramo.evaluation.score ))))
   //     .flat(Infinity)
 
-  const notas = edital?.releases[0].check_tree
+  const notas = edital?.releases?.[0]?.check_tree
     .map((tipificacao) =>
       tipificacao.taxonomies.map((taxonomia) =>
         taxonomia.branches.map((ramo: any) => ramo.evaluation.score),
@@ -121,7 +121,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
     const url =
       process.env.NEXT_PUBLIC_URL_BASE +
       "/export/release/pdf?document_release_id=" +
-      edital?.releases[0].id;
+      edital?.releases?.[0]?.id;
     window.location.href = url;
   };
 

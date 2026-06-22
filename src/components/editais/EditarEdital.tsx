@@ -62,7 +62,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
     async function buscarCaminhoEdital() {
         const arquivo: EditalArquivo = await getEditalArquivoService(edital.id!) as EditalArquivo;
-        setUrlArquivoEdital(arquivo.releases[0].file_path);
+        setUrlArquivoEdital(arquivo?.releases?.[0]?.file_path ?? "");
     }
 
     useEffect(() => {
