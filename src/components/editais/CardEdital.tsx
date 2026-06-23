@@ -570,11 +570,16 @@ export default function CardEdital({
                         flex flex-col items-start gap-1 mt-2
                     "
         >
-          {(edital.grupo || edital.tipo_documento) && (
-            <div className="flex gap-2 mt-1 text-sm ">
+          {(edital.grupo || edital.tipo_documento || edital.projeto_nome) && (
+            <div className="flex gap-2 mt-1 text-sm flex-wrap">
               {edital.grupo && (
                 <p className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
                   <strong>Grupo</strong>: {edital.grupo}
+                </p>
+              )}
+              {edital.projeto_nome && (
+                <p className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
+                  <strong>Projeto</strong>: {edital.projeto_nome}
                 </p>
               )}
               {edital.tipo_documento && (
