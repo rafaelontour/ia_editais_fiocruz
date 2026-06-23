@@ -4,6 +4,7 @@ import { Upload, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FileUpload } from "@/components/ui/file-upload";
 import {
   Select,
   SelectContent,
@@ -52,7 +53,7 @@ const schema = z.object({
 
 interface Props {
   projectId: string;
-  onAdded?: () => void;
+  onAdded?: (id: string, file?: File) => void;
   defaultTipo?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -105,6 +106,7 @@ export default function AdicionarDocumentoProjeto({
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [responsavelSelecionado, setResponsavelSelecionado] =
     useState<any>(null);
+  const [arquivoFile, setArquivoFile] = useState<File | null>(null);
   const { usuario } = useUsuario();
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
@@ -260,6 +262,7 @@ export default function AdicionarDocumentoProjeto({
     reset();
     setTipificacoesSelecionadas([]);
     setResponsavelSelecionado(null);
+    setArquivoFile(null);
   }
 
   const setDialogOpenState = (value: boolean) => {
@@ -299,7 +302,7 @@ export default function AdicionarDocumentoProjeto({
     toast.success("Documento criado");
     limparDados();
     setDialogOpenState(false);
-    onAdded && onAdded();
+    onAdded && onAdded(id, arquivoFile ?? undefined);
   };
 
   return (
@@ -632,17 +635,28 @@ export default function AdicionarDocumentoProjeto({
             )}
 
             {currentStep === 3 && (
-              <div className="space-y-2">
-                <Label>Descrição</Label>
-                <Textarea
-                  {...register("descricao")}
-                  className="min-h-[154px]"
-                />
-                {errors.descricao && (
-                  <span className="text-xs text-red-500">
-                    {String(errors.descricao.message)}
-                  </span>
-                )}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Descrição</Label>
+                  <Textarea
+                    {...register("descricao")}
+                    className="min-h-[154px]"
+                  />
+                  {errors.descricao && (
+                    <span className="text-xs text-red-500">
+                      {String(errors.descricao.message)}
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Upload do documento</Label>
+                  <FileUpload
+                    onChange={(files) => {
+                      if (files.length > 0) setArquivoFile(files[0]);
+                    }}
+                  />
+                </div>
               </div>
             )}
 

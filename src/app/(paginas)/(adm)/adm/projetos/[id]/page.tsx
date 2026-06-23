@@ -24,6 +24,7 @@ import {
   excluirDocumentoService,
 } from "@/service/documento";
 import { adicionarEditalService } from "@/service/edital";
+import { enviarArquivoService } from "@/service/editalArquivo";
 import { getDocumentGroupItemsService, getDocumentGroupsService } from "@/service/configurador";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import AdicionarDocumentoProjeto from "@/components/projetos/AdicionarDocumentoProjeto";
@@ -47,6 +48,7 @@ export default function ProjetoInternoPage() {
   const [removedGroupItemIds, setRemovedGroupItemIds] = useState<string[]>([]);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [pendingFiles, setPendingFiles] = useState<Record<string, File>>({});
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
   const { usuario } = useUsuario();
@@ -178,6 +180,20 @@ export default function ProjetoInternoPage() {
       salvarLista(lista);
     }
 
+    const file = pendingFiles[doc.id];
+    if (file) {
+      const uploadStatus = await enviarArquivoService(idEdital, file);
+      if (uploadStatus !== 201) {
+        toast.error("Erro ao fazer upload do arquivo");
+      } else {
+        setPendingFiles((prev) => {
+          const next = { ...prev };
+          delete next[doc.id];
+          return next;
+        });
+      }
+    }
+
     await marcarEnviadoAoKanban(doc.id);
     toast.success("Documento enviado para Kanban");
     fetch();
@@ -228,7 +244,13 @@ export default function ProjetoInternoPage() {
           </div>
         </div>
 
-        <AdicionarDocumentoProjeto projectId={id} onAdded={() => fetch()} />
+        <AdicionarDocumentoProjeto
+          projectId={id}
+          onAdded={(docId, file) => {
+            if (file && docId) setPendingFiles((prev) => ({ ...prev, [docId]: file }));
+            fetch();
+          }}
+        />
       </div>
       <AdicionarDocumentoProjeto
         projectId={id}
@@ -236,7 +258,8 @@ export default function ProjetoInternoPage() {
         open={openAddSameTypeDocumento}
         onOpenChange={setOpenAddSameTypeDocumento}
         withTrigger={false}
-        onAdded={() => {
+        onAdded={(docId, file) => {
+          if (file && docId) setPendingFiles((prev) => ({ ...prev, [docId]: file }));
           setDefaultTipoDocumento(undefined);
           setOpenAddSameTypeDocumento(false);
           fetch();
