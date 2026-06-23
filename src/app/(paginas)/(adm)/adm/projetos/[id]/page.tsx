@@ -162,7 +162,7 @@ export default function ProjetoInternoPage() {
       name: doc.name,
       identifier: doc.number ?? doc.id,
       description: doc.type ?? "",
-      typification_ids: [],
+      typification_ids: doc.typification_ids ?? [],
       editors_ids: doc.responsible ? [doc.responsible] : [],
     };
 

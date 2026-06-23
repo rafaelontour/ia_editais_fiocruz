@@ -40,6 +40,7 @@ export async function adicionarDocumentoService(
         number: payload.number,
         status: payload.status ?? "PENDING",
         responsible: payload.responsible,
+        typification_ids: payload.typification_ids,
       }),
     });
 
@@ -48,13 +49,6 @@ export async function adicionarDocumentoService(
   } catch {
     return [500, ""];
   }
-}
-
-export async function enviarArquivoDocumentoService(
-  _documentId: string,
-  _arquivo?: File | null,
-): Promise<number> {
-  return 201;
 }
 
 export async function marcarEnviadoAoKanban(

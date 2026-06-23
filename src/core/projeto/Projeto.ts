@@ -22,6 +22,7 @@ export interface DocumentoProjeto {
   responsible_icon?: {
     file_path: string;
   } | null;
+  typification_ids?: string[];
   created_at?: string;
   sent_to_kanban?: boolean;
 }

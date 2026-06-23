@@ -2,7 +2,6 @@
 
 import { Upload, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -34,10 +33,7 @@ import { getDocumentGroupItemsService } from "@/service/configurador";
 import { getProjetosService } from "@/service/projeto";
 import { getTipificacoesService } from "@/service/tipificacao";
 import { getUsuariosPorUnidade } from "@/service/usuario";
-import {
-  adicionarDocumentoService,
-  enviarArquivoDocumentoService,
-} from "@/service/documento";
+import { adicionarDocumentoService } from "@/service/documento";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import useUsuario from "@/data/hooks/useUsuario";
@@ -52,7 +48,6 @@ const schema = z.object({
   responsavel: z.string().min(1, "Selecione o responsável"),
   identificador: z.string().min(1, "O número do documento é obrigatório"),
   descricao: z.string().min(3, "A descrição é obrigatória"),
-  arquivo: z.instanceof(File, { message: "O arquivo é obrigatório" }),
 });
 
 interface Props {
@@ -119,7 +114,6 @@ export default function AdicionarDocumentoProjeto({
   const tipificacoesValue = watch("tipificacoes");
   const responsavelValue = watch("responsavel");
   const descricaoValue = watch("descricao");
-  const arquivoValue = watch("arquivo");
 
   const stepDefinitions = [
     {
@@ -143,12 +137,11 @@ export default function AdicionarDocumentoProjeto({
     !!tipificacoesValue?.length,
     !!responsavelValue,
     !!descricaoValue,
-    !!arquivoValue,
   ].filter(Boolean).length;
 
   const progressPercentage = Math.min(
     100,
-    Math.round((completedFields / 7) * 100),
+    Math.round((completedFields / 6) * 100),
   );
 
   const isFirstStep = currentStep === 1;
@@ -295,16 +288,12 @@ export default function AdicionarDocumentoProjeto({
       responsible: data.responsavel,
       responsible_name: usuarioSelecionado?.username,
       responsible_icon: usuarioSelecionado?.icon,
+      typification_ids: data.tipificacoes,
     });
 
     if (status !== 201) {
       toast.error("Erro ao criar documento");
       return;
-    }
-
-    const arquivoField = (data as any).arquivo as File | undefined;
-    if (arquivoField) {
-      await enviarArquivoDocumentoService(id, arquivoField);
     }
 
     toast.success("Documento criado");
@@ -643,37 +632,17 @@ export default function AdicionarDocumentoProjeto({
             )}
 
             {currentStep === 3 && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Descrição</Label>
-                  <Textarea
-                    {...register("descricao")}
-                    className="min-h-[154px]"
-                  />
-                  {errors.descricao && (
-                    <span className="text-xs text-red-500">
-                      {String(errors.descricao.message)}
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Upload do documento</Label>
-                  <Controller
-                    name="arquivo"
-                    control={control}
-                    render={({ field }) => (
-                      <FileUpload
-                        onChange={(files: File[]) => field.onChange(files[0])}
-                      />
-                    )}
-                  />
-                  {errors.arquivo && (
-                    <span className="text-xs text-red-500">
-                      {String(errors.arquivo.message)}
-                    </span>
-                  )}
-                </div>
+              <div className="space-y-2">
+                <Label>Descrição</Label>
+                <Textarea
+                  {...register("descricao")}
+                  className="min-h-[154px]"
+                />
+                {errors.descricao && (
+                  <span className="text-xs text-red-500">
+                    {String(errors.descricao.message)}
+                  </span>
+                )}
               </div>
             )}
 
