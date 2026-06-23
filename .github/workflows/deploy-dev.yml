@@ -47,6 +47,11 @@ jobs:
             export DOCKER_BUILDKIT=1
 
             docker compose down || true
+
+            echo "🧹 Limpando imagens não utilizadas..."
+            docker image prune -af
+
+            echo "🏗️ Gerando nova imagem..."
             docker compose up -d --build
 
             echo "✅ Deploy concluído"
