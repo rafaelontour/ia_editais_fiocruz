@@ -131,9 +131,12 @@ export default function Editais() {
         for (const status of Object.keys(next) as StatusEdital[]) {
           next[status] = next[status].map((edital) => {
             if (!edital.projeto_nome && edital.grupo && edital.tipo_documento) {
-              const match = projs.find(
-                (p) => p.document_group_name === edital.grupo,
+              const grupo = documentGroups.find(
+                (g) => g.name === edital.grupo,
               );
+              const match = grupo
+                ? projs.find((p) => p.document_group_id === grupo.id)
+                : undefined;
               if (match) {
                 return { ...edital, projeto_nome: match.name };
               }
@@ -483,15 +486,22 @@ export default function Editais() {
               }}
             >
               <option value="">Todos</option>
-              {projetos
-                .filter(
-                  (p) => p.document_group_name === selectedGroupFilter,
-                )
-                .map((p) => (
-                  <option key={p.id} value={p.name}>
-                    {p.name}
-                  </option>
-                ))}
+              {(() => {
+                const grupoAtual = documentGroups.find(
+                  (g) => g.name === selectedGroupFilter,
+                );
+                return projetos
+                  .filter(
+                    (p) =>
+                      grupoAtual &&
+                      p.document_group_id === grupoAtual.id,
+                  )
+                  .map((p) => (
+                    <option key={p.id} value={p.name}>
+                      {p.name}
+                    </option>
+                  ));
+              })()}
             </select>
           </div>
         )}
@@ -511,11 +521,7 @@ export default function Editais() {
                 const projeto = projetos.find(
                   (p) => p.name === selectedProjectFilter,
                 );
-                const groupId = projeto
-                  ? documentGroups.find(
-                      (g) => g.name === projeto.document_group_name,
-                    )?.id
-                  : undefined;
+                const groupId = projeto?.document_group_id;
                 return groupId
                   ? documentGroupItems
                       .filter((item) => item.group_id === groupId)
