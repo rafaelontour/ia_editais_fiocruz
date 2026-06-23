@@ -94,21 +94,24 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
 
                         console.log("[ProcEdital] Polling doc", id, { procStatus, descricao, doc, editalArquivo });
 
-                        if (procStatus === "FAILED") {
-                            console.warn("[ProcEdital] Documento com FAILED status:", id, doc);
-                            toast.error(
-                                `Falha no processamento do documento!`,
-                                {
-                                    description:
-                                        "Ocorreu um erro ao processar o documento. Entre em contato com o suporte."
-                                }
-                            );
-                        } else if (descricao) {
+                        if (descricao) {
+                            if (procStatus === "FAILED") {
+                                console.warn("[ProcEdital] Documento com FAILED status mas ja tem descricao:", id, doc);
+                            }
                             toast.success(
                                 `Edital ${doc?.name ?? id} processado!`,
                                 {
                                     description:
                                         "O resultado do processamento já está disponível para visualização."
+                                }
+                            );
+                        } else if (procStatus === "FAILED") {
+                            console.warn("[ProcEdital] Documento com FAILED status e SEM descricao:", id, doc);
+                            toast.error(
+                                `Falha no processamento do documento!`,
+                                {
+                                    description:
+                                        "Ocorreu um erro ao processar o documento. Entre em contato com o suporte."
                                 }
                             );
                         } else {

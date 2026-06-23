@@ -26,8 +26,13 @@ Além disso, ao carregar a página do Kanban (`editais/page.tsx`), é feito um *
 
 ### O que precisa ser implementado no backend
 
-1. Adicionar os campos `grupo`, `tipo_documento` e `projeto_nome` (ou equivalentes) ao modelo/endpoint de **Edital** (`GET /doc`, `GET /doc/:id` e `POST /doc`)
-2. Esses campos devem ser preenchidos com o nome do grupo de documentos, tipo de documento e projeto associados ao edital no momento da criação
+1. Adicionar colunas `grupo`, `tipo_documento` e `projeto_nome` ao model `Document` (tabela `documents`)
+2. Adicionar campos opcionais ao schema de criação (`POST /doc`)
+3. No frontend (`enviarParaKanban`), incluir esses campos no payload
+4. Criar migration para adicionar as colunas
+
+**Status:** Pendente — aguardando implementação.
+**Prioridade:** Média — necessária para o filtro do Kanban funcionar corretamente.
 
 ---
 
