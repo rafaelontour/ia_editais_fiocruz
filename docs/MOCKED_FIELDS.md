@@ -1,38 +1,12 @@
 # Campos Mockados — Funcionalidades sem backend
 
-## 1. Grupo e Tipo de Documento no Kanban
+## 1. ~~Grupo e Tipo de Documento no Kanban~~ ✅ Implementado
 
-### O que foi mockado
-
-Foram adicionados três campos ao `Edital` (card do Kanban):
-
-- `grupo` — nome do grupo de documentos (`DocumentGroup.name`) definido no **Modo Configurador**
-- `tipo_documento` — nome do tipo de documento (`DocumentGroupItem.name`) associado ao projeto
-- `projeto_nome` — nome do projeto de origem
-
-Atualmente esses campos **não existem no backend** e são preenchidos **apenas no front-end** quando um documento é enviado do projeto para o Kanban.
-
-### Onde os dados são inseridos
+Os campos `grupo`, `tipo_documento` e `projeto_nome` foram adicionados ao model `Document` no backend (migration `e4d5f6a7b8c9`) e agora são enviados no payload do `POST /doc`.
 
 **Arquivo:** `src/app/(paginas)/(adm)/adm/projetos/[id]/page.tsx` — função `enviarParaKanban`
 
-```typescript
-grupo: projeto?.document_group_name ?? "",
-tipo_documento: doc.type ?? "",
-projeto_nome: projeto?.name ?? "",
-```
-
-Além disso, ao carregar a página do Kanban (`editais/page.tsx`), é feito um **backfill** automático: para documentos existentes que tenham `grupo` e `tipo_documento` mas não tenham `projeto_nome`, o código tenta associar o primeiro projeto que contenha aquele grupo.
-
-### O que precisa ser implementado no backend
-
-1. Adicionar colunas `grupo`, `tipo_documento` e `projeto_nome` ao model `Document` (tabela `documents`)
-2. Adicionar campos opcionais ao schema de criação (`POST /doc`)
-3. No frontend (`enviarParaKanban`), incluir esses campos no payload
-4. Criar migration para adicionar as colunas
-
-**Status:** Pendente — aguardando implementação.
-**Prioridade:** Média — necessária para o filtro do Kanban funcionar corretamente.
+O backfill no `editais/page.tsx` ainda existe para documentos criados antes da migration; pode ser removido no futuro.
 
 ---
 

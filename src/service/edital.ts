@@ -75,6 +75,9 @@ async function atualizarEditalService(dados: any): Promise<number | undefined> {
                 name: dados.name,
                 identifier: dados.identifier,
                 description: dados.description,
+                grupo: dados.grupo,
+                tipo_documento: dados.tipo_documento,
+                projeto_nome: dados.projeto_nome,
                 editors_ids: dados.editors_ids,
                 typification_ids: dados.typification_ids,
             })
