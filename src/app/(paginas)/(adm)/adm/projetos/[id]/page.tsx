@@ -16,7 +16,6 @@ import {
   Bot,
 } from "lucide-react";
 import { Projeto, DocumentoProjeto } from "@/core/projeto/Projeto";
-import { StatusEdital } from "@/core/edital/Edital";
 import { DocumentGroupItem } from "@/core/configurador/GrupoDocumento";
 import { getProjetosService } from "@/service/projeto";
 import {
@@ -28,7 +27,6 @@ import { adicionarEditalService } from "@/service/edital";
 import { getDocumentGroupItemsService, getDocumentGroupsService } from "@/service/configurador";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import AdicionarDocumentoProjeto from "@/components/projetos/AdicionarDocumentoProjeto";
-import { useKanban } from "@/data/context/kanban";
 
 import useEditalProc from "@/data/hooks/useProcEdital";
 import { toast } from "sonner";
@@ -51,7 +49,6 @@ export default function ProjetoInternoPage() {
   const [carregando, setCarregando] = useState(true);
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
-  const { addDocumentToRascunho } = useKanban();
   const { usuario } = useUsuario();
   const { lista, salvarLista } = useEditalProc();
 
@@ -161,8 +158,6 @@ export default function ProjetoInternoPage() {
   };
 
   const enviarParaKanban = async (doc: DocumentoProjeto) => {
-    console.log('[enviarParaKanban] doc original:', doc);
-
     const payload = {
       name: doc.name,
       identifier: doc.number ?? doc.id,
@@ -170,40 +165,13 @@ export default function ProjetoInternoPage() {
       typification_ids: [],
       editors_ids: doc.responsible ? [doc.responsible] : [],
     };
-    console.log('[enviarParaKanban] payload para API:', payload);
 
     const [resposta, idEdital] = (await adicionarEditalService(payload)) ?? [];
-    console.log('[enviarParaKanban] resposta da API:', { resposta, idEdital });
 
     if (resposta !== 201 || !idEdital) {
       toast.error("Erro ao enviar documento para o Kanban");
       return;
     }
-
-    const docKanban = {
-      id: idEdital,
-      name: doc.name,
-      identifier: doc.number ?? doc.id,
-      description: doc.type ?? "",
-      status: "PENDING" as StatusEdital,
-      created_at: doc.created_at,
-      editors: doc.responsible_name
-        ? [
-            {
-              id: doc.responsible,
-              username: doc.responsible_name,
-              icon: doc.responsible_icon ?? undefined,
-            },
-          ]
-        : undefined,
-      isMock: true,
-      grupo: documentGroups.find((g) => g.id === projeto?.document_group_id)?.name ?? "",
-      tipo_documento: doc.type ?? "",
-      projeto_nome: projeto?.name ?? "",
-    };
-    console.log('[enviarParaKanban] docKanban adicionado:', docKanban);
-
-    addDocumentToRascunho(docKanban);
 
     if (!lista.includes(idEdital)) {
       lista.push(idEdital);

@@ -63,7 +63,6 @@ export default function Editais() {
     "COMPLETED",
   ];
   const { usuario } = useUsuario();
-  const { mergeInitial } = useKanban();
   const { limparLista, lista } = useEditalProc();
 
   type KanbanItem = Edital;
@@ -213,8 +212,7 @@ export default function Editais() {
         }
       });
 
-      // merge with any local/mock kanban state
-      mergeInitial(novasColunas);
+      setColumns(novasColunas);
     } catch (e) {
       toast.error("Erro ao buscar editais!");
     }
