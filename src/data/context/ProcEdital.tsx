@@ -92,7 +92,10 @@ export function ProcEditalProvider({ children }: { children: ReactNode }) {
                         const descricao = editalArquivo?.releases?.[0]?.description;
                         const procStatus = doc?.processing_status;
 
+                        console.log("[ProcEdital] Polling doc", id, { procStatus, descricao, doc, editalArquivo });
+
                         if (procStatus === "FAILED") {
+                            console.warn("[ProcEdital] Documento com FAILED status:", id, doc);
                             toast.error(
                                 `Falha no processamento do documento!`,
                                 {

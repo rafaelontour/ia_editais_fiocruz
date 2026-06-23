@@ -145,6 +145,27 @@ O código original comentado já está no arquivo, basta descomentá-lo e remove
 
 ---
 
+## 5. `typification_ids` como JSONB em `ProjectDocument`
+
+### Problema
+
+O campo `typification_ids` no model `ProjectDocument` foi implementado como `JSONB` para agilizar o desenvolvimento. O psycopg não serializa objetos `UUID` nativamente via `json.dumps()`, o que gerou erro 500 ao salvar.
+
+### Correção aplicada
+
+- Mudou o tipo no schema e model de `list[UUID]` para `list[str]`
+- Adicionou `UUIDEncoder` personalizado no `database.py` como proteção global
+
+### Recomendação futura
+
+Para melhor performance e consistência, refatorar para **junction table** (igual `document_typifications` do model `Document`):
+
+1. Criar tabela `project_document_typifications` com FK para `project_documents.id` e `typifications.id`
+2. Remover coluna `typification_ids` de `project_documents`
+3. Atualizar os schemas, service e repositório do `ProjectDocument`
+
+---
+
 ## Arquivos alterados (geral) — segunda rodada
 
 | Arquivo | O que faz |
