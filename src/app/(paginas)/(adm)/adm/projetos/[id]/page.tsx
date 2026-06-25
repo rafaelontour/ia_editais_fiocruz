@@ -164,7 +164,9 @@ export default function ProjetoInternoPage() {
       name: doc.name,
       identifier: doc.number ?? doc.id,
       description: doc.type ?? "",
-      grupo: projeto?.document_group_name ?? "",
+      grupo: projeto?.document_group_id
+        ? documentGroups.find((g) => g.id === projeto.document_group_id)?.name ?? ""
+        : "",
       tipo_documento: doc.type ?? "",
       projeto_nome: projeto?.name ?? "",
       typification_ids: doc.typification_ids ?? [],
