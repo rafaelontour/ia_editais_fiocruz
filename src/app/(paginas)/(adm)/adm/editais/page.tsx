@@ -74,17 +74,11 @@ export default function Editais() {
     DocumentGroupItem[]
   >([]);
   const [projetos, setProjetos] = useState<Projeto[]>([]);
-  const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
-  const [selectedProjectFilter, setSelectedProjectFilter] =
-    useState<string>("");
+  const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>("");
   const [selectedTipoFilter, setSelectedTipoFilter] = useState<string>("");
 
   const filteredColumns = useMemo(() => {
-    if (
-      !selectedGroupFilter &&
-      !selectedProjectFilter &&
-      !selectedTipoFilter
-    )
+    if (!selectedProjectFilter && !selectedTipoFilter)
       return columns;
 
     const result: Record<StatusEdital, KanbanItem[]> = {
@@ -96,8 +90,6 @@ export default function Editais() {
 
     for (const status of statuses) {
       result[status] = columns[status].filter((edital) => {
-        if (selectedGroupFilter && edital.grupo !== selectedGroupFilter)
-          return false;
         if (
           selectedProjectFilter &&
           edital.projeto_nome !== selectedProjectFilter
@@ -113,7 +105,7 @@ export default function Editais() {
     }
 
     return result;
-  }, [columns, selectedGroupFilter, selectedProjectFilter, selectedTipoFilter]);
+  }, [columns, selectedProjectFilter, selectedTipoFilter]);
 
   useEffect(() => {
     async function fetchFilters() {
@@ -455,56 +447,23 @@ export default function Editais() {
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Grupo:</label>
+          <label className="text-sm font-medium">Projeto:</label>
           <select
             className="border rounded-md px-2 py-1 text-sm"
-            value={selectedGroupFilter}
+            value={selectedProjectFilter}
             onChange={(e) => {
-              setSelectedGroupFilter(e.target.value);
-              setSelectedProjectFilter("");
+              setSelectedProjectFilter(e.target.value);
               setSelectedTipoFilter("");
             }}
           >
             <option value="">Todos</option>
-            {documentGroups.map((grupo) => (
-              <option key={grupo.id} value={grupo.name}>
-                {grupo.name}
+            {projetos.map((p) => (
+              <option key={p.id} value={p.name}>
+                {p.name}
               </option>
             ))}
           </select>
         </div>
-
-        {selectedGroupFilter && (
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium">Projeto:</label>
-            <select
-              className="border rounded-md px-2 py-1 text-sm"
-              value={selectedProjectFilter}
-              onChange={(e) => {
-                setSelectedProjectFilter(e.target.value);
-                setSelectedTipoFilter("");
-              }}
-            >
-              <option value="">Todos</option>
-              {(() => {
-                const grupoAtual = documentGroups.find(
-                  (g) => g.name === selectedGroupFilter,
-                );
-                return projetos
-                  .filter(
-                    (p) =>
-                      grupoAtual &&
-                      p.document_group_id === grupoAtual.id,
-                  )
-                  .map((p) => (
-                    <option key={p.id} value={p.name}>
-                      {p.name}
-                    </option>
-                  ));
-              })()}
-            </select>
-          </div>
-        )}
 
         {selectedProjectFilter && (
           <div className="flex items-center gap-2">
