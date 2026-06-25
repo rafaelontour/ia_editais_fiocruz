@@ -57,7 +57,6 @@ export interface Edital {
     typifications?: EditalTypification[];
     created_at?: string;
     updated_at?: string | null;
-    isMock?: boolean;
     processing_status?: "QUEUED" | "PROCESSING" | "IDLE" | "FAILED";
     grupo?: string;
     tipo_documento?: string;

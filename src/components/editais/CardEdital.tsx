@@ -27,7 +27,6 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { arquivarEditalService, excluirEditalService } from "@/service/edital";
-import { desmarcarEnviadoAoKanban } from "@/service/documento";
 import { useKanban } from "@/data/context/kanban";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -93,21 +92,11 @@ export default function CardEdital({
   };
 
   async function excluirEdital() {
-    // FUTURO: quando o backend suportar DELETE /doc/:id, descomentar o bloco abaixo
-    // e remover a mock atual.
-    //
-    // if (!edital.isMock) {
-    //   const resposta = await excluirEditalService(edital.id);
-    //   if (resposta !== 204) {
-    //     toast.error("Erro ao excluir edital!");
-    //     return;
-    //   }
-    // } else {
-    //   await desmarcarEnviadoAoKanban(edital.id);
-    // }
-
-    // Mock atual — remove do state local + localStorage independente de isMock
-    await desmarcarEnviadoAoKanban(edital.id);
+    const resposta = await excluirEditalService(edital.id);
+    if (resposta !== 204) {
+      toast.error("Erro ao excluir edital!");
+      return;
+    }
 
     setColumns((prev) => {
       const next = structuredClone(prev) as KanbanColumns;
