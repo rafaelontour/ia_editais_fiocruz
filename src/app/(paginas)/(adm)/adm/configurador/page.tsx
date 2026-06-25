@@ -31,14 +31,15 @@ import {
   DocumentGroupItem,
 } from "@/core/configurador/GrupoDocumento";
 import {
-  getDocumentGroupsService,
-  adicionarGrupoDocumentoService,
-  excluirGrupoDocumentoService,
-  getDocumentGroupItemsService,
-  adicionarDocumentoConfiguravelService,
-  atualizarDocumentoConfiguravelService,
-  excluirDocumentoConfiguravelService,
-} from "@/service/configurador";
+   getDocumentGroupsService,
+   adicionarGrupoDocumentoService,
+   atualizarGrupoDocumentoService,
+   excluirGrupoDocumentoService,
+   getDocumentGroupItemsService,
+   adicionarDocumentoConfiguravelService,
+   atualizarDocumentoConfiguravelService,
+   excluirDocumentoConfiguravelService,
+ } from "@/service/configurador";
 
 export default function ConfiguradorPage() {
   const [grupos, setGrupos] = useState<DocumentGroup[]>([]);
@@ -60,6 +61,9 @@ export default function ConfiguradorPage() {
   const [editItem, setEditItem] = useState<DocumentGroupItem | null>(null);
   const [editDocumentoNome, setEditDocumentoNome] = useState("");
   const [editDocumentoImagem, setEditDocumentoImagem] = useState<string>("");
+  const [editGroupDialogAberto, setEditGroupDialogAberto] = useState(false);
+  const [editGroupId, setEditGroupId] = useState<string | null>(null);
+  const [editGroupName, setEditGroupName] = useState("");
 
   const breakpointColumnsObj = { default: 3, 1500: 3, 1000: 2, 700: 1 };
 
@@ -154,6 +158,38 @@ export default function ConfiguradorPage() {
     setDocumentDialogAberto(false);
     const items = await getDocumentGroupItemsService(selectedGroupId);
     setItemsByGroup((m) => ({ ...m, [selectedGroupId]: items ?? [] }));
+  };
+
+  const abrirModalEditarGrupo = (grupo: DocumentGroup) => {
+    setEditGroupId(grupo.id);
+    setEditGroupName(grupo.name);
+    setEditGroupDialogAberto(true);
+  };
+
+  const fecharModalEditarGrupo = () => {
+    setEditGroupDialogAberto(false);
+    setEditGroupId(null);
+    setEditGroupName("");
+  };
+
+  const atualizarGrupo = async () => {
+    if (!editGroupId || !editGroupName.trim()) {
+      toast.error("Informe um nome para o grupo.");
+      return;
+    }
+
+    const status = await atualizarGrupoDocumentoService(
+      editGroupId,
+      editGroupName.trim(),
+    );
+    if (status !== 200) {
+      toast.error("Erro ao atualizar grupo.");
+      return;
+    }
+
+    toast.success("Grupo atualizado.");
+    fecharModalEditarGrupo();
+    carregarGrupos();
   };
 
   const abrirModalEditarDocumento = (item: DocumentGroupItem) => {
@@ -375,6 +411,52 @@ export default function ConfiguradorPage() {
       </Dialog>
 
       <Dialog
+        open={editGroupDialogAberto}
+        onOpenChange={(open) => {
+          setEditGroupDialogAberto(open);
+          if (!open) fecharModalEditarGrupo();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar grupo</DialogTitle>
+            <DialogDescription>
+              Altere o nome do grupo de documentos.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="editGrupoNome">Nome do grupo</Label>
+              <Input
+                id="editGrupoNome"
+                value={editGroupName}
+                onChange={(event) => setEditGroupName(event.target.value)}
+                placeholder="Ex: Documentos de compliance"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose>
+              <Button
+                variant="secondary"
+                className="cursor-pointer text-white bg-vermelho hover:bg-vermelho"
+              >
+                Cancelar
+              </Button>
+            </DialogClose>
+            <Button
+              onClick={atualizarGrupo}
+              className="bg-verde cursor-pointer hover:bg-verde text-white"
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
         open={editDialogAberto}
         onOpenChange={(open) => {
           setEditDialogAberto(open);
@@ -566,9 +648,10 @@ export default function ConfiguradorPage() {
                         <Button
                           title="Editar grupo"
                           className={`
-                                                                h-8 w-8 hover:cursor-pointer border border-gray-300 rounded-sm
-                                                                bg-branco hover:bg-branco
-                                                            `}
+                                                                 h-8 w-8 hover:cursor-pointer border border-gray-300 rounded-sm
+                                                                 bg-branco hover:bg-branco
+                                                             `}
+                          onClick={() => abrirModalEditarGrupo(grupo)}
                         >
                           <PencilLine size={16} color="black" />
                         </Button>

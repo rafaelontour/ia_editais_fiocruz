@@ -14,6 +14,7 @@ import {
   Plus,
   Trash2,
   Bot,
+  X,
 } from "lucide-react";
 import { Projeto, DocumentoProjeto } from "@/core/projeto/Projeto";
 import { DocumentGroupItem } from "@/core/configurador/GrupoDocumento";
@@ -49,6 +50,7 @@ export default function ProjetoInternoPage() {
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [pendingFiles, setPendingFiles] = useState<Record<string, File>>({});
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
 
   const { usuario } = useUsuario();
@@ -245,7 +247,6 @@ export default function ProjetoInternoPage() {
           </Button>
           <div>
             <h2 className="text-3xl font-bold">{projeto?.name}</h2>
-            {/* <div className="text-sm text-gray-500">{projeto?.status}</div> */}
           </div>
         </div>
 
@@ -271,7 +272,7 @@ export default function ProjetoInternoPage() {
         }}
       />
 
-      <div className=" w-full rounded-xl bg-white border border-gray-200 p-4">
+      <div className="w-full rounded-xl bg-white border border-gray-200 p-4">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="min-w-0">
             <h3 className="text-2xl font-semibold">Documentos do Projeto</h3>
@@ -365,7 +366,20 @@ export default function ProjetoInternoPage() {
                 key={doc?.id ?? groupItem.id}
                 className="border-b hover:bg-gray-50"
               >
-                <td className="p-2">{groupItem.name}</td>
+                <td className="p-2">
+                  <div className="flex items-center gap-2">
+                    {groupItem.icon_path && (
+                      <img
+                        src={groupItem.icon_path}
+                        alt=""
+                        className="h-6 w-6 rounded object-cover cursor-pointer flex-shrink-0 hover:opacity-80"
+                        title="Clique para ampliar"
+                        onClick={() => setExpandedImage(groupItem.icon_path ?? null)}
+                      />
+                    )}
+                    <span>{groupItem.name}</span>
+                  </div>
+                </td>
                 <td className="p-2">{doc?.name ?? ""}</td>
                 <td className="p-2">{doc?.number ?? ""}</td>
                 <td className="p-2">
@@ -413,13 +427,6 @@ export default function ProjetoInternoPage() {
                       >
                         <Plus color="black" />
                       </Button>
-                      {/* <Button
-                        onClick={() => removePlaceholderRow(groupItem.id)}
-                        title="Remover tipo"
-                        className="h-10 w-10 hover:cursor-pointer border border-gray-300 rounded-sm bg-branco hover:bg-branco"
-                      >
-                        <Trash2 color="black" />
-                      </Button> */}
                     </>
                   ) : doc.sent_to_kanban ? (
                     <Button
@@ -453,6 +460,27 @@ export default function ProjetoInternoPage() {
           </tbody>
         </table>
       </div>
+
+      {expandedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          onClick={() => setExpandedImage(null)}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh]">
+            <img
+              src={expandedImage}
+              alt="Imagem ampliada"
+              className="max-w-full max-h-[90vh] rounded shadow-2xl"
+            />
+            <button
+              className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow cursor-pointer"
+              onClick={() => setExpandedImage(null)}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
