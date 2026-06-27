@@ -541,7 +541,7 @@ export default function CardEdital({
                 )}
               </div>
             </DialogContent>
-
+{/* 
             {currentStatus === "COMPLETED" && (
               <DialogFooter>
                 <DialogClose asChild>
@@ -550,7 +550,7 @@ export default function CardEdital({
                   </Button>
                 </DialogClose>
               </DialogFooter>
-            )}
+            )} */}
           </Dialog>
         </div>
 

@@ -21,6 +21,25 @@ async function getEditaisService(idUnidade: string | undefined): Promise<Edital[
     }
 }
 
+async function getEditalPorProjectDocumentIdService(projectDocumentId: string): Promise<Edital | undefined> {
+    try {
+        const res = await fetch(`${urlBase}/doc/by-project-document/${projectDocumentId}`, {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
+
+        if (!res.ok) return
+
+        return await res.json()
+    } catch (e) {
+        return
+    }
+}
+
 async function getEditalPorIdService(id: string | undefined): Promise<Edital | undefined> {
     try {
         const res = await fetch(`${urlBase}/doc/${id}`, {
@@ -209,6 +228,7 @@ async function getEditaisArquivadosService(idUnidade: string | undefined) {
 export {
     getEditaisService,
     getEditalPorIdService,
+    getEditalPorProjectDocumentIdService,
     adicionarEditalService,
     atualizarEditalService,
     excluirEditalService,

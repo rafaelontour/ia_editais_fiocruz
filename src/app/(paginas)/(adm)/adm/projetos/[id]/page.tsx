@@ -24,7 +24,7 @@ import {
   marcarEnviadoAoKanban,
   excluirDocumentoService,
 } from "@/service/documento";
-import { adicionarEditalService } from "@/service/edital";
+import { adicionarEditalService, getEditalPorProjectDocumentIdService } from "@/service/edital";
 import { enviarArquivoService } from "@/service/editalArquivo";
 import { getDocumentGroupItemsService, getDocumentGroupsService } from "@/service/configurador";
 import { getUsuariosPorUnidade } from "@/service/usuario";
@@ -430,7 +430,14 @@ export default function ProjetoInternoPage() {
                     </>
                   ) : doc.sent_to_kanban ? (
                     <Button
-                      onClick={() => router.push("/adm/editais")}
+                      onClick={async () => {
+                        const edital = await getEditalPorProjectDocumentIdService(doc.id);
+                        if (edital?.id) {
+                          router.push(`/adm/editais/${edital.id}`);
+                        } else {
+                          toast.error("Edital não encontrado");
+                        }
+                      }}
                       title="Visualizar análise do OiacIA"
                       className="h-10 w-10 hover:cursor-pointer border border-gray-300 rounded-sm bg-branco hover:bg-branco"
                     >
