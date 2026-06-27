@@ -173,6 +173,7 @@ export default function ProjetoInternoPage() {
       projeto_nome: projeto?.name ?? "",
       typification_ids: doc.typification_ids ?? [],
       editors_ids: doc.responsible ? [doc.responsible] : [],
+      project_document_id: doc.id,
     };
 
     const [resposta, idEdital] = (await adicionarEditalService(payload)) ?? [];
