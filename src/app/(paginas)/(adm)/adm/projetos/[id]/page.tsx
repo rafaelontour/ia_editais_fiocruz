@@ -136,8 +136,7 @@ export default function ProjetoInternoPage() {
     if (!status) return "Sem status";
     switch (status.toLowerCase()) {
       case "pending":
-      case "PENDING":
-        return "Pendente";
+        return "Rascunho";
       case "under_construction":
       case "UNDER_CONSTRUCTION":
         return "Em construção";
