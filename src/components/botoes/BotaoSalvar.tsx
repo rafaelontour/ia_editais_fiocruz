@@ -1,11 +1,12 @@
 import { Button } from "../ui/button";
 
 
-export default function BotaoSalvar({ onClick, rotulo }: { onClick?: () => void , rotulo?: string } ) {
+export default function BotaoSalvar({ onClick, rotulo, disabled }: { onClick?: () => void , rotulo?: string, disabled?: boolean } ) {
     return (
         <Button
             onClick={onClick}
             type="submit"
+            disabled={disabled}
             className={`
                 flex bg-verde hover:bg-verde
                 text-white hover:cursor-pointer

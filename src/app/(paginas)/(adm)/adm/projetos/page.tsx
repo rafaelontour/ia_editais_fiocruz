@@ -124,56 +124,69 @@ export default function ProjetosPage() {
   }, [openDialogIdEditar, projetos, setValue]);
 
   const adicionarProjeto = async (data: FormData) => {
+    if (carregando) return;
     setCarregando(true);
-    const grupo = documentGroups.find((g) => g.id === data.document_group_id);
-    const [status] = await adicionarProjetoService(
-      data.nome,
-      data.descricao,
-      data.document_group_id,
-      grupo?.name,
-    );
-    if (status !== 201) {
-      toast.error("Erro ao adicionar projeto");
+    try {
+      const grupo = documentGroups.find((g) => g.id === data.document_group_id);
+      const [status] = await adicionarProjetoService(
+        data.nome,
+        data.descricao,
+        data.document_group_id,
+        grupo?.name,
+      );
+      if (status !== 201) {
+        toast.error("Erro ao adicionar projeto");
+        return;
+      }
+      toast.success("Projeto adicionado");
+      setOpenDialogProjetos(false);
+      reset();
+      fetchData();
+    } finally {
       setCarregando(false);
-      return;
     }
-    toast.success("Projeto adicionado");
-    setOpenDialogProjetos(false);
-    reset();
-    fetchData();
   };
 
   const atualizarProjeto = async (data: FormData) => {
-    if (!openDialogIdEditar) return;
-    const grupo = documentGroups.find((g) => g.id === data.document_group_id);
-    const status = await atualizarProjetoService(
-      openDialogIdEditar,
-      data.nome,
-      data.descricao,
-      data.document_group_id,
-      grupo?.name,
-    );
-    if (status !== 200) {
-      toast.error("Erro ao atualizar projeto");
-      return;
+    if (carregando || !openDialogIdEditar) return;
+    setCarregando(true);
+    try {
+      const grupo = documentGroups.find((g) => g.id === data.document_group_id);
+      const status = await atualizarProjetoService(
+        openDialogIdEditar,
+        data.nome,
+        data.descricao,
+        data.document_group_id,
+        grupo?.name,
+      );
+      if (status !== 200) {
+        toast.error("Erro ao atualizar projeto");
+        return;
+      }
+      toast.success("Projeto atualizado");
+      setOpenDialogIdEditar(null);
+      setOpenDialogProjetos(false);
+      reset();
+      fetchData();
+    } finally {
+      setCarregando(false);
     }
-    toast.success("Projeto atualizado");
-    setOpenDialogIdEditar(null);
-    setOpenDialogProjetos(false);
-    reset();
-    fetchData();
   };
 
   const excluirProjeto = async (item: Projeto) => {
+    if (carregando) return;
     setCarregando(true);
-    const status = await excluirProjetoService(item.id);
-    if (status !== 204) {
-      toast.error("Erro ao excluir projeto");
+    try {
+      const status = await excluirProjetoService(item.id);
+      if (status !== 204) {
+        toast.error("Erro ao excluir projeto");
+        return;
+      }
+      toast.success("Projeto excluído");
+      fetchData();
+    } finally {
       setCarregando(false);
-      return;
     }
-    toast.success("Projeto excluído");
-    fetchData();
   };
 
   function filtrarProjetos() {
@@ -274,7 +287,7 @@ export default function ProjetosPage() {
                   <DialogClose>
                     <BotaoCancelar />
                   </DialogClose>
-                  <BotaoSalvar onClick={handleSubmit(adicionarProjeto)} />
+                  <BotaoSalvar onClick={handleSubmit(adicionarProjeto)} disabled={carregando} />
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -386,6 +399,7 @@ export default function ProjetosPage() {
                           </DialogClose>
                           <BotaoSalvar
                             onClick={handleSubmit(atualizarProjeto)}
+                            disabled={carregando}
                           />
                         </DialogFooter>
                       </DialogContent>
@@ -393,6 +407,7 @@ export default function ProjetosPage() {
                     <BotaoExcluir
                       tipo="projeto"
                       item={projeto}
+                      disabled={carregando}
                       funcExcluir={() => excluirProjeto(projeto)}
                     />
                   </div>

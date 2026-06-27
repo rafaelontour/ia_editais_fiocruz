@@ -90,35 +90,45 @@ export default function ConfiguradorPage() {
   };
 
   const adicionarGrupo = async () => {
-    if (!nomeGrupo.trim()) {
-      toast.error("Informe um nome para o grupo de documentos.");
-      return;
-    }
-
+    if (carregando) return;
     setCarregando(true);
-    const [status] = await adicionarGrupoDocumentoService(nomeGrupo.trim());
-    setCarregando(false);
+    try {
+      if (!nomeGrupo.trim()) {
+        toast.error("Informe um nome para o grupo de documentos.");
+        return;
+      }
 
-    if (status !== 201) {
-      toast.error("Erro ao adicionar grupo de documentos.");
-      return;
+      const [status] = await adicionarGrupoDocumentoService(nomeGrupo.trim());
+
+      if (status !== 201) {
+        toast.error("Erro ao adicionar grupo de documentos.");
+        return;
+      }
+
+      toast.success("Grupo de documentos adicionado com sucesso.");
+      setNomeGrupo("");
+      setDialogAberto(false);
+      carregarGrupos();
+    } finally {
+      setCarregando(false);
     }
-
-    toast.success("Grupo de documentos adicionado com sucesso.");
-    setNomeGrupo("");
-    setDialogAberto(false);
-    carregarGrupos();
   };
 
   const excluirGrupo = async (id: string) => {
-    const status = await excluirGrupoDocumentoService(id);
-    if (status !== 204) {
-      toast.error("Erro ao excluir o grupo.");
-      return;
-    }
+    if (carregando) return;
+    setCarregando(true);
+    try {
+      const status = await excluirGrupoDocumentoService(id);
+      if (status !== 204) {
+        toast.error("Erro ao excluir o grupo.");
+        return;
+      }
 
-    toast.success("Grupo excluído com sucesso.");
-    carregarGrupos();
+      toast.success("Grupo excluído com sucesso.");
+      carregarGrupos();
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const abrirModalDocumento = (groupId: string) => {
@@ -135,33 +145,39 @@ export default function ConfiguradorPage() {
   };
 
   const adicionarDocumentoAoGrupo = async () => {
-    if (!selectedGroupId) {
-      toast.error("Grupo não selecionado.");
-      return;
-    }
+    if (carregando) return;
+    setCarregando(true);
+    try {
+      if (!selectedGroupId) {
+        toast.error("Grupo não selecionado.");
+        return;
+      }
 
-    const name = newDocumentoNome.trim();
-    if (!name) {
-      toast.error("Informe o nome do documento.");
-      return;
-    }
+      const name = newDocumentoNome.trim();
+      if (!name) {
+        toast.error("Informe o nome do documento.");
+        return;
+      }
 
-    const [status] = await adicionarDocumentoConfiguravelService(
-      selectedGroupId,
-      name,
-      newDocumentoImagem || undefined,
-    );
-    if (status !== 201) {
-      toast.error("Erro ao adicionar documento no grupo.");
-      return;
-    }
+      const [status] = await adicionarDocumentoConfiguravelService(
+        selectedGroupId,
+        name,
+        newDocumentoImagem || undefined,
+      );
+      if (status !== 201) {
+        toast.error("Erro ao adicionar documento no grupo.");
+        return;
+      }
 
-    toast.success("Documento adicionado ao grupo.");
-    setNewDocumentoNome("");
-    setNewDocumentoImagem("");
-    setDocumentDialogAberto(false);
-    const items = await getDocumentGroupItemsService(selectedGroupId);
-    setItemsByGroup((m) => ({ ...m, [selectedGroupId]: items ?? [] }));
+      toast.success("Documento adicionado ao grupo.");
+      setNewDocumentoNome("");
+      setNewDocumentoImagem("");
+      setDocumentDialogAberto(false);
+      const items = await getDocumentGroupItemsService(selectedGroupId);
+      setItemsByGroup((m) => ({ ...m, [selectedGroupId]: items ?? [] }));
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const abrirModalEditarGrupo = (grupo: DocumentGroup) => {
@@ -177,23 +193,29 @@ export default function ConfiguradorPage() {
   };
 
   const atualizarGrupo = async () => {
-    if (!editGroupId || !editGroupName.trim()) {
-      toast.error("Informe um nome para o grupo.");
-      return;
-    }
+    if (carregando) return;
+    setCarregando(true);
+    try {
+      if (!editGroupId || !editGroupName.trim()) {
+        toast.error("Informe um nome para o grupo.");
+        return;
+      }
 
-    const status = await atualizarGrupoDocumentoService(
-      editGroupId,
-      editGroupName.trim(),
-    );
-    if (status !== 200) {
-      toast.error("Erro ao atualizar grupo.");
-      return;
-    }
+      const status = await atualizarGrupoDocumentoService(
+        editGroupId,
+        editGroupName.trim(),
+      );
+      if (status !== 200) {
+        toast.error("Erro ao atualizar grupo.");
+        return;
+      }
 
-    toast.success("Grupo atualizado.");
-    fecharModalEditarGrupo();
-    carregarGrupos();
+      toast.success("Grupo atualizado.");
+      fecharModalEditarGrupo();
+      carregarGrupos();
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const abrirModalEditarDocumento = (item: DocumentGroupItem) => {
@@ -211,42 +233,54 @@ export default function ConfiguradorPage() {
   };
 
   const atualizarDocumentoNoGrupo = async () => {
-    if (!editItem) {
-      toast.error("Item não selecionado.");
-      return;
-    }
+    if (carregando) return;
+    setCarregando(true);
+    try {
+      if (!editItem) {
+        toast.error("Item não selecionado.");
+        return;
+      }
 
-    const name = editDocumentoNome.trim();
-    if (!name) {
-      toast.error("Informe o nome do documento.");
-      return;
-    }
+      const name = editDocumentoNome.trim();
+      if (!name) {
+        toast.error("Informe o nome do documento.");
+        return;
+      }
 
-    const status = await atualizarDocumentoConfiguravelService(
-      editItem.id,
-      name,
-      editDocumentoImagem || undefined,
-    );
-    if (status !== 200) {
-      toast.error("Erro ao atualizar documento.");
-      return;
-    }
+      const status = await atualizarDocumentoConfiguravelService(
+        editItem.id,
+        name,
+        editDocumentoImagem || undefined,
+      );
+      if (status !== 200) {
+        toast.error("Erro ao atualizar documento.");
+        return;
+      }
 
-    toast.success("Documento atualizado.");
-    fecharModalEditarDocumento();
-    const items = await getDocumentGroupItemsService(editItem.group_id);
-    setItemsByGroup((m) => ({ ...m, [editItem.group_id]: items ?? [] }));
+      toast.success("Documento atualizado.");
+      fecharModalEditarDocumento();
+      const items = await getDocumentGroupItemsService(editItem.group_id);
+      setItemsByGroup((m) => ({ ...m, [editItem.group_id]: items ?? [] }));
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const excluirDocumentoDoGrupo = async (groupId: string, itemId: string) => {
-    const status = await excluirDocumentoConfiguravelService(itemId);
-    if (status !== 204) {
-      toast.error("Erro ao excluir documento.");
-      return;
+    if (carregando) return;
+    setCarregando(true);
+    try {
+      const status = await excluirDocumentoConfiguravelService(itemId);
+      if (status !== 204) {
+        toast.error("Erro ao excluir documento.");
+        return;
+      }
+      toast.success("Documento excluído.");
+      const items = await getDocumentGroupItemsService(groupId);
+      setItemsByGroup((m) => ({ ...m, [groupId]: items ?? [] }));
+    } finally {
+      setCarregando(false);
     }
-    toast.success("Documento excluído.");
-    const items = await getDocumentGroupItemsService(groupId);
-    setItemsByGroup((m) => ({ ...m, [groupId]: items ?? [] }));
   };
 
   const toggleExpandGroup = (groupId: string) => {
@@ -413,6 +447,7 @@ export default function ConfiguradorPage() {
             </DialogClose>
             <Button
               onClick={adicionarDocumentoAoGrupo}
+              disabled={carregando}
               className="bg-verde text-white hover:bg-verde cursor-pointer"
             >
               Salvar
@@ -459,6 +494,7 @@ export default function ConfiguradorPage() {
             </DialogClose>
             <Button
               onClick={atualizarGrupo}
+              disabled={carregando}
               className="bg-verde cursor-pointer hover:bg-verde text-white"
             >
               Salvar
@@ -557,6 +593,7 @@ export default function ConfiguradorPage() {
             </DialogClose>
             <Button
               onClick={atualizarDocumentoNoGrupo}
+              disabled={carregando}
               className="bg-verde text-white hover:bg-verde cursor-pointer"
             >
               Salvar
@@ -626,6 +663,7 @@ export default function ConfiguradorPage() {
                             <Button
                               variant="ghost"
                               className="text-xs border border-gray-300 rounded-md hover:bg-gray-100 px-2 cursor-pointer"
+                              disabled={carregando}
                               onClick={() =>
                                 excluirDocumentoDoGrupo(grupo.id, item.id)
                               }
@@ -670,6 +708,7 @@ export default function ConfiguradorPage() {
                           title="Excluir grupo"
                           variant="destructive"
                           className="h-8 w-8 bg-vermelho hover:bg-vermelho hover:cursor-pointer rounded-sm"
+                          disabled={carregando}
                           onClick={() => excluirGrupo(grupo.id)}
                         >
                           <Trash size={16} />

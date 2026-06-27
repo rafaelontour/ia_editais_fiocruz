@@ -49,6 +49,7 @@ export default function ProjetoInternoPage() {
   const [removedGroupItemIds, setRemovedGroupItemIds] = useState<string[]>([]);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<Record<string, File>>({});
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
@@ -161,60 +162,72 @@ export default function ProjetoInternoPage() {
   };
 
   const enviarParaKanban = async (doc: DocumentoProjeto) => {
-    const payload = {
-      name: doc.name,
-      identifier: doc.number ?? doc.id,
-      description: doc.type ?? "",
-      grupo: projeto?.document_group_id
-        ? documentGroups.find((g) => g.id === projeto.document_group_id)?.name ?? ""
-        : "",
-      tipo_documento: doc.type ?? "",
-      projeto_nome: projeto?.name ?? "",
-      typification_ids: doc.typification_ids ?? [],
-      editors_ids: doc.responsible ? [doc.responsible] : [],
-      project_document_id: doc.id,
-    };
+    if (saving) return;
+    setSaving(true);
+    try {
+      const payload = {
+        name: doc.name,
+        identifier: doc.number ?? doc.id,
+        description: doc.type ?? "",
+        grupo: projeto?.document_group_id
+          ? documentGroups.find((g) => g.id === projeto.document_group_id)?.name ?? ""
+          : "",
+        tipo_documento: doc.type ?? "",
+        projeto_nome: projeto?.name ?? "",
+        typification_ids: doc.typification_ids ?? [],
+        editors_ids: doc.responsible ? [doc.responsible] : [],
+        project_document_id: doc.id,
+      };
 
-    const [resposta, idEdital] = (await adicionarEditalService(payload)) ?? [];
+      const [resposta, idEdital] = (await adicionarEditalService(payload)) ?? [];
 
-    if (resposta !== 201 || !idEdital) {
-      toast.error("Erro ao enviar documento para o Kanban");
-      return;
-    }
-
-    if (!lista.includes(idEdital)) {
-      lista.push(idEdital);
-      salvarLista(lista);
-    }
-
-    const file = pendingFiles[doc.id];
-    if (file) {
-      const uploadStatus = await enviarArquivoService(idEdital, file);
-      if (uploadStatus !== 201) {
-        toast.error("Erro ao fazer upload do arquivo");
-      } else {
-        setPendingFiles((prev) => {
-          const next = { ...prev };
-          delete next[doc.id];
-          return next;
-        });
+      if (resposta !== 201 || !idEdital) {
+        toast.error("Erro ao enviar documento para o Kanban");
+        return;
       }
-    }
 
-    await marcarEnviadoAoKanban(doc.id);
-    toast.success("Documento enviado para Kanban");
-    fetch();
-    router.push("/adm/editais");
+      if (!lista.includes(idEdital)) {
+        lista.push(idEdital);
+        salvarLista(lista);
+      }
+
+      const file = pendingFiles[doc.id];
+      if (file) {
+        const uploadStatus = await enviarArquivoService(idEdital, file);
+        if (uploadStatus !== 201) {
+          toast.error("Erro ao fazer upload do arquivo");
+        } else {
+          setPendingFiles((prev) => {
+            const next = { ...prev };
+            delete next[doc.id];
+            return next;
+          });
+        }
+      }
+
+      await marcarEnviadoAoKanban(doc.id);
+      toast.success("Documento enviado para Kanban");
+      fetch();
+      router.push("/adm/editais");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const deleteDocument = async (documentId: string) => {
-    const status = await excluirDocumentoService(documentId);
-    if (status !== 204) {
-      toast.error("Erro ao excluir documento");
-      return;
+    if (saving) return;
+    setSaving(true);
+    try {
+      const status = await excluirDocumentoService(documentId);
+      if (status !== 204) {
+        toast.error("Erro ao excluir documento");
+        return;
+      }
+      toast.success("Documento excluído");
+      fetch();
+    } finally {
+      setSaving(false);
     }
-    toast.success("Documento excluído");
-    fetch();
   };
 
   const removePlaceholderRow = (groupItemId: string) => {
@@ -454,6 +467,7 @@ export default function ProjetoInternoPage() {
                     <>
                       <Button
                         onClick={() => enviarParaKanban(doc)}
+                        disabled={saving}
                         title="Enviar para Kanban"
                         className="h-10 w-10 bg-verde hover:cursor-pointer border border-gray-300 rounded-sm text-white hover:bg-verde"
                       >
@@ -461,6 +475,7 @@ export default function ProjetoInternoPage() {
                       </Button>
                       <Button
                         onClick={() => deleteDocument(doc.id)}
+                        disabled={saving}
                         title="Excluir documento"
                         className="h-10 w-10 hover:cursor-pointer border border-gray-300 rounded-sm bg-branco hover:bg-branco"
                       >

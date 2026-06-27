@@ -17,6 +17,7 @@ interface BotaoExcluirProps {
   tipo: string;
   item: Fonte | Tipificacao
   funcExcluir: (id: string) => void;
+  disabled?: boolean;
 }
 
 export default function BotaoExcluir(dados: BotaoExcluirProps) {
@@ -59,6 +60,7 @@ export default function BotaoExcluir(dados: BotaoExcluirProps) {
           <Button
             className="flex bg-vermelho hover:bg-vermelho text-white hover:cursor-pointer"
             style={{ boxShadow: "0 0 3px rgba(0, 0, 0, 0.5)" }}
+            disabled={dados.disabled}
             onClick={() => dados.funcExcluir(dados.item.id)}
           >
             Excluir
