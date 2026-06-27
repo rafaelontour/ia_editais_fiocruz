@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   ImageIcon,
+  Loader2,
   Pencil,
   PencilLine,
   Plus,
@@ -56,6 +57,7 @@ export default function ConfiguradorPage() {
     {},
   );
   const [carregando, setCarregando] = useState(false);
+  const [carregandoDados, setCarregandoDados] = useState(true);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [editDialogAberto, setEditDialogAberto] = useState(false);
   const [editItem, setEditItem] = useState<DocumentGroupItem | null>(null);
@@ -72,6 +74,7 @@ export default function ConfiguradorPage() {
   }, []);
 
   const carregarGrupos = async () => {
+    setCarregandoDados(true);
     const dados = await getDocumentGroupsService();
     const grupos = dados ?? [];
     setGrupos(grupos);
@@ -83,6 +86,7 @@ export default function ConfiguradorPage() {
       map[g.id] = items ?? [];
     }
     setItemsByGroup(map);
+    setCarregandoDados(false);
   };
 
   const adicionarGrupo = async () => {
@@ -254,6 +258,13 @@ export default function ConfiguradorPage() {
 
   return (
     <div className="flex flex-col gap-5">
+      {carregandoDados ? (
+        <div className="flex justify-center items-center gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <p className="animate-pulse">Carregando grupos...</p>
+          <Loader2 className="animate-spin" />
+        </div>
+      ) : (
+      <>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-4xl font-bold">Modo Configurador</p>
@@ -702,6 +713,8 @@ export default function ConfiguradorPage() {
             </button>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

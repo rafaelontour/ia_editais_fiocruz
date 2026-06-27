@@ -292,7 +292,7 @@ export default function ProjetosPage() {
 
       {carregando ? (
         <div className="flex justify-center items-center gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-          <span>Carregando projetos...</span>
+          <p className="animate-pulse">Carregando projetos...</p>
           <Loader2 className="animate-spin ml-2" />
         </div>
       ) : projetosFiltradas.length > 0 ? (
