@@ -132,11 +132,11 @@ export default function ProjetoInternoPage() {
     };
   };
 
-  const formatDocumentStatus = (status?: string) => {
+  const formatDocumentStatus = (status?: string, enviadoAoKanban?: boolean) => {
     if (!status) return "Sem status";
     switch (status.toLowerCase()) {
       case "pending":
-        return "Rascunho";
+        return enviadoAoKanban ? "Rascunho" : "Pendente";
       case "under_construction":
       case "UNDER_CONSTRUCTION":
         return "Em construção";
@@ -383,7 +383,7 @@ export default function ProjetoInternoPage() {
                 <td className="p-2">{doc?.name ?? ""}</td>
                 <td className="p-2">{doc?.number ?? ""}</td>
                 <td className="p-2">
-                  {doc ? formatDocumentStatus(doc.status) : ""}
+                  {doc ? formatDocumentStatus(doc.status, doc.sent_to_kanban) : ""}
                 </td>
                 <td className="p-2">
                   {doc?.created_at ? <Calendario data={doc.created_at} /> : ""}
