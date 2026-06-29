@@ -200,33 +200,19 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
     try {
       const group = gruposDocumento.find((g) => g.id === data.grupoDocumentoId);
       const item = itensDocumento.find((i) => i.id === data.tipoDocumentoId);
-      const responsavelUsuario =
-        usuarios.find((u) => u.id === data.responsavel) ??
-        (currentUser?.id === data.responsavel ? currentUser : null);
-
-      const reader = new FileReader();
-      const fileDataUrl = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(data.arquivo);
-      });
 
       const { criarDocumentoChat } = await import("@/service/assistente/assistente");
 
-      const doc = criarDocumentoChat({
+      const doc = await criarDocumentoChat({
         name: data.nome,
         identifier: data.identificador,
         description: data.descricao,
-        tipificacoes: data.tipificacoes,
-        tipificacoesNomes: tipificacoesSelecionadas.map((t) => t.name ?? ""),
-        grupoDocumentoId: data.grupoDocumentoId,
-        grupoDocumentoNome: group?.name ?? "",
-        tipoDocumentoId: data.tipoDocumentoId,
-        tipoDocumentoNome: item?.name ?? "",
-        fileDataUrl,
-        fileName: data.arquivo.name,
-        responsavel_id: data.responsavel,
-        responsavel_nome: responsavelUsuario?.username ?? "",
+        grupo: group?.name ?? "",
+        tipo_documento: item?.name ?? "",
+        projeto_nome: "",
+        typification_ids: data.tipificacoes,
+        editors_ids: data.responsavel ? [data.responsavel] : [],
+        arquivo: data.arquivo,
       });
 
       toast.success("Documento enviado com sucesso!");
@@ -236,7 +222,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
 
       onDocumentoCriado({
         id: doc.id,
-        fileDataUrl: doc.fileDataUrl,
+        fileDataUrl: doc.fileUrl,
         fileName: doc.fileName,
       });
     } catch (error) {

@@ -3,13 +3,14 @@
 import { Bot, Send, User, ChevronLeft } from "lucide-react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { useEffect, useRef, useState } from "react";
-import type { ChatDocumento } from "@/core/assistente/ChatDocumento";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  adicionarMensagem,
   getDocumentoChatPorId,
-  gerarRespostaMock,
+  getMensagensChat,
+  adicionarMensagemLocal,
+  enviarMensagemChat,
 } from "@/service/assistente/assistente";
+import type { ChatDocumentoMeta, ChatMensagem } from "@/service/assistente/assistente";
 
 interface Props {
   documentoId: string;
@@ -17,23 +18,24 @@ interface Props {
 }
 
 export default function ChatIA({ documentoId, onVoltar }: Props) {
-  const [documento, setDocumento] = useState<ChatDocumento | undefined>();
+  const [documento, setDocumento] = useState<ChatDocumentoMeta | undefined>();
+  const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [pensando, setPensando] = useState(false);
   const fimDaListaRef = useRef<HTMLDivElement>(null);
 
-  function carregar() {
-    const doc = getDocumentoChatPorId(documentoId);
-    setDocumento(doc);
-  }
-
-  useEffect(() => {
-    carregar();
+  const carregar = useCallback(() => {
+    setDocumento(getDocumentoChatPorId(documentoId));
+    setMensagens(getMensagensChat(documentoId));
   }, [documentoId]);
 
   useEffect(() => {
+    carregar();
+  }, [carregar]);
+
+  useEffect(() => {
     fimDaListaRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [documento?.mensagens]);
+  }, [mensagens]);
 
   async function enviar() {
     if (!mensagem.trim() || !documento) return;
@@ -41,17 +43,23 @@ export default function ChatIA({ documentoId, onVoltar }: Props) {
     const pergunta = mensagem.trim();
     setMensagem("");
 
-    adicionarMensagem(documento.id, "user", pergunta);
-    carregar();
+    adicionarMensagemLocal(documento.id, "user", pergunta);
+    setMensagens(getMensagensChat(documentoId));
     setPensando(true);
 
-    await new Promise((resolve) =>
-      setTimeout(resolve, 1000 + Math.random() * 1500),
-    );
+    try {
+      const history = mensagens.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
 
-    const resposta = gerarRespostaMock(pergunta, documento);
-    adicionarMensagem(documento.id, "assistant", resposta);
-    carregar();
+      const resposta = await enviarMensagemChat(documento.id, pergunta, history);
+      adicionarMensagemLocal(documento.id, "assistant", resposta);
+    } catch {
+      adicionarMensagemLocal(documento.id, "assistant", "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.");
+    }
+
+    setMensagens(getMensagensChat(documentoId));
     setPensando(false);
   }
 
@@ -99,7 +107,7 @@ export default function ChatIA({ documentoId, onVoltar }: Props) {
           </div>
         </div>
 
-        {documento.mensagens.map((msg) => (
+        {mensagens.map((msg) => (
           <div
             key={msg.id}
             className={`flex items-start gap-3 ${

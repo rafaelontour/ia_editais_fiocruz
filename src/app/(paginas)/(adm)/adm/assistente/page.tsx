@@ -7,7 +7,6 @@ import {
   MessageSquare,
   Plus,
   Trash2,
-  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Masonry from "react-masonry-css";
@@ -26,9 +25,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ChatDocumento } from "@/core/assistente/ChatDocumento";
+import type { ChatDocumentoMeta } from "@/service/assistente/assistente";
 import {
   getDocumentosChat,
+  getMensagensChat,
   excluirDocumentoChat,
 } from "@/service/assistente/assistente";
 import { toast } from "sonner";
@@ -43,7 +43,7 @@ type PaginaState =
 
 export default function AssistentePage() {
   const [state, setState] = useState<PaginaState>({ tipo: "lista" });
-  const [conversas, setConversas] = useState<ChatDocumento[]>([]);
+  const [conversas, setConversas] = useState<ChatDocumentoMeta[]>([]);
 
   function carregarConversas() {
     setConversas(getDocumentosChat());
@@ -159,7 +159,7 @@ export default function AssistentePage() {
             columnClassName="flex flex-col gap-4"
           >
             {conversas.map((conv) => {
-              const mensagensCount = conv.mensagens?.length ?? 0;
+              const mensagens = getMensagensChat(conv.id);
 
               return (
                 <Div key={conv.id}>
@@ -172,18 +172,9 @@ export default function AssistentePage() {
                   </p>
 
                   <div className="flex items-center gap-3 mt-3 text-xs text-zinc-500">
-                    {conv.responsavel_nome && (
-                      <span className="flex items-center gap-1">
-                        <User size={12} />
-                        {conv.responsavel_nome}
-                      </span>
-                    )}
-
                     <span className="flex items-center gap-1">
                       <MessageSquare size={12} />
-                      {mensagensCount === 0
-                        ? "Nenhuma"
-                        : `${mensagensCount} msg`}
+                      {mensagens.length === 0 ? "Nenhuma" : `${mensagens.length} msg`}
                     </span>
                   </div>
 
@@ -201,7 +192,7 @@ export default function AssistentePage() {
                             tipo: "chat",
                             doc: {
                               id: conv.id,
-                              fileDataUrl: conv.fileDataUrl,
+                              fileDataUrl: conv.fileUrl,
                               fileName: conv.fileName,
                             },
                           })
