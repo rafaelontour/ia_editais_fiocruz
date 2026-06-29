@@ -29,7 +29,7 @@ const itemsAdm = [
     icon: Bot,
   },
   {
-    title: "Projetos",
+    title: "Processos",
     url: "/adm/projetos",
     icon: FolderOpenDot,
   },

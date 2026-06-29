@@ -54,38 +54,40 @@ Após a implementação no backend:
 
 ---
 
-## 3. Responsável nas conversas do Assistente (OiacIA)
+## 3. Conversas do Assistente (OiacIA) — ✅ Implementado no backend
 
-### O que foi mockado
+### O que foi feito
 
-Foram adicionados dois campos à interface `ChatDocumento`:
+Foram criadas duas tabelas no banco de dados:
 
-- `responsavel_id` — ID do usuário responsável pela conversa
-- `responsavel_nome` — nome do responsável (para exibição nos cards)
+- `chat_conversations` — vinculada a `documents` e `users` (FKs), com soft delete
+- `chat_messages` — vinculada a `chat_conversations`, com `role` (user/assistant) e `content`
 
-No formulário de upload (`FormularioUpload`), foi adicionado um campo **Responsável** (Select) que lista os usuários da mesma unidade (obtidos via `getUsuariosPorUnidade`).
+### Endpoints criados
 
-### Onde os dados são inseridos
+| Método | Rota | Descrição |
+|---|---|---|
+| `POST` | `/chat/conversations` | Cria conversa para um documento |
+| `GET` | `/chat/conversations` | Lista conversas do usuário logado |
+| `GET` | `/chat/conversations/{id}/messages` | Mensagens de uma conversa |
+| `DELETE` | `/chat/conversations/{id}` | Exclusão lógica |
+| `POST` | `/doc/{doc_id}/assistant/chat` | Envia mensagem + salva pergunta e resposta no banco |
 
-**Arquivo:** `src/components/assistente/FormularioUpload.tsx`
+### Frontend
 
-O campo `responsavel` é obrigatório no schema Zod e é persistido via `criarDocumentoChat` no localStorage.
+- `service/assistente/assistente.ts` — reescrito para usar API (não usa mais localStorage)
+- `ChatIA.tsx` — recebe `conversationId` + `documentId`, busca mensagens da API
+- `FormularioUpload.tsx` — após upload, cria conversa via API
+- `page.tsx` — estado da página usa `conversationId` + `documentId`
 
-### Como funciona a página do assistente
+### Arquivos do backend alterados/criados
 
-1. **Estado "lista"**: exibe um **Masonry** com cards de todas as conversas salvas, mostrando: nome do documento, nome do arquivo, responsável, quantidade de mensagens e data de criação.
-2. **Botão "Nova conversa"**: abre o formulário de upload (`FormularioUpload`) com os campos existentes mais o novo campo **Responsável**.
-3. **Estado "chat"**: após criar ou clicar em uma conversa existente, exibe o visualizador de documento + chat lado a lado (mesmo layout anterior).
-4. **Botão "Cancelar"** no formulário: retorna para a lista sem salvar.
-5. **Botão de excluir** (Trash2) em cada card: remove a conversa do localStorage e atualiza a lista.
-6. **Responsável** movido para a **Etapa 2** do formulário (junto com tipificações), validado no avanço da etapa.
-
-### O que precisa ser implementado no backend
-
-1. Adicionar os campos `responsavel_id` e `responsavel_nome` ao modelo/endpoint de `ChatDocumento` no backend
-2. O campo `responsavel` deve referenciar um usuário real (FK para tabela de usuários)
-3. O endpoint de listagem de conversas deve suportar filtro por responsável
-4. Substituir o armazenamento em localStorage por chamadas de API (CRUD de conversas), incluindo exclusão
+- `iaEditais/models.py` — classes `ChatConversation` e `ChatMessage`
+- `iaEditais/repositories/chat_repo.py` — CRUD das conversas
+- `iaEditais/routers/docs/chat.py` — endpoints REST
+- `iaEditais/routers/docs/assistant.py` — endpoint de chat salva mensagens
+- `iaEditais/app.py` — router registrado
+- `migrations/versions/0001_add_chat_tables.py` — migration
 
 ## 4. Exclusão de editais no Kanban
 
@@ -142,6 +144,37 @@ Para melhor performance e consistência, refatorar para **junction table** (igua
 1. Criar tabela `project_document_typifications` com FK para `project_documents.id` e `typifications.id`
 2. Remover coluna `typification_ids` de `project_documents`
 3. Atualizar os schemas, service e repositório do `ProjectDocument`
+
+---
+
+## 6. Separar assistente em rotas (futuro)
+
+### Motivação
+
+Atualmente a page do assistente (`/adm/assistente`) usa **estado React** (`PaginaState`) para alternar entre lista, formulário e chat. Isso significa que:
+
+- **F5/refresh** durante o chat volta para a lista
+- Não é possível **compartilhar/bookmark** uma conversa específica
+- Botão "voltar" do navegador não funciona como esperado
+
+### O que fazer
+
+Separar em três rotas:
+
+| Rota | Componente |
+|---|---|
+| `/adm/assistente` | Lista de conversas (igual hoje) |
+| `/adm/assistente/novo` | Formulário de upload (`FormularioUpload`) |
+| `/adm/assistente/[id]` | Split view: PDF + chat (`VisualizadorDocumento` + `ChatIA`) |
+
+### Como fazer
+
+Os componentes já estão isolados (`FormularioUpload`, `ChatIA`, `VisualizadorDocumento`), então a migração é simples:
+
+1. Criar `src/app/(paginas)/(adm)/adm/assistente/novo/page.tsx` com `<FormularioUpload>` que redireciona para `/[id]` após criar
+2. Criar `src/app/(paginas)/(adm)/adm/assistente/[id]/page.tsx` que busca a conversa pelo parâmetro da URL e renderiza a split view
+3. Simplificar `src/app/(paginas)/(adm)/adm/assistente/page.tsx` para apenas a listagem
+4. Remover `PaginaState` e navegação baseada em estado
 
 ---
 
