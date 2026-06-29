@@ -28,7 +28,6 @@ import {
 import type { ChatDocumentoMeta } from "@/service/assistente/assistente";
 import {
   getDocumentosChat,
-  getMensagensChat,
   excluirDocumentoChat,
 } from "@/service/assistente/assistente";
 import { toast } from "sonner";
@@ -38,15 +37,16 @@ type PaginaState =
   | { tipo: "formulario" }
   | {
       tipo: "chat";
-      doc: { id: string; fileDataUrl: string; fileName: string };
+      doc: { conversationId: string; documentId: string; fileDataUrl: string; fileName: string };
     };
 
 export default function AssistentePage() {
   const [state, setState] = useState<PaginaState>({ tipo: "lista" });
   const [conversas, setConversas] = useState<ChatDocumentoMeta[]>([]);
 
-  function carregarConversas() {
-    setConversas(getDocumentosChat());
+  async function carregarConversas() {
+    const docs = await getDocumentosChat();
+    setConversas(docs);
   }
 
   useEffect(() => {
@@ -59,8 +59,8 @@ export default function AssistentePage() {
     }
   }, [state.tipo]);
 
-  function handleExcluir(id: string) {
-    const ok = excluirDocumentoChat(id);
+  async function handleExcluir(id: string) {
+    const ok = await excluirDocumentoChat(id);
     if (ok) {
       toast.success("Conversa excluída");
       carregarConversas();
@@ -103,7 +103,8 @@ export default function AssistentePage() {
 
         <ResizablePanel minSize={25} defaultSize={50}>
           <ChatIA
-            documentoId={state.doc.id}
+            conversationId={state.doc.conversationId}
+            documentId={state.doc.documentId}
             onVoltar={() => setState({ tipo: "lista" })}
           />
         </ResizablePanel>
@@ -159,8 +160,6 @@ export default function AssistentePage() {
             columnClassName="flex flex-col gap-4"
           >
             {conversas.map((conv) => {
-              const mensagens = getMensagensChat(conv.id);
-
               return (
                 <Div key={conv.id}>
                   <h3 className="text-lg font-semibold truncate">
@@ -174,7 +173,7 @@ export default function AssistentePage() {
                   <div className="flex items-center gap-3 mt-3 text-xs text-zinc-500">
                     <span className="flex items-center gap-1">
                       <MessageSquare size={12} />
-                      {mensagens.length === 0 ? "Nenhuma" : `${mensagens.length} msg`}
+                      Conversa
                     </span>
                   </div>
 
@@ -191,7 +190,8 @@ export default function AssistentePage() {
                           setState({
                             tipo: "chat",
                             doc: {
-                              id: conv.id,
+                              conversationId: conv.id,
+                              documentId: conv.documentId,
                               fileDataUrl: conv.fileUrl,
                               fileName: conv.fileName,
                             },

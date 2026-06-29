@@ -47,7 +47,8 @@ type formData = z.infer<typeof schemaDocumento>;
 
 interface Props {
   onDocumentoCriado: (doc: {
-    id: string;
+    conversationId: string;
+    documentId: string;
     fileDataUrl: string;
     fileName: string;
   }) => void;
@@ -217,7 +218,8 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
       setCurrentStep(1);
 
       onDocumentoCriado({
-        id: doc.id,
+        conversationId: doc.conversationId,
+        documentId: doc.documentId,
         fileDataUrl: doc.fileUrl,
         fileName: doc.fileName,
       });

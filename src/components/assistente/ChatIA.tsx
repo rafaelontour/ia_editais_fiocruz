@@ -5,47 +5,52 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  getDocumentoChatPorId,
   getMensagensChat,
-  adicionarMensagemLocal,
   enviarMensagemChat,
 } from "@/service/assistente/assistente";
-import type { ChatDocumentoMeta, ChatMensagem } from "@/service/assistente/assistente";
+import type { ChatMensagem } from "@/service/assistente/assistente";
 
 interface Props {
-  documentoId: string;
+  conversationId: string;
+  documentId: string;
   onVoltar: () => void;
 }
 
-export default function ChatIA({ documentoId, onVoltar }: Props) {
-  const [documento, setDocumento] = useState<ChatDocumentoMeta | undefined>();
+export default function ChatIA({ conversationId, documentId, onVoltar }: Props) {
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [pensando, setPensando] = useState(false);
   const fimDaListaRef = useRef<HTMLDivElement>(null);
 
-  const carregar = useCallback(() => {
-    setDocumento(getDocumentoChatPorId(documentoId));
-    setMensagens(getMensagensChat(documentoId));
-  }, [documentoId]);
+  const carregarMensagens = useCallback(async () => {
+    const msgs = await getMensagensChat(conversationId);
+    setMensagens(msgs);
+  }, [conversationId]);
 
   useEffect(() => {
-    carregar();
-  }, [carregar]);
+    carregarMensagens();
+  }, [carregarMensagens]);
 
   useEffect(() => {
     fimDaListaRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [mensagens]);
 
   async function enviar() {
-    if (!mensagem.trim() || !documento) return;
+    if (!mensagem.trim()) return;
 
     const pergunta = mensagem.trim();
     setMensagem("");
-
-    adicionarMensagemLocal(documento.id, "user", pergunta);
-    setMensagens(getMensagensChat(documentoId));
     setPensando(true);
+
+    setMensagens((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        role: "user",
+        content: pergunta,
+        created_at: new Date().toISOString(),
+      },
+    ]);
 
     try {
       const history = mensagens.map((m) => ({
@@ -53,13 +58,26 @@ export default function ChatIA({ documentoId, onVoltar }: Props) {
         content: m.content,
       }));
 
-      const resposta = await enviarMensagemChat(documento.id, pergunta, history);
-      adicionarMensagemLocal(documento.id, "assistant", resposta);
+      const resposta = await enviarMensagemChat(
+        conversationId,
+        documentId,
+        pergunta,
+        history,
+      );
+
+      await carregarMensagens();
     } catch {
-      adicionarMensagemLocal(documento.id, "assistant", "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.");
+      setMensagens((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
+          created_at: new Date().toISOString(),
+        },
+      ]);
     }
 
-    setMensagens(getMensagensChat(documentoId));
     setPensando(false);
   }
 
@@ -69,8 +87,6 @@ export default function ChatIA({ documentoId, onVoltar }: Props) {
       enviar();
     }
   }
-
-  if (!documento) return null;
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -86,9 +102,8 @@ export default function ChatIA({ documentoId, onVoltar }: Props) {
         </Button>
         <div className="flex-1 min-w-0">
           <h2 className="text-sm font-semibold text-zinc-800 truncate">
-            {documento.name}
+            Assistente IA
           </h2>
-          <p className="text-xs text-zinc-500 truncate">{documento.fileName}</p>
         </div>
       </div>
 
@@ -99,8 +114,7 @@ export default function ChatIA({ documentoId, onVoltar }: Props) {
           </div>
           <div className="bg-zinc-100 rounded-lg px-4 py-2.5 max-w-[85%]">
             <p className="text-sm text-zinc-700">
-              Olá! Sou o OiacIA assistente do documento{" "}
-              <strong>{documento.name}</strong>. Faça perguntas sobre o
+              Olá! Sou o OiacIA assistente. Faça perguntas sobre o
               conteúdo, prazos, requisitos ou qualquer informação presente no
               documento.
             </p>

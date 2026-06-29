@@ -1,5 +1,6 @@
 export interface ChatDocumentoMeta {
   id: string
+  documentId: string
   name: string
   fileName: string
   fileUrl: string
@@ -13,71 +14,38 @@ export interface ChatMensagem {
   created_at: string
 }
 
-const STORAGE_KEY = "ia_chat_documentos_v1"
-const MESSAGES_KEY = "ia_chat_mensagens_v1"
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
-function loadMetas(): ChatDocumentoMeta[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    return JSON.parse(raw) as ChatDocumentoMeta[]
-  } catch {
-    return []
-  }
+export async function getDocumentosChat(): Promise<ChatDocumentoMeta[]> {
+  const res = await fetch(`${urlBase}/chat/conversations`, {
+    credentials: "include",
+  })
+  if (!res.ok) return []
+  const data = await res.json()
+  return data.map((c: any) => ({
+    id: c.id,
+    documentId: c.document_id,
+    name: c.document_name,
+    fileName: c.document_name,
+    fileUrl: `${urlBase}${c.file_url}`,
+    created_at: c.created_at,
+  }))
 }
 
-function saveMetas(docs: ChatDocumentoMeta[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(docs))
+export async function getMensagensChat(conversationId: string): Promise<ChatMensagem[]> {
+  const res = await fetch(`${urlBase}/chat/conversations/${conversationId}/messages`, {
+    credentials: "include",
+  })
+  if (!res.ok) return []
+  return await res.json()
 }
 
-function loadMensagens(documentoId: string): ChatMensagem[] {
-  try {
-    const raw = localStorage.getItem(`${MESSAGES_KEY}_${documentoId}`)
-    if (!raw) return []
-    return JSON.parse(raw) as ChatMensagem[]
-  } catch {
-    return []
-  }
-}
-
-function saveMensagens(documentoId: string, msgs: ChatMensagem[]) {
-  localStorage.setItem(`${MESSAGES_KEY}_${documentoId}`, JSON.stringify(msgs))
-}
-
-export function getDocumentosChat(): ChatDocumentoMeta[] {
-  return loadMetas()
-}
-
-export function getDocumentoChatPorId(id: string): ChatDocumentoMeta | undefined {
-  return loadMetas().find((d) => d.id === id)
-}
-
-export function getMensagensChat(documentoId: string): ChatMensagem[] {
-  return loadMensagens(documentoId)
-}
-
-export function excluirDocumentoChat(id: string): boolean {
-  const docs = loadMetas()
-  const index = docs.findIndex((d) => d.id === id)
-  if (index === -1) return false
-  docs.splice(index, 1)
-  saveMetas(docs)
-  localStorage.removeItem(`${MESSAGES_KEY}_${id}`)
-  return true
-}
-
-export function adicionarMensagemLocal(documentoId: string, role: "user" | "assistant", content: string): ChatMensagem {
-  const msgs = loadMensagens(documentoId)
-  const msg: ChatMensagem = {
-    id: crypto.randomUUID(),
-    role,
-    content,
-    created_at: new Date().toISOString(),
-  }
-  msgs.push(msg)
-  saveMensagens(documentoId, msgs)
-  return msg
+export async function excluirDocumentoChat(id: string): Promise<boolean> {
+  const res = await fetch(`${urlBase}/chat/conversations/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  })
+  return res.ok
 }
 
 export async function criarDocumentoChat(data: {
@@ -90,7 +58,7 @@ export async function criarDocumentoChat(data: {
   typification_ids: string[]
   editors_ids: string[]
   arquivo: File
-}): Promise<{ id: string; fileUrl: string; fileName: string }> {
+}): Promise<{ conversationId: string; documentId: string; fileUrl: string; fileName: string }> {
   const res = await fetch(`${urlBase}/doc`, {
     method: "POST",
     credentials: "include",
@@ -124,31 +92,35 @@ export async function criarDocumentoChat(data: {
   const release = await uploadRes.json()
   const filePath = release.file_path as string
 
-  const meta: ChatDocumentoMeta = {
-    id: docId,
-    name: data.name,
-    fileName: data.arquivo.name,
-    fileUrl: `${urlBase}${filePath}`,
-    created_at: new Date().toISOString(),
-  }
-
-  const docs = loadMetas()
-  docs.unshift(meta)
-  saveMetas(docs)
-
-  return { id: meta.id, fileUrl: meta.fileUrl, fileName: meta.fileName }
-}
-
-export async function enviarMensagemChat(
-  documentoId: string,
-  message: string,
-  history: { role: string; content: string }[],
-): Promise<string> {
-  const res = await fetch(`${urlBase}/doc/${documentoId}/assistant/chat`, {
+  const convRes = await fetch(`${urlBase}/chat/conversations`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-type": "application/json" },
-    body: JSON.stringify({ message, history }),
+    body: JSON.stringify({ document_id: docId }),
+  })
+
+  if (!convRes.ok) throw new Error("Erro ao criar conversa")
+  const conv = await convRes.json()
+
+  return {
+    conversationId: conv.id as string,
+    documentId: docId,
+    fileUrl: `${urlBase}${filePath}`,
+    fileName: data.arquivo.name,
+  }
+}
+
+export async function enviarMensagemChat(
+  conversationId: string,
+  documentId: string,
+  message: string,
+  history: { role: string; content: string }[],
+): Promise<string> {
+  const res = await fetch(`${urlBase}/doc/${documentId}/assistant/chat`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-type": "application/json" },
+    body: JSON.stringify({ message, history, conversation_id: conversationId }),
   })
 
   if (!res.ok) {
