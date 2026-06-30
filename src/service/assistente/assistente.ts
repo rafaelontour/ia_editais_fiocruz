@@ -72,6 +72,7 @@ export async function criarDocumentoChat(data: {
       projeto_nome: data.projeto_nome,
       typification_ids: data.typification_ids,
       editors_ids: data.editors_ids,
+      source: 'assistant',
     }),
   })
 
