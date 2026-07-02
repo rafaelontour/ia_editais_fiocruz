@@ -39,7 +39,8 @@ export async function adicionarDocumentoService(
         name: payload.name ?? "Sem nome",
         number: payload.number,
         status: payload.status ?? "PENDING",
-        responsible: payload.responsible,
+        responsible: payload.responsible ?? payload.responsibles?.[0],
+        responsibles: payload.responsibles,
         typification_ids: payload.typification_ids,
       }),
     });

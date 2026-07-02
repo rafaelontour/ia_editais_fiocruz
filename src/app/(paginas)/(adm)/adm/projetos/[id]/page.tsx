@@ -119,9 +119,13 @@ export default function ProjetoInternoPage() {
   ];
 
   const getResponsibleInfo = (doc: DocumentoProjeto) => {
-    if (doc.responsible_name) {
+    const responsibleNames = [doc.responsible_name, ...(doc.responsible_names ?? [])]
+      .filter(Boolean)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    if (responsibleNames.length > 0) {
       return {
-        name: doc.responsible_name,
+        name: responsibleNames.join(", "),
         iconPath: doc.responsible_icon?.file_path,
       };
     }
@@ -175,7 +179,11 @@ export default function ProjetoInternoPage() {
         tipo_documento: doc.type ?? "",
         projeto_nome: projeto?.name ?? "",
         typification_ids: doc.typification_ids ?? [],
-        editors_ids: doc.responsible ? [doc.responsible] : [],
+        editors_ids: doc.responsibles?.length
+          ? doc.responsibles
+          : doc.responsible
+            ? [doc.responsible]
+            : [],
         project_document_id: doc.id,
       };
 

@@ -19,6 +19,8 @@ export interface DocumentoProjeto {
   status?: string;
   responsible?: string;
   responsible_name?: string;
+  responsibles?: string[];
+  responsible_names?: string[];
   responsible_icon?: {
     file_path: string;
   } | null;

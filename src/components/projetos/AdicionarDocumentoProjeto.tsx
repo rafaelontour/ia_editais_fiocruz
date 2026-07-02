@@ -46,7 +46,9 @@ const schema = z.object({
   tipificacoes: z
     .array(z.string())
     .min(1, "Selecione pelo menos uma tipificação"),
-  responsavel: z.string().min(1, "Selecione o responsável"),
+  responsavel: z
+    .array(z.string().min(1))
+    .min(1, "Selecione pelo menos um responsável"),
   identificador: z.string().min(1, "O número do documento é obrigatório"),
   descricao: z.string().min(3, "A descrição é obrigatória"),
 });
@@ -83,7 +85,7 @@ export default function AdicionarDocumentoProjeto({
     defaultValues: {
       tipo: "Documento",
       tipificacoes: [],
-      responsavel: "",
+      responsavel: [],
     },
   });
 
@@ -104,8 +106,7 @@ export default function AdicionarDocumentoProjeto({
     Tipificacao[]
   >([]);
   const [usuarios, setUsuarios] = useState<any[]>([]);
-  const [responsavelSelecionado, setResponsavelSelecionado] =
-    useState<any>(null);
+  const [responsaveisSelecionados, setResponsaveisSelecionados] = useState<any[]>([]);
   const [arquivoFile, setArquivoFile] = useState<File | null>(null);
   const { usuario } = useUsuario();
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
@@ -137,7 +138,7 @@ export default function AdicionarDocumentoProjeto({
     !!identificadorValue,
     !!(tipoValue || defaultTipo),
     !!tipificacoesValue?.length,
-    !!responsavelValue,
+    !!responsavelValue?.length,
     !!descricaoValue,
   ].filter(Boolean).length;
 
@@ -261,7 +262,7 @@ export default function AdicionarDocumentoProjeto({
   function limparDados() {
     reset();
     setTipificacoesSelecionadas([]);
-    setResponsavelSelecionado(null);
+    setResponsaveisSelecionados([]);
     setArquivoFile(null);
   }
 
@@ -282,15 +283,21 @@ export default function AdicionarDocumentoProjeto({
   };
 
   const onSubmit = async (data: Form) => {
-    const usuarioSelecionado = usuarios.find((u) => u.id === data.responsavel);
+    const responsaveisIds = data.responsavel ?? [];
+    const usuariosSelecionados = responsaveisIds
+      .map((id) => usuarios.find((u) => u.id === id))
+      .filter(Boolean);
+    const primeiroResponsavel = usuariosSelecionados[0];
+
     const [status, id] = await adicionarDocumentoService(projectId, {
       name: data.nome,
       number: data.identificador,
       type: data.tipo,
       status: "PENDING",
-      responsible: data.responsavel,
-      responsible_name: usuarioSelecionado?.username,
-      responsible_icon: usuarioSelecionado?.icon,
+      responsible: primeiroResponsavel?.id,
+      responsible_name: primeiroResponsavel?.username,
+      responsible_icon: primeiroResponsavel?.icon,
+      responsibles: responsaveisIds,
       typification_ids: data.tipificacoes,
     });
 
@@ -535,38 +542,51 @@ export default function AdicionarDocumentoProjeto({
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Responsável</Label>
+                    <Label>Responsáveis</Label>
                     <Controller
                       name="responsavel"
                       control={control}
                       render={({ field }) => (
                         <Select
-                          value={field.value}
+                          value=""
                           onValueChange={(value) => {
-                            field.onChange(value);
+                            const novoValor = [...(field.value ?? []), value];
+                            field.onChange(novoValor);
                             const usuarioSelecionado = usuarios.find(
                               (u) => u.id === value,
                             );
                             if (usuarioSelecionado) {
-                              setResponsavelSelecionado(usuarioSelecionado);
+                              setResponsaveisSelecionados((prev) => [
+                                ...prev,
+                                usuarioSelecionado,
+                              ]);
                             }
                           }}
                         >
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Selecione um usuário" />
+                            <SelectValue placeholder="Selecione os responsáveis" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
                               <SelectLabel>Usuários</SelectLabel>
                               {usuarios.length > 0 ? (
-                                usuarios.map((usuarioItem) => (
-                                  <SelectItem
-                                    key={usuarioItem.id}
-                                    value={usuarioItem.id}
-                                  >
-                                    {usuarioItem.username}
-                                  </SelectItem>
-                                ))
+                                usuarios
+                                  .filter(
+                                    (usuarioItem) =>
+                                      !responsaveisSelecionados.some(
+                                        (responsavelSelecionado) =>
+                                          responsavelSelecionado.id ===
+                                          usuarioItem.id,
+                                      ),
+                                  )
+                                  .map((usuarioItem) => (
+                                    <SelectItem
+                                      key={usuarioItem.id}
+                                      value={usuarioItem.id}
+                                    >
+                                      {usuarioItem.username}
+                                    </SelectItem>
+                                  ))
                               ) : (
                                 <SelectItem value="nenhum" disabled>
                                   Nenhum usuário disponível
@@ -584,49 +604,60 @@ export default function AdicionarDocumentoProjeto({
                     )}
                   </div>
 
-                  {responsavelSelecionado && (
+                  {responsaveisSelecionados.length > 0 && (
                     <div className="space-y-2">
-                      <Label>Responsável selecionado</Label>
+                      <Label>Responsáveis selecionados</Label>
                       <div className="grid grid-cols-1 gap-3 border border-gray-200 rounded-md p-3">
-                        <div className="flex items-center justify-between gap-3 border border-gray-200 rounded-sm p-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-200 overflow-hidden">
-                              {responsavelSelecionado.icon?.file_path ? (
-                                <img
-                                  src={
-                                    responsavelSelecionado.icon.file_path.startsWith(
-                                      "http",
-                                    )
-                                      ? responsavelSelecionado.icon.file_path
-                                      : `${urlBase}${responsavelSelecionado.icon.file_path}`
-                                  }
-                                  alt={responsavelSelecionado.username}
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <User className="h-5 w-5 text-gray-500" />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold">
-                                {responsavelSelecionado.username}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                Responsável
-                              </p>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setResponsavelSelecionado(null);
-                              setValue("responsavel", "");
-                            }}
-                            className="text-red-500 hover:text-red-700"
+                        {responsaveisSelecionados.map((responsavelSelecionado) => (
+                          <div
+                            key={responsavelSelecionado.id}
+                            className="flex items-center justify-between gap-3 border border-gray-200 rounded-sm p-3"
                           >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-200 overflow-hidden">
+                                {responsavelSelecionado.icon?.file_path ? (
+                                  <img
+                                    src={
+                                      responsavelSelecionado.icon.file_path.startsWith(
+                                        "http",
+                                      )
+                                        ? responsavelSelecionado.icon.file_path
+                                        : `${urlBase}${responsavelSelecionado.icon.file_path}`
+                                    }
+                                    alt={responsavelSelecionado.username}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <User className="h-5 w-5 text-gray-500" />
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold">
+                                  {responsavelSelecionado.username}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Responsável
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const novaLista = responsaveisSelecionados.filter(
+                                  (item) => item.id !== responsavelSelecionado.id,
+                                );
+                                setResponsaveisSelecionados(novaLista);
+                                setValue(
+                                  "responsavel",
+                                  novaLista.map((item) => item.id),
+                                );
+                              }}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
