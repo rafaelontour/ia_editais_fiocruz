@@ -132,3 +132,39 @@ export async function enviarMensagemChat(
   const data = await res.json()
   return data.response as string
 }
+
+export async function getMensagensDocumentoService(documentId: string): Promise<ChatMensagem[]> {
+  const res = await fetch(`${urlBase}/doc/${documentId}/messages`, {
+    credentials: "include",
+  })
+  if (!res.ok) return []
+  const data = await res.json()
+  return (data.messages ?? []).map((m: any) => ({
+    id: m.id,
+    role: m.author?.id ? "assistant" : "user",
+    content: m.content,
+    created_at: m.created_at,
+  }))
+}
+
+export async function enviarMensagemAiService(
+  documentId: string,
+  content: string,
+): Promise<ChatMensagem | null> {
+  const res = await fetch(`${urlBase}/doc/${documentId}/message/ai`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-type": "application/json" },
+    body: JSON.stringify({ content }),
+  })
+
+  if (!res.ok) return null
+
+  const data = await res.json()
+  return {
+    id: data.id,
+    role: "assistant",
+    content: data.content,
+    created_at: data.created_at,
+  }
+}

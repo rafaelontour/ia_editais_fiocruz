@@ -5,8 +5,7 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  getMensagensChat,
-  enviarMensagemChat,
+  enviarMensagemAiService,
 } from "@/service/assistente/assistente";
 import type { ChatMensagem } from "@/service/assistente/assistente";
 import { getContextItemsService } from "@/service/assistente/contextItems";
@@ -28,15 +27,6 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
   const [mentionIndex, setMentionIndex] = useState(0);
   const fimDaListaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const carregarMensagens = useCallback(async () => {
-    const msgs = await getMensagensChat(conversationId);
-    setMensagens(msgs);
-  }, [conversationId]);
-
-  useEffect(() => {
-    carregarMensagens();
-  }, [carregarMensagens]);
 
   useEffect(() => {
     getContextItemsService(documentId).then(setContextItems);
@@ -64,19 +54,17 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
     ]);
 
     try {
-      const history = mensagens.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
+      const ai = await enviarMensagemAiService(documentId, pergunta);
 
-      const resposta = await enviarMensagemChat(
-        conversationId,
-        documentId,
-        pergunta,
-        history,
-      );
-
-      await carregarMensagens();
+      setMensagens((prev) => [
+        ...prev,
+        {
+          id: ai?.id ?? crypto.randomUUID(),
+          role: "assistant",
+          content: ai?.content ?? "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
+          created_at: ai?.created_at ?? new Date().toISOString(),
+        },
+      ]);
     } catch {
       setMensagens((prev) => [
         ...prev,
