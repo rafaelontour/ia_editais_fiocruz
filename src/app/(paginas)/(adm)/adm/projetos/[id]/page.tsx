@@ -119,30 +119,19 @@ export default function ProjetoInternoPage() {
   ];
 
   const getResponsaveisAnimatedItems = (doc: DocumentoProjeto) => {
-    const responsibleNames = [doc.responsible_name, ...(doc.responsible_names ?? [])]
-      .filter(Boolean)
-      .filter((value, index, self) => self.indexOf(value) === index);
-
-    if (responsibleNames.length === 0) {
-      const user = usuarios.find((u) => u.id === doc.responsible);
-      return [{
-        id: 0,
-        name: user?.username?.split(" ")[0] ?? "Sem responsável",
-        designation: "Analista",
-        image: user?.icon?.file_path ? `${urlBase}${user.icon.file_path}` : "/user.png",
-      }];
-    }
-
-    return responsibleNames.map((name, index) => ({
-      id: index,
-      name: name?.split(" ")[0] ?? "Usuário",
-      designation: "Analista",
-      image: index === 0 && doc.responsible_icon?.file_path
-        ? doc.responsible_icon.file_path.startsWith("http")
-          ? doc.responsible_icon.file_path
-          : `${urlBase}${doc.responsible_icon.file_path}`
-        : "/user.png",
-    }));
+    const userIds = doc.responsibles ?? (doc.responsible ? [doc.responsible] : []);
+    return userIds.map((userId, index) => {
+      const user = usuarios.find((u) => u.id === userId);
+      const label = ({ DEFAULT: "Padrão", ADMIN: "Administrador", ANALYST: "Analista", AUDITOR: "Auditor" } as Record<string, string>)[user?.access_level ?? ""] ?? user?.access_level ?? "Usuário";
+      return {
+        id: index,
+        name: user?.username?.split(" ")[0] ?? "Usuário",
+        designation: label,
+        image: user?.icon?.file_path
+          ? `${urlBase}${user.icon.file_path}`
+          : "/user.png",
+      };
+    });
   };
 
   const formatDocumentStatus = (status?: string, enviadoAoKanban?: boolean) => {
