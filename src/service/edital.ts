@@ -4,7 +4,7 @@ const urlBase = process.env.NEXT_PUBLIC_URL_BASE
 
 async function getEditaisService(idUnidade: string | undefined): Promise<Edital[] | undefined> {
     try {
-        const res = await fetch(`${urlBase}/doc?unit_id=${idUnidade}`, {
+        const res = await fetch(`${urlBase}/doc?unit_id=${idUnidade}&source=manual`, {
             method: "GET",
             credentials: "include",
             headers: {
