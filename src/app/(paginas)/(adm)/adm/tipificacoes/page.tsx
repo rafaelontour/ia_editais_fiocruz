@@ -532,10 +532,10 @@ export default function Tipificacoes() {
                       {tipificacao.name}
                     </h2>
                     <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                      <span className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg">
+                      <span className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
                         Grupo: {tipificacao.document_group_name ?? "Sem grupo"}
                       </span>
-                      <span className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg">
+                      <span className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
                         Tipo:{" "}
                         {tipificacao.document_group_item_name ?? "Sem tipo"}
                       </span>
