@@ -183,14 +183,20 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }, [grupoSelecionado, setValue]);
 
   useEffect(() => {
-    const selectedItem = itensDocumento.find((i) => i.id === tipoDocumentoIdValue);
-    const selectedTipoName = selectedItem?.name;
-
-    const filtered = tipificacoes.filter((t) => {
+    const filteredByGroup = tipificacoes.filter((t) => {
       if (t.document_group_id && t.document_group_id !== grupoSelecionado) return false;
-      if (selectedTipoName && t.document_group_item_name && t.document_group_item_name !== selectedTipoName) return false;
       return true;
     });
+
+    if (!tipoDocumentoIdValue) {
+      setFilteredTipificacoes(filteredByGroup);
+      return;
+    }
+
+    const selectedItem = itensDocumento.find((i) => i.id === tipoDocumentoIdValue);
+    const filtered = selectedItem
+      ? filteredByGroup.filter((t) => t.document_group_item_id === selectedItem.id)
+      : filteredByGroup;
 
     setFilteredTipificacoes(filtered);
   }, [tipificacoes, grupoSelecionado, tipoDocumentoIdValue, itensDocumento]);
