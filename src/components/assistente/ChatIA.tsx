@@ -9,6 +9,8 @@ import {
   enviarMensagemChat,
 } from "@/service/assistente/assistente";
 import type { ChatMensagem } from "@/service/assistente/assistente";
+import { getContextItemsService } from "@/service/assistente/contextItems";
+import type { ContextItem } from "@/service/assistente/contextItems";
 
 interface Props {
   conversationId: string;
@@ -20,7 +22,12 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [pensando, setPensando] = useState(false);
+  const [contextItems, setContextItems] = useState<ContextItem[]>([]);
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [mentionIndex, setMentionIndex] = useState(0);
   const fimDaListaRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const carregarMensagens = useCallback(async () => {
     const msgs = await getMensagensChat(conversationId);
@@ -30,6 +37,10 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
   useEffect(() => {
     carregarMensagens();
   }, [carregarMensagens]);
+
+  useEffect(() => {
+    getContextItemsService(documentId).then(setContextItems);
+  }, [documentId]);
 
   useEffect(() => {
     fimDaListaRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -81,12 +92,81 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
     setPensando(false);
   }
 
+  function handleChange(value: string) {
+    setMensagem(value);
+
+    const pos = textareaRef.current?.selectionStart ?? value.length;
+    const beforeCursor = value.slice(0, pos);
+    const atIndex = beforeCursor.lastIndexOf("@");
+
+    if (atIndex !== -1 && beforeCursor.slice(atIndex).length <= 50) {
+      const query = beforeCursor.slice(atIndex + 1);
+      const hasSpace = /\s/.test(query);
+      if (!hasSpace && contextItems.length > 0) {
+        setMentionQuery(query.toLowerCase());
+        setShowMentions(true);
+        setMentionIndex(0);
+        return;
+      }
+    }
+    setShowMentions(false);
+  }
+
+  function insertMention(item: ContextItem) {
+    const pos = textareaRef.current?.selectionStart ?? mensagem.length;
+    const beforeCursor = mensagem.slice(0, pos);
+    const atIndex = beforeCursor.lastIndexOf("@");
+    if (atIndex === -1) return;
+
+    const before = mensagem.slice(0, atIndex);
+    const after = mensagem.slice(pos);
+    const tag = `<branch:${item.id}>`;
+    const nova = `${before}${tag} ${after}`;
+    setMensagem(nova);
+    setShowMentions(false);
+    setTimeout(() => {
+      textareaRef.current?.focus();
+      const newPos = before.length + tag.length + 1;
+      textareaRef.current?.setSelectionRange(newPos, newPos);
+    }, 0);
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (showMentions) {
+      const filtered = contextItems.filter((i) =>
+        i.label.toLowerCase().includes(mentionQuery)
+      );
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setMentionIndex((prev) => Math.min(prev + 1, filtered.length - 1));
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setMentionIndex((prev) => Math.max(prev - 1, 0));
+        return;
+      }
+      if ((e.key === "Enter" || e.key === "Tab") && filtered.length > 0) {
+        e.preventDefault();
+        insertMention(filtered[mentionIndex]);
+        return;
+      }
+      if (e.key === "Escape") {
+        setShowMentions(false);
+        return;
+      }
+    }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       enviar();
     }
   }
+
+  const filteredMentions = showMentions
+    ? contextItems.filter((i) =>
+        i.label.toLowerCase().includes(mentionQuery)
+      )
+    : [];
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -175,13 +255,35 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
         <div ref={fimDaListaRef} />
       </div>
 
-      <div className="border-t p-4 bg-white">
+      <div className="border-t p-4 bg-white relative">
+        {showMentions && filteredMentions.length > 0 && (
+          <div className="absolute bottom-full left-4 right-4 mb-1 bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
+            {filteredMentions.map((item, idx) => (
+              <button
+                key={item.id}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  insertMention(item);
+                }}
+                onMouseEnter={() => setMentionIndex(idx)}
+                className={`w-full text-left px-3 py-2 text-sm cursor-pointer ${
+                  idx === mentionIndex ? "bg-verde/10 text-verde" : "hover:bg-zinc-50"
+                }`}
+              >
+                <span className="font-medium text-xs text-zinc-500">{item.type}</span>
+                <span className="ml-1 text-zinc-800">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
         <div className="flex gap-2">
           <Textarea
+            ref={textareaRef}
             value={mensagem}
-            onChange={(e) => setMensagem(e.target.value)}
+            onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Digite sua pergunta..."
+            placeholder='Digite sua pergunta... Use @ para mencionar uma tipificação, taxonomia ou ramo'
             className="resize-none min-h-[44px] max-h-[120px]"
             rows={1}
           />
@@ -195,7 +297,7 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
           </Button>
         </div>
         <p className="text-xs text-zinc-400 mt-1">
-          Pressione Enter para enviar, Shift+Enter para nova linha
+          Enter para enviar · Shift+Enter para nova linha · @ para mencionar itens do documento
         </p>
       </div>
     </div>
