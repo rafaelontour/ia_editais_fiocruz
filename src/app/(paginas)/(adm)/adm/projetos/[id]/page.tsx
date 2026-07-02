@@ -10,12 +10,12 @@ import {
   View,
   Loader2,
   CheckCircle2,
-  User,
   Plus,
   Trash2,
   Bot,
   X,
 } from "lucide-react";
+import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Projeto, DocumentoProjeto } from "@/core/projeto/Projeto";
 import { DocumentGroupItem } from "@/core/configurador/GrupoDocumento";
 import { getProjetosService } from "@/service/projeto";
@@ -118,23 +118,31 @@ export default function ProjetoInternoPage() {
     { label: "Finalizado", icon: CheckCircle2 },
   ];
 
-  const getResponsibleInfo = (doc: DocumentoProjeto) => {
+  const getResponsaveisAnimatedItems = (doc: DocumentoProjeto) => {
     const responsibleNames = [doc.responsible_name, ...(doc.responsible_names ?? [])]
       .filter(Boolean)
       .filter((value, index, self) => self.indexOf(value) === index);
 
-    if (responsibleNames.length > 0) {
-      return {
-        name: responsibleNames.join(", "),
-        iconPath: doc.responsible_icon?.file_path,
-      };
+    if (responsibleNames.length === 0) {
+      const user = usuarios.find((u) => u.id === doc.responsible);
+      return [{
+        id: 0,
+        name: user?.username?.split(" ")[0] ?? "Sem responsável",
+        designation: "Analista",
+        image: user?.icon?.file_path ? `${urlBase}${user.icon.file_path}` : "/user.png",
+      }];
     }
 
-    const user = usuarios.find((u) => u.id === doc.responsible);
-    return {
-      name: user?.username ?? doc.responsible ?? "Sem responsável",
-      iconPath: user?.icon?.file_path,
-    };
+    return responsibleNames.map((name, index) => ({
+      id: index,
+      name: name?.split(" ")[0] ?? "Usuário",
+      designation: "Analista",
+      image: index === 0 && doc.responsible_icon?.file_path
+        ? doc.responsible_icon.file_path.startsWith("http")
+          ? doc.responsible_icon.file_path
+          : `${urlBase}${doc.responsible_icon.file_path}`
+        : "/user.png",
+    }));
   };
 
   const formatDocumentStatus = (status?: string, enviadoAoKanban?: boolean) => {
@@ -417,30 +425,7 @@ export default function ProjetoInternoPage() {
                   {doc?.created_at ? <Calendario data={doc.created_at} /> : ""}
                 </td>
                 <td className="p-2">
-                  {doc ? (
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 overflow-hidden">
-                        {getResponsibleInfo(doc).iconPath ? (
-                          <img
-                            src={
-                              getResponsibleInfo(doc).iconPath.startsWith(
-                                "http",
-                              )
-                                ? getResponsibleInfo(doc).iconPath
-                                : `${urlBase}${getResponsibleInfo(doc).iconPath}`
-                            }
-                            alt={getResponsibleInfo(doc).name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <User className="h-4 w-4 text-gray-500" />
-                        )}
-                      </div>
-                      <span>{getResponsibleInfo(doc).name}</span>
-                    </div>
-                  ) : (
-                    ""
-                  )}
+                  {doc ? <AnimatedTooltip items={getResponsaveisAnimatedItems(doc)} /> : ""}
                 </td>
                 <td className="p-2 flex items-center gap-2">
                   {!doc ? (
