@@ -3,8 +3,9 @@
 import { Bot, Send, User, ChevronLeft } from "lucide-react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  getMensagensDocumentoService,
   enviarMensagemAiService,
 } from "@/service/assistente/assistente";
 import type { ChatMensagem } from "@/service/assistente/assistente";
@@ -27,6 +28,10 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
   const [mentionIndex, setMentionIndex] = useState(0);
   const fimDaListaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    getMensagensDocumentoService(documentId).then(setMensagens);
+  }, [documentId]);
 
   useEffect(() => {
     getContextItemsService(documentId).then(setContextItems);

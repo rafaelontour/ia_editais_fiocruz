@@ -139,12 +139,23 @@ export async function getMensagensDocumentoService(documentId: string): Promise<
   })
   if (!res.ok) return []
   const data = await res.json()
-  return (data.messages ?? []).map((m: any) => ({
-    id: m.id,
-    role: m.author?.id ? "assistant" : "user",
-    content: m.content,
-    created_at: m.created_at,
-  }))
+  const msgs = data.messages ?? []
+
+  const hasAiMention = msgs.some((m: any) =>
+    m.mentions?.some((mention: any) => mention.type === "AI")
+  )
+
+  return msgs.map((m: any, idx: number) => {
+    const isAi = hasAiMention
+      ? m.mentions?.some((mention: any) => mention.type === "AI")
+      : idx % 2 === 1
+    return {
+      id: m.id,
+      role: isAi ? "assistant" : "user",
+      content: m.content,
+      created_at: m.created_at,
+    }
+  })
 }
 
 export async function enviarMensagemAiService(
