@@ -30,12 +30,22 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mentionMapRef = useRef<Map<string, string>>(new Map());
 
+  const contextMapRef = useRef<Map<string, string>>(new Map());
+
   useEffect(() => {
     getMensagensDocumentoService(documentId).then(setMensagens);
   }, [documentId]);
 
   useEffect(() => {
-    getContextItemsService(documentId).then(setContextItems);
+    getContextItemsService(documentId).then((items) => {
+      setContextItems(items);
+      const map = new Map<string, string>();
+      for (const item of items) {
+        const name = item.label.split(" > ").pop() ?? item.id;
+        map.set(item.id, name);
+      }
+      contextMapRef.current = map;
+    });
   }, [documentId]);
 
   useEffect(() => {
@@ -224,7 +234,10 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
               }`}
             >
               <p className="text-sm text-zinc-700 whitespace-pre-wrap">
-                {msg.content}
+                {msg.content.replace(/<branch:([^>]+)>/g, (_, id) => {
+                  const name = contextMapRef.current.get(id)
+                  return name ? `@${name}` : ""
+                })}
               </p>
             </div>
           </div>
