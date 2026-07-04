@@ -145,7 +145,7 @@ export async function getMensagensDocumentoService(documentId: string): Promise<
     m.mentions?.some((mention: any) => mention.type === "AI")
   )
 
-  return msgs.map((m: any, idx: number) => {
+  return msgs.reverse().map((m: any, idx: number) => {
     const isAi = hasAiMention
       ? m.mentions?.some((mention: any) => mention.type === "AI")
       : idx % 2 === 1
