@@ -28,6 +28,7 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
   const [mentionIndex, setMentionIndex] = useState(0);
   const fimDaListaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const mentionMapRef = useRef<Map<string, string>>(new Map());
 
   useEffect(() => {
     getMensagensDocumentoService(documentId).then(setMensagens);
@@ -44,7 +45,10 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
   async function enviar() {
     if (!mensagem.trim()) return;
 
-    const pergunta = mensagem.trim();
+    let pergunta = mensagem.trim();
+    mentionMapRef.current.forEach((uuid, name) => {
+      pergunta = pergunta.replaceAll(`<branch:${name}>`, `<branch:${uuid}>`);
+    });
     setMensagem("");
     setPensando(true);
 
@@ -113,7 +117,9 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
 
     const before = mensagem.slice(0, atIndex);
     const after = mensagem.slice(pos);
-    const tag = `<branch:${item.id}>`;
+    const name = item.label.split(" > ").pop() ?? item.id;
+    mentionMapRef.current.set(name, item.id);
+    const tag = `<branch:${name}>`;
     const nova = `${before}${tag} ${after}`;
     setMensagem(nova);
     setShowMentions(false);
