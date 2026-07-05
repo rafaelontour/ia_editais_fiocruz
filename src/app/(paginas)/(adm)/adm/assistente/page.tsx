@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Bot,
   InfoIcon,
+  Loader2,
   MessageSquare,
   Plus,
   Trash2,
@@ -43,10 +44,13 @@ type PaginaState =
 export default function AssistentePage() {
   const [state, setState] = useState<PaginaState>({ tipo: "lista" });
   const [conversas, setConversas] = useState<ChatDocumentoMeta[]>([]);
+  const [carregando, setCarregando] = useState(true);
 
   async function carregarConversas() {
+    setCarregando(true);
     const docs = await getDocumentosChat();
     setConversas(docs);
+    setCarregando(false);
   }
 
   useEffect(() => {
@@ -146,7 +150,12 @@ export default function AssistentePage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-1 ">
-        {conversas.length === 0 ? (
+        {carregando ? (
+          <div className="flex justify-center items-center gap-2 h-full">
+            <p className="animate-pulse">Carregando conversas...</p>
+            <Loader2 className="animate-spin" />
+          </div>
+        ) : conversas.length === 0 ? (
           <Div>
             <p className="text-gray-500 text-center py-8">
               Nenhuma conversa iniciada ainda. Clique em "Nova conversa" para

@@ -59,12 +59,13 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   const {
     register,
     handleSubmit,
-    formState: { errors, submitCount },
+    formState: { errors },
     control,
     setValue,
     reset,
     watch,
     trigger,
+    clearErrors,
   } = useForm<formData>({
     resolver: zodResolver(schemaDocumento),
     defaultValues: {
@@ -81,6 +82,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   const [gruposDocumento, setGruposDocumento] = useState<DocumentGroup[]>([]);
   const [itensDocumento, setItensDocumento] = useState<DocumentGroupItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [tentouEnviar, setTentouEnviar] = useState(false);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const { usuario: currentUser } = useUsuario();
 
@@ -202,6 +204,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }, [tipificacoes, grupoSelecionado, tipoDocumentoIdValue, itensDocumento]);
 
   async function enviar(data: formData) {
+    setTentouEnviar(true);
     setLoading(true);
 
     try {
@@ -504,7 +507,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                   placeholder="Descreva o documento..."
                   className="resize-y min-h-[100px]"
                 />
-                {submitCount > 0 && errors.descricao && (
+                {tentouEnviar && errors.descricao && (
                   <span className="text-xs text-red-500 italic">{errors.descricao.message}</span>
                 )}
               </div>
@@ -522,7 +525,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                     />
                   )}
                 />
-                {submitCount > 0 && errors.arquivo && (
+                {tentouEnviar && errors.arquivo && (
                   <span className="text-xs text-red-500 italic">{errors.arquivo.message}</span>
                 )}
               </div>
