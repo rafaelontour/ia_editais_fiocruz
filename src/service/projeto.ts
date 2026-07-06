@@ -49,17 +49,16 @@ export async function atualizarProjetoService(
   status?: string,
 ): Promise<number> {
   try {
+    const body: Record<string, unknown> = { id, name };
+    if (description) body.description = description;
+    if (document_group_id) body.document_group_id = document_group_id;
+    if (status) body.status = status;
+
     const res = await fetch(`${urlBase}/project`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id,
-        name,
-        description,
-        document_group_id,
-        status,
-      }),
+      body: JSON.stringify(body),
     });
 
     return res.status;

@@ -416,7 +416,7 @@ export default function AdicionarDocumentoProjeto({
                 </div>
                 <div className="space-y-2">
                   <Label>Nome do documento</Label>
-                  <Input {...register("nome")} />
+                  <Input {...register("nome")} placeholder="Ex: Contrato nº 123"/>
                   {errors.nome && (
                     <span className="text-xs text-red-500">
                       {String(errors.nome.message)}
@@ -426,7 +426,7 @@ export default function AdicionarDocumentoProjeto({
 
                 <div className="space-y-2">
                   <Label>Número do documento</Label>
-                  <Input {...register("identificador")} />
+                  <Input {...register("identificador")} placeholder="Ex: 2024/0001"/>
                   {errors.identificador && (
                     <span className="text-xs text-red-500">
                       {String(errors.identificador.message)}
