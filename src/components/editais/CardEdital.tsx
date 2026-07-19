@@ -5,6 +5,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Edital } from "@/core";
 import { StatusEdital } from "@/core/edital/Edital";
+import type { Projeto } from "@/core/projeto/Projeto";
 import EditarEdital from "./EditarEdital";
 import { Button } from "../ui/button";
 import {
@@ -13,6 +14,7 @@ import {
   Bot,
   Calendar,
   Clock,
+  ExternalLink,
   Trash,
   View,
 } from "lucide-react";
@@ -49,9 +51,10 @@ import { Log } from "@/core/log/Log";
 
 interface Props {
   edital: Edital;
-  containerId: string; // StatusEdital como string
+  containerId: string;
   funcaoAtualizarEditais: Dispatch<SetStateAction<boolean>>;
   flagEdital: boolean;
+  projetos?: Projeto[];
 }
 
 export default function CardEdital({
@@ -59,6 +62,7 @@ export default function CardEdital({
   containerId,
   funcaoAtualizarEditais,
   flagEdital,
+  projetos,
 }: Props) {
   const { usuario } = useUsuario();
   const { lista } = useEditalProc();
@@ -561,11 +565,22 @@ export default function CardEdital({
         >
           {(edital.projeto_nome || edital.tipo_documento) && (
             <div className="flex gap-2 mt-1 text-sm flex-wrap">
-              {edital.projeto_nome && (
-                <p className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
-                  <strong>Projeto</strong>: {edital.projeto_nome}
-                </p>
-              )}
+              {edital.projeto_nome && (() => {
+                const projeto = projetos?.find((p) => p.name === edital.projeto_nome);
+                return projeto ? (
+                  <Link
+                    href={`/adm/projetos/${projeto.id}`}
+                    className="flex justify-center items-center gap-1 bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300 hover:bg-gray-300 transition-colors"
+                  >
+                    <strong>Projeto</strong>: {edital.projeto_nome}
+                    <ExternalLink size={12} />
+                  </Link>
+                ) : (
+                  <p className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
+                    <strong>Projeto</strong>: {edital.projeto_nome}
+                  </p>
+                );
+              })()}
               {edital.tipo_documento && (
                 <p className="flex justify-center items-center bg-gray-200 px-1 py-0.5 rounded-lg border border-gray-300">
                   <strong>Tipo</strong>: {edital.tipo_documento}

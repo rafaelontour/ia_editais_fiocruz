@@ -178,7 +178,7 @@ export default function AssistentePage() {
                   </h3>
 
                   <p className="text-xs text-zinc-400 truncate mt-1">
-                    {conv.fileName}
+                    {conv.identifier || conv.fileName}
                   </p>
 
                   <div className="flex items-center gap-3 mt-3 text-xs text-zinc-500">

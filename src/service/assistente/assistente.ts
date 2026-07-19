@@ -2,6 +2,7 @@ export interface ChatDocumentoMeta {
   id: string
   documentId: string
   name: string
+  identifier: string
   fileName: string
   fileUrl: string
   created_at: string
@@ -26,6 +27,7 @@ export async function getDocumentosChat(): Promise<ChatDocumentoMeta[]> {
     id: c.id,
     documentId: c.document_id,
     name: c.document_name,
+    identifier: c.document_identifier ?? "",
     fileName: c.document_name,
     fileUrl: `${urlBase}${c.file_url}`,
     created_at: c.created_at,

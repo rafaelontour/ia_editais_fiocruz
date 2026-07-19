@@ -537,6 +537,7 @@ export default function Editais() {
                       },
                     ]}
                     editais={filteredColumns[status]}
+                    projetos={projetos}
                   />
                 </SortableContext>
               </div>
