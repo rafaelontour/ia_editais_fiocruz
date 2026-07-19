@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useKanban } from "@/data/context/kanban";
 import {
   DndContext,
@@ -64,6 +65,7 @@ export default function Editais() {
   ];
   const { usuario } = useUsuario();
   const { limparLista, lista } = useEditalProc();
+  const searchParams = useSearchParams();
 
   type KanbanItem = Edital;
 
@@ -74,7 +76,9 @@ export default function Editais() {
     DocumentGroupItem[]
   >([]);
   const [projetos, setProjetos] = useState<Projeto[]>([]);
-  const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>("");
+  const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>(
+    searchParams.get("projeto") ?? "",
+  );
   const [selectedTipoFilter, setSelectedTipoFilter] = useState<string>("");
 
   const filteredColumns = useMemo(() => {

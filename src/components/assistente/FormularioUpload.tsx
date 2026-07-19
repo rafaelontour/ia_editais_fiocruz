@@ -82,7 +82,6 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   const [gruposDocumento, setGruposDocumento] = useState<DocumentGroup[]>([]);
   const [itensDocumento, setItensDocumento] = useState<DocumentGroupItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [tentouEnviar, setTentouEnviar] = useState(false);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const { usuario: currentUser } = useUsuario();
 
@@ -204,7 +203,6 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }, [tipificacoes, grupoSelecionado, tipoDocumentoIdValue, itensDocumento]);
 
   async function enviar(data: formData) {
-    setTentouEnviar(true);
     setLoading(true);
 
     try {
@@ -237,7 +235,8 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
         fileName: doc.fileName,
       });
     } catch (error) {
-      toast.error("Erro ao criar documento!");
+      const msg = error instanceof Error ? error.message : "Erro ao criar documento!";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -507,7 +506,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                   placeholder="Descreva o documento..."
                   className="resize-y min-h-[100px]"
                 />
-                {tentouEnviar && errors.descricao && (
+                {errors.descricao && (
                   <span className="text-xs text-red-500 italic">{errors.descricao.message}</span>
                 )}
               </div>
@@ -525,7 +524,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                     />
                   )}
                 />
-                {tentouEnviar && errors.arquivo && (
+                {errors.arquivo && (
                   <span className="text-xs text-red-500 italic">{errors.arquivo.message}</span>
                 )}
               </div>

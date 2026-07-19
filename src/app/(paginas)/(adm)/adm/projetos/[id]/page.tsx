@@ -14,6 +14,7 @@ import {
   Trash2,
   Bot,
   X,
+  LayoutGrid,
 } from "lucide-react";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Projeto, DocumentoProjeto } from "@/core/projeto/Projeto";
@@ -275,13 +276,24 @@ export default function ProjetoInternoPage() {
           </div>
         </div>
 
-        <AdicionarDocumentoProjeto
-          projectId={id}
-          onAdded={(docId, file) => {
-            if (file && docId) setPendingFiles((prev) => ({ ...prev, [docId]: file }));
-            fetch();
-          }}
-        />
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => router.push(`/adm/editais?projeto=${encodeURIComponent(projeto?.name ?? "")}`)}
+            className="flex rounded-md gap-2 items-center px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:cursor-pointer"
+            style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+          >
+            <LayoutGrid size={18} />
+            <span className="text-sm">Meus Documentos</span>
+          </Button>
+          <AdicionarDocumentoProjeto
+            projectId={id}
+            onAdded={(docId, file) => {
+              if (file && docId) setPendingFiles((prev) => ({ ...prev, [docId]: file }));
+              fetch();
+            }}
+          />
+        </div>
       </div>
       <AdicionarDocumentoProjeto
         projectId={id}

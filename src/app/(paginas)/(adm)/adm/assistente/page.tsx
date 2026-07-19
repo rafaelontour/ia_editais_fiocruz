@@ -68,6 +68,8 @@ export default function AssistentePage() {
     if (ok) {
       toast.success("Conversa excluída");
       carregarConversas();
+    } else {
+      toast.error("Erro ao excluir conversa");
     }
   }
 

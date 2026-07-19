@@ -76,7 +76,10 @@ export async function criarDocumentoChat(data: {
     }),
   })
 
-  if (!res.ok) throw new Error("Erro ao criar documento")
+  if (!res.ok) {
+    const err = await res.json().catch(() => null)
+    throw new Error(err?.detail ?? "Erro ao criar documento")
+  }
   const doc = await res.json()
   const docId = doc.id as string
 
