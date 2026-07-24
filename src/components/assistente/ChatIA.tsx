@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Send, User, ChevronLeft } from "lucide-react";
+import { Bot, Send, User, ChevronLeft, FileSearch } from "lucide-react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { useEffect, useRef, useState } from "react";
@@ -11,6 +11,13 @@ import {
 import type { ChatMensagem } from "@/service/assistente/assistente";
 import { getContextItemsService } from "@/service/assistente/contextItems";
 import type { ContextItem } from "@/service/assistente/contextItems";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "../ui/sheet";
+import AnaliseDetalhadaAssistente from "./AnaliseDetalhadaAssistente";
 
 interface Props {
   conversationId: string;
@@ -22,6 +29,7 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [pensando, setPensando] = useState(false);
+  const [showAnalise, setShowAnalise] = useState(false);
   const [contextItems, setContextItems] = useState<ContextItem[]>([]);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
@@ -194,7 +202,28 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
             Assistente IA
           </h2>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowAnalise(true)}
+          className="cursor-pointer shrink-0 flex items-center gap-1.5 text-xs text-zinc-600 hover:text-verde"
+          title="Ver análise detalhada"
+        >
+          <FileSearch className="w-4 h-4" />
+          Análise
+        </Button>
       </div>
+
+      <Sheet open={showAnalise} onOpenChange={setShowAnalise}>
+        <SheetContent side="right" className="w-[55%] max-w-[55%] p-0">
+          <SheetHeader className="px-4 py-3 border-b">
+            <SheetTitle className="text-lg">Análise Detalhada</SheetTitle>
+          </SheetHeader>
+          <div className="h-[calc(100%-52px)] overflow-y-auto">
+            <AnaliseDetalhadaAssistente documentId={documentId} />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         <div className="flex items-start gap-3">

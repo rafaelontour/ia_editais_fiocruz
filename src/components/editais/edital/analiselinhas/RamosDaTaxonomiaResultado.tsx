@@ -11,11 +11,12 @@ import style from "@/components/css_personalizado/resumoIA.module.css";
 interface Props {
   ramos: Branch[];
   taxonomia: string | undefined;
+  docId?: string;
 }
 
-export default function RamosDaTaxonomiaResultado({ ramos, taxonomia }: Props) {
+export default function RamosDaTaxonomiaResultado({ ramos, taxonomia, docId: docIdProp }: Props) {
   const params = useParams();
-  const docId = params.id as string;
+  const docId = docIdProp ?? (params.id as string);
 
   const [ultimaTab, setUltimaTab] = useState<boolean>(false);
   const [primeiraTab, setPrimeiraTab] = useState<boolean>(true);

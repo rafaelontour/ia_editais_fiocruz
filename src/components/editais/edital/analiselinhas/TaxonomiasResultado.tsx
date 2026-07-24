@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 
 interface Props {
   taxonomias: Taxonomia[] | undefined;
+  docId?: string;
 }
 
-export default function TaxonommiasResultado({ taxonomias }: Props) {
+export default function TaxonommiasResultado({ taxonomias, docId }: Props) {
   const [ultimaTab, setUltimaTab] = useState<boolean>(false);
   const [primeiraTab, setPrimeiraTab] = useState<boolean>(true);
   const [abaSelecionada, setAbaSelecionada] = useState<string>("tabTax0");
@@ -122,6 +123,7 @@ export default function TaxonommiasResultado({ taxonomias }: Props) {
                 ramos={taxonomia.branches ? taxonomia.branches : []}
                 key={taxonomia.id}
                 taxonomia={taxonomia.title}
+                docId={docId}
               />
             </TabsContent>
           ))}
