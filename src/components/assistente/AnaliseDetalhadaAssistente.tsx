@@ -33,30 +33,16 @@ export default function AnaliseDetalhadaAssistente({ documentId }: Props) {
     async function carregar() {
       setCarregando(true);
       setErro(false);
-      console.log("[AnaliseDetalhada] documentId:", documentId);
-      console.log("[AnaliseDetalhada] urlBase:", urlBase);
       try {
-        const url = `${urlBase}/doc/${documentId}/release`;
-        console.log("[AnaliseDetalhada] fetch URL:", url);
-        const res = await fetch(url, {
+        const res = await fetch(`${urlBase}/doc/${documentId}/release`, {
           credentials: "include",
         });
-        console.log("[AnaliseDetalhada] response status:", res.status);
         if (!res.ok) {
-          const text = await res.text().catch(() => "");
-          console.log("[AnaliseDetalhada] error body:", text);
           setErro(true);
           return;
         }
-        const data = await res.json();
-        console.log("[AnaliseDetalhada] data completa:", JSON.stringify(data, null, 2));
-        const releases = data?.releases;
-        console.log("[AnaliseDetalhada] releases:", releases);
-        console.log("[AnaliseDetalhada] releases[0]:", releases?.[0]);
-        const checkTree = releases?.[0]?.check_tree;
-        console.log("[AnaliseDetalhada] check_tree:", checkTree);
-        console.log("[AnaliseDetalhada] check_tree length:", checkTree?.length);
-        const tree = checkTree ?? [];
+        const data: EditalArquivo = await res.json();
+        const tree = data?.releases?.[0]?.check_tree ?? [];
         setCheckTree(tree);
         if (tree.length > 0) {
           setTipificacaoSelecionada({ tipificacao: tree[0], index: 0 });
@@ -65,8 +51,7 @@ export default function AnaliseDetalhadaAssistente({ documentId }: Props) {
           setPrimeiraTab(true);
           setUltimaTab(true);
         }
-      } catch (err) {
-        console.log("[AnaliseDetalhada] exception:", err);
+      } catch {
         setErro(true);
       } finally {
         setCarregando(false);

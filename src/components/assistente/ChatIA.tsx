@@ -26,8 +26,6 @@ interface Props {
 }
 
 export default function ChatIA({ conversationId, documentId, onVoltar }: Props) {
-  console.log("[ChatIA] conversationId:", conversationId);
-  console.log("[ChatIA] documentId:", documentId);
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [pensando, setPensando] = useState(false);
