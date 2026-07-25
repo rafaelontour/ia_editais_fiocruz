@@ -143,7 +143,7 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
             setUltimaTab(index === tipificacoes.length - 1);
           }}
         >
-          <TabsList className="w-full flex items-start flex-col gap-4 p-3 border border-gray-300 flex-1">
+          <TabsList className="w-full h-9 flex items-start flex-col gap-4 p-3 border border-gray-300 flex-1">
             <div className="w-full flex flex-col gap-2 rounded-md  flex-1 min-h-0 ">
               <div className="flex items-center justify-between py-2 px-4 bg-white rounded-md border border-gray-300 ">
                 <h3 className="text-2xl font-semibold text-black flex items-center gap-2">

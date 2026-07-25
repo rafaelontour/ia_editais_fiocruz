@@ -19,7 +19,12 @@ interface Props {
   onAbrirAnalise: () => void;
 }
 
-export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAnalise }: Props) {
+export default function ChatIA({
+  conversationId,
+  documentId,
+  onVoltar,
+  onAbrirAnalise,
+}: Props) {
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [pensando, setPensando] = useState(false);
@@ -81,7 +86,9 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
         {
           id: ai?.id ?? crypto.randomUUID(),
           role: "assistant",
-          content: ai?.content ?? "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
+          content:
+            ai?.content ??
+            "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
           created_at: ai?.created_at ?? new Date().toISOString(),
         },
       ]);
@@ -91,7 +98,8 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
+          content:
+            "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
           created_at: new Date().toISOString(),
         },
       ]);
@@ -144,7 +152,7 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (showMentions) {
       const filtered = contextItems.filter((i) =>
-        i.label.toLowerCase().includes(mentionQuery)
+        i.label.toLowerCase().includes(mentionQuery),
       );
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -173,14 +181,12 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
   }
 
   const filteredMentions = showMentions
-    ? contextItems.filter((i) =>
-        i.label.toLowerCase().includes(mentionQuery)
-      )
+    ? contextItems.filter((i) => i.label.toLowerCase().includes(mentionQuery))
     : [];
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className="flex items-center gap-2 px-4 py-2 bg-zinc-100 border w-full">
+      <div className="flex items-center gap-2 px-4 py-2 border bg-zinc-100  w-full">
         <Button
           variant="ghost"
           size="icon"
@@ -214,9 +220,8 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
           </div>
           <div className="bg-zinc-100 rounded-lg px-4 py-2.5 max-w-[85%]">
             <p className="text-sm text-zinc-700">
-              Olá! Sou o OiacIA assistente. Faça perguntas sobre o
-              conteúdo, prazos, requisitos ou qualquer informação presente no
-              documento.
+              Olá! Sou o OiacIA assistente. Faça perguntas sobre o conteúdo,
+              prazos, requisitos ou qualquer informação presente no documento.
             </p>
           </div>
         </div>
@@ -246,8 +251,8 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
             >
               <p className="text-sm text-zinc-700 whitespace-pre-wrap">
                 {msg.content.replace(/<branch:([^>]+)>/g, (_, id) => {
-                  const name = contextMapRef.current.get(id)
-                  return name ? `@${name}` : ""
+                  const name = contextMapRef.current.get(id);
+                  return name ? `@${name}` : "";
                 })}
               </p>
             </div>
@@ -291,10 +296,14 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
                 }}
                 onMouseEnter={() => setMentionIndex(idx)}
                 className={`w-full text-left px-3 py-2 text-sm cursor-pointer ${
-                  idx === mentionIndex ? "bg-verde/10 text-verde" : "hover:bg-zinc-50"
+                  idx === mentionIndex
+                    ? "bg-verde/10 text-verde"
+                    : "hover:bg-zinc-50"
                 }`}
               >
-                <span className="font-medium text-xs text-zinc-500">{item.type}</span>
+                <span className="font-medium text-xs text-zinc-500">
+                  {item.type}
+                </span>
                 <span className="ml-1 text-zinc-800">{item.label}</span>
               </button>
             ))}
@@ -306,7 +315,7 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
             value={mensagem}
             onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder='Digite sua pergunta... Use @ para mencionar uma tipificação, taxonomia ou ramo'
+            placeholder="Digite sua pergunta... Use @ para mencionar uma tipificação, taxonomia ou ramo"
             className="resize-none min-h-[44px] max-h-[120px]"
             rows={1}
           />
@@ -320,7 +329,8 @@ export default function ChatIA({ conversationId, documentId, onVoltar, onAbrirAn
           </Button>
         </div>
         <p className="text-xs text-zinc-400 mt-1">
-          Enter para enviar · Shift+Enter para nova linha · @ para mencionar itens do documento
+          Enter para enviar · Shift+Enter para nova linha · @ para mencionar
+          itens do documento
         </p>
       </div>
     </div>

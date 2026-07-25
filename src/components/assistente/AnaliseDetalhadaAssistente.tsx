@@ -99,7 +99,7 @@ export default function AnaliseDetalhadaAssistente({ documentId, onFechar }: Pro
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between py-2 px-4 bg-zinc-100 border-b">
+      <div className="flex items-center justify-between py-2 px-4 bg-zinc-100 border-b border-t">
         <h2 className="text-sm font-semibold text-zinc-800">Análise Detalhada</h2>
         <Button
           variant="ghost"
