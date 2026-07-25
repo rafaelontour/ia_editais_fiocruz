@@ -28,6 +28,7 @@ export default function ChatIA({
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [pensando, setPensando] = useState(false);
+  const [analisePronta, setAnalisePronta] = useState(false);
   const [contextItems, setContextItems] = useState<ContextItem[]>([]);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
@@ -52,6 +53,17 @@ export default function ChatIA({
       }
       contextMapRef.current = map;
     });
+  }, [documentId]);
+
+  useEffect(() => {
+    const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
+    fetch(`${urlBase}/doc/${documentId}/release`, { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const tree = data?.releases?.[0]?.check_tree ?? [];
+        setAnalisePronta(tree.length > 0);
+      })
+      .catch(() => setAnalisePronta(false));
   }, [documentId]);
 
   useEffect(() => {
@@ -205,8 +217,9 @@ export default function ChatIA({
           variant="ghost"
           size="sm"
           onClick={onAbrirAnalise}
-          className="cursor-pointer shrink-0 flex items-center gap-1.5 text-xs text-zinc-600 hover:text-verde"
-          title="Ver análise detalhada"
+          disabled={!analisePronta}
+          className={`shrink-0 flex items-center gap-1.5 text-xs ${analisePronta ? "text-zinc-600 hover:text-verde cursor-pointer" : "text-zinc-300 cursor-not-allowed"}`}
+          title={analisePronta ? "Ver análise detalhada" : "Análise ainda não disponível"}
         >
           <FileSearch className="w-4 h-4" />
           Análise
