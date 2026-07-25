@@ -96,7 +96,7 @@ export default function AnaliseDetalhadaAssistente({ documentId }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 p-2">
+    <div className="flex flex-col flex-1 min-h-0 p-2 overflow-y-auto">
       <div className="flex items-center justify-between py-2 px-4 bg-white rounded-md border border-gray-300 mb-2">
         <h3 className="text-lg font-semibold text-black">OiacIA</h3>
         <p
