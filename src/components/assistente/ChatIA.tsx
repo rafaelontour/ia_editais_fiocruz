@@ -215,11 +215,11 @@ export default function ChatIA({ conversationId, documentId, onVoltar }: Props) 
       </div>
 
       <Sheet open={showAnalise} onOpenChange={setShowAnalise}>
-        <SheetContent side="right" className="w-[55%] max-w-[55%] p-0">
-          <SheetHeader className="px-4 py-3 border-b">
+        <SheetContent side="right" className="w-[55%] max-w-[55%] p-0 flex flex-col overflow-hidden">
+          <SheetHeader className="px-4 py-3 border-b shrink-0">
             <SheetTitle className="text-lg">Análise Detalhada</SheetTitle>
           </SheetHeader>
-          <div className="h-[calc(100%-52px)] overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <AnaliseDetalhadaAssistente documentId={documentId} />
           </div>
         </SheetContent>
