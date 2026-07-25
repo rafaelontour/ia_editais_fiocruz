@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import TaxonommiasResultado from "@/components/editais/edital/analiselinhas/TaxonomiasResultado";
@@ -13,9 +14,10 @@ import type { EditalArquivo, EditalTypification } from "@/core/edital/Edital";
 
 interface Props {
   documentId: string;
+  onFechar: () => void;
 }
 
-export default function AnaliseDetalhadaAssistente({ documentId }: Props) {
+export default function AnaliseDetalhadaAssistente({ documentId, onFechar }: Props) {
   const [checkTree, setCheckTree] = useState<EditalTypification[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
@@ -96,29 +98,43 @@ export default function AnaliseDetalhadaAssistente({ documentId }: Props) {
   }
 
   return (
-    <div className="flex-1 min-h-0 p-2 overflow-y-auto">
-      <div className="flex items-center justify-between py-2 px-4 bg-white rounded-md border border-gray-300 mb-2">
-        <h3 className="text-lg font-semibold text-black">OiacIA</h3>
-        <p
-          style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }}
-          className={`
-            text-sm font-semibold px-3 py-1 rounded-md text-white
-            ${
-              typeof media === "number"
-                ? media < 5
-                  ? "bg-orange-500"
-                  : media < 7
-                    ? "bg-yellow-600"
-                    : media < 8
-                      ? "bg-green-600"
-                      : "bg-green-800"
-                : "bg-gray-200"
-            }
-          `}
+    <div className="h-full flex flex-col">
+      <div className="flex items-center justify-between py-2 px-4 bg-zinc-100 border-b">
+        <h2 className="text-sm font-semibold text-zinc-800">Análise Detalhada</h2>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onFechar}
+          className="cursor-pointer shrink-0"
+          title="Fechar análise"
         >
-          Média de todos os ramos: {media?.toFixed(2)}
-        </p>
+          <X className="w-4 h-4" />
+        </Button>
       </div>
+
+      <div className="flex-1 min-h-0 p-2 overflow-y-auto">
+        <div className="flex items-center justify-between py-2 px-4 bg-white rounded-md border border-gray-300 mb-2">
+          <h3 className="text-lg font-semibold text-black">OiacIA</h3>
+          <p
+            style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }}
+            className={`
+              text-sm font-semibold px-3 py-1 rounded-md text-white
+              ${
+                typeof media === "number"
+                  ? media < 5
+                    ? "bg-orange-500"
+                    : media < 7
+                      ? "bg-yellow-600"
+                      : media < 8
+                        ? "bg-green-600"
+                        : "bg-green-800"
+                  : "bg-gray-200"
+              }
+            `}
+          >
+            Média de todos os ramos: {media?.toFixed(2)}
+          </p>
+        </div>
 
       <Tabs
         className="w-full"
@@ -214,6 +230,7 @@ export default function AnaliseDetalhadaAssistente({ documentId }: Props) {
           ))}
         </TabsList>
       </Tabs>
+      </div>
     </div>
   );
 }

@@ -16,6 +16,7 @@ import Calendario from "@/components/Calendario";
 import FormularioUpload from "@/components/assistente/FormularioUpload";
 import VisualizadorDocumento from "@/components/assistente/VisualizadorDocumento";
 import ChatIA from "@/components/assistente/ChatIA";
+import AnaliseDetalhadaAssistente from "@/components/assistente/AnaliseDetalhadaAssistente";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -45,6 +46,7 @@ export default function AssistentePage() {
   const [state, setState] = useState<PaginaState>({ tipo: "lista" });
   const [conversas, setConversas] = useState<ChatDocumentoMeta[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [showAnalise, setShowAnalise] = useState(false);
 
   async function carregarConversas() {
     setCarregando(true);
@@ -59,6 +61,7 @@ export default function AssistentePage() {
 
   useEffect(() => {
     if (state.tipo === "lista") {
+      setShowAnalise(false);
       carregarConversas();
     }
   }, [state.tipo]);
@@ -86,7 +89,7 @@ export default function AssistentePage() {
         direction="horizontal"
         className="flex h-[calc(100vh-7rem)] gap-0 -mt-5"
       >
-        <ResizablePanel minSize={30} defaultSize={50}>
+        <ResizablePanel minSize={30} defaultSize={showAnalise ? 35 : 50}>
           <VisualizadorDocumento
             fileDataUrl={state.doc.fileDataUrl}
             fileName={state.doc.fileName}
@@ -107,13 +110,26 @@ export default function AssistentePage() {
           <ResizableHandle className="w-px h-full" />
         </div>
 
-        <ResizablePanel minSize={25} defaultSize={50}>
+        <ResizablePanel minSize={25} defaultSize={showAnalise ? 30 : 50}>
           <ChatIA
             conversationId={state.doc.conversationId}
             documentId={state.doc.documentId}
             onVoltar={() => setState({ tipo: "lista" })}
+            onAbrirAnalise={() => setShowAnalise(true)}
           />
         </ResizablePanel>
+
+        {showAnalise && (
+          <>
+            <ResizableHandle className="w-px h-full" />
+            <ResizablePanel minSize={25} defaultSize={35}>
+              <AnaliseDetalhadaAssistente
+                documentId={state.doc.documentId}
+                onFechar={() => setShowAnalise(false)}
+              />
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
     );
   }
