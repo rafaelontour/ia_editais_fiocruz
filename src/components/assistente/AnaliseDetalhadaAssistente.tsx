@@ -96,7 +96,7 @@ export default function AnaliseDetalhadaAssistente({ documentId }: Props) {
   }
 
   return (
-    <div className="p-2" style={{ height: "calc(100vh - 110px)", overflowY: "auto" }}>
+    <div className="flex-1 min-h-0 p-2 overflow-y-auto">
       <div className="flex items-center justify-between py-2 px-4 bg-white rounded-md border border-gray-300 mb-2">
         <h3 className="text-lg font-semibold text-black">OiacIA</h3>
         <p
