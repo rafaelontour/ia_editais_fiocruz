@@ -57,13 +57,31 @@ export default function ChatIA({
 
   useEffect(() => {
     const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
-    fetch(`${urlBase}/doc/${documentId}/release`, { credentials: "include" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        const tree = data?.releases?.[0]?.check_tree ?? [];
-        setAnalisePronta(tree.length > 0);
-      })
-      .catch(() => setAnalisePronta(false));
+    let timer: ReturnType<typeof setInterval>;
+
+    async function checar() {
+      try {
+        const res = await fetch(`${urlBase}/doc/${documentId}/release`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const tree = data?.releases?.[0]?.check_tree ?? [];
+          if (tree.length > 0) {
+            setAnalisePronta(true);
+            clearInterval(timer);
+            return;
+          }
+        }
+      } catch {
+        // ignora erro, tenta de novo
+      }
+    }
+
+    checar();
+    timer = setInterval(checar, 5000);
+
+    return () => clearInterval(timer);
   }, [documentId]);
 
   useEffect(() => {
