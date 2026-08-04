@@ -30,14 +30,16 @@ import useUsuario from "@/data/hooks/useUsuario";
 const schemaDocumento = z.object({
   nome: z.string().min(3, "O nome do documento é obrigatório"),
   identificador: z.string().min(1, "O número do documento é obrigatório"),
-  descricao: z.string().min(3, "A descrição é obrigatória"),
   tipificacoes: z.array(z.string()).min(1, "Selecione pelo menos uma tipificação"),
   grupoDocumentoId: z.string().min(1, "Selecione o grupo de documento"),
   tipoDocumentoId: z.string().min(1, "Selecione o tipo de documento"),
   responsavel: z.string().min(1, "Selecione o responsável"),
 });
 
-type formData = z.infer<typeof schemaDocumento> & { arquivo?: File | null };
+type formData = z.infer<typeof schemaDocumento> & {
+  descricao?: string;
+  arquivo?: File | null;
+};
 
 interface Props {
   onDocumentoCriado: (doc: {
@@ -53,14 +55,13 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitted },
+    formState: { errors },
     control,
     setValue,
     reset,
     watch,
     trigger,
     getValues,
-    clearErrors,
   } = useForm<formData>({
     resolver: zodResolver(schemaDocumento),
     defaultValues: {
@@ -136,11 +137,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
     if (!valid) return;
 
     if (currentStep < stepDefinitions.length) {
-      const proximoPasso = currentStep + 1;
-      setCurrentStep(proximoPasso);
-      if (proximoPasso === 3) {
-        clearErrors(["descricao", "arquivo"]);
-      }
+      setCurrentStep(currentStep + 1);
     }
   };
 
@@ -202,6 +199,12 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }, [tipificacoes, grupoSelecionado, tipoDocumentoIdValue, itensDocumento]);
 
   async function enviar(data: formData) {
+    const descricao = getValues("descricao");
+    if (!descricao || descricao.trim().length < 3) {
+      toast.error("A descrição é obrigatória");
+      return;
+    }
+
     const arquivo = getValues("arquivo");
     if (!arquivo) {
       toast.error("O arquivo é obrigatório");
@@ -219,7 +222,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
       const doc = await criarDocumentoChat({
         name: data.nome,
         identifier: data.identificador,
-        description: data.descricao,
+        description: descricao,
         grupo: group?.name ?? "",
         tipo_documento: item?.name ?? "",
         projeto_nome: "",
@@ -511,9 +514,6 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                   placeholder="Descreva o documento..."
                   className="resize-y min-h-[100px]"
                 />
-                {isSubmitted && errors.descricao && (
-                  <span className="text-xs text-red-500 italic">{errors.descricao.message}</span>
-                )}
               </div>
 
               <div className="flex flex-col gap-2">
