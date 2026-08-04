@@ -35,15 +35,9 @@ const schemaDocumento = z.object({
   grupoDocumentoId: z.string().min(1, "Selecione o grupo de documento"),
   tipoDocumentoId: z.string().min(1, "Selecione o tipo de documento"),
   responsavel: z.string().min(1, "Selecione o responsável"),
-  arquivo: z
-    .instanceof(File, { message: "O arquivo é obrigatório" })
-    .refine((file) => file.size > 0, { message: "O arquivo é obrigatório" })
-    .refine((file) => file.type === "application/pdf", {
-      message: "O arquivo deve ser um PDF",
-    }),
 });
 
-type formData = z.infer<typeof schemaDocumento>;
+type formData = z.infer<typeof schemaDocumento> & { arquivo?: File | null };
 
 interface Props {
   onDocumentoCriado: (doc: {
@@ -65,6 +59,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
     reset,
     watch,
     trigger,
+    getValues,
     clearErrors,
   } = useForm<formData>({
     resolver: zodResolver(schemaDocumento),
@@ -207,6 +202,12 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }, [tipificacoes, grupoSelecionado, tipoDocumentoIdValue, itensDocumento]);
 
   async function enviar(data: formData) {
+    const arquivo = getValues("arquivo");
+    if (!arquivo) {
+      toast.error("O arquivo é obrigatório");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -224,7 +225,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
         projeto_nome: "",
         typification_ids: data.tipificacoes,
         editors_ids: data.responsavel ? [data.responsavel] : [],
-        arquivo: data.arquivo,
+        arquivo,
       });
 
       toast.success("Documento enviado com sucesso!");
@@ -528,9 +529,6 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                     />
                   )}
                 />
-                {isSubmitted && errors.arquivo && (
-                  <span className="text-xs text-red-500 italic">{errors.arquivo.message}</span>
-                )}
               </div>
             </div>
           )}
