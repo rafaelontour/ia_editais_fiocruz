@@ -312,7 +312,7 @@ export default function ProjetoInternoPage() {
       <div className="w-full rounded-xl bg-white border border-gray-200 p-4">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="min-w-0">
-            <h3 className="text-2xl font-semibold">Documentos do Projeto</h3>
+            <h3 className="text-2xl font-semibold">Documentos do Processo</h3>
             <p className="text-sm text-gray-500">
               Acompanhe todos os documentos relacionados
             </p>

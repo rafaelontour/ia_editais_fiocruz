@@ -197,12 +197,7 @@ export default function AssistentePage() {
                     {conv.identifier || conv.fileName}
                   </p>
 
-                  <div className="flex items-center gap-3 mt-3 text-xs text-zinc-500">
-                    <span className="flex items-center gap-1">
-                      <MessageSquare size={12} />
-                      Conversa
-                    </span>
-                  </div>
+                
 
                   <div className="flex justify-between items-center mt-3">
                     <Calendario data={conv.created_at} />
