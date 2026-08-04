@@ -59,7 +59,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitted },
     control,
     setValue,
     reset,
@@ -141,7 +141,11 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
     if (!valid) return;
 
     if (currentStep < stepDefinitions.length) {
-      setCurrentStep((prev) => prev + 1);
+      const proximoPasso = currentStep + 1;
+      setCurrentStep(proximoPasso);
+      if (proximoPasso === 3) {
+        clearErrors(["descricao", "arquivo"]);
+      }
     }
   };
 
@@ -506,7 +510,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                   placeholder="Descreva o documento..."
                   className="resize-y min-h-[100px]"
                 />
-                {errors.descricao && (
+                {isSubmitted && errors.descricao && (
                   <span className="text-xs text-red-500 italic">{errors.descricao.message}</span>
                 )}
               </div>
@@ -524,7 +528,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                     />
                   )}
                 />
-                {errors.arquivo && (
+                {isSubmitted && errors.arquivo && (
                   <span className="text-xs text-red-500 italic">{errors.arquivo.message}</span>
                 )}
               </div>
