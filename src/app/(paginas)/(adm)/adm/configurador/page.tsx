@@ -317,7 +317,7 @@ export default function ConfiguradorPage() {
               <DialogTitle>Adicionar novo grupo</DialogTitle>
               <DialogDescription>
                 Crie um grupo de documentos para ser usado em tipificações e em
-                projetos.
+                processos.
               </DialogDescription>
             </DialogHeader>
 

@@ -283,6 +283,11 @@ export default function AdicionarDocumentoProjeto({
   };
 
   const onSubmit = async (data: Form) => {
+    if (!arquivoFile) {
+      toast.error("Envie o documento antes de salvar");
+      return;
+    }
+
     const responsaveisIds = data.responsavel ?? [];
     const usuariosSelecionados = responsaveisIds
       .map((id) => usuarios.find((u) => u.id === id))

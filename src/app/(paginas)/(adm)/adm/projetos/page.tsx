@@ -135,7 +135,7 @@ export default function ProjetosPage() {
         grupo?.name,
       );
       if (status !== 201) {
-        toast.error("Erro ao adicionar projeto");
+        toast.error("Erro ao adicionar processo");
         return;
       }
       toast.success("Projeto adicionado");
@@ -234,12 +234,12 @@ export default function ProjetosPage() {
               onOpenChange={setOpenDialogProjetos}
             >
               <DialogTrigger asChild>
-                <Botao texto="Adicionar projeto" />
+                <Botao texto="Adicionar processo" />
               </DialogTrigger>
               <DialogContent onCloseAutoFocus={() => reset()}>
                 <DialogHeader>
                   <DialogTitle className="text-3xl font-bold">
-                    Adicionar projeto à base de dados
+                    Adicionar processo à base de dados
                   </DialogTitle>
                   <DialogDescription className="text-md pb-2">
                     Preencha os campos abaixo para adicionar um novo projeto
