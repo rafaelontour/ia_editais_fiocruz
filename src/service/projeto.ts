@@ -43,14 +43,11 @@ export async function adicionarProjetoService(
 export async function atualizarProjetoService(
   id: string,
   name: string,
-  description?: string,
   document_group_id?: string,
-  document_group_name?: string,
   status?: string,
 ): Promise<number> {
   try {
     const body: Record<string, unknown> = { id, name };
-    if (description) body.description = description;
     if (document_group_id) body.document_group_id = document_group_id;
     if (status) body.status = status;
 

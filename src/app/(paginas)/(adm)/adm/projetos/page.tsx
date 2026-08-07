@@ -151,13 +151,10 @@ export default function ProjetosPage() {
     if (carregando || !openDialogIdEditar) return;
     setCarregando(true);
     try {
-      const grupo = documentGroups.find((g) => g.id === data.document_group_id);
       const status = await atualizarProjetoService(
         openDialogIdEditar,
         data.nome,
-        data.descricao,
         data.document_group_id,
-        grupo?.name,
       );
       if (status !== 200) {
         toast.error("Erro ao atualizar projeto");
@@ -380,15 +377,6 @@ export default function ProjetosPage() {
                             <label className="text-sm block mb-1">Nome</label>
                             <input
                               {...register("nome")}
-                              className="w-full border rounded px-2 py-1"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-sm block mb-1">
-                              Descrição
-                            </label>
-                            <textarea
-                              {...register("descricao")}
                               className="w-full border rounded px-2 py-1"
                             />
                           </div>
