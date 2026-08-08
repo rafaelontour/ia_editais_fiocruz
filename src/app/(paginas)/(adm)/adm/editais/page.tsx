@@ -436,7 +436,7 @@ export default function Editais() {
             flagEdital={adicionouNovoEdital}
           />
         </div>
-        {/* {lista.length > 0 && (
+        {lista.length > 0 && (
           <Button
             onClick={limparLista}
             variant="destructive"
@@ -446,7 +446,7 @@ export default function Editais() {
           >
             Limpar fila ({lista.length})
           </Button>
-        )} */}
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
