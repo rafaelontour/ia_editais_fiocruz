@@ -24,7 +24,7 @@ export async function adicionarProjetoService(
   description?: string,
   document_group_id?: string,
   document_group_name?: string,
-): Promise<[number, string]> {
+): Promise<[number, string, string]> {
   try {
     const res = await fetch(`${urlBase}/project`, {
       method: "POST",
@@ -34,9 +34,9 @@ export async function adicionarProjetoService(
     });
 
     const json = await res.json();
-    return [res.status, json.id];
+    return [res.status, json.id, json.detail ?? ""];
   } catch {
-    return [500, ""];
+    return [500, "", ""];
   }
 }
 
@@ -45,7 +45,7 @@ export async function atualizarProjetoService(
   name: string,
   document_group_id?: string,
   status?: string,
-): Promise<number> {
+): Promise<[number, string]> {
   try {
     const body: Record<string, unknown> = { id, name };
     if (document_group_id) body.document_group_id = document_group_id;
@@ -58,9 +58,10 @@ export async function atualizarProjetoService(
       body: JSON.stringify(body),
     });
 
-    return res.status;
+    const json = await res.json().catch(() => null);
+    return [res.status, json?.detail ?? ""];
   } catch {
-    return 500;
+    return [500, ""];
   }
 }
 

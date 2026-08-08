@@ -128,14 +128,14 @@ export default function ProjetosPage() {
     setCarregando(true);
     try {
       const grupo = documentGroups.find((g) => g.id === data.document_group_id);
-      const [status] = await adicionarProjetoService(
+      const [status, , detail] = await adicionarProjetoService(
         data.nome,
         data.descricao,
         data.document_group_id,
         grupo?.name,
       );
       if (status !== 201) {
-        toast.error("Erro ao adicionar processo");
+        toast.error(detail || "Erro ao adicionar processo");
         return;
       }
       toast.success("Projeto adicionado");
@@ -151,13 +151,13 @@ export default function ProjetosPage() {
     if (carregando || !openDialogIdEditar) return;
     setCarregando(true);
     try {
-      const status = await atualizarProjetoService(
+      const [status, detail] = await atualizarProjetoService(
         openDialogIdEditar,
         data.nome,
         data.document_group_id,
       );
       if (status !== 200) {
-        toast.error("Erro ao atualizar projeto");
+        toast.error(detail || "Erro ao atualizar projeto");
         return;
       }
       toast.success("Projeto atualizado");
