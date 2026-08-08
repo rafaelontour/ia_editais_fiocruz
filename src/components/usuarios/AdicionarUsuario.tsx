@@ -11,6 +11,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Unidade } from "@/core/unidade";
 import { adicionarUsuarioService } from "@/service/usuario";
+import { toast } from "sonner";
 
 const usuarioSchema = z.object({
     nome: z.string().min(4, "O nome do usuário é obrigatório"),
@@ -64,6 +65,7 @@ export default function AdicionarUsuario({ open, onOpenChange, unidade, unidades
         onOpenChange(false);
         atualizarUsuariosUnidade(unidade)
         limparCampos();
+        toast.success("Usuário adicionado com sucesso!");
     }
     function limparCampos() {
         if (erroGeral) setErroGeral("");

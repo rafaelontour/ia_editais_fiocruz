@@ -34,6 +34,7 @@ const schemaDocumento = z.object({
   grupoDocumentoId: z.string().min(1, "Selecione o grupo de documento"),
   tipoDocumentoId: z.string().min(1, "Selecione o tipo de documento"),
   responsavel: z.string().min(1, "Selecione o responsável"),
+  descricao: z.string().min(3, "A descrição é obrigatória"),
 });
 
 type formData = z.infer<typeof schemaDocumento> & {
@@ -200,11 +201,6 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
 
   async function enviar(data: formData) {
     const descricao = getValues("descricao");
-    if (!descricao || descricao.trim().length < 3) {
-      toast.error("A descrição é obrigatória");
-      return;
-    }
-
     const arquivo = getValues("arquivo");
     if (!arquivo) {
       toast.error("O arquivo é obrigatório");
@@ -514,6 +510,11 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                   placeholder="Descreva o documento..."
                   className="resize-y min-h-[100px]"
                 />
+                {errors.descricao && (
+                  <span className="text-xs text-red-500 italic">
+                    {errors.descricao.message}
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">

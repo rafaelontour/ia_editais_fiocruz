@@ -7,6 +7,7 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { adicionarUnidadeService } from "@/service/unidade";
+import { toast } from "sonner";
 
 const unidadeSchema = z.object({
     nome: z.string().min(4, "O nome da unidade é obrigatório"),
@@ -44,6 +45,7 @@ export default function AdicionarUnidade({ open, onOpenChange, atualizarUnidades
         onOpenChange(false);
         atualizarUnidades()
         limparCampos();
+        toast.success("Unidade adicionada com sucesso!");
     }
     function limparCampos() {
         if (erroGeral) setErroGeral("");
