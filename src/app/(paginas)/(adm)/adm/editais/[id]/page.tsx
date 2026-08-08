@@ -9,6 +9,29 @@ import rehypeStringify from "rehype-stringify";
 import type { EditalArquivo, Edital } from "@/core/edital/Edital";
 import VisualizarEditalCliente from "./VisualizarEditalCliente";
 
+const SECOES = [
+  { titulo: "Pontos atendidos", regex: /^(?:#+\s*|\*+\s*)?pontos atendidos\b/i },
+  { titulo: "Pontos a aprimorar", regex: /^(?:#+\s*|\*+\s*)?pontos a aprimorar\b/i },
+  { titulo: "Orientação final", regex: /^(?:#+\s*|\*+\s*)?orientação final\b/i },
+];
+
+function normalizarSecoesMarkdown(texto: string): string {
+  return texto
+    .split("\n")
+    .map((linha) => {
+      const t = linha.trim();
+      if (!t || /^#+\s/.test(t)) return linha;
+      for (const secao of SECOES) {
+        const m = secao.regex.exec(t);
+        if (!m) continue;
+        const resto = t.slice(m[0].trim().length).replace(/^\s*[:.\-–—]*\s*/, "");
+        return resto ? `# ${secao.titulo}\n\n${resto}` : `# ${secao.titulo}`;
+      }
+      return linha;
+    })
+    .join("\n");
+}
+
 export default async function VisualizarEdital({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
@@ -39,7 +62,7 @@ export default async function VisualizarEdital({ params }: { params: Promise<{ i
     .use(remarkRehype)
     .use(rehypeSanitize)
     .use(rehypeStringify)
-    .process(editalArquivo?.releases?.[0]?.description || "");
+    .process(normalizarSecoesMarkdown(editalArquivo?.releases?.[0]?.description || ""));
 
   const resumosIA: Record<string, string> = {};
   for (const release of editalArquivo?.releases ?? []) {
@@ -48,7 +71,7 @@ export default async function VisualizarEdital({ params }: { params: Promise<{ i
       .use(remarkRehype)
       .use(rehypeSanitize)
       .use(rehypeStringify)
-      .process(release.description || "");
+      .process(normalizarSecoesMarkdown(release.description || ""));
     resumosIA[release.id] = String(html);
   }
 

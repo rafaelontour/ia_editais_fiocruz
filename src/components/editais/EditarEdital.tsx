@@ -518,31 +518,32 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                         }
                                     </div>
 
-                                    {
-                                        editarComArquivo && (
-                                            <div className="flex flex-col gap-2 mt-2">
-                                                <Label className="text-lg">O que mudou?</Label>
-                                                <Select
-                                                    value={tipoAlteracao}
-                                                    onValueChange={setTipoAlteracao}
-                                                >
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Selecione o tipo de alteração" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectGroup>
-                                                            <SelectLabel>Tipo de alteração</SelectLabel>
-                                                            <SelectItem value="patch">Correção (pequenos ajustes)</SelectItem>
-                                                            <SelectItem value="minor">Adição (novas informações)</SelectItem>
-                                                            <SelectItem value="major">Reestruturação (mudança grande)</SelectItem>
-                                                        </SelectGroup>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        )
-                                    }
                                 </div>
                             </div>
+
+                            {
+                                editarComArquivo && (
+                                    <div className="flex flex-col gap-2">
+                                        <Label className="text-lg">O que mudou?</Label>
+                                        <Select
+                                            value={tipoAlteracao}
+                                            onValueChange={setTipoAlteracao}
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Selecione o tipo de alteração" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Tipo de alteração</SelectLabel>
+                                                    <SelectItem value="patch">Correção (pequenos ajustes)</SelectItem>
+                                                    <SelectItem value="minor">Adição (novas informações)</SelectItem>
+                                                    <SelectItem value="major">Reestruturação (mudança grande)</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )
+                            }
                         </div>
                         {/*<SheetFooter className="flex flex-end justify-end max-w-full">
                             <div className="flex flex-row justify-between">

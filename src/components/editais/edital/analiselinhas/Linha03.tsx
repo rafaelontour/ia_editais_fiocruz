@@ -181,12 +181,7 @@ export default function Linha03({ edital, editalInfo, resumoIA, versoes, versaoS
                           <SelectLabel>Versões do documento</SelectLabel>
                           {versoes.map((release, index) => (
                             <SelectItem key={release.id} value={release.id}>
-                              <span>
-                                versão {versaoExibida(release, index)}
-                              </span>
-                              <span className="text-xs text-gray-400">
-                                {formatarData(release.created_at)}
-                              </span>
+                              versão {versaoExibida(release, index)}
                             </SelectItem>
                           ))}
                         </SelectGroup>
