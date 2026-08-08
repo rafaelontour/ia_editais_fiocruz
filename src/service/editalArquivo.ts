@@ -41,7 +41,25 @@ async function enviarArquivoService(idEdital: string | undefined, arquivo: File 
     }
 }
 
+async function reenviarArquivoService(idEdital: string | undefined, projectDocumentId: string): Promise<number | undefined> {
+    try {
+        const res = await fetch(`${urlBase}/doc/${idEdital}/release/from-file`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ project_document_id: projectDocumentId })
+        });
+
+        return res.status;
+    } catch (e) {
+        return
+    }
+}
+
 export {
     enviarArquivoService,
+    reenviarArquivoService,
     getEditalArquivoService
 }

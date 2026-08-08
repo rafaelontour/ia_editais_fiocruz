@@ -26,7 +26,7 @@ import {
   excluirDocumentoService,
 } from "@/service/documento";
 import { adicionarEditalService, getEditalPorProjectDocumentIdService } from "@/service/edital";
-import { enviarArquivoService } from "@/service/editalArquivo";
+import { enviarArquivoService, reenviarArquivoService } from "@/service/editalArquivo";
 import { getDocumentGroupItemsService, getDocumentGroupsService } from "@/service/configurador";
 import { getUsuariosPorUnidade } from "@/service/usuario";
 import AdicionarDocumentoProjeto from "@/components/projetos/AdicionarDocumentoProjeto";
@@ -165,6 +165,13 @@ export default function ProjetoInternoPage() {
 
   const enviarParaKanban = async (doc: DocumentoProjeto) => {
     if (saving) return;
+    const file = pendingFiles[doc.id];
+    if (!file && !doc.file_path) {
+      toast.error(
+        "Este documento não possui um arquivo para enviar ao Kanban.",
+      );
+      return;
+    }
     setSaving(true);
     try {
       const payload = {
@@ -197,20 +204,24 @@ export default function ProjetoInternoPage() {
         salvarLista(lista);
       }
 
-      const file = pendingFiles[doc.id];
-      if (file) {
-        const uploadStatus = await enviarArquivoService(idEdital, file);
-        if (uploadStatus !== 201) {
-          toast.error("Erro ao fazer upload do arquivo");
-        } else {
-          setPendingFiles((prev) => {
-            const next = { ...prev };
-            delete next[doc.id];
-            return next;
-          });
-        }
+      const uploadStatus = file
+        ? await enviarArquivoService(idEdital, file)
+        : await reenviarArquivoService(idEdital, doc.id);
+      if (uploadStatus !== 201) {
+        toast.error(
+          file
+            ? "Erro ao fazer upload do arquivo"
+            : "Erro ao reutilizar o arquivo do documento",
+        );
+        return;
       }
-
+      if (file) {
+        setPendingFiles((prev) => {
+          const next = { ...prev };
+          delete next[doc.id];
+          return next;
+        });
+      }
       await marcarEnviadoAoKanban(doc.id);
       toast.success("Documento enviado para Kanban");
       fetch();

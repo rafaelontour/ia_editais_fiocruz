@@ -93,6 +93,7 @@ export default function AdicionarDocumentoProjeto({
   const [currentStep, setCurrentStep] = useState(1);
   const dialogOpen = open ?? internalOpen;
   const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
+  const [carregandoTipificacoes, setCarregandoTipificacoes] = useState(true);
   const [filteredTipificacoes, setFilteredTipificacoes] = useState<
     Tipificacao[]
   >([]);
@@ -176,12 +177,15 @@ export default function AdicionarDocumentoProjeto({
   };
 
   async function buscarTipificacoes() {
+    setCarregandoTipificacoes(true);
     const t = await getTipificacoesService();
     if (!t) {
       toast.error("Erro ao buscar tipificações!");
+      setCarregandoTipificacoes(false);
       return;
     }
     setTipificacoes(t);
+    setCarregandoTipificacoes(false);
   }
 
   async function carregarProjetoGrupo() {
@@ -452,6 +456,7 @@ export default function AdicionarDocumentoProjeto({
                       render={({ field }) => (
                         <Select
                           value=""
+                          disabled={carregandoTipificacoes}
                           onValueChange={(value) => {
                             const novoValor = [...(field.value ?? []), value];
                             field.onChange(novoValor);

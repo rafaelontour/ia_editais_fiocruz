@@ -27,4 +27,5 @@ export interface DocumentoProjeto {
   typification_ids?: string[];
   created_at?: string;
   sent_to_kanban?: boolean;
+  file_path?: string;
 }
