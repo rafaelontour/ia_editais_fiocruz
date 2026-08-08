@@ -3,18 +3,20 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AdicionarUsuario from "@/components/usuarios/AdicionarUsuario";
+import AdicionarUnidade from "@/components/usuarios/AdicionarUnidade";
 import { UsuarioCard } from "@/components/usuarios/UsuarioCard";
 import type { Unidade } from "@/core/unidade";
 import type { UsuarioUnidade } from "@/core/usuario";
 import { getTodasUnidades } from "@/service/unidade";
 import { getUsuariosPorUnidade } from "@/service/usuario";
-import { UserPlus } from "lucide-react";
+import { Building2, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function AtribuirCargo () {
 
     const [isDialogAdicionarUsuarioOpen, setIsDialogAdicionarUsuarioOpen] = useState<boolean>(false);
+    const [isDialogAdicionarUnidadeOpen, setIsDialogAdicionarUnidadeOpen] = useState<boolean>(false);
     const [usuariosDaUnidade, setUsuariosDaUnidade] = useState<UsuarioUnidade[] | undefined>([]);
     const [unidades, setUnidades] = useState<Unidade[]>([]);
     const [idUnidadeSelecionada, setIdUnidadeSelecionada] = useState<string | undefined>("");
@@ -56,22 +58,41 @@ export default function AtribuirCargo () {
                     <h2 className="text-4xl font-semibold">Gerenciar usuários</h2>
                 </div>
                 
-                <Button
-                    variant={"destructive"}
-                    style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
-                    className={`
-                        flex rounded-md gap-2 items-center px-4 py-2
-                        bg-vermelho text-white
-                        hover:cursor-pointer
-                    `}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        setIsDialogAdicionarUsuarioOpen(true);
-                    }}
-                >
-                    <UserPlus size={18} />
-                    <span className="text-sm">Adicionar usuário</span>
-                </Button>
+                <div className="flex flex-row gap-2">
+                    <Button
+                        variant={"destructive"}
+                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                        className={`
+                            flex rounded-md gap-2 items-center px-4 py-2
+                            bg-vermelho text-white
+                            hover:cursor-pointer
+                        `}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setIsDialogAdicionarUnidadeOpen(true);
+                        }}
+                    >
+                        <Building2 size={18} />
+                        <span className="text-sm">Adicionar unidade</span>
+                    </Button>
+
+                    <Button
+                        variant={"destructive"}
+                        style={{ boxShadow: "0 0 3px rgba(0,0,0,.5)" }}
+                        className={`
+                            flex rounded-md gap-2 items-center px-4 py-2
+                            bg-vermelho text-white
+                            hover:cursor-pointer
+                        `}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setIsDialogAdicionarUsuarioOpen(true);
+                        }}
+                    >
+                        <UserPlus size={18} />
+                        <span className="text-sm">Adicionar usuário</span>
+                    </Button>
+                </div>
             </div>
 
             {/* FILTRO + BUSCA */}
@@ -116,6 +137,7 @@ export default function AtribuirCargo () {
             </div>
 
             <AdicionarUsuario unidade={idUnidadeSelecionada} atualizarUsuariosUnidade={buscarUsuariosDaUnidade} unidades={unidades} open={isDialogAdicionarUsuarioOpen} onOpenChange={setIsDialogAdicionarUsuarioOpen}/>
+            <AdicionarUnidade atualizarUnidades={buscarTodasUnidades} open={isDialogAdicionarUnidadeOpen} onOpenChange={setIsDialogAdicionarUnidadeOpen}/>
         </div>
     );
 }

@@ -48,7 +48,13 @@ export default function AdicionarUsuario({ open, onOpenChange, unidade, unidades
     const [erroGeral, setErroGeral] = useState<string>("");
 
     async function adicionarUsuario(data: UsuarioFormData) {
-        const resposta = await adicionarUsuarioService(data);
+        const resposta = await adicionarUsuarioService({
+            username: data.nome,
+            email: data.email,
+            phone_number: data.whatsapp,
+            unit_id: data.unidade,
+            access_level: data.perfil,
+        });
 
         if (resposta !== 201) {
             setErroGeral("Já existe um usuário cadastrado com algum dos dados informados!");
@@ -168,6 +174,7 @@ export default function AdicionarUsuario({ open, onOpenChange, unidade, unidades
                                                 <SelectGroup>
                                                     <SelectLabel>Perfil</SelectLabel>
                                                     <SelectItem value="DEFAULT">Usuário</SelectItem>
+                                                    <SelectItem value="ADMIN">Administrador</SelectItem>
                                                     <SelectItem value="ANALYST">Analista</SelectItem>
                                                     <SelectItem value="AUDITOR">Auditor</SelectItem>
                                                 </SelectGroup>

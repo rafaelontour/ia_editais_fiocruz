@@ -285,7 +285,10 @@ export default function ProjetosPage() {
                   <DialogClose>
                     <BotaoCancelar />
                   </DialogClose>
-                  <BotaoSalvar onClick={handleSubmit(adicionarProjeto)} disabled={carregando} />
+                  <BotaoSalvar
+                    onClick={handleSubmit(adicionarProjeto)}
+                    disabled={carregando}
+                  />
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -303,8 +306,8 @@ export default function ProjetosPage() {
 
       {carregando ? (
         <div className="flex justify-center items-center gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-          {/* <p className="animate-pulse">Carregando projetos...</p> */}
-          <Loading size="sm" />
+          <p className="animate-pulse">Carregando projetos...</p>
+          {/* <Loading size="sm" /> */}
         </div>
       ) : projetosFiltradas.length > 0 ? (
         <div className="h-[calc(100vh-248px)] overflow-y-auto px-3 py-1">

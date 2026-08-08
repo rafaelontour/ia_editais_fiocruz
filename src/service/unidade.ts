@@ -54,13 +54,10 @@ async function adicionarUnidadeService(name: string, location: string) {
             body: JSON.stringify({ name, location })
         });
 
-        if (!res.ok) throw new Error("Erro ao criar unidade ");
-
-        const data = await res.json();
-        return data;
+        return res.status;
 
     } catch (e) {
-        throw new Error("Erro ao criar unidade: " + e)
+        console.error("Erro ao tentar criar unidade: ", e);
     }
 }
 

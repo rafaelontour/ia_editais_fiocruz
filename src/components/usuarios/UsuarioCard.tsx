@@ -236,6 +236,7 @@ export const UsuarioCard = ({ usuario, unidades, buscarUsuarios }: UsuarioCardPr
                                 <SelectGroup>
                                   <SelectLabel>Perfil</SelectLabel>
                                   <SelectItem value="DEFAULT">Usuário</SelectItem>
+                                  <SelectItem value="ADMIN">Administrador</SelectItem>
                                   <SelectItem value="ANALYST">Analista</SelectItem>
                                   <SelectItem value="AUDITOR">Auditor</SelectItem>
                                 </SelectGroup>
