@@ -76,6 +76,8 @@ body {
   --color-cinza: #4E4E4E;
   --color-branco: #FFFFFF;
 
+  --animate-fifth: moveInCircle 20s ease infinite;
+
   /* Acima */
 
   --color-background: var(--background);
@@ -194,3 +196,9 @@ body {
     @apply bg-background text-foreground;
   }
 }
+@keyframes moveInCircle {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+

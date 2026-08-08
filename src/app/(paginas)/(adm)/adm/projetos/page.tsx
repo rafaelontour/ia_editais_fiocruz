@@ -16,13 +16,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2, PencilLine, View } from "lucide-react";
+import { PencilLine, View } from "lucide-react";
 import Masonry from "react-masonry-css";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import Div from "@/components/Div";
+import { Loading } from "@/components/loading/loading";
 import Calendario from "@/components/Calendario";
 import BotaoExcluir from "@/components/BotaoExcluir";
 import { useRouter } from "next/navigation";
@@ -303,7 +304,7 @@ export default function ProjetosPage() {
       {carregando ? (
         <div className="flex justify-center items-center gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2">
           <p className="animate-pulse">Carregando projetos...</p>
-          <Loader2 className="animate-spin ml-2" />
+          <Loading size="sm" />
         </div>
       ) : projetosFiltradas.length > 0 ? (
         <div className="h-[calc(100vh-248px)] overflow-y-auto px-3 py-1">
