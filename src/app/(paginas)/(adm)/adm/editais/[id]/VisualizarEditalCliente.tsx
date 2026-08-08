@@ -23,13 +23,14 @@ import {
   definirStatusEmConstrucao,
 } from "@/service/edital";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getStatusColor,
   iconeParaStatusDoEdital,
   verificarStatusEdital,
 } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { EditalRelease } from "@/core/edital/Edital";
 import {
   Dialog,
   DialogClose,
@@ -46,6 +47,7 @@ import BotaoVoltar from "@/components/botoes/BotaoVoltar";
 interface VisualizarEditalClienteProps {
   edital: Edital | undefined;
   resumoIA: string;
+  resumosIA: Record<string, string>;
   editalArquivo: EditalArquivo | undefined;
   urlBase: string;
 }
@@ -55,12 +57,33 @@ export default function VisualizarEditalCliente({
   editalArquivo,
   urlBase,
   resumoIA,
+  resumosIA,
 }: VisualizarEditalClienteProps) {
   const { usuario } = useUsuario();
   const [enviouAnaliseOuConcluido, setEnviouAnaliseOuConcluido] =
     useState<boolean>(false);
   const [justificativa, setJustificativa] = useState<string>("");
+  const [releaseSelecionadaId, setReleaseSelecionadaId] = useState<string>(
+    editalArquivo?.releases?.[0]?.id ?? "",
+  );
   const router = useRouter();
+
+  const releaseSelecionada: EditalRelease | undefined =
+    editalArquivo?.releases?.find((r) => r.id === releaseSelecionadaId) ??
+    editalArquivo?.releases?.[0];
+
+  const editalArquivoAtivo: EditalArquivo | undefined = editalArquivo
+    ? { ...editalArquivo, releases: releaseSelecionada ? [releaseSelecionada] : [] }
+    : undefined;
+
+  const resumoIAAtivo = releaseSelecionada
+    ? (resumosIA[releaseSelecionada.id] ?? resumoIA)
+    : resumoIA;
+
+  useEffect(() => {
+    const id = editalArquivo?.releases?.[0]?.id;
+    if (id) setReleaseSelecionadaId(id);
+  }, [editalArquivo]);
 
   async function enviarEditalParaConcluido() {
     if (!edital) {
@@ -221,7 +244,7 @@ export default function VisualizarEditalCliente({
         <ResizablePanel minSize={30} defaultSize={50}>
           <div className="flex w-full h-full">
             <iframe
-              src={urlBase + (editalArquivo?.releases?.[0]?.file_path ?? "")}
+              src={urlBase + (releaseSelecionada?.file_path ?? "")}
               className="h-full border-2 border-gray-300 rounded-md items-center w-full"
             ></iframe>
           </div>
@@ -245,8 +268,11 @@ export default function VisualizarEditalCliente({
           <div className="w-full flex flex-col h-full flex-1 min-h-0">
             <AnaliseEdital
               edital={edital}
-              editalArquivo={editalArquivo}
-              resumoIA={resumoIA}
+              editalArquivo={editalArquivoAtivo}
+              resumoIA={resumoIAAtivo}
+              versoes={editalArquivo?.releases ?? []}
+              versaoSelecionadaId={releaseSelecionada?.id}
+              onMudarVersao={setReleaseSelecionadaId}
             />
           </div>
         </ResizablePanel>

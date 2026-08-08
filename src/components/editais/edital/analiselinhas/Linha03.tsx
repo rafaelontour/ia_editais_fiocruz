@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ChevronDown,
   ChevronLeft,
@@ -11,7 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import TaxonommiasResultado from "./TaxonomiasResultado";
-import { EditalArquivo } from "@/core/edital/Edital";
+import { EditalArquivo, EditalRelease } from "@/core/edital/Edital";
 import { Edital } from "@/core";
 import { formatarData } from "@/lib/utils";
 
@@ -24,9 +25,17 @@ interface Props {
   edital: EditalArquivo | undefined;
   editalInfo: Edital | undefined;
   resumoIA?: string | undefined;
+  versoes?: EditalRelease[];
+  versaoSelecionadaId?: string;
+  onMudarVersao?: (id: string) => void;
 }
 
-export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
+function versaoExibida(release: EditalRelease | undefined, index: number): string {
+  if (release?.version) return release.version;
+  return `1.0.${index}`;
+}
+
+export default function Linha03({ edital, editalInfo, resumoIA, versoes, versaoSelecionadaId, onMudarVersao }: Props) {
   const tipificacoes = edital?.releases?.[0]?.check_tree ?? [];
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
@@ -151,9 +160,43 @@ export default function Linha03({ edital, editalInfo, resumoIA }: Props) {
                   {/* <Stars color="blue" size={18} /> */}
                 </h3>
                 <div className="flex flex-row gap-4 items-center">
-                  <p className="text-sm font-semibold text-gray-400">
-                    versão 1.0.1
-                  </p>
+                  {versoes && versoes.length > 1 && onMudarVersao ? (
+                    <Select
+                      value={versaoSelecionadaId}
+                      onValueChange={onMudarVersao}
+                    >
+                      <SelectTrigger className="w-fit gap-1 border-none bg-transparent p-0 text-sm font-semibold text-gray-400 shadow-none hover:cursor-pointer data-[size=default]:h-auto [&_svg:not([class*='text-'])]:text-gray-400">
+                        <SelectValue>
+                          {"versão " +
+                            versaoExibida(
+                              versoes.find(
+                                (r) => r.id === versaoSelecionadaId,
+                              ),
+                              0,
+                            )}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Versões do documento</SelectLabel>
+                          {versoes.map((release, index) => (
+                            <SelectItem key={release.id} value={release.id}>
+                              <span>
+                                versão {versaoExibida(release, index)}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {formatarData(release.created_at)}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <p className="text-sm font-semibold text-gray-400">
+                      versão {versaoExibida(edital?.releases?.[0], 0)}
+                    </p>
+                  )}
                   <p
                     style={{ boxShadow: "2px 2px 3px rgba(0, 0, 0, .25)" }}
                     className={`

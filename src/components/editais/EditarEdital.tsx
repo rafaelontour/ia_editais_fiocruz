@@ -93,6 +93,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [usuariosDaUnidade, setUsuariosDaUnidade] = useState<UsuarioUnidade[] | undefined>([]);
     const [sheetOpen, setSheetOpen] = useState<boolean>(false);
     const [editarComArquivo, setEditarComArquivo] = useState<boolean>(false);
+    const [tipoAlteracao, setTipoAlteracao] = useState<string>("patch");
     const [alterouDados, setAlterouDados] = useState<boolean>(false);
 
     function filtrarTipificacoesSelectionadas() {
@@ -158,7 +159,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             return
         }
 
-        const resposta = await enviarArquivoService(edital.id, data.arquivo);
+        const resposta = await enviarArquivoService(edital.id, data.arquivo, tipoAlteracao);
 
         if (resposta !== 201) {
             toast.error("Erro ao atualizar edital!");
@@ -180,6 +181,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     function limparCampos() {
         setAlterouDados(false);
         setEditarComArquivo(false);
+        setTipoAlteracao("patch");
         reset();
         setTipificacoesSelecionadas([]);
         setResponsaveisEdital([]);
@@ -515,6 +517,30 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
                                             )
                                         }
                                     </div>
+
+                                    {
+                                        editarComArquivo && (
+                                            <div className="flex flex-col gap-2 mt-2">
+                                                <Label className="text-lg">O que mudou?</Label>
+                                                <Select
+                                                    value={tipoAlteracao}
+                                                    onValueChange={setTipoAlteracao}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Selecione o tipo de alteração" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
+                                                            <SelectLabel>Tipo de alteração</SelectLabel>
+                                                            <SelectItem value="patch">Correção (pequenos ajustes)</SelectItem>
+                                                            <SelectItem value="minor">Adição (novas informações)</SelectItem>
+                                                            <SelectItem value="major">Reestruturação (mudança grande)</SelectItem>
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        )
+                                    }
                                 </div>
                             </div>
                         </div>

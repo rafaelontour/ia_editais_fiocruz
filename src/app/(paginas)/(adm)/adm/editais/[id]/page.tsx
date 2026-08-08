@@ -41,12 +41,24 @@ export default async function VisualizarEdital({ params }: { params: Promise<{ i
     .use(rehypeStringify)
     .process(editalArquivo?.releases?.[0]?.description || "");
 
+  const resumosIA: Record<string, string> = {};
+  for (const release of editalArquivo?.releases ?? []) {
+    const html = await remark()
+      .use(remarkParse)
+      .use(remarkRehype)
+      .use(rehypeSanitize)
+      .use(rehypeStringify)
+      .process(release.description || "");
+    resumosIA[release.id] = String(html);
+  }
+
   return (
     <VisualizarEditalCliente
       edital={edital}
       editalArquivo={editalArquivo}
       urlBase={urlBase!}
       resumoIA={String(resumoIA)}
+      resumosIA={resumosIA}
     />
   );
 }

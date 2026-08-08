@@ -63,16 +63,17 @@ export interface Edital {
     projeto_nome?: string;
 }
 
+export interface EditalRelease {
+    id: string;
+    file_path: string;
+    version?: string;
+    description: string;
+    check_tree: EditalTypification[]
+    created_at: string;
+}
+
 export interface EditalArquivo {
-    releases: [
-        {
-            id: string;
-            file_path: string;
-            description: string;
-            check_tree: EditalTypification[]
-            created_at: string;
-        }
-    ]
+    releases: EditalRelease[]
 }
 
 export interface ListaEditais {

@@ -2,18 +2,24 @@ import { Edital } from "@/core";
 import Linha01 from "./analiselinhas/Linha01";
 import Linha02 from "./analiselinhas/Linha02";
 import Linha03 from "./analiselinhas/Linha03";
-import { EditalArquivo } from "@/core/edital/Edital";
+import { EditalArquivo, EditalRelease } from "@/core/edital/Edital";
 
 interface Props {
   edital: Edital | undefined;
   editalArquivo: EditalArquivo | undefined;
   resumoIA?: string;
+  versoes?: EditalRelease[];
+  versaoSelecionadaId?: string;
+  onMudarVersao?: (id: string) => void;
 }
 
 export default function AnaliseEdital({
   edital,
   editalArquivo,
   resumoIA,
+  versoes,
+  versaoSelecionadaId,
+  onMudarVersao,
 }: Props) {
   return (
     <div className="flex w-full flex-col gap-4 h-full min-h-0">
@@ -25,6 +31,9 @@ export default function AnaliseEdital({
           edital={editalArquivo}
           editalInfo={edital}
           resumoIA={resumoIA}
+          versoes={versoes}
+          versaoSelecionadaId={versaoSelecionadaId}
+          onMudarVersao={onMudarVersao}
         />
       </div>
     </div>
