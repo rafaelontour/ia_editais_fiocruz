@@ -1,14 +1,27 @@
 import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
-export default function BotaoVoltar() {
+interface BotaoVoltarProps {
+    rota?: string;
+}
+
+export default function BotaoVoltar({ rota }: BotaoVoltarProps) {
+    const router = useRouter();
+
     return (
         <Button
             className="hover:cursor-pointer"
             variant={"outline"}
             size={"icon"}
             title="Voltar para página anterior"
-            onClick={() => window.history.go(-1)}
+            onClick={() => {
+                if (rota) {
+                    router.push(rota);
+                } else {
+                    window.history.go(-1);
+                }
+            }}
         >
             <ChevronLeft />
         </Button>

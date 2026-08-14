@@ -247,8 +247,8 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg border p-8 space-y-6">
+    <div className="flex min-h-[calc(100vh-8rem)] overflow-y-auto">
+      <div className="m-auto w-full max-w-2xl bg-white rounded-xl shadow-lg border p-8 space-y-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-verde/10 rounded-lg">
             <Bot className="w-6 h-6 text-verde" />

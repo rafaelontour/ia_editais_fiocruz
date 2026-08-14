@@ -124,7 +124,7 @@ export default function VisualizarEditalCliente({
       <div className="flex items-center justify-between">
         <div className="flex items-center flex-row gap-4 w-full justify-between">
           <div className="flex items-baseline gap-4 ">
-            <BotaoVoltar />
+            <BotaoVoltar rota="/adm/editais" />
             <h2 className="font-bold text-3xl">Análise do documento:</h2>
 
             <span className="font-semibold text-2xl">{edital?.identifier}</span>
