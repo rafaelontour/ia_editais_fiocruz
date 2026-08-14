@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Upload, User, X } from "lucide-react";
+import { Bot, Check, Upload, User, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { FileUpload } from "../ui/file-upload";
 import { Input } from "../ui/input";
@@ -123,23 +123,36 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   const isFirstStep = currentStep === 1;
   const isLastStep = currentStep === stepDefinitions.length;
 
-  const handleNextStep = async () => {
+  const validarEtapa = async (etapa: number): Promise<boolean> => {
     const fieldsToValidate: Array<keyof formData> =
-      currentStep === 1
+      etapa === 1
         ? ["nome", "identificador", "grupoDocumentoId", "tipoDocumentoId"]
-        : currentStep === 2
+        : etapa === 2
           ? ["tipificacoes", "responsavel"]
           : [];
 
-    const valid = fieldsToValidate.length
-      ? await trigger(fieldsToValidate)
-      : true;
+    return fieldsToValidate.length ? await trigger(fieldsToValidate) : true;
+  };
 
-    if (!valid) return;
+  const handleNextStep = async () => {
+    if (!(await validarEtapa(currentStep))) return;
 
     if (currentStep < stepDefinitions.length) {
       setCurrentStep(currentStep + 1);
     }
+  };
+
+  const handleClickStep = async (etapa: number) => {
+    if (etapa < currentStep) {
+      setCurrentStep(etapa);
+      return;
+    }
+    if (etapa === currentStep) return;
+
+    for (let s = currentStep; s < etapa; s++) {
+      if (!(await validarEtapa(s))) return;
+    }
+    setCurrentStep(etapa);
   };
 
   const handlePrevStep = () => {
@@ -247,42 +260,87 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] overflow-y-auto">
-      <div className="m-auto w-full max-w-2xl bg-white rounded-xl shadow-lg border p-8 space-y-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-verde/10 rounded-lg">
-            <Bot className="w-6 h-6 text-verde" />
+    <div className="flex h-[calc(100vh-7rem)] min-h-[400px] overflow-y-auto">
+      <div className="m-auto flex flex-col md:flex-row w-full max-w-4xl h-full min-h-0 bg-white rounded-xl shadow-lg border overflow-hidden">
+        <aside className="shrink-0 md:w-64 bg-zinc-50 border-b md:border-b-0 md:border-r p-4 flex md:flex-col gap-2 md:overflow-y-auto">
+          {stepDefinitions.map((step, index) => {
+            const numero = index + 1;
+            const ativo = currentStep === numero;
+            const concluido = numero < currentStep;
+
+            return (
+              <button
+                type="button"
+                key={numero}
+                onClick={() => handleClickStep(numero)}
+                className={`flex items-center md:items-start gap-3 p-3 rounded-lg text-left transition-colors cursor-pointer ${
+                  ativo
+                    ? "bg-verde/10 border border-verde/30"
+                    : "hover:bg-zinc-100 border border-transparent"
+                }`}
+              >
+                <span
+                  className={`flex items-center justify-center h-7 w-7 shrink-0 rounded-full text-xs font-bold ${
+                    concluido || ativo
+                      ? "bg-verde text-white"
+                      : "bg-zinc-200 text-zinc-600"
+                  }`}
+                >
+                  {concluido ? <Check className="w-4 h-4" /> : numero}
+                </span>
+                <span className="min-w-0">
+                  <span
+                    className={`block text-sm font-semibold truncate ${
+                      ativo ? "text-verde" : "text-zinc-700"
+                    }`}
+                  >
+                    {step.title}
+                  </span>
+                  <span className="hidden md:block text-xs text-zinc-500">
+                    {step.description}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </aside>
+
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          <div className="flex items-center gap-3 p-6 pb-3">
+            <div className="p-2 bg-verde/10 rounded-lg">
+              <Bot className="w-6 h-6 text-verde" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-zinc-800">OiacIA</h1>
+              <p className="text-sm text-zinc-500">
+                Envie um documento para começar a conversar
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-800">OiacIA</h1>
-            <p className="text-sm text-zinc-500">
-              Envie um documento para começar a conversar
+
+          <div className="px-6 pb-2">
+            <p className="text-sm font-semibold text-gray-600">
+              Etapa {currentStep} de {stepDefinitions.length}
             </p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <p className="text-sm font-semibold text-gray-600">
-            Etapa {currentStep} de {stepDefinitions.length}
-          </p>
-          <div className="h-2 overflow-hidden rounded-full bg-gray-200">
-            <div
-              className="h-full rounded-full bg-verde transition-all duration-300"
-              style={{ width: `${progressPercentage}%` }}
-            />
+            <div className="h-2 mt-2 overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full rounded-full bg-verde transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="px-6 pb-3">
             <p className="text-xl font-bold text-gray-900">
               {stepDefinitions[currentStep - 1].title}
             </p>
-            <p className="text-sm font-semibold text-gray-600 mb-7">
+            <p className="text-sm font-semibold text-gray-600">
               {stepDefinitions[currentStep - 1].description}
             </p>
           </div>
-        </div>
 
-        <form onSubmit={handleSubmit(enviar)} className="space-y-6">
+          <form onSubmit={handleSubmit(enviar)} className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 overflow-y-auto px-6 py-2 space-y-6">
           {currentStep === 1 && (
             <div className="space-y-4">
               <div className="flex flex-col gap-2">
@@ -533,8 +591,9 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
               </div>
             </div>
           )}
+            </div>
 
-            <div className="flex items-center justify-between w-full pt-4">
+            <div className="flex items-center justify-between w-full px-6 py-4 border-t">
               <div className="flex gap-2">
                 {isFirstStep && onCancelar ? (
                   <Button
@@ -577,7 +636,8 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                 </Button>
               )}
             </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
