@@ -262,48 +262,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   return (
     <div className="flex h-[calc(100vh-7rem)] min-h-[400px] overflow-y-auto">
       <div className="m-auto flex flex-col md:flex-row w-full max-w-4xl h-full min-h-0 bg-white rounded-xl shadow-lg border overflow-hidden">
-        <aside className="shrink-0 md:w-64 bg-zinc-50 border-b md:border-b-0 md:border-r p-4 flex md:flex-col gap-2 md:overflow-y-auto">
-          {stepDefinitions.map((step, index) => {
-            const numero = index + 1;
-            const ativo = currentStep === numero;
-            const concluido = numero < currentStep;
-
-            return (
-              <button
-                type="button"
-                key={numero}
-                onClick={() => handleClickStep(numero)}
-                className={`flex items-center md:items-start gap-3 p-3 rounded-lg text-left transition-colors cursor-pointer ${
-                  ativo
-                    ? "bg-verde/10 border border-verde/30"
-                    : "hover:bg-zinc-100 border border-transparent"
-                }`}
-              >
-                <span
-                  className={`flex items-center justify-center h-7 w-7 shrink-0 rounded-full text-xs font-bold ${
-                    concluido || ativo
-                      ? "bg-verde text-white"
-                      : "bg-zinc-200 text-zinc-600"
-                  }`}
-                >
-                  {concluido ? <Check className="w-4 h-4" /> : numero}
-                </span>
-                <span className="min-w-0">
-                  <span
-                    className={`block text-sm font-semibold truncate ${
-                      ativo ? "text-verde" : "text-zinc-700"
-                    }`}
-                  >
-                    {step.title}
-                  </span>
-                  <span className="hidden md:block text-xs text-zinc-500">
-                    {step.description}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </aside>
+        
 
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
           <div className="flex items-center gap-3 p-6 pb-3">
