@@ -260,8 +260,8 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }
 
   return (
-    <div className="flex h-[calc(100vh-7rem)] min-h-[400px] overflow-y-auto">
-      <div className="m-auto flex flex-col md:flex-row w-full max-w-4xl h-full min-h-0 bg-white rounded-xl shadow-lg border overflow-hidden">
+    <div className="flex h-fit w-full overflow-y-auto max-h-[calc(100vh-7rem)]">
+      <div className="m-auto flex flex-col w-full max-w-4xl h-fit bg-white rounded-xl shadow-lg border overflow-hidden">
         
 
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
@@ -552,7 +552,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
           )}
             </div>
 
-            <div className="flex items-center justify-between w-full px-6 py-4 border-t">
+            <div className="flex items-center justify-between w-full px-6 py-4 ">
               <div className="flex gap-2">
                 {isFirstStep && onCancelar ? (
                   <Button
