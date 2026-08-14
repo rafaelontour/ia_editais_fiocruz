@@ -29,11 +29,15 @@ const secondaryVariant = {
 
 export const FileUpload = ({
   onChange,
+  value,
 }: {
   onChange?: (files: File[]) => void;
+  value?: File | null;
 }) => {
-  const [files, setFiles] = useState<File[]>([]);
+  const [internalFiles, setInternalFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const files = value !== undefined ? (value ? [value] : []) : internalFiles;
 
   function erro() {
     toast.info("Este campo aceita apenas um arquivo! Para enviar outro, remova o arquivo existente e adicione o novo!");
@@ -42,20 +46,22 @@ export const FileUpload = ({
   const handleFileChange = (newFiles: File[]) => {
     if (files.length === 1) {
       erro();
-      return
+      return;
     }
 
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-    if (onChange) onChange(newFiles);
+    if (value !== undefined) {
+      onChange?.(newFiles);
+    } else {
+      setInternalFiles((prevFiles) => [...prevFiles, ...newFiles]);
+      onChange?.(newFiles);
+    }
   };
 
-
   const handleClick = () => {
-    
     if (files.length === 1) {
       erro();
-      return
-    } 
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -69,7 +75,11 @@ export const FileUpload = ({
   });
 
   const removerArquivo = () => {
-    setFiles([]);
+    if (value !== undefined) {
+      onChange?.([]);
+    } else {
+      setInternalFiles([]);
+    }
   }
 
   return (

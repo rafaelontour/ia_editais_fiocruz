@@ -541,6 +541,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                   control={control}
                   render={({ field }) => (
                     <FileUpload
+                      value={field.value ?? null}
                       onChange={(files: File[]) => {
                         field.onChange(files[0]);
                       }}
@@ -588,7 +589,10 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
               ) : (
                 <Button
                   type="button"
-                  onClick={handleNextStep}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNextStep();
+                  }}
                   className="bg-verde hover:bg-verde/90 text-white cursor-pointer"
                 >
                   Avançar
