@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Bot,
   InfoIcon,
@@ -14,9 +15,9 @@ import Masonry from "react-masonry-css";
 import Div from "@/components/Div";
 import Calendario from "@/components/Calendario";
 import FormularioUpload from "@/components/assistente/FormularioUpload";
-import VisualizadorDocumento from "@/components/assistente/VisualizadorDocumento";
 import ChatIA from "@/components/assistente/ChatIA";
 import AnaliseDetalhadaAssistente from "@/components/assistente/AnaliseDetalhadaAssistente";
+import type { DestaquePdf } from "@/components/assistente/VisualizadorDocumento";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -34,6 +35,11 @@ import {
 } from "@/service/assistente/assistente";
 import { toast } from "sonner";
 
+const VisualizadorDocumento = dynamic(
+  () => import("@/components/assistente/VisualizadorDocumento"),
+  { ssr: false }
+);
+
 type PaginaState =
   | { tipo: "lista" }
   | { tipo: "formulario" }
@@ -47,6 +53,7 @@ export default function AssistentePage() {
   const [conversas, setConversas] = useState<ChatDocumentoMeta[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [showAnalise, setShowAnalise] = useState(false);
+  const [destaquePdf, setDestaquePdf] = useState<DestaquePdf | null>(null);
 
   async function carregarConversas() {
     setCarregando(true);
@@ -62,6 +69,7 @@ export default function AssistentePage() {
   useEffect(() => {
     if (state.tipo === "lista") {
       setShowAnalise(false);
+      setDestaquePdf(null);
       carregarConversas();
     }
   }, [state.tipo]);
@@ -93,6 +101,7 @@ export default function AssistentePage() {
           <VisualizadorDocumento
             fileDataUrl={state.doc.fileDataUrl}
             fileName={state.doc.fileName}
+            destaque={destaquePdf}
           />
         </ResizablePanel>
 
@@ -116,6 +125,19 @@ export default function AssistentePage() {
             documentId={state.doc.documentId}
             onVoltar={() => setState({ tipo: "lista" })}
             onAbrirAnalise={() => setShowAnalise(true)}
+            onVerNoDocumento={(citacao) => {
+              if (!citacao.page || citacao.page <= 0) return;
+              setDestaquePdf({
+                page: citacao.page,
+                rects: (citacao.rects ?? []).filter(
+                  (r) =>
+                    typeof r?.x1 === "number" &&
+                    typeof r?.y1 === "number" &&
+                    typeof r?.x2 === "number" &&
+                    typeof r?.y2 === "number"
+                ),
+              });
+            }}
           />
         </ResizablePanel>
 

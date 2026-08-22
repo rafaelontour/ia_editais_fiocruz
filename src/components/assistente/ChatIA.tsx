@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Send, User, ChevronLeft, FileSearch } from "lucide-react";
+import { Bot, Send, User, ChevronLeft, FileSearch, BookOpen } from "lucide-react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +8,7 @@ import {
   getMensagensDocumentoService,
   enviarMensagemAiService,
 } from "@/service/assistente/assistente";
-import type { ChatMensagem } from "@/service/assistente/assistente";
+import type { ChatMensagem, ChatCitation } from "@/service/assistente/assistente";
 import { getContextItemsService } from "@/service/assistente/contextItems";
 import type { ContextItem } from "@/service/assistente/contextItems";
 
@@ -17,6 +17,51 @@ interface Props {
   documentId: string;
   onVoltar: () => void;
   onAbrirAnalise: () => void;
+  onVerNoDocumento?: (citacao: ChatCitation) => void;
+}
+
+function CitacaoCard({
+  citacao,
+  onClick,
+}: {
+  citacao: ChatCitation;
+  onClick?: () => void;
+}) {
+  const temLocal = !!citacao.page && citacao.page > 0;
+  const clicavel = temLocal && !!onClick;
+
+  return (
+    <button
+      type="button"
+      disabled={!clicavel}
+      onClick={onClick}
+      title={
+        clicavel
+          ? `Ver no documento (página ${citacao.page})`
+          : "Localização não disponível para este trecho"
+      }
+      className={`w-full text-left flex items-start gap-2 rounded-md border px-2.5 py-1.5 transition-colors ${
+        clicavel
+          ? "border-verde/20 bg-white cursor-pointer hover:border-verde/50 hover:bg-verde/5"
+          : "border-zinc-200 bg-white cursor-default opacity-70"
+      }`}
+    >
+      <BookOpen className="w-3.5 h-3.5 mt-0.5 text-verde shrink-0" />
+      <span className="flex-1 min-w-0">
+        {temLocal && (
+          <span className={`block text-[11px] font-semibold ${clicavel ? "text-verde" : "text-zinc-400"}`}>
+            Página {citacao.page}
+            {!clicavel && " · sem localização exata"}
+          </span>
+        )}
+        {citacao.text_snippet && (
+          <span className="block text-xs text-zinc-600 truncate">
+            &ldquo;{citacao.text_snippet}&rdquo;
+          </span>
+        )}
+      </span>
+    </button>
+  );
 }
 
 export default function ChatIA({
@@ -24,6 +69,7 @@ export default function ChatIA({
   documentId,
   onVoltar,
   onAbrirAnalise,
+  onVerNoDocumento,
 }: Props) {
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
@@ -120,6 +166,7 @@ export default function ChatIA({
             ai?.content ??
             "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
           created_at: ai?.created_at ?? new Date().toISOString(),
+          references: ai?.references ?? [],
         },
       ]);
     } catch {
@@ -131,6 +178,7 @@ export default function ChatIA({
           content:
             "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
           created_at: new Date().toISOString(),
+          references: [],
         },
       ]);
     }
@@ -286,6 +334,26 @@ export default function ChatIA({
                   return name ? `@${name}` : "";
                 })}
               </p>
+              {msg.role === "assistant" &&
+                msg.references &&
+                msg.references.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-zinc-200 space-y-1">
+                    <p className="text-[11px] font-medium text-zinc-400 uppercase tracking-wide">
+                      Fontes no documento
+                    </p>
+                    {msg.references.map((ref, idx) => (
+                      <CitacaoCard
+                        key={`${ref.chunk_id}-${idx}`}
+                        citacao={ref}
+                        onClick={
+                          ref.page && ref.page > 0 && onVerNoDocumento
+                            ? () => onVerNoDocumento(ref)
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
             </div>
           </div>
         ))}
