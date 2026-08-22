@@ -8,11 +8,19 @@ export interface ChatDocumentoMeta {
   created_at: string
 }
 
+export interface ChatCitation {
+  chunk_id: string
+  text_snippet?: string | null
+  page?: number | null
+  rects?: Array<{ x1: number; y1: number; x2: number; y2: number }> | null
+}
+
 export interface ChatMensagem {
   id: string
   role: "user" | "assistant"
   content: string
   created_at: string
+  references?: ChatCitation[]
 }
 
 const urlBase = process.env.NEXT_PUBLIC_URL_BASE
@@ -177,10 +185,12 @@ export async function enviarMensagemAiService(
   if (!res.ok) return null
 
   const data = await res.json()
+  const msg = data.message ?? data
   return {
-    id: data.id,
+    id: msg.id,
     role: "assistant",
-    content: data.content,
-    created_at: data.created_at,
+    content: msg.content,
+    created_at: msg.created_at,
+    references: data.references ?? [],
   }
 }
