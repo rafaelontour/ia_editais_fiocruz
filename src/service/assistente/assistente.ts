@@ -15,6 +15,12 @@ export interface ChatCitation {
   rects?: Array<{ x1: number; y1: number; x2: number; y2: number }> | null
 }
 
+export interface PdfDestino {
+  /** Página em base humana (1 = primeira página) */
+  pagina: number
+  rects: Array<{ x1: number; y1: number; x2: number; y2: number }>
+}
+
 export interface ChatMensagem {
   id: string
   role: "user" | "assistant"
@@ -167,6 +173,7 @@ export async function getMensagensDocumentoService(documentId: string): Promise<
       role: isAi ? "assistant" : "user",
       content: m.content,
       created_at: m.created_at,
+      references: m.references ?? [],
     }
   })
 }

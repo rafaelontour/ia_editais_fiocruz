@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Send, User, ChevronLeft, FileSearch } from "lucide-react";
+import { Bot, Send, User, ChevronLeft, FileSearch, FileText } from "lucide-react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +8,11 @@ import {
   getMensagensDocumentoService,
   enviarMensagemAiService,
 } from "@/service/assistente/assistente";
-import type { ChatMensagem } from "@/service/assistente/assistente";
+import type {
+  ChatMensagem,
+  ChatCitation,
+  PdfDestino,
+} from "@/service/assistente/assistente";
 import { getContextItemsService } from "@/service/assistente/contextItems";
 import type { ContextItem } from "@/service/assistente/contextItems";
 
@@ -17,6 +21,35 @@ interface Props {
   documentId: string;
   onVoltar: () => void;
   onAbrirAnalise: () => void;
+  onIrParaPagina?: (destino: PdfDestino) => void;
+}
+
+function limparReferenciasTexto(texto: string): string {
+  return texto
+    .replace(
+      /\[?\s*chunk_[A-Za-z0-9_]+(?:\s*[;,]\s*chunk_[A-Za-z0-9_]+)*\s*\]?/gi,
+      "",
+    )
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+function destinosDasReferencias(refs?: ChatCitation[]): PdfDestino[] {
+  if (!refs?.length) return [];
+  const mapa = new Map<number, PdfDestino>();
+  for (const ref of refs) {
+    if (typeof ref.page !== "number") continue;
+    const rects = ref.rects ?? [];
+    const temCoords = rects.length > 0;
+    // page é 0-based no back; exibimos/navegamos em base 1.
+    // Docs antigos têm page=0 sem rects e ficam sem botão.
+    if (!(ref.page > 0 || temCoords)) continue;
+    const pagina = ref.page + 1;
+    const atual = mapa.get(pagina) ?? { pagina, rects: [] };
+    atual.rects.push(...rects);
+    mapa.set(pagina, atual);
+  }
+  return [...mapa.values()].sort((a, b) => a.pagina - b.pagina);
 }
 
 export default function ChatIA({
@@ -24,6 +57,7 @@ export default function ChatIA({
   documentId,
   onVoltar,
   onAbrirAnalise,
+  onIrParaPagina,
 }: Props) {
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
   const [mensagem, setMensagem] = useState("");
@@ -120,6 +154,7 @@ export default function ChatIA({
             ai?.content ??
             "Desculpe, ocorreu um erro ao processar sua pergunta. Tente novamente.",
           created_at: ai?.created_at ?? new Date().toISOString(),
+          references: ai?.references ?? [],
         },
       ]);
     } catch {
@@ -257,38 +292,62 @@ export default function ChatIA({
           </div>
         </div>
 
-        {mensagens.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex items-start gap-3 ${
-              msg.role === "user" ? "flex-row-reverse" : ""
-            }`}
-          >
+        {mensagens.map((msg) => {
+          const destinos =
+            msg.role === "assistant"
+              ? destinosDasReferencias(msg.references)
+              : [];
+          return (
             <div
-              className={`p-2 rounded-lg flex-shrink-0 ${
-                msg.role === "user" ? "bg-blue-100" : "bg-verde/10"
+              key={msg.id}
+              className={`flex items-start gap-3 ${
+                msg.role === "user" ? "flex-row-reverse" : ""
               }`}
             >
-              {msg.role === "user" ? (
-                <User className="w-5 h-5 text-blue-600" />
-              ) : (
-                <Bot className="w-5 h-5 text-verde" />
-              )}
+              <div
+                className={`p-2 rounded-lg flex-shrink-0 ${
+                  msg.role === "user" ? "bg-blue-100" : "bg-verde/10"
+                }`}
+              >
+                {msg.role === "user" ? (
+                  <User className="w-5 h-5 text-blue-600" />
+                ) : (
+                  <Bot className="w-5 h-5 text-verde" />
+                )}
+              </div>
+              <div
+                className={`rounded-lg px-4 py-2.5 max-w-[85%] ${
+                  msg.role === "user" ? "bg-blue-50" : "bg-zinc-100"
+                }`}
+              >
+                <p className="text-sm text-zinc-700 whitespace-pre-wrap">
+                  {limparReferenciasTexto(
+                    msg.content.replace(/<branch:([^>]+)>/g, (_, id) => {
+                      const name = contextMapRef.current.get(id);
+                      return name ? `@${name}` : "";
+                    }),
+                  )}
+                </p>
+                {destinos.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {destinos.map((destino) => (
+                      <button
+                        key={destino.pagina}
+                        type="button"
+                        onClick={() => onIrParaPagina?.(destino)}
+                        title={`Ver página ${destino.pagina} no documento`}
+                        className="inline-flex items-center gap-1 text-[11px] leading-none px-1.5 py-1 rounded-md border border-zinc-200 bg-white text-zinc-500 hover:text-verde hover:border-verde/50 hover:bg-verde/10 transition-colors cursor-pointer"
+                      >
+                        <FileText className="w-3 h-3" />
+                        Pág. {destino.pagina}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            <div
-              className={`rounded-lg px-4 py-2.5 max-w-[85%] ${
-                msg.role === "user" ? "bg-blue-50" : "bg-zinc-100"
-              }`}
-            >
-              <p className="text-sm text-zinc-700 whitespace-pre-wrap">
-                {msg.content.replace(/<branch:([^>]+)>/g, (_, id) => {
-                  const name = contextMapRef.current.get(id);
-                  return name ? `@${name}` : "";
-                })}
-              </p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         {pensando && (
           <div className="flex items-start gap-3">

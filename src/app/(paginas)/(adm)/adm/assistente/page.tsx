@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Bot,
   InfoIcon,
@@ -14,7 +15,10 @@ import Masonry from "react-masonry-css";
 import Div from "@/components/Div";
 import Calendario from "@/components/Calendario";
 import FormularioUpload from "@/components/assistente/FormularioUpload";
-import VisualizadorDocumento from "@/components/assistente/VisualizadorDocumento";
+const VisualizadorDocumento = dynamic(
+  () => import("@/components/assistente/VisualizadorDocumento"),
+  { ssr: false },
+);
 import ChatIA from "@/components/assistente/ChatIA";
 import AnaliseDetalhadaAssistente from "@/components/assistente/AnaliseDetalhadaAssistente";
 import {
@@ -27,7 +31,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ChatDocumentoMeta } from "@/service/assistente/assistente";
+import type { ChatDocumentoMeta, PdfDestino } from "@/service/assistente/assistente";
 import {
   getDocumentosChat,
   excluirDocumentoChat,
@@ -47,6 +51,9 @@ export default function AssistentePage() {
   const [conversas, setConversas] = useState<ChatDocumentoMeta[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [showAnalise, setShowAnalise] = useState(false);
+  const [paginaAlvo, setPaginaAlvo] = useState<
+    (PdfDestino & { ts: number }) | null
+  >(null);
 
   async function carregarConversas() {
     setCarregando(true);
@@ -93,6 +100,7 @@ export default function AssistentePage() {
           <VisualizadorDocumento
             fileDataUrl={state.doc.fileDataUrl}
             fileName={state.doc.fileName}
+            paginaAlvo={paginaAlvo}
           />
         </ResizablePanel>
 
@@ -116,6 +124,9 @@ export default function AssistentePage() {
             documentId={state.doc.documentId}
             onVoltar={() => setState({ tipo: "lista" })}
             onAbrirAnalise={() => setShowAnalise(true)}
+            onIrParaPagina={(destino) =>
+              setPaginaAlvo({ ...destino, ts: Date.now() })
+            }
           />
         </ResizablePanel>
 
@@ -208,7 +219,8 @@ export default function AssistentePage() {
                         size="icon"
                         className="h-8 w-8 bg-verde hover:bg-verde/90 cursor-pointer rounded-sm text-white"
                         title="Abrir conversa"
-                        onClick={() =>
+                        onClick={() => {
+                          setPaginaAlvo(null);
                           setState({
                             tipo: "chat",
                             doc: {
@@ -217,8 +229,8 @@ export default function AssistentePage() {
                               fileDataUrl: conv.fileUrl,
                               fileName: conv.fileName,
                             },
-                          })
-                        }
+                          });
+                        }}
                       >
                         <Bot size={16} />
                       </Button>
