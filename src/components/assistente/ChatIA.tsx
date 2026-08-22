@@ -49,7 +49,9 @@ function destinosDasReferencias(refs?: ChatCitation[]): PdfDestino[] {
     atual.rects.push(...rects);
     mapa.set(pagina, atual);
   }
-  return [...mapa.values()].sort((a, b) => a.pagina - b.pagina);
+  // Mantém a ordem de chegada das referências (relevância),
+  // em vez de reordenar por página.
+  return [...mapa.values()];
 }
 
 export default function ChatIA({
