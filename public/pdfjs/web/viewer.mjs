@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @licstart The following is the entire license notice for the
  * JavaScript code in this page
  *
@@ -2309,7 +2309,7 @@ class FluentResource {
       if (test(RE_UNICODE_ESCAPE)) {
         let [, codepoint4, codepoint6] = match(RE_UNICODE_ESCAPE);
         let codepoint = parseInt(codepoint4 || codepoint6, 16);
-        return codepoint <= 0xd7ff || 0xe000 <= codepoint ? String.fromCodePoint(codepoint) : "�";
+        return codepoint <= 0xd7ff || 0xe000 <= codepoint ? String.fromCodePoint(codepoint) : "ï¿½";
       }
       throw new SyntaxError("Unknown escape sequence");
     }
@@ -5259,7 +5259,7 @@ function getCharacterType(charCode) {
 }
 let NormalizeWithNFKC;
 function getNormalizeWithNFKC() {
-  NormalizeWithNFKC ||= ` ¨ª¯²-µ¸-º¼-¾Ĳ-ĳĿ-ŀŉſǄ-ǌǱ-ǳʰ-ʸ˘-˝ˠ-ˤʹͺ;΄-΅·ϐ-ϖϰ-ϲϴ-ϵϹևٵ-ٸक़-य़ড়-ঢ়য়ਲ਼ਸ਼ਖ਼-ਜ਼ਫ਼ଡ଼-ଢ଼ำຳໜ-ໝ༌གྷཌྷདྷབྷཛྷཀྵჼᴬ-ᴮᴰ-ᴺᴼ-ᵍᵏ-ᵪᵸᶛ-ᶿẚ-ẛάέήίόύώΆ᾽-῁ΈΉ῍-῏ΐΊ῝-῟ΰΎ῭-`ΌΏ´-῾ - ‑‗․-… ″-‴‶-‷‼‾⁇-⁉⁗ ⁰-ⁱ⁴-₎ₐ-ₜ₨℀-℃℅-ℇ℉-ℓℕ-№ℙ-ℝ℠-™ℤΩℨK-ℭℯ-ℱℳ-ℹ℻-⅀ⅅ-ⅉ⅐-ⅿ↉∬-∭∯-∰〈-〉①-⓪⨌⩴-⩶⫝̸ⱼ-ⱽⵯ⺟⻳⼀-⿕　〶〸-〺゛-゜ゟヿㄱ-ㆎ㆒-㆟㈀-㈞㈠-㉇㉐-㉾㊀-㏿ꚜ-ꚝꝰꟲ-ꟴꟸ-ꟹꭜ-ꭟꭩ豈-嗀塚晴凞-羽蘒諸逸-都飯-舘並-龎ﬀ-ﬆﬓ-ﬗיִײַ-זּטּ-לּמּנּ-סּףּ-פּצּ-ﮱﯓ-ﴽﵐ-ﶏﶒ-ﷇﷰ-﷼︐-︙︰-﹄﹇-﹒﹔-﹦﹨-﹫ﹰ-ﹲﹴﹶ-ﻼ！-ﾾￂ-ￇￊ-ￏￒ-ￗￚ-ￜ￠-￦`;
+  NormalizeWithNFKC ||= `Â Â¨ÂªÂ¯Â²-ÂµÂ¸-ÂºÂ¼-Â¾Ä²-Ä³Ä¿-Å€Å‰Å¿Ç„-ÇŒÇ±-Ç³Ê°-Ê¸Ë˜-ËË -Ë¤Í´ÍºÍ¾Î„-Î…Î‡Ï-Ï–Ï°-Ï²Ï´-ÏµÏ¹Ö‡Ùµ-Ù¸à¥˜-à¥Ÿà§œ-à§à§Ÿà¨³à¨¶à©™-à©›à©žà­œ-à­à¸³àº³à»œ-à»à¼Œà½ƒà½à½’à½—à½œà½©áƒ¼á´¬-á´®á´°-á´ºá´¼-áµáµ-áµªáµ¸á¶›-á¶¿áºš-áº›á½±á½³á½µá½·á½¹á½»á½½á¾»á¾½-á¿á¿‰á¿‹á¿-á¿á¿“á¿›á¿-á¿Ÿá¿£á¿«á¿­-á¿¯á¿¹á¿»á¿½-á¿¾â€€-â€Šâ€‘â€—â€¤-â€¦â€¯â€³-â€´â€¶-â€·â€¼â€¾â‡-â‰â—âŸâ°-â±â´-â‚Žâ‚-â‚œâ‚¨â„€-â„ƒâ„…-â„‡â„‰-â„“â„•-â„–â„™-â„â„ -â„¢â„¤â„¦â„¨â„ª-â„­â„¯-â„±â„³-â„¹â„»-â…€â……-â…‰â…-â…¿â†‰âˆ¬-âˆ­âˆ¯-âˆ°âŒ©-âŒªâ‘ -â“ªâ¨Œâ©´-â©¶â«œâ±¼-â±½âµ¯âºŸâ»³â¼€-â¿•ã€€ã€¶ã€¸-ã€ºã‚›-ã‚œã‚Ÿãƒ¿ã„±-ã†Žã†’-ã†Ÿãˆ€-ãˆžãˆ -ã‰‡ã‰-ã‰¾ãŠ€-ã¿êšœ-êšê°êŸ²-êŸ´êŸ¸-êŸ¹ê­œ-ê­Ÿê­©ï¤€-ï¨ï¨ï¨’ï¨•-ï¨žï¨ ï¨¢ï¨¥-ï¨¦ï¨ª-ï©­ï©°-ï«™ï¬€-ï¬†ï¬“-ï¬—ï¬ï¬Ÿ-ï¬¶ï¬¸-ï¬¼ï¬¾ï­€-ï­ï­ƒ-ï­„ï­†-ï®±ï¯“-ï´½ïµ-ï¶ï¶’-ï·‡ï·°-ï·¼ï¸-ï¸™ï¸°-ï¹„ï¹‡-ï¹’ï¹”-ï¹¦ï¹¨-ï¹«ï¹°-ï¹²ï¹´ï¹¶-ï»¼ï¼-ï¾¾ï¿‚-ï¿‡ï¿Š-ï¿ï¿’-ï¿—ï¿š-ï¿œï¿ -ï¿¦`;
   return NormalizeWithNFKC;
 }
 
@@ -14575,10 +14575,8 @@ initCom(PDFViewerApplication);
       if (HOSTED_VIEWER_ORIGINS.includes(viewerOrigin)) {
         return;
       }
-      const fileOrigin = new URL(file, window.location.href).origin;
-      if (fileOrigin !== viewerOrigin) {
-        throw new Error("file origin does not match viewer's");
-      }
+      // OiacIA: PDF servido em origem propria (back com CORS liberado);
+      // trava same-origin do viewer oficial desativada nesta copia.
     } catch (ex) {
       PDFViewerApplication._documentError("pdfjs-loading-error", {
         message: ex.message
