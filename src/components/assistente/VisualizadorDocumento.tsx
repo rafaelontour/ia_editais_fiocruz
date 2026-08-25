@@ -17,6 +17,9 @@ export default function VisualizadorDocumento({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const prontoRef = useRef(false);
   const pendenteRef = useRef<PdfDestino | null>(null);
+  // Alvos de página criados ANTES da montagem são resquícios de
+  // sessões anteriores do chat e devem ser ignorados.
+  const montadoEmRef = useRef(Date.now());
 
   // Viewer oficial do pdf.js servido localmente (public/pdfjs):
   // cópia de texto, busca (Ctrl+F), scroll e zoom nativos.
@@ -62,6 +65,7 @@ export default function VisualizadorDocumento({
 
   useEffect(() => {
     if (!paginaAlvo) return;
+    if (paginaAlvo.ts <= montadoEmRef.current) return;
     const alvo: PdfDestino = {
       pagina: paginaAlvo.pagina,
       rects: paginaAlvo.rects,
