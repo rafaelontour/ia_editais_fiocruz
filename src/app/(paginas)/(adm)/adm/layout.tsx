@@ -36,6 +36,13 @@ export default function RootLayout({
   const pathname = usePathname();
   const { items } = useUsuario();
 
+  const isActive = (url: string) =>
+    pathname === url || (url !== "/" && pathname.startsWith(url + "/"));
+
+  const activeUrl = items
+    .filter((item) => isActive(item.url))
+    .sort((a, b) => b.url.length - a.url.length)[0]?.url;
+
   const titulosMap: Record<string, string> = {
     "/adm": "Início",
     "/adm/editais": "Meus documentos",
@@ -83,7 +90,7 @@ export default function RootLayout({
                           className={`flex items-center gap-3 px-3 py-0.5`}
                         >
                           <span
-                            className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} hover:bg-vermelho hover:text-white text-sm mb-1 items-center gap-2 p-2 rounded-md ${pathname === item.url ? "bg-vermelho font-bold text-white" : "bg-zinc-300"}`}
+                            className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} hover:bg-vermelho hover:text-white text-sm mb-1 items-center gap-2 p-2 rounded-md ${item.url === activeUrl ? "bg-vermelho font-bold text-white" : "bg-zinc-300"}`}
                           >
                             <item.icon size={18} />
                             {barraLateralAberta && <span>{item.title}</span>}
@@ -98,7 +105,7 @@ export default function RootLayout({
                             href={item.url}
                           >
                             <span
-                              className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} hover:bg-vermelho hover:text-white text-sm mb-1 items-center gap-2 p-2 rounded-md ${pathname === item.url ? "bg-vermelho font-bold text-white" : "bg-zinc-300"}`}
+                              className={`flex ${barraLateralAberta ? "w-full" : "w-fit"} hover:bg-vermelho hover:text-white text-sm mb-1 items-center gap-2 p-2 rounded-md ${item.url === activeUrl ? "bg-vermelho font-bold text-white" : "bg-zinc-300"}`}
                             >
                               <item.icon size={18} />
                             </span>
