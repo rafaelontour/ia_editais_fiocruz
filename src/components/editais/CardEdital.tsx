@@ -238,8 +238,19 @@ export default function CardEdital({
       case "CREATE":
         return (
           <p>
-            O documento foi criado pelo usuário{" "}
-            <i className="font-bold">{log.user.username?.split(" ")[0]}</i>
+            {log.table_name === "document_releases" ? (
+              <>
+                Foi adicionada uma nova versão do documento{" "}
+                <i className="font-bold">{log.description}</i>
+              </>
+            ) : (
+              <>
+                O documento foi criado pelo usuário{" "}
+                <i className="font-bold">
+                  {log.user.username?.split(" ")[0]}
+                </i>
+              </>
+            )}
           </p>
         );
       case "UPDATE":
