@@ -24,11 +24,10 @@ async function getEditalArquivoService(id: string | null | undefined): Promise<E
 }
 
 
-async function enviarArquivoService(idEdital: string | undefined, arquivo: File | undefined | null, tipoAlteracao: string = "patch"): Promise<number | undefined> {
+async function enviarArquivoService(idEdital: string | undefined, arquivo: File | undefined | null): Promise<number | undefined> {
     try {
         const formData = new FormData();
         formData.append('file', arquivo!);
-        formData.append('bump', tipoAlteracao);
 
         const res = await fetch(`${urlBase}/doc/${idEdital}/release`, {
             method: "POST",
@@ -42,7 +41,7 @@ async function enviarArquivoService(idEdital: string | undefined, arquivo: File 
     }
 }
 
-async function reenviarArquivoService(idEdital: string | undefined, projectDocumentId: string, tipoAlteracao: string = "patch"): Promise<number | undefined> {
+async function reenviarArquivoService(idEdital: string | undefined, projectDocumentId: string): Promise<number | undefined> {
     try {
         const res = await fetch(`${urlBase}/doc/${idEdital}/release/from-file`, {
             method: "POST",
@@ -50,7 +49,7 @@ async function reenviarArquivoService(idEdital: string | undefined, projectDocum
             headers: {
                 "Content-type": "application/json"
             },
-            body: JSON.stringify({ project_document_id: projectDocumentId, bump: tipoAlteracao })
+            body: JSON.stringify({ project_document_id: projectDocumentId })
         });
 
         return res.status;

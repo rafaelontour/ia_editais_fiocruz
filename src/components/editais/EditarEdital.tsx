@@ -57,12 +57,22 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
     const [cliqueEditar, setCliqueEditar] = useState<boolean>(false);
     const [urlCaminhoArquivoEdital, setUrlArquivoEdital] = useState<string>("");
+    const [proximaVersao, setProximaVersao] = useState<number>(1);
     const { lista, salvarLista } = useEditalProc();
     const [carregando, setCarregando] = useState<boolean>(true);
 
     async function buscarCaminhoEdital() {
         const arquivo: EditalArquivo = await getEditalArquivoService(edital.id!) as EditalArquivo;
         setUrlArquivoEdital(arquivo?.releases?.[0]?.file_path ?? "");
+        const versaoAtual = arquivo?.releases?.[0]?.version;
+        setProximaVersao(obterProximaVersao(versaoAtual));
+    }
+
+    function obterProximaVersao(versao: string | undefined): number {
+        if (!versao) return 1;
+        const major = String(versao).split(".")[0];
+        const num = parseInt(major, 10);
+        return isNaN(num) ? 1 : num + 1;
     }
 
     useEffect(() => {
@@ -93,7 +103,6 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     const [usuariosDaUnidade, setUsuariosDaUnidade] = useState<UsuarioUnidade[] | undefined>([]);
     const [sheetOpen, setSheetOpen] = useState<boolean>(false);
     const [editarComArquivo, setEditarComArquivo] = useState<boolean>(false);
-    const [tipoAlteracao, setTipoAlteracao] = useState<string>("patch");
     const [alterouDados, setAlterouDados] = useState<boolean>(false);
 
     function filtrarTipificacoesSelectionadas() {
@@ -159,7 +168,7 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
             return
         }
 
-        const resposta = await enviarArquivoService(edital.id, data.arquivo, tipoAlteracao);
+        const resposta = await enviarArquivoService(edital.id, data.arquivo);
 
         if (resposta !== 201) {
             toast.error("Erro ao atualizar edital!");
@@ -181,7 +190,6 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
     function limparCampos() {
         setAlterouDados(false);
         setEditarComArquivo(false);
-        setTipoAlteracao("patch");
         reset();
         setTipificacoesSelecionadas([]);
         setResponsaveisEdital([]);
@@ -523,25 +531,9 @@ export default function EditarEdital({ edital, atualizarEditais, flagEdital }: P
 
                             {
                                 editarComArquivo && (
-                                    <div className="flex flex-col gap-2">
-                                        <Label className="text-lg">O que mudou?</Label>
-                                        <Select
-                                            value={tipoAlteracao}
-                                            onValueChange={setTipoAlteracao}
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Selecione o tipo de alteração" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectLabel>Tipo de alteração</SelectLabel>
-                                                    <SelectItem value="patch">Correção (pequenos ajustes)</SelectItem>
-                                                    <SelectItem value="minor">Adição (novas informações)</SelectItem>
-                                                    <SelectItem value="major">Reestruturação (mudança grande)</SelectItem>
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                                    <p className="text-sm text-zinc-500 italic">
+                                        Será a versão {proximaVersao} do documento.
+                                    </p>
                                 )
                             }
                         </div>

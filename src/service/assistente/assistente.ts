@@ -122,6 +122,10 @@ export async function criarDocumentoChat(data: {
   if (!convRes.ok) throw new Error("Erro ao criar conversa")
   const conv = await convRes.json()
 
+  // Respiro curto e fixo para a ingestão/vetores conseguirem "pegar" no
+  // início. Não checa status (nunca trava a navegação para a próxima tela).
+  await new Promise((resolve) => setTimeout(resolve, 400))
+
   return {
     conversationId: conv.id as string,
     documentId: docId,
