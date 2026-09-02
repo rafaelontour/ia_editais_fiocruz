@@ -122,6 +122,8 @@ export async function criarDocumentoChat(data: {
   if (!convRes.ok) throw new Error("Erro ao criar conversa")
   const conv = await convRes.json()
 
+  await aguardarProcessamento(docId)
+
   return {
     conversationId: conv.id as string,
     documentId: docId,
@@ -200,4 +202,36 @@ export async function enviarMensagemAiService(
     created_at: msg.created_at,
     references: data.references ?? [],
   }
+}
+
+/**
+ * Aguarda o processamento/ingestão do documento terminar antes de
+ * liberar o chat. O upload agenda a geração dos vetores em background
+ * (release_pipeline), então perguntar antes do `IDLE` retorna vazio.
+ */
+async function aguardarProcessamento(docId: string): Promise<void> {
+  const inicio = Date.now()
+  const TIMEOUT_MS = 90_000
+  const INTERVALO_MS = 1_500
+
+  while (Date.now() - inicio < TIMEOUT_MS) {
+    const res = await fetch(`${urlBase}/doc/${docId}`, {
+      credentials: "include",
+    })
+    if (!res.ok) {
+      await delay(INTERVALO_MS)
+      continue
+    }
+    const doc = await res.json()
+    const status = doc.processing_status
+
+    if (status === "IDLE") return
+    if (status === "FAILED") return // deixa o fluxo seguir; o back avisará
+
+    await delay(INTERVALO_MS)
+  }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

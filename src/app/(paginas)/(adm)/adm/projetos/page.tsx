@@ -41,7 +41,9 @@ import { getDocumentGroupsService } from "@/service/configurador";
 const schema = z.object({
   nome: z.string().min(1, "O nome do projeto é obrigatório"),
   descricao: z.string().optional(),
-  document_group_id: z.string().optional(),
+  document_group_id: z
+    .string()
+    .min(1, "Selecione o grupo de documentos"),
 });
 
 export default function ProjetosPage() {
@@ -272,12 +274,22 @@ export default function ProjetosPage() {
                       {...register("document_group_id")}
                       className="w-full border rounded px-2 py-1"
                     >
+                      <option value="">
+                        {documentGroups.length
+                          ? "Selecione o grupo de documentos..."
+                          : "Carregando grupos de documentos..."}
+                      </option>
                       {documentGroups.map((grupo) => (
                         <option key={grupo.id} value={grupo.id}>
                           {grupo.name}
                         </option>
                       ))}
                     </select>
+                    {errors.document_group_id && (
+                      <p className="text-xs text-red-500">
+                        {String(errors.document_group_id.message)}
+                      </p>
+                    )}
                   </div>
                 </div>
 

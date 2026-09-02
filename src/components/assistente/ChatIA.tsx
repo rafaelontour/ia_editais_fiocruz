@@ -62,6 +62,7 @@ export default function ChatIA({
   onIrParaPagina,
 }: Props) {
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([]);
+  const [processando, setProcessando] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [pensando, setPensando] = useState(false);
   const [analisePronta, setAnalisePronta] = useState(false);
@@ -89,6 +90,44 @@ export default function ChatIA({
       }
       contextMapRef.current = map;
     });
+  }, [documentId]);
+
+  // Evita enviar pergunta antes de o pipeline de ingestão/geração de
+  // vetores terminar (status do documento ≠ IDLE). Cobre reentrada
+  // numa conversa cujo documento ainda esteja processando.
+  useEffect(() => {
+    const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
+    let ativo = true;
+    let timer: ReturnType<typeof setInterval>;
+
+    async function checar() {
+      try {
+        const res = await fetch(`${urlBase}/doc/${documentId}`, {
+          credentials: "include",
+        });
+        if (!res.ok) return;
+        const doc = await res.json();
+        if (!ativo) return;
+        if (doc.processing_status === "IDLE") {
+          setProcessando(false);
+          if (timer) clearInterval(timer);
+        } else if (
+          doc.processing_status !== "IDLE" &&
+          doc.processing_status !== "FAILED"
+        ) {
+          setProcessando(true);
+        }
+      } catch {
+        /* ignora flutuação de rede */
+      }
+    }
+
+    checar();
+    timer = setInterval(checar, 2000);
+    return () => {
+      ativo = false;
+      if (timer) clearInterval(timer);
+    };
   }, [documentId]);
 
   useEffect(() => {
@@ -243,7 +282,7 @@ export default function ChatIA({
     }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      enviar();
+      if (!processando) enviar();
     }
   }
 
@@ -407,13 +446,18 @@ export default function ChatIA({
             value={mensagem}
             onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Digite sua pergunta... Use @ para mencionar uma tipificação, taxonomia ou ramo"
+            placeholder={
+              processando
+                ? "Processando o documento... aguarde para perguntar"
+                : "Digite sua pergunta... Use @ para mencionar uma tipificação, taxonomia ou ramo"
+            }
             className="resize-none min-h-[44px] max-h-[120px]"
             rows={1}
+            disabled={processando}
           />
           <Button
             onClick={enviar}
-            disabled={!mensagem.trim() || pensando}
+            disabled={!mensagem.trim() || pensando || processando}
             size="icon"
             className="bg-verde hover:bg-verde/90 cursor-pointer flex-shrink-0"
           >
@@ -421,8 +465,9 @@ export default function ChatIA({
           </Button>
         </div>
         <p className="text-xs text-zinc-400 mt-1">
-          Enter para enviar · Shift+Enter para nova linha · @ para mencionar
-          itens do documento
+          {processando
+            ? "Aguarde a conclusão do processamento do documento para enviar."
+            : "Enter para enviar · Shift+Enter para nova linha · @ para mencionar itens do documento"}
         </p>
       </div>
     </div>
