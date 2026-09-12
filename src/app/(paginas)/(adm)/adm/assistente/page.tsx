@@ -137,6 +137,9 @@ export default function AssistentePage() {
               <AnaliseDetalhadaAssistente
                 documentId={state.doc.documentId}
                 onFechar={() => setShowAnalise(false)}
+                onIrParaPagina={(destino) =>
+                  setPaginaAlvo({ ...destino, ts: Date.now() })
+                }
               />
             </ResizablePanel>
           </>

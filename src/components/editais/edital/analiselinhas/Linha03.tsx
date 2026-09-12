@@ -15,6 +15,7 @@ import TaxonommiasResultado from "./TaxonomiasResultado";
 import { EditalArquivo, EditalRelease } from "@/core/edital/Edital";
 import { Edital } from "@/core";
 import { formatarData } from "@/lib/utils";
+import type { DestinoPagina } from "@/lib/utils";
 
 import style from "@/components/css_personalizado/resumoIA.module.css";
 
@@ -28,6 +29,7 @@ interface Props {
   versoes?: EditalRelease[];
   versaoSelecionadaId?: string;
   onMudarVersao?: (id: string) => void;
+  onIrParaPagina?: (destino: DestinoPagina) => void;
 }
 
 function versaoExibida(release: EditalRelease | undefined, index: number): string {
@@ -35,7 +37,7 @@ function versaoExibida(release: EditalRelease | undefined, index: number): strin
   return `1.0.${index}`;
 }
 
-export default function Linha03({ edital, editalInfo, resumoIA, versoes, versaoSelecionadaId, onMudarVersao }: Props) {
+export default function Linha03({ edital, editalInfo, resumoIA, versoes, versaoSelecionadaId, onMudarVersao, onIrParaPagina }: Props) {
   const tipificacoes = edital?.releases?.[0]?.check_tree ?? [];
   const [htmlSeguro, setHtmlSeguro] = useState<string>("");
   const urlBase = process.env.NEXT_PUBLIC_URL_BASE ?? "";
@@ -402,6 +404,7 @@ export default function Linha03({ edital, editalInfo, resumoIA, versoes, versaoS
                               : []
                           }
                           key={tipificacao.id}
+                          onIrParaPagina={onIrParaPagina}
                         />
                       </TabsContent>
                     ))}

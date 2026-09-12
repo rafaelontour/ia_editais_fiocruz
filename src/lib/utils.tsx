@@ -66,6 +66,41 @@ function iconeParaStatusDoEdital(status: StatusEdital): React.ReactNode {
   }
 }
 
+export interface ReferenciaPagina {
+  chunk_id?: string;
+  text_snippet?: string | null;
+  page?: number | null;
+  rects?: Array<{ x1: number; y1: number; x2: number; y2: number }> | null;
+}
+
+export interface DestinoPagina {
+  /** Página em base humana (1 = primeira página) */
+  pagina: number;
+  rects: Array<{ x1: number; y1: number; x2: number; y2: number }>;
+}
+
+export function destinosDasReferencias(
+  refs?: ReferenciaPagina[] | null,
+): DestinoPagina[] {
+  if (!refs?.length) return [];
+  const mapa = new Map<number, DestinoPagina>();
+  for (const ref of refs) {
+    if (typeof ref.page !== "number") continue;
+    const rects = ref.rects ?? [];
+    const temCoords = rects.length > 0;
+    // page é 0-based no back; exibimos/navegamos em base 1.
+    // Referências antigas podem ter page=0 sem rects e ficam sem botão.
+    if (!(ref.page > 0 || temCoords)) continue;
+    const pagina = ref.page + 1;
+    const atual = mapa.get(pagina) ?? { pagina, rects: [] };
+    atual.rects.push(...rects);
+    mapa.set(pagina, atual);
+  }
+  // Mantém a ordem de chegada das referências (relevância),
+  // em vez de reordenar por página.
+  return [...mapa.values()];
+}
+
 export {
   formatarData,
   getStatusColor,

@@ -15,6 +15,7 @@ import type {
 } from "@/service/assistente/assistente";
 import { getContextItemsService } from "@/service/assistente/contextItems";
 import type { ContextItem } from "@/service/assistente/contextItems";
+import { destinosDasReferencias } from "@/lib/utils";
 
 interface Props {
   conversationId: string;
@@ -32,26 +33,6 @@ function limparReferenciasTexto(texto: string): string {
     )
     .replace(/[ \t]{2,}/g, " ")
     .trim();
-}
-
-function destinosDasReferencias(refs?: ChatCitation[]): PdfDestino[] {
-  if (!refs?.length) return [];
-  const mapa = new Map<number, PdfDestino>();
-  for (const ref of refs) {
-    if (typeof ref.page !== "number") continue;
-    const rects = ref.rects ?? [];
-    const temCoords = rects.length > 0;
-    // page é 0-based no back; exibimos/navegamos em base 1.
-    // Docs antigos têm page=0 sem rects e ficam sem botão.
-    if (!(ref.page > 0 || temCoords)) continue;
-    const pagina = ref.page + 1;
-    const atual = mapa.get(pagina) ?? { pagina, rects: [] };
-    atual.rects.push(...rects);
-    mapa.set(pagina, atual);
-  }
-  // Mantém a ordem de chegada das referências (relevância),
-  // em vez de reordenar por página.
-  return [...mapa.values()];
 }
 
 export default function ChatIA({

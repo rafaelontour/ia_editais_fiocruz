@@ -1,10 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Branch } from "@/core/tipificacao/Tipificacao";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DetalhesRamoDialog } from "./DetalhesRamoDialog";
 import { useParams } from "next/navigation";
+import {
+  destinosDasReferencias,
+  type DestinoPagina,
+} from "@/lib/utils";
 
 import style from "@/components/css_personalizado/resumoIA.module.css";
 
@@ -12,9 +16,10 @@ interface Props {
   ramos: Branch[];
   taxonomia: string | undefined;
   docId?: string;
+  onIrParaPagina?: (destino: DestinoPagina) => void;
 }
 
-export default function RamosDaTaxonomiaResultado({ ramos, taxonomia, docId: docIdProp }: Props) {
+export default function RamosDaTaxonomiaResultado({ ramos, taxonomia, docId: docIdProp, onIrParaPagina }: Props) {
   const params = useParams();
   const docId = docIdProp ?? (params.id as string);
 
@@ -152,6 +157,27 @@ export default function RamosDaTaxonomiaResultado({ ramos, taxonomia, docId: doc
                   taxonomia={taxonomia}
                 />
               </div>
+
+              {(() => {
+                const destinos = destinosDasReferencias(ramo.references);
+                if (destinos.length === 0 || !onIrParaPagina) return null;
+                return (
+                  <div className="flex flex-wrap gap-1 px-3 mt-3">
+                    {destinos.map((destino) => (
+                      <button
+                        key={destino.pagina}
+                        type="button"
+                        onClick={() => onIrParaPagina(destino)}
+                        title={`Ver página ${destino.pagina} no documento`}
+                        className="inline-flex items-center gap-1 text-[11px] leading-none px-1.5 py-1 rounded-md border border-zinc-200 bg-white text-zinc-500 hover:text-verde hover:border-verde/50 hover:bg-verde/10 transition-colors cursor-pointer"
+                      >
+                        <FileText className="w-3 h-3" />
+                        Pág. {destino.pagina}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </TabsContent>
         ))}

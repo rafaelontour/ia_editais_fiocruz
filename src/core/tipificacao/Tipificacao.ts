@@ -24,6 +24,13 @@ export interface Taxonomia {
   updated_at?: string | null;
 }
 
+export interface BranchReference {
+  chunk_id?: string;
+  text_snippet?: string | null;
+  page?: number | null;
+  rects?: Array<{ x1: number; y1: number; x2: number; y2: number }> | null;
+}
+
 export interface Branch {
   id: string;
   title?: string;
@@ -33,6 +40,7 @@ export interface Branch {
     fulfilled: boolean;
     score: number;
   };
+  references?: BranchReference[];
   created_at?: string;
   updated_at?: string | undefined;
 }

@@ -3,7 +3,13 @@
 import { InfoIcon, Play, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import AnaliseEdital from "@/components/editais/edital/AnaliseEdital";
+import type { DestinoPagina } from "@/lib/utils";
+const VisualizadorDocumento = dynamic(
+  () => import("@/components/assistente/VisualizadorDocumento"),
+  { ssr: false },
+);
 import {
   ResizableHandle,
   ResizablePanel,
@@ -67,6 +73,9 @@ export default function VisualizarEditalCliente({
     editalArquivo?.releases?.[0]?.id ?? "",
   );
   const router = useRouter();
+  const [paginaAlvo, setPaginaAlvo] = useState<
+    (DestinoPagina & { ts: number }) | null
+  >(null);
 
   const releaseSelecionada: EditalRelease | undefined =
     editalArquivo?.releases?.find((r) => r.id === releaseSelecionadaId) ??
@@ -243,10 +252,11 @@ export default function VisualizarEditalCliente({
       <ResizablePanelGroup direction="horizontal" className="flex gap-6">
         <ResizablePanel minSize={30} defaultSize={50}>
           <div className="flex w-full h-full">
-            <iframe
-              src={urlBase + (releaseSelecionada?.file_path ?? "")}
-              className="h-full border-2 border-gray-300 rounded-md items-center w-full"
-            ></iframe>
+            <VisualizadorDocumento
+              fileDataUrl={urlBase + (releaseSelecionada?.file_path ?? "")}
+              fileName={releaseSelecionada?.file_path ?? "documento.pdf"}
+              paginaAlvo={paginaAlvo}
+            />
           </div>
         </ResizablePanel>
 
@@ -273,6 +283,9 @@ export default function VisualizarEditalCliente({
               versoes={editalArquivo?.releases ?? []}
               versaoSelecionadaId={releaseSelecionada?.id}
               onMudarVersao={setReleaseSelecionadaId}
+              onIrParaPagina={(destino) =>
+                setPaginaAlvo({ ...destino, ts: Date.now() })
+              }
             />
           </div>
         </ResizablePanel>

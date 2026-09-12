@@ -11,13 +11,15 @@ import {
 import { useEffect, useState } from "react";
 import TaxonommiasResultado from "@/components/editais/edital/analiselinhas/TaxonomiasResultado";
 import type { EditalArquivo, EditalTypification } from "@/core/edital/Edital";
+import type { DestinoPagina } from "@/lib/utils";
 
 interface Props {
   documentId: string;
   onFechar: () => void;
+  onIrParaPagina?: (destino: DestinoPagina) => void;
 }
 
-export default function AnaliseDetalhadaAssistente({ documentId, onFechar }: Props) {
+export default function AnaliseDetalhadaAssistente({ documentId, onFechar, onIrParaPagina }: Props) {
   const [checkTree, setCheckTree] = useState<EditalTypification[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
@@ -225,6 +227,7 @@ export default function AnaliseDetalhadaAssistente({ documentId, onFechar }: Pro
                 taxonomias={tipificacaoSelecionada.tipificacao?.taxonomies ?? []}
                 key={tipificacao.id}
                 docId={documentId}
+                onIrParaPagina={onIrParaPagina}
               />
             </TabsContent>
           ))}

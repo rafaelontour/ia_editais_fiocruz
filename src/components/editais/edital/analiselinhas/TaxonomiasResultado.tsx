@@ -4,13 +4,15 @@ import { ChevronLeft, ChevronRight, Link } from "lucide-react";
 import RamosDaTaxonomiaResultado from "./RamosDaTaxonomiaResultado";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import type { DestinoPagina } from "@/lib/utils";
 
 interface Props {
   taxonomias: Taxonomia[] | undefined;
   docId?: string;
+  onIrParaPagina?: (destino: DestinoPagina) => void;
 }
 
-export default function TaxonommiasResultado({ taxonomias, docId }: Props) {
+export default function TaxonommiasResultado({ taxonomias, docId, onIrParaPagina }: Props) {
   const [ultimaTab, setUltimaTab] = useState<boolean>(false);
   const [primeiraTab, setPrimeiraTab] = useState<boolean>(true);
   const [abaSelecionada, setAbaSelecionada] = useState<string>("tabTax0");
@@ -124,6 +126,7 @@ export default function TaxonommiasResultado({ taxonomias, docId }: Props) {
                 key={taxonomia.id}
                 taxonomia={taxonomia.title}
                 docId={docId}
+                onIrParaPagina={onIrParaPagina}
               />
             </TabsContent>
           ))}
