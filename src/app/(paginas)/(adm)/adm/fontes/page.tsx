@@ -6,7 +6,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Loader2, PencilLine } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from '@/components/ui/button';
-import { adicionarFonteService, atualizarFonteService, excluirFonteService, getFontesService } from '@/service/fonte';
+import { adicionarFonteService, atualizarFonteService, enviarArquivoFonteService, excluirFonteService, getFontesService } from '@/service/fonte';
 import type { Fonte } from '@/core/fonte';
 import z from 'zod';
 import { useForm } from 'react-hook-form';
@@ -51,6 +51,8 @@ export default function Fontes() {
     const [openDialogIdEditar, setOpenDialogIdEditar] = useState<string | null>(null);
     const [fontesFiltradas, setFontesFiltradas] = useState<Fonte[]>([]);
     const [carregando, setCarregando] = useState<boolean>(true);
+    const [arquivoFonte, setArquivoFonte] = useState<File | null>(null);
+    const [salvandoFonte, setSalvandoFonte] = useState<boolean>(false);
 
     const termoBusca = useRef<string>("");
 
@@ -79,43 +81,96 @@ export default function Fontes() {
             if (fonteParaEditar) {
                 setValue("nome", fonteParaEditar.name);
                 setValue("descricao", fonteParaEditar.description ?? "");
+                setArquivoFonte(null);
             }
         }
     }, [openDialogIdEditar, fontes, setValue]);
 
+    const limparFormularioFonte = () => {
+        reset();
+        setArquivoFonte(null);
+    }
+
     const adicionarFonte = async (formData: FormDataFonte) => {
         setCarregando(true);
+        setSalvandoFonte(true);
 
-        const resposta = await adicionarFonteService(formData.nome, formData.descricao);
+        const resultado = await adicionarFonteService(formData.nome, formData.descricao);
+        const resposta = resultado?.[0];
+        const idFonte = resultado?.[1];
 
         if (resposta !== 201) {
             toast.error("Erro ao adicionar fonte!")
             setCarregando(false);
+            setSalvandoFonte(false);
             return
         }
 
-        toast.success("Fonte adicionada com sucesso!");
+        if (arquivoFonte) {
+            if (idFonte) {
+                const respostaArquivo = await enviarArquivoFonteService(idFonte, arquivoFonte);
+
+                if (respostaArquivo !== 201) {
+                    toast.error("Fonte adicionada, mas o documento não foi enviado.", {
+                        description: "Abra a edição da fonte para tentar novamente."
+                    });
+                } else {
+                    toast.success("Fonte e documento adicionados com sucesso!");
+                }
+            } else {
+                toast.error("Fonte adicionada, mas o documento não foi enviado.", {
+                    description: "Abra a edição da fonte para tentar novamente."
+                });
+            }
+        } else {
+            toast.success("Fonte adicionada com sucesso!");
+        }
 
         setOpenDialogFontes(false);
-        reset();
+        limparFormularioFonte();
+        setSalvandoFonte(false);
         fetchData();
     }
 
     const atualizarFonte = async (formData: FormDataFonte) => {
+        const idFonte = openDialogIdEditar;
 
-        const resposta = await atualizarFonteService(openDialogIdEditar as string, formData.nome, formData.descricao);
-
-        if (resposta !== 200) {
-            toast.error("Erro ao atualizar fonte")
+        if (!idFonte) {
+            toast.error("Erro ao identificar a fonte para atualização")
             return
         }
 
-        setCarregando(true);
-        toast.success("Fonte atualizada com sucesso!");
+        setSalvandoFonte(true);
 
+        const resposta = await atualizarFonteService(idFonte, formData.nome, formData.descricao);
+
+        if (resposta !== 200) {
+            toast.error("Erro ao atualizar fonte")
+            setSalvandoFonte(false);
+            return
+        }
+
+        if (arquivoFonte) {
+            const respostaArquivo = await enviarArquivoFonteService(idFonte, arquivoFonte);
+
+            if (respostaArquivo !== 201) {
+                toast.error("Dados da fonte atualizados, mas o documento não foi enviado.", {
+                    description: "Selecione o arquivo novamente e tente salvar."
+                });
+                setSalvandoFonte(false);
+                return
+            }
+
+            toast.success("Fonte e documento atualizados com sucesso!");
+        } else {
+            toast.success("Fonte atualizada com sucesso!");
+        }
+
+        setCarregando(true);
         setOpenDialogIdEditar(null);
         setOpenDialogFontes(false)
-        reset();
+        limparFormularioFonte();
+        setSalvandoFonte(false);
         fetchData();
     }
 
@@ -161,7 +216,7 @@ export default function Fontes() {
                             <DialogTrigger asChild>
                                 <Botao texto="Adicionar fonte" />
                             </DialogTrigger>
-                            <DialogContent onCloseAutoFocus={() => reset()}>
+                            <DialogContent onCloseAutoFocus={limparFormularioFonte}>
                                 <DialogHeader>
                                     <DialogTitle className="text-3xl font-bold">
                                         Adicionar fonte à base de dados
@@ -173,12 +228,17 @@ export default function Fontes() {
                                 <Formulario
                                     register={register}
                                     errors={errors}
+                                    arquivo={arquivoFonte}
+                                    onArquivoChange={setArquivoFonte}
                                 />
                                 <DialogFooter>
                                     <DialogClose>
                                         <BotaoCancelar />
                                     </DialogClose>
-                                    <BotaoSalvar onClick={handleSubmit(adicionarFonte)} />
+                                    <BotaoSalvar
+                                        onClick={handleSubmit(adicionarFonte)}
+                                        disabled={salvandoFonte}
+                                    />
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
@@ -233,7 +293,7 @@ export default function Fontes() {
                                                             <PencilLine color="black" />
                                                         </Button>
                                                     </DialogTrigger>
-                                                    <DialogContent onCloseAutoFocus={() => reset()}>
+                                                    <DialogContent onCloseAutoFocus={limparFormularioFonte}>
                                                         <DialogHeader>
                                                             <DialogTitle className="text-3xl font-bold">
                                                                 Atualizar fonte
@@ -245,12 +305,17 @@ export default function Fontes() {
                                                         <Formulario
                                                             register={register}
                                                             errors={errors}
+                                                            arquivo={arquivoFonte}
+                                                            onArquivoChange={setArquivoFonte}
                                                         />
                                                         <DialogFooter>
                                                             <DialogClose>
                                                                 <BotaoCancelar />
                                                             </DialogClose>
-                                                            <BotaoSalvar onClick={handleSubmit(atualizarFonte)} />
+                                                            <BotaoSalvar
+                                                                onClick={handleSubmit(atualizarFonte)}
+                                                                disabled={salvandoFonte}
+                                                            />
                                                         </DialogFooter>
                                                     </DialogContent>
                                                 </Dialog>

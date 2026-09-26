@@ -7,9 +7,11 @@ import RotuloOpcional from "@/components/RotuloOpcional";
 interface FormularioFonteProps {
     register: any;
     errors: any;
+    arquivo: File | null;
+    onArquivoChange: (arquivo: File | null) => void;
 }
 
-export default function Formulario({ register, errors }: FormularioFonteProps) {
+export default function Formulario({ register, errors, arquivo, onArquivoChange }: FormularioFonteProps) {
 
     return (
         <form className="flex text-lg flex-col gap-4">
@@ -54,7 +56,14 @@ export default function Formulario({ register, errors }: FormularioFonteProps) {
                 <RotuloOpcional />
             </p>
 
-            <FileUpload />
+            <FileUpload
+                value={arquivo}
+                onChange={(files) => onArquivoChange(files[0] ?? null)}
+            />
+
+            <span className="text-sm text-gray-500 italic">
+                O documento é opcional. Se a fonte já tiver um arquivo, ele será mantido enquanto nenhum novo arquivo for selecionado.
+            </span>
         </form>
     );
 }

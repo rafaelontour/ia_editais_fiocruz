@@ -21,7 +21,7 @@ async function getFontesService(): Promise<Fonte[] | undefined> {
     }
 }
 
-async function adicionarFonteService(nome: string, descricao: string): Promise<number | undefined> {
+async function adicionarFonteService(nome: string, descricao: string): Promise<[number, string] | undefined> {
     try {
         const url = `${urlBase}/source`
         const resposta = await fetch(`${url}`, {
@@ -36,7 +36,9 @@ async function adicionarFonteService(nome: string, descricao: string): Promise<n
             })
         });
 
-        return resposta.status
+        const json = await resposta.json().catch(() => ({}));
+
+        return [resposta.status, json.id ?? '']
     } catch (error) {
         console.error('Erro ao adicionar fonte:', error);
     }
@@ -80,9 +82,27 @@ async function excluirFonteService(id: string): Promise<number | undefined> {
     }
 }
 
+async function enviarArquivoFonteService(id: string, arquivo: File): Promise<number | undefined> {
+    try {
+        const formData = new FormData();
+        formData.append('file', arquivo);
+
+        const resposta = await fetch(`${urlBase}/source/${id}/upload`, {
+            method: 'POST',
+            credentials: "include",
+            body: formData
+        });
+
+        return resposta.status
+    } catch (error) {
+        console.error('Erro ao enviar arquivo da fonte:', error);
+    }
+}
+
 export {
     getFontesService,
     adicionarFonteService,
     atualizarFonteService,
-    excluirFonteService
+    excluirFonteService,
+    enviarArquivoFonteService
 }
