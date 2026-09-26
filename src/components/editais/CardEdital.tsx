@@ -16,7 +16,6 @@ import {
   Clock,
   ExternalLink,
   Trash,
-  View,
 } from "lucide-react";
 import {
   Dialog,
@@ -633,29 +632,16 @@ export default function CardEdital({
             <>
               <div className="self-end flex gap-2">
                 <div className="flex gap-2 absolute bottom-3 right-3">
-                  {currentStatus !== "COMPLETED" && (
-                    <Link href={`/adm/editais/${edital.id}`}>
-                      <Button
-                        title="Visualizar documento"
-                        variant={"outline"}
-                        size={"icon"}
-                        className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5"
-                      >
-                        <Bot />
-                      </Button>
-                    </Link>
-                  )}
-
-                  {currentStatus === "COMPLETED" && (
+                  <Link href={`/adm/editais/${edital.id}`}>
                     <Button
-                      title="Visualizar edital"
+                      title="Visualizar documento"
                       variant={"outline"}
                       size={"icon"}
                       className="h-6 w-6 border-gray-300 hover:cursor-pointer transition-all rounded-sm p-3.5"
                     >
-                      <View />
+                      <Bot />
                     </Button>
-                  )}
+                  </Link>
 
                   {usuario && (
                     <div
