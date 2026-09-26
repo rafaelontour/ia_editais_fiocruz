@@ -307,6 +307,8 @@ export default function Fontes() {
                                                             errors={errors}
                                                             arquivo={arquivoFonte}
                                                             onArquivoChange={setArquivoFonte}
+                                                            filePath={fonte.file_path}
+                                                            fonteName={fonte.name}
                                                         />
                                                         <DialogFooter>
                                                             <DialogClose>
