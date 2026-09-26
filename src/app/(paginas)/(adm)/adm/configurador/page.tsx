@@ -31,6 +31,7 @@ import {
   DocumentGroup,
   DocumentGroupItem,
 } from "@/core/configurador/GrupoDocumento";
+import { escolherArquivoImagem, urlImagem } from "@/lib/imagem";
 import {
    getDocumentGroupsService,
    adicionarGrupoDocumentoService,
@@ -40,6 +41,8 @@ import {
    adicionarDocumentoConfiguravelService,
    atualizarDocumentoConfiguravelService,
    excluirDocumentoConfiguravelService,
+   enviarImagemDocumentoConfiguravelService,
+   removerImagemDocumentoConfiguravelService,
  } from "@/service/configurador";
 
 export default function ConfiguradorPage() {
@@ -52,7 +55,12 @@ export default function ConfiguradorPage() {
   const [documentDialogAberto, setDocumentDialogAberto] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [newDocumentoNome, setNewDocumentoNome] = useState("");
-  const [newDocumentoImagem, setNewDocumentoImagem] = useState<string>("");
+  const [newDocumentoArquivo, setNewDocumentoArquivo] = useState<File | null>(
+    null,
+  );
+  const [newDocumentoPrevia, setNewDocumentoPrevia] = useState<string | null>(
+    null,
+  );
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {},
   );
@@ -62,10 +70,19 @@ export default function ConfiguradorPage() {
   const [editDialogAberto, setEditDialogAberto] = useState(false);
   const [editItem, setEditItem] = useState<DocumentGroupItem | null>(null);
   const [editDocumentoNome, setEditDocumentoNome] = useState("");
-  const [editDocumentoImagem, setEditDocumentoImagem] = useState<string>("");
+  const [editDocumentoArquivo, setEditDocumentoArquivo] = useState<File | null>(
+    null,
+  );
+  const [editDocumentoPrevia, setEditDocumentoPrevia] = useState<string | null>(
+    null,
+  );
+  const [editImagemRemovida, setEditImagemRemovida] = useState(false);
   const [editGroupDialogAberto, setEditGroupDialogAberto] = useState(false);
   const [editGroupId, setEditGroupId] = useState<string | null>(null);
   const [editGroupName, setEditGroupName] = useState("");
+
+  const imagemAtualDoItem =
+    editDocumentoPrevia ?? (editImagemRemovida ? null : urlImagem(editItem?.icon_path));
 
   const breakpointColumnsObj = { default: 3, 1500: 3, 1000: 2, 700: 1 };
 
@@ -134,6 +151,8 @@ export default function ConfiguradorPage() {
   const abrirModalDocumento = (groupId: string) => {
     setSelectedGroupId(groupId);
     setNewDocumentoNome("");
+    setNewDocumentoArquivo(null);
+    setNewDocumentoPrevia(null);
     setDocumentDialogAberto(true);
   };
 
@@ -141,7 +160,16 @@ export default function ConfiguradorPage() {
     setDocumentDialogAberto(false);
     setSelectedGroupId(null);
     setNewDocumentoNome("");
-    setNewDocumentoImagem("");
+    setNewDocumentoArquivo(null);
+    setNewDocumentoPrevia(null);
+  };
+
+  const selecionarNovaImagem = (arquivo: File) => {
+    setNewDocumentoPrevia((previa) => {
+      if (previa) URL.revokeObjectURL(previa);
+      return URL.createObjectURL(arquivo);
+    });
+    setNewDocumentoArquivo(arquivo);
   };
 
   const adicionarDocumentoAoGrupo = async () => {
@@ -159,19 +187,35 @@ export default function ConfiguradorPage() {
         return;
       }
 
-      const [status] = await adicionarDocumentoConfiguravelService(
+      const [status, itemId] = await adicionarDocumentoConfiguravelService(
         selectedGroupId,
         name,
-        newDocumentoImagem || undefined,
       );
       if (status !== 201) {
         toast.error("Erro ao adicionar documento no grupo.");
         return;
       }
 
-      toast.success("Documento adicionado ao grupo.");
+      let imagemOk = true;
+      if (newDocumentoArquivo && itemId) {
+        imagemOk =
+          (await enviarImagemDocumentoConfiguravelService(
+            itemId,
+            newDocumentoArquivo,
+          )) === 200;
+      }
+
+      if (imagemOk) {
+        toast.success("Documento adicionado ao grupo.");
+      } else {
+        toast.error(
+          "Documento adicionado, mas a imagem não pôde ser enviada.",
+        );
+      }
+
       setNewDocumentoNome("");
-      setNewDocumentoImagem("");
+      setNewDocumentoArquivo(null);
+      setNewDocumentoPrevia(null);
       setDocumentDialogAberto(false);
       const items = await getDocumentGroupItemsService(selectedGroupId);
       setItemsByGroup((m) => ({ ...m, [selectedGroupId]: items ?? [] }));
@@ -221,15 +265,40 @@ export default function ConfiguradorPage() {
   const abrirModalEditarDocumento = (item: DocumentGroupItem) => {
     setEditItem(item);
     setEditDocumentoNome(item.name);
-    setEditDocumentoImagem(item.icon_path ?? "");
+    setEditDocumentoArquivo(null);
+    setEditDocumentoPrevia(null);
+    setEditImagemRemovida(false);
     setEditDialogAberto(true);
   };
 
   const fecharModalEditarDocumento = () => {
+    setEditDocumentoPrevia((previa) => {
+      if (previa) URL.revokeObjectURL(previa);
+      return null;
+    });
     setEditDialogAberto(false);
     setEditItem(null);
     setEditDocumentoNome("");
-    setEditDocumentoImagem("");
+    setEditDocumentoArquivo(null);
+    setEditImagemRemovida(false);
+  };
+
+  const selecionarImagemEdicao = (arquivo: File) => {
+    setEditDocumentoPrevia((previa) => {
+      if (previa) URL.revokeObjectURL(previa);
+      return URL.createObjectURL(arquivo);
+    });
+    setEditDocumentoArquivo(arquivo);
+    setEditImagemRemovida(false);
+  };
+
+  const descartarImagemEdicao = () => {
+    setEditDocumentoPrevia((previa) => {
+      if (previa) URL.revokeObjectURL(previa);
+      return null;
+    });
+    setEditDocumentoArquivo(null);
+    if (editItem?.icon_path) setEditImagemRemovida(true);
   };
 
   const atualizarDocumentoNoGrupo = async () => {
@@ -250,17 +319,35 @@ export default function ConfiguradorPage() {
       const status = await atualizarDocumentoConfiguravelService(
         editItem.id,
         name,
-        editDocumentoImagem || undefined,
       );
       if (status !== 200) {
         toast.error("Erro ao atualizar documento.");
         return;
       }
 
-      toast.success("Documento atualizado.");
+      let imagemOk = true;
+      if (editDocumentoArquivo) {
+        imagemOk =
+          (await enviarImagemDocumentoConfiguravelService(
+            editItem.id,
+            editDocumentoArquivo,
+          )) === 200;
+      } else if (editImagemRemovida) {
+        imagemOk =
+          (await removerImagemDocumentoConfiguravelService(editItem.id)) ===
+          204;
+      }
+
+      if (imagemOk) {
+        toast.success("Documento atualizado.");
+      } else {
+        toast.error("Documento atualizado, mas a imagem não pôde ser alterada.");
+      }
+
+      const groupId = editItem.group_id;
       fecharModalEditarDocumento();
-      const items = await getDocumentGroupItemsService(editItem.group_id);
-      setItemsByGroup((m) => ({ ...m, [editItem.group_id]: items ?? [] }));
+      const items = await getDocumentGroupItemsService(groupId);
+      setItemsByGroup((m) => ({ ...m, [groupId]: items ?? [] }));
     } finally {
       setCarregando(false);
     }
@@ -358,11 +445,7 @@ export default function ConfiguradorPage() {
         open={documentDialogAberto}
         onOpenChange={(open) => {
           setDocumentDialogAberto(open);
-          if (!open) {
-            setSelectedGroupId(null);
-            setNewDocumentoNome("");
-            setNewDocumentoImagem("");
-          }
+          if (!open) fecharModalDocumento();
         }}
       >
         <DialogContent>
@@ -392,42 +475,33 @@ export default function ConfiguradorPage() {
                   type="button"
                   variant="outline"
                   className="relative cursor-pointer"
-                  onClick={() => {
-                    const input = document.createElement("input");
-                    input.type = "file";
-                    input.accept = "image/*";
-                    input.onchange = (e) => {
-                      const file = (e.target as HTMLInputElement).files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = (ev) => {
-                        setNewDocumentoImagem(ev.target?.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                    };
-                    input.click();
-                  }}
+                  onClick={() => escolherArquivoImagem(selecionarNovaImagem)}
                 >
                   <ImageIcon size={16} className="mr-1" />
                   Escolher imagem
                 </Button>
 
-                {newDocumentoImagem && (
+                {newDocumentoPrevia && (
                   <Button
                     type="button"
                     variant="ghost"
                     className="text-red-500 cursor-pointer"
-                    onClick={() => setNewDocumentoImagem("")}
+                    title="Remover imagem"
+                    onClick={() => {
+                      URL.revokeObjectURL(newDocumentoPrevia);
+                      setNewDocumentoPrevia(null);
+                      setNewDocumentoArquivo(null);
+                    }}
                   >
                     <X size={16} />
                   </Button>
                 )}
               </div>
 
-              {newDocumentoImagem && (
+              {newDocumentoPrevia && (
                 <div className="relative mt-2 inline-block">
                   <img
-                    src={newDocumentoImagem}
+                    src={newDocumentoPrevia}
                     alt="Preview"
                     className="h-20 w-20 object-cover rounded border"
                   />
@@ -538,42 +612,29 @@ export default function ConfiguradorPage() {
                   type="button"
                   variant="outline"
                   className="relative cursor-pointer"
-                  onClick={() => {
-                    const input = document.createElement("input");
-                    input.type = "file";
-                    input.accept = "image/*";
-                    input.onchange = (e) => {
-                      const file = (e.target as HTMLInputElement).files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = (ev) => {
-                        setEditDocumentoImagem(ev.target?.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                    };
-                    input.click();
-                  }}
+                  onClick={() => escolherArquivoImagem(selecionarImagemEdicao)}
                 >
                   <ImageIcon size={16} className="mr-1" />
-                  {editDocumentoImagem ? "Trocar imagem" : "Escolher imagem"}
+                  {imagemAtualDoItem ? "Trocar imagem" : "Escolher imagem"}
                 </Button>
 
-                {editDocumentoImagem && (
+                {imagemAtualDoItem && (
                   <Button
                     type="button"
                     variant="ghost"
                     className="text-red-500 cursor-pointer"
-                    onClick={() => setEditDocumentoImagem("")}
+                    title="Remover imagem"
+                    onClick={descartarImagemEdicao}
                   >
                     <X size={16} />
                   </Button>
                 )}
               </div>
 
-              {editDocumentoImagem && (
+              {imagemAtualDoItem && (
                 <div className="relative mt-2 inline-block">
                   <img
-                    src={editDocumentoImagem}
+                    src={imagemAtualDoItem}
                     alt="Preview"
                     className="h-20 w-20 object-cover rounded border"
                   />
@@ -636,14 +697,14 @@ export default function ConfiguradorPage() {
                           className="flex items-center justify-between gap-2"
                         >
                           <div className="flex items-center gap-2 min-w-0">
-                            {item.icon_path && (
+                            {urlImagem(item.icon_path) && (
                               <img
-                                src={item.icon_path}
+                                src={urlImagem(item.icon_path) ?? ""}
                                 alt=""
                                 className="h-6 w-6 rounded object-cover cursor-pointer flex-shrink-0 hover:opacity-80"
                                 title="Clique para ampliar"
                                 onClick={() =>
-                                  setExpandedImage(item.icon_path ?? null)
+                                  setExpandedImage(urlImagem(item.icon_path))
                                 }
                               />
                             )}

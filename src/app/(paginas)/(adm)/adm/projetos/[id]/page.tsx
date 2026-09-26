@@ -29,6 +29,7 @@ import { adicionarEditalService, getEditalPorProjectDocumentIdService } from "@/
 import { enviarArquivoService, reenviarArquivoService } from "@/service/editalArquivo";
 import { getDocumentGroupItemsService, getDocumentGroupsService } from "@/service/configurador";
 import { getUsuariosPorUnidade } from "@/service/usuario";
+import { urlImagem } from "@/lib/imagem";
 import AdicionarDocumentoProjeto from "@/components/projetos/AdicionarDocumentoProjeto";
 
 import useEditalProc from "@/data/hooks/useProcEdital";
@@ -416,13 +417,15 @@ export default function ProjetoInternoPage() {
               >
                 <td className="p-2">
                   <div className="flex items-center gap-2">
-                    {groupItem.icon_path && (
+                    {urlImagem(groupItem.icon_path) && (
                       <img
-                        src={groupItem.icon_path}
+                        src={urlImagem(groupItem.icon_path) ?? ""}
                         alt=""
                         className="h-6 w-6 rounded object-cover cursor-pointer flex-shrink-0 hover:opacity-80"
                         title="Clique para ampliar"
-                        onClick={() => setExpandedImage(groupItem.icon_path ?? null)}
+                        onClick={() =>
+                          setExpandedImage(urlImagem(groupItem.icon_path))
+                        }
                       />
                     )}
                     <span>{groupItem.name}</span>

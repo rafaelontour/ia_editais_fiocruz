@@ -124,14 +124,13 @@ export async function getAllDocumentGroupItemsService(): Promise<
 export async function adicionarDocumentoConfiguravelService(
   groupId: string,
   name: string,
-  icon_path?: string,
 ): Promise<[number, string]> {
   try {
     const res = await fetch(`${urlBase}/document-group/${groupId}/item`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, icon_path }),
+      body: JSON.stringify({ name }),
     });
 
     const json = await res.json();
@@ -144,14 +143,49 @@ export async function adicionarDocumentoConfiguravelService(
 export async function atualizarDocumentoConfiguravelService(
   itemId: string,
   name: string,
-  icon_path?: string,
 ): Promise<number> {
   try {
     const res = await fetch(`${urlBase}/document-group/item`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: itemId, name, icon_path }),
+      body: JSON.stringify({ id: itemId, name }),
+    });
+
+    return res.status;
+  } catch {
+    return 500;
+  }
+}
+
+export async function enviarImagemDocumentoConfiguravelService(
+  itemId: string,
+  imagem: File,
+): Promise<number> {
+  try {
+    const dados = new FormData();
+    dados.append("file", imagem);
+
+    const res = await fetch(`${urlBase}/document-group/item/${itemId}/icon`, {
+      method: "POST",
+      credentials: "include",
+      body: dados,
+    });
+
+    return res.status;
+  } catch {
+    return 500;
+  }
+}
+
+export async function removerImagemDocumentoConfiguravelService(
+  itemId: string,
+): Promise<number> {
+  try {
+    const res = await fetch(`${urlBase}/document-group/item/${itemId}/icon`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
     });
 
     return res.status;

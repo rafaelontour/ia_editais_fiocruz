@@ -11,6 +11,7 @@ import { Unidade } from "@/core/unidade";
 import { UsuarioUnidade } from "@/core/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 import { formatarData } from "@/lib/utils";
+import { comprimirImagem } from "@/lib/imagem";
 import { getUnidadePorId } from "@/service/unidade";
 import { adicionarFotoPerfilService, atualizarInfoUsuarioService, excluirFotoDePerfilService, trocarSenhaService, validarNumeroWhatsappService } from "@/service/usuario";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -191,11 +192,12 @@ export default function MeuPerfil() {
 
     setAdicionouImagemPerfil(true);
 
-    if (!e.target.files) return;
-    setImagem(e.target.files?.[0]);
     const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
 
-    setPreviaImagem(URL.createObjectURL(arquivo));
+    const comprimida = await comprimirImagem(arquivo, 320);
+    setImagem(comprimida);
+    setPreviaImagem(URL.createObjectURL(comprimida));
   }
 
   async function adicionarFotoDePerfil() {
