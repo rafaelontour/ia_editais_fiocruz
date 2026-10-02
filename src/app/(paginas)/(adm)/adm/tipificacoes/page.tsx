@@ -134,10 +134,13 @@ export default function Tipificacoes() {
         grupoDocumentoSelecionado,
       );
       setDocumentGroupItems(items ?? []);
-      setValue("tipoDocumento", (atual) => {
-        const idAtual = typeof atual === "string" ? atual : "";
-        return items?.some((i) => i.id === idAtual) ? idAtual : "";
-      });
+      const currentTipo = watch("tipoDocumento");
+      const idAtual = typeof currentTipo === "string" ? currentTipo : "";
+      if (idAtual && items?.some((i) => i.id === idAtual)) {
+        setValue("tipoDocumento", idAtual);
+      } else {
+        setValue("tipoDocumento", "");
+      }
     }
 
     carregarItensDoGrupo();
