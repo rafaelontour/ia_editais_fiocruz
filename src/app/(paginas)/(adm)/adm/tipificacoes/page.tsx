@@ -134,7 +134,10 @@ export default function Tipificacoes() {
         grupoDocumentoSelecionado,
       );
       setDocumentGroupItems(items ?? []);
-      setValue("tipoDocumento", "");
+      setValue("tipoDocumento", (atual) => {
+        const idAtual = typeof atual === "string" ? atual : "";
+        return items?.some((i) => i.id === idAtual) ? idAtual : "";
+      });
     }
 
     carregarItensDoGrupo();
@@ -578,36 +581,97 @@ export default function Tipificacoes() {
                         </Link>
                       ) : (
                         <>
-                          <Link
-                            href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}
-                          >
-                            <Button
-                              className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco cursor-pointer"
-                              title="Taxonomias desta tipificação"
-                            >
-                              <IconHierarchy2 size={20} color="black" />
-                            </Button>
-                          </Link>
+                           <Link
+                             href={`/adm/tipificacoes/${tipificacao.id}/taxonomias`}
+                           >
+                             <Button
+                               className="h-8 w-8 rounded-sm border border-gray-300 bg-branco hover:bg-branco cursor-pointer"
+                               title="Taxonomias desta tipificação"
+                             >
+                               <IconHierarchy2 size={20} color="black" />
+                             </Button>
+                           </Link>
 
-                          <BotaoExcluir
-                            funcExcluir={excluirTipificacao}
-                            item={tipificacao}
-                            tipo="tipificação"
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </Div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-400 text-2xl text-center py-10 animate-pulse">
-              Nenhuma tipificação encontrada.
-            </p>
-          )}
-        </Masonry>
-      </div>
-    </div>
-  );
-}
+                           <Dialog
+                             open={idDialogEditar === tipificacao.id}
+                             onOpenChange={(open) =>
+                               setIdDialogEditar(open ? tipificacao.id : null)
+                             }
+                           >
+                             <DialogTrigger asChild>
+                               <Button
+                                 onClick={() => {
+                                   const idsFontes = tipificacao.sources?.map(
+                                     (f: Fonte) => f.id,
+                                   );
+                                   const fontesDaTipificacao =
+                                     filtrarPraEdicao(idsFontes);
+                                   setFontesSelecionadas(fontesDaTipificacao);
+                                   setValue(
+                                     "fontesSelecionadas",
+                                     fontesDaTipificacao.map((f) => f.id),
+                                   );
+                                 }}
+                                 title="Editar tipificação"
+                                 className="h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300 bg-branco hover:bg-branco"
+                                 size={"icon"}
+                               >
+                                 <PencilLine color="black" />
+                               </Button>
+                             </DialogTrigger>
+
+                             <DialogContent onCloseAutoFocus={limparCampos}>
+                               <DialogHeader>
+                                 <DialogTitle className="text-3xl font-bold">
+                                   Editar tipificação
+                                 </DialogTitle>
+                                 <DialogDescription className="text-md pb-4">
+                                   Atualize os dados da tipificação selecionada
+                                 </DialogDescription>
+                               </DialogHeader>
+
+                               <Formulario
+                                 fontes={fontes}
+                                 fontesSelecionadas={fontesSelecionadas}
+                                 setFontesSelecionadas={setFontesSelecionadas}
+                                 control={control}
+                                 setValue={setValue}
+                                 register={register}
+                                 errors={errors}
+                                 documentGroups={documentGroups}
+                                 documentGroupItems={documentGroupItems}
+                               />
+
+                               <DialogFooter>
+                                 <DialogClose>
+                                   <BotaoCancelar />
+                                 </DialogClose>
+                                 <BotaoSalvar
+                                   onClick={handleSubmit(atualizarTipificacao)}
+                                 />
+                               </DialogFooter>
+                             </DialogContent>
+                           </Dialog>
+
+                           <BotaoExcluir
+                             funcExcluir={excluirTipificacao}
+                             item={tipificacao}
+                             tipo="tipificação"
+                           />
+                         </>
+                       )}
+                     </div>
+                   </div>
+                 </Div>
+               </div>
+             ))
+           ) : (
+             <p className="text-gray-400 text-2xl text-center py-10 animate-pulse">
+               Nenhuma tipificação encontrada.
+             </p>
+           )}
+         </Masonry>
+       </div>
+     </div>
+   );
+ }
