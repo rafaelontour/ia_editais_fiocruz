@@ -402,12 +402,7 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
           {currentStep === 2 && (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <Label className="text-sm font-medium">
-                  Responsável
-                  <span className="ml-2 text-xs font-normal text-gray-400">
-                    (definido automaticamente)
-                  </span>
-                </Label>
+                <Label className="text-sm font-medium">Responsável</Label>
                 <Controller
                   name="responsavel"
                   control={control}
