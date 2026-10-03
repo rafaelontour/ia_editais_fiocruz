@@ -24,7 +24,6 @@ import { getTipificacoesService } from "@/service/tipificacao";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getDocumentGroupsService, getDocumentGroupItemsService } from "@/service/configurador";
 import type { DocumentGroup, DocumentGroupItem } from "@/core/configurador/GrupoDocumento";
-import { getUsuariosPorUnidade } from "@/service/usuario";
 import useUsuario from "@/data/hooks/useUsuario";
 
 const schemaDocumento = z.object({
@@ -79,7 +78,6 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   const [gruposDocumento, setGruposDocumento] = useState<DocumentGroup[]>([]);
   const [itensDocumento, setItensDocumento] = useState<DocumentGroupItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [usuarios, setUsuarios] = useState<any[]>([]);
   const { usuario: currentUser } = useUsuario();
 
   const grupoSelecionado = watch("grupoDocumentoId");
@@ -175,12 +173,10 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
   }, []);
 
   useEffect(() => {
-    if (currentUser?.unit_id) {
-      getUsuariosPorUnidade(currentUser.unit_id).then((u) =>
-        setUsuarios(u ?? []),
-      );
+    if (currentUser?.id) {
+      setValue("responsavel", currentUser.id);
     }
-  }, [currentUser?.unit_id]);
+  }, [currentUser?.id, setValue]);
 
   useEffect(() => {
     if (grupoSelecionado) {
@@ -236,12 +232,15 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
         tipo_documento: item?.name ?? "",
         projeto_nome: "",
         typification_ids: data.tipificacoes,
-        editors_ids: data.responsavel ? [data.responsavel] : [],
+        editors_ids: data.responsavel ?? currentUser?.id ? [data.responsavel ?? currentUser?.id] : [],
         arquivo,
       });
 
       toast.success("Documento enviado com sucesso!");
       reset();
+      if (currentUser?.id) {
+        setValue("responsavel", currentUser.id);
+      }
       setTipificacoesSelecionadas([]);
       setCurrentStep(1);
 
@@ -403,29 +402,32 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
           {currentStep === 2 && (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <Label className="text-sm font-medium">Responsável</Label>
+                <Label className="text-sm font-medium">
+                  Responsável
+                  <span className="ml-2 text-xs font-normal text-gray-400">
+                    (definido automaticamente)
+                  </span>
+                </Label>
                 <Controller
                   name="responsavel"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione o responsável" />
+                    <Select value={field.value} onValueChange={field.onChange} disabled>
+                      <SelectTrigger
+                        disabled
+                        className="w-full bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
+                        title="O responsável é definido automaticamente como o usuário logado"
+                      >
+                        <SelectValue placeholder="Usuário logado" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Responsáveis</SelectLabel>
-                          {usuarios.length > 0
-                            ? usuarios.map((u: any) => (
-                                <SelectItem key={u.id} value={u.id}>
-                                  {u.username}
-                                </SelectItem>
-                              ))
-                            : currentUser && (
-                                <SelectItem value={currentUser.id ?? ""}>
-                                  {currentUser.username}
-                                </SelectItem>
-                              )}
+                          {currentUser?.id && (
+                            <SelectItem value={currentUser.id}>
+                              {currentUser.username}
+                            </SelectItem>
+                          )}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -436,6 +438,9 @@ export default function FormularioUpload({ onDocumentoCriado, onCancelar }: Prop
                     {errors.responsavel.message}
                   </span>
                 )}
+                <span className="text-xs text-gray-400 italic">
+                  A conversa será vinculada a você automaticamente.
+                </span>
               </div>
 
               <div className="flex flex-col gap-2">
