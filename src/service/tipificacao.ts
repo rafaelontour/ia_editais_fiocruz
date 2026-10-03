@@ -134,10 +134,37 @@ async function atualizarTipificacaoService(
   }
 }
 
+async function clonarTipificacaoService(
+  id: string,
+  nome?: string,
+): Promise<{ status: number; clone: Tipificacao | null }> {
+  const url = `${urlBase}/typification/${id}/clone`;
+
+  try {
+    const dados = await fetch(url, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ name: nome ?? null }),
+    });
+
+    if (dados.status !== 201) {
+      return { status: dados.status, clone: null };
+    }
+
+    return { status: dados.status, clone: await dados.json() };
+  } catch (error) {
+    return { status: 0, clone: null };
+  }
+}
+
 export {
   getTipificacoesService,
   getTipificacaoPorIdService,
   adicionarTipificacaoService,
   atualizarTipificacaoService,
   excluirTipificacaoService,
+  clonarTipificacaoService,
 };

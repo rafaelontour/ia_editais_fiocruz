@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Fonte, Tipificacao } from "@/core";
 import { getFontesService } from "@/service/fonte";
 import {
@@ -20,6 +21,7 @@ import {
   adicionarTipificacaoService,
   excluirTipificacaoService,
   atualizarTipificacaoService,
+  clonarTipificacaoService,
 } from "@/service/tipificacao";
 import {
   DocumentGroup,
@@ -31,7 +33,14 @@ import {
   getAllDocumentGroupItemsService,
 } from "@/service/configurador";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, Loader2, PencilLine, Plus, View } from "lucide-react";
+import {
+  Calendar,
+  Loader2,
+  PencilLine,
+  Plus,
+  View,
+  Copy,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
@@ -94,6 +103,8 @@ export default function Tipificacoes() {
 
   const [dialogTipificacao, setDialogTipificacao] = useState(false);
   const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
+  const [idDialogClonar, setIdDialogClonar] = useState<string | null>(null);
+  const [nomeClone, setNomeClone] = useState<string>("");
 
   const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
 
@@ -300,6 +311,28 @@ export default function Tipificacoes() {
     await getTipificacoes();
     limparCampos();
     setIdDialogEditar(null);
+  };
+
+  const clonarTipificacao = async (id: string) => {
+    setCarregandoTipificacoes(true);
+
+    const nome = nomeClone.trim();
+    const { status, clone } = await clonarTipificacaoService(
+      id,
+      nome.length > 0 ? nome : undefined,
+    );
+
+    if (status !== 201 || !clone) {
+      toast.error("Erro ao duplicar tipificação");
+      setCarregandoTipificacoes(false);
+      return;
+    }
+
+    toast.success(`Tipificação "${clone.name}" criada com sucesso!`);
+
+    setIdDialogClonar(null);
+    setNomeClone("");
+    await getTipificacoes();
   };
 
   const excluirTipificacao = async (id: string) => {
@@ -656,11 +689,76 @@ export default function Tipificacoes() {
                              </DialogContent>
                            </Dialog>
 
-                           <BotaoExcluir
-                             funcExcluir={excluirTipificacao}
-                             item={tipificacao}
-                             tipo="tipificação"
-                           />
+<Dialog
+                            open={idDialogClonar === tipificacao.id}
+                            onOpenChange={(open) => {
+                              setIdDialogClonar(open ? tipificacao.id : null);
+                              if (!open) {
+                                setNomeClone("");
+                              }
+                            }}
+                          >
+                            <DialogTrigger asChild>
+                              <Button
+                                onClick={() =>
+                                  setNomeClone(
+                                    `Cópia de ${tipificacao.name ?? ""}`,
+                                  )
+                                }
+                                title="Duplicar tipificação"
+                                className="h-8 w-8 hover:cursor-pointer rounded-sm border border-gray-300 bg-branco hover:bg-branco"
+                                size={"icon"}
+                              >
+                                <Copy color="black" />
+                              </Button>
+                            </DialogTrigger>
+
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle className="text-3xl font-bold">
+                                  Duplicar tipificação
+                                </DialogTitle>
+                                <DialogDescription className="text-md pb-4">
+                                  Será criada uma cópia de{" "}
+                                  <strong>{tipificacao.name}</strong> com todas as
+                                  taxonomias e ramos. Edite a cópia para manter a
+                                  original intacta.
+                                </DialogDescription>
+                              </DialogHeader>
+
+                              <div className="flex flex-col gap-2">
+                                <label
+                                  htmlFor="nome-clone-tipificacao"
+                                  className="text-sm font-medium"
+                                >
+                                  Nome da cópia
+                                </label>
+                                <Input
+                                  id="nome-clone-tipificacao"
+                                  data-cy="input-nome-clone-tipificacao"
+                                  value={nomeClone}
+                                  onChange={(e) => setNomeClone(e.target.value)}
+                                  placeholder="Cópia de ..."
+                                />
+                              </div>
+
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <BotaoCancelar />
+                                </DialogClose>
+                                <BotaoSalvar
+                                  onClick={() => clonarTipificacao(tipificacao.id)}
+                                  rotulo="Duplicar"
+                                />
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+
+                          <BotaoExcluir
+                            funcExcluir={excluirTipificacao}
+                            item={tipificacao}
+                            tipo="tipificação"
+                          />
                          </>
                        )}
                      </div>
