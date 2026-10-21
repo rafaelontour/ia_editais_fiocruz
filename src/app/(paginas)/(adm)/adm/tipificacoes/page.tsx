@@ -31,7 +31,7 @@ import {
   getAllDocumentGroupItemsService,
 } from "@/service/configurador";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, Loader2, PencilLine, Plus, View } from "lucide-react";
+import { Calendar, FileUp, Loader2, PencilLine, Plus, View } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
@@ -46,6 +46,7 @@ import { useForm } from "react-hook-form";
 import { IconDownload, IconHierarchy2 } from "@tabler/icons-react";
 import Div from "@/components/Div";
 import useUsuario from "@/data/hooks/useUsuario";
+import GerarTipificacaoDialog from "@/components/sugestao/GerarTipificacaoDialog";
 
 const schemaTipificacao = z.object({
   nome: z.string().min(1, "O nome da tipificação é obrigatório"),
@@ -93,6 +94,7 @@ export default function Tipificacoes() {
   >([]);
 
   const [dialogTipificacao, setDialogTipificacao] = useState(false);
+  const [dialogSugestao, setDialogSugestao] = useState(false);
   const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
 
   const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
@@ -363,6 +365,23 @@ export default function Tipificacoes() {
               >
                 <span>Baixar todas tipificações</span>
                 <IconDownload size={18} />
+              </Button>
+            )}
+
+            {usuario?.access_level === "ADMIN" && (
+              <Button
+                onClick={() => setDialogSugestao(true)}
+                variant={"outline"}
+                className={`
+                        flex rounded-md gap-2 items-center px-4 py-2
+                        transition duration-100
+                        border border-gray-300 bg-branco hover:bg-branco
+                        cursor-pointer
+                    `}
+                title="Gerar uma tipificação a partir de um documento PDF"
+              >
+                <FileUp size={18} color="black" />
+                <p className="text-sm">Gerar por documento</p>
               </Button>
             )}
 
@@ -673,8 +692,15 @@ export default function Tipificacoes() {
                Nenhuma tipificação encontrada.
              </p>
            )}
-         </Masonry>
+           </Masonry>
+         </div>
+
+         <GerarTipificacaoDialog
+           open={dialogSugestao}
+           onOpenChange={setDialogSugestao}
+           tipificacoes={tipificacoes}
+           aoAplicar={() => void getTipificacoes()}
+         />
        </div>
-     </div>
-   );
- }
+    );
+  }
