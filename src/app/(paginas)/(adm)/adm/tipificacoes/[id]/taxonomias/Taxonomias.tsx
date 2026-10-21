@@ -30,7 +30,7 @@ import { adicionarRamoService, atualizarRamoService, buscarRamosDaTaxonomiaServi
 import { adicionarTaxonomiaService, atualizarTaxonomiaService, excluirTaxonomiaService } from "@/service/taxonomia";
 import { getTipificacaoPorIdService, getTipificacoesService } from "@/service/tipificacao";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowUpDown, Calendar, FileUp, Loader2, PencilLine, Plus, Trash, X } from "lucide-react";
+import { ArrowUpDown, Calendar, Loader2, PencilLine, Plus, Trash, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -45,7 +45,6 @@ import BotaoAdicionar from "@/components/botoes/BotaoAdicionar";
 import BotaoVoltar from "@/components/botoes/BotaoVoltar";
 import useUsuario from "@/data/hooks/useUsuario";
 import { IconDownload } from "@tabler/icons-react";
-import GerarTipificacaoDialog from "@/components/sugestao/GerarTipificacaoDialog";
 
 const schemaTaxonomia = z.object({
     id_tipificacao: z.string().min(1),
@@ -98,7 +97,6 @@ export default function Taxonomias({ id }: { id: string }) {
     const [openDialogRamo, setOpenDialogRamo] = useState<boolean>(false);
     const [openDialogIdRamoExcluir, setOpenDialogIdRamoExcluir] = useState<string | null | undefined>(null);
     const [openDialogIdRamoEditar, setOpenDialogIdRamoEditar] = useState<string | null | undefined>(null);
-    const [dialogSugestao, setDialogSugestao] = useState<boolean>(false);
 
     const [ramosDaTaxonomia, setRamosDaTaxonomia] = useState<Ramo[]>([]);
     const [ramosOriginais, setRamosOriginais] = useState<Ramo[]>([]);
@@ -306,11 +304,6 @@ export default function Taxonomias({ id }: { id: string }) {
         setRamosDaTaxonomia(ramos || []);
     }
 
-    const recarregarArvore = async () => {
-        await getTipificacaoPorId();
-        await buscarRamos(idTaxonomiaSelecionada.current);
-    }
-
     const filtrarTaxonomiasPorNome = () => {
         // Se for uma busca vazia, retorna todas as taxonomias
         if ((termoBusca.current?.trim() === "" || termoBusca.current === undefined)) {
@@ -396,25 +389,6 @@ export default function Taxonomias({ id }: { id: string }) {
                         <span>Baixar tipificação</span>
                         <IconDownload size={18} />
                     </Button>
-
-                    {
-                        usuario?.access_level === "ADMIN" && (
-                            <Button
-                                onClick={() => setDialogSugestao(true)}
-                                variant={"outline"}
-                                className={`
-                                    flex rounded-md gap-2 items-center px-4 py-2
-                                    transition duration-100
-                                    border border-gray-300 bg-white hover:bg-white
-                                    cursor-pointer
-                                `}
-                                title="Gerar taxonomias e ramos para esta tipificação a partir de um documento PDF"
-                            >
-                                <FileUp size={18} color="black" />
-                                <p className="text-sm">Enriquecer por documento</p>
-                            </Button>
-                        )
-                    }
 
                     {
                         usuario?.access_level === "ADMIN" && (
@@ -782,13 +756,6 @@ export default function Taxonomias({ id }: { id: string }) {
                     </Card>
                 </div>
             </div>
-
-            <GerarTipificacaoDialog
-                open={dialogSugestao}
-                onOpenChange={setDialogSugestao}
-                tipificacaoId={id}
-                aoAplicar={() => void recarregarArvore()}
-            />
         </div>
     );
 }

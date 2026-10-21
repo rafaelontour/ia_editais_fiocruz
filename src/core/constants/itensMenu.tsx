@@ -1,6 +1,7 @@
 import {
   Bot,
   Building,
+  ClipboardCheck,
   FilePen,
   Home,
   IdCard,
@@ -42,6 +43,11 @@ const itemsAdm = [
     title: "Tipificações",
     url: "/adm/tipificacoes",
     icon: Type,
+  },
+  {
+    title: "Sugestões",
+    url: "/adm/tipificacoes/sugestoes",
+    icon: ClipboardCheck,
   },
   {
     title: "Configurador",
@@ -95,6 +101,11 @@ const itemsAuditorAnalista = [
     title: "Tipificações",
     url: "/adm/tipificacoes",
     icon: Type,
+  },
+  {
+    title: "Sugestões",
+    url: "/adm/tipificacoes/sugestoes",
+    icon: ClipboardCheck,
   },
   {
     title: "Docs. Arquivados",

@@ -31,7 +31,15 @@ import {
   getAllDocumentGroupItemsService,
 } from "@/service/configurador";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Calendar, FileUp, Loader2, PencilLine, Plus, View } from "lucide-react";
+import {
+  Calendar,
+  ClipboardCheck,
+  FileUp,
+  Loader2,
+  PencilLine,
+  Plus,
+  View,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry from "react-masonry-css";
 import { toast } from "sonner";
@@ -46,7 +54,8 @@ import { useForm } from "react-hook-form";
 import { IconDownload, IconHierarchy2 } from "@tabler/icons-react";
 import Div from "@/components/Div";
 import useUsuario from "@/data/hooks/useUsuario";
-import GerarTipificacaoDialog from "@/components/sugestao/GerarTipificacaoDialog";
+import EnviarDocumentoSugestao from "@/components/sugestao/EnviarDocumentoSugestao";
+import { useRouter } from "next/navigation";
 
 const schemaTipificacao = z.object({
   nome: z.string().min(1, "O nome da tipificação é obrigatório"),
@@ -80,6 +89,7 @@ export default function Tipificacoes() {
   const termoBusca = useRef<string>("");
 
   const { usuario } = useUsuario();
+  const router = useRouter();
 
   const [tipificacoes, setTipificacoes] = useState<Tipificacao[]>([]);
   const [fontes, setFontes] = useState<Fonte[]>([]);
@@ -94,7 +104,9 @@ export default function Tipificacoes() {
   >([]);
 
   const [dialogTipificacao, setDialogTipificacao] = useState(false);
-  const [dialogSugestao, setDialogSugestao] = useState(false);
+  const [etapaDialog, setEtapaDialog] = useState<
+    "escolha" | "manual" | "documento"
+  >("escolha");
   const [idDialogEditar, setIdDialogEditar] = useState<string | null>("");
 
   const [fontesSelecionadas, setFontesSelecionadas] = useState<Fonte[]>([]);
@@ -368,27 +380,28 @@ export default function Tipificacoes() {
               </Button>
             )}
 
-            {usuario?.access_level === "ADMIN" && (
-              <Button
-                onClick={() => setDialogSugestao(true)}
-                variant={"outline"}
-                className={`
+            <Button
+              onClick={() => router.push("/adm/tipificacoes/sugestoes")}
+              variant={"outline"}
+              className={`
                         flex rounded-md gap-2 items-center px-4 py-2
                         transition duration-100
                         border border-gray-300 bg-branco hover:bg-branco
                         cursor-pointer
                     `}
-                title="Gerar uma tipificação a partir de um documento PDF"
-              >
-                <FileUp size={18} color="black" />
-                <p className="text-sm">Gerar por documento</p>
-              </Button>
-            )}
+              title="Ambiente de aprovação das sugestões geradas a partir de documentos"
+            >
+              <ClipboardCheck size={18} color="black" />
+              <p className="text-sm">Aprovar sugestões</p>
+            </Button>
 
             {usuario?.access_level === "ADMIN" && (
               <Dialog
                 open={dialogTipificacao}
-                onOpenChange={setDialogTipificacao}
+                onOpenChange={(aberto) => {
+                  setDialogTipificacao(aberto);
+                  if (aberto) setEtapaDialog("escolha");
+                }}
               >
                 <DialogTrigger asChild>
                   <Button
@@ -409,32 +422,98 @@ export default function Tipificacoes() {
                 <DialogContent onCloseAutoFocus={limparCampos}>
                   <DialogHeader>
                     <DialogTitle className="text-3xl font-bold">
-                      Adicionar tipificação
+                      {etapaDialog === "documento"
+                        ? "Novo documento"
+                        : "Adicionar tipificação"}
                     </DialogTitle>
                     <DialogDescription className="text-md pb-4">
-                      Preencha os campos abaixo para adicionar uma nova
-                      tipificação
+                      {etapaDialog === "manual"
+                        ? "Preencha os campos abaixo para adicionar uma nova tipificação"
+                        : etapaDialog === "documento"
+                          ? "Envie um documento para gerar as sugestões de tipificação, taxonomias e ramos"
+                          : "Escolha como a tipificação será criada"}
                     </DialogDescription>
                   </DialogHeader>
 
-                  <Formulario
-                    fontes={fontes}
-                    fontesSelecionadas={fontesSelecionadas}
-                    setFontesSelecionadas={setFontesSelecionadas}
-                    control={control}
-                    setValue={setValue}
-                    register={register}
-                    errors={errors}
-                    documentGroups={documentGroups}
-                    documentGroupItems={documentGroupItems}
-                  />
+                  {etapaDialog === "escolha" && (
+                    <div className="flex flex-col gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setEtapaDialog("manual")}
+                        className="flex items-start gap-3 rounded-md border-2 border-gray-300 bg-white p-4 text-left transition duration-100 hover:border-verde hover:bg-verde/5 cursor-pointer"
+                      >
+                        <PencilLine size={22} className="text-verde mt-1" />
 
-                  <DialogFooter>
-                    <DialogClose>
-                      <BotaoCancelar />
-                    </DialogClose>
-                    <BotaoSalvar onClick={handleSubmit(adicionarTipificacao)} />
-                  </DialogFooter>
+                        <span className="flex flex-col gap-1">
+                          <span className="font-semibold">Gerar manualmente</span>
+                          <span className="text-sm text-gray-500">
+                            Cadastre a tipificação, taxonomias e ramos no
+                            formulário do sistema.
+                          </span>
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setEtapaDialog("documento")}
+                        className="flex items-start gap-3 rounded-md border-2 border-gray-300 bg-white p-4 text-left transition duration-100 hover:border-verde hover:bg-verde/5 cursor-pointer"
+                      >
+                        <FileUp size={22} className="text-verde mt-1" />
+
+                        <span className="flex flex-col gap-1">
+                          <span className="font-semibold">
+                            Gerar a partir de um documento
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            Envie um PDF e aprove as sugestões geradas na tela
+                            de Sugestões.
+                          </span>
+                        </span>
+                      </button>
+
+                      <DialogFooter>
+                        <DialogClose>
+                          <BotaoCancelar />
+                        </DialogClose>
+                      </DialogFooter>
+                    </div>
+                  )}
+
+                  {etapaDialog === "manual" && (
+                    <>
+                      <Formulario
+                        fontes={fontes}
+                        fontesSelecionadas={fontesSelecionadas}
+                        setFontesSelecionadas={setFontesSelecionadas}
+                        control={control}
+                        setValue={setValue}
+                        register={register}
+                        errors={errors}
+                        documentGroups={documentGroups}
+                        documentGroupItems={documentGroupItems}
+                      />
+
+                      <DialogFooter>
+                        <DialogClose>
+                          <BotaoCancelar />
+                        </DialogClose>
+                        <BotaoSalvar
+                          onClick={handleSubmit(adicionarTipificacao)}
+                        />
+                      </DialogFooter>
+                    </>
+                  )}
+
+                  {etapaDialog === "documento" && (
+                    <EnviarDocumentoSugestao
+                      tipificacoes={tipificacoes}
+                      aoCancelar={() => setEtapaDialog("escolha")}
+                      aoEnviar={() => {
+                        setDialogTipificacao(false);
+                        router.push("/adm/tipificacoes/sugestoes");
+                      }}
+                    />
+                  )}
                 </DialogContent>
               </Dialog>
             )}
@@ -692,15 +771,8 @@ export default function Tipificacoes() {
                Nenhuma tipificação encontrada.
              </p>
            )}
-           </Masonry>
-         </div>
-
-         <GerarTipificacaoDialog
-           open={dialogSugestao}
-           onOpenChange={setDialogSugestao}
-           tipificacoes={tipificacoes}
-           aoAplicar={() => void getTipificacoes()}
-         />
-       </div>
+            </Masonry>
+          </div>
+        </div>
     );
   }

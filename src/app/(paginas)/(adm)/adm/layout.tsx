@@ -48,6 +48,7 @@ export default function RootLayout({
     "/adm/editais": "Meus documentos",
     "/adm/assistente": "Assistente IA",
     "/adm/tipificacoes": "Tipificações",
+    "/adm/tipificacoes/sugestoes": "Sugestões",
     "/adm/taxonomias": "Taxonomias",
     "/adm/fontes": "Fontes",
     "/adm/unidades": "Unidades",
