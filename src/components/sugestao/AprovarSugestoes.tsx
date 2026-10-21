@@ -60,6 +60,19 @@ function classesStatusItem(status: StatusItemSugestao) {
     return "bg-white text-gray-600 border-gray-300";
 }
 
+function traduzirErro(mensagem: string) {
+    if (mensagem.includes("Parent item must be confirmed"))
+        return "A sugestão pai precisa ser aprovada antes desta.";
+    if (mensagem.includes("Parent entity no longer exists"))
+        return "A tipificação ou taxonomia de origem não existe mais.";
+    if (mensagem.includes("Target entity changed"))
+        return "O item foi alterado desde a sugestão. Revise e tente novamente.";
+    if (mensagem.includes("already"))
+        return "Esta sugestão já foi aplicada.";
+
+    return mensagem;
+}
+
 type AprovarSugestoesProps = {
     sessionId: string;
     aoAplicar?: () => void;
@@ -193,7 +206,7 @@ export default function AprovarSugestoes({
         } catch (erroConfirmacao) {
             toast.error(
                 erroConfirmacao instanceof Error
-                    ? erroConfirmacao.message
+                    ? traduzirErro(erroConfirmacao.message)
                     : "Erro ao aplicar a sugestão.",
             );
             return false;
@@ -224,37 +237,68 @@ export default function AprovarSugestoes({
         if (processandoLote || pendentes.length === 0) return;
 
         setProcessandoLote(true);
-        const confirmados = new Set(
-            itens
-                .filter((item) => item.status === "confirmed")
-                .map((item) => item.id),
-        );
 
+        const statusPorId = new Map<string, StatusItemSugestao | "failed">(
+            itens.map((item) => [item.id, item.status]),
+        );
+        const erros: string[] = [];
+
+        let aplicadas = 0;
         let restantes = [...pendentes];
 
         while (restantes.length > 0) {
-            const proximo = restantes.find(
-                (item) =>
-                    !item.parent_item_id ||
-                    confirmados.has(item.parent_item_id),
-            );
+            const proximo = restantes.find((item) => {
+                if (!item.parent_item_id) return true;
 
-            if (!proximo) {
-                toast.error(
-                    "Há sugestões que dependem de itens pai que ainda não foram aprovados.",
-                );
-                break;
-            }
+                return statusPorId.get(item.parent_item_id) === "confirmed";
+            });
 
-            const aplicado = await confirmar(proximo);
-            if (!aplicado) break;
+            if (!proximo) break;
 
-            confirmados.add(proximo.id);
             restantes = restantes.filter((item) => item.id !== proximo.id);
+
+            try {
+                await confirmarItemSugestaoService(sessionId, proximo.id, {
+                    title: proximo.proposed_title,
+                    description: proximo.proposed_description ?? "",
+                });
+
+                statusPorId.set(proximo.id, "confirmed");
+                aplicadas += 1;
+            } catch (erroAplicacao) {
+                statusPorId.set(proximo.id, "failed");
+                erros.push(
+                    erroAplicacao instanceof Error
+                        ? traduzirErro(erroAplicacao.message)
+                        : "Erro ao aplicar a sugestão.",
+                );
+            }
+        }
+
+        await carregar(false);
+
+        const ignoradas = restantes.length;
+
+        if (aplicadas > 0 && erros.length === 0 && ignoradas === 0) {
+            toast.success(`${aplicadas} sugestões aplicadas.`);
+        } else if (aplicadas > 0) {
+            toast.warning(
+                `${aplicadas} aplicadas e ${
+                    erros.length + ignoradas
+                } não aplicadas.`,
+                {
+                    description:
+                        erros[0] ??
+                        "As sugestões ignoradas dependem de um item pai que não foi aprovado.",
+                },
+            );
+        } else if (erros.length > 0) {
+            toast.error("Nenhuma sugestão foi aplicada.", {
+                description: erros[0],
+            });
         }
 
         setProcessandoLote(false);
-        await carregar(false);
     }
 
     async function descartarTodas() {
