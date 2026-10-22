@@ -185,6 +185,15 @@ export default function Sugestoes() {
                                                 : `Enriquecer: ${sessao.target_typification_name ?? "—"}`}
                                         </span>
 
+                                        {sessao.document_group_name && (
+                                            <span className="text-sm text-gray-500">
+                                                Grupo: {sessao.document_group_name}
+                                                {" · "}
+                                                Tipo:{" "}
+                                                {sessao.document_group_item_name ?? "—"}
+                                            </span>
+                                        )}
+
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <span
                                                 className={`rounded-sm border px-2 py-0.5 text-xs ${classesStatus(sessao.status)}`}

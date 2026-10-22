@@ -365,34 +365,35 @@ export default function Tipificacoes() {
             {tipificacoes.length > 0 && (
               <Button
                 onClick={() => baixarTipificacao()}
-                variant={"destructive"}
+                variant={"outline"}
                 style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
                 className={`
                                         flex rounded-md gap-2 items-center px-4 py-2
                                         transition duration-100
-                                        bg-vermelho text-white
+                                        border border-gray-300 bg-branco hover:bg-branco
                                         cursor-pointer
                                     `}
                 title="Download de um PDF contendo todas tipificações com suas respectivas taxonomias e ramos"
               >
                 <span>Baixar todas tipificações</span>
-                <IconDownload size={18} />
+                <IconDownload size={18} color="black" />
               </Button>
             )}
 
             <Button
               onClick={() => router.push("/adm/tipificacoes/sugestoes")}
-              variant={"outline"}
+              variant={"destructive"}
+              style={{ boxShadow: "0 0 3px rgba(0, 0 ,0,.5)" }}
               className={`
                         flex rounded-md gap-2 items-center px-4 py-2
                         transition duration-100
-                        border border-gray-300 bg-branco hover:bg-branco
-                        cursor-pointer
+                        bg-vermelho text-white
+                        hover:cursor-pointer
                     `}
               title="Ambiente de aprovação das sugestões geradas a partir de documentos"
             >
-              <ClipboardCheck size={18} color="black" />
-              <p className="text-sm">Aprovar sugestões</p>
+              <ClipboardCheck size={18} />
+              <p className="text-sm text-white">Aprovar sugestões</p>
             </Button>
 
             {usuario?.access_level === "ADMIN" && (

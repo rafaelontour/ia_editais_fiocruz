@@ -26,11 +26,21 @@ async function extrairDetalhe(
 async function criarSessaoSugestaoService(
   arquivo: File,
   tipificacaoId?: string,
+  documento?: {
+    groupId?: string;
+    groupItemId?: string;
+  },
 ): Promise<SessaoSugestaoDetalhe> {
   const dados = new FormData();
   dados.append("file", arquivo);
   if (tipificacaoId) {
     dados.append("typification_id", tipificacaoId);
+  }
+  if (documento?.groupId) {
+    dados.append("document_group_id", documento.groupId);
+  }
+  if (documento?.groupItemId) {
+    dados.append("document_group_item_id", documento.groupItemId);
   }
 
   const response = await fetch(`${urlBase}/tree-suggestion`, {

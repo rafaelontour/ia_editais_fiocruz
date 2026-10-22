@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Layers3,
     Loader2,
@@ -20,7 +20,15 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import type { Tipificacao } from "@/core";
+import type {
+    DocumentGroup,
+    DocumentGroupItem,
+} from "@/core/configurador/GrupoDocumento";
 import type { SessaoSugestaoDetalhe } from "@/core/sugestaoTipificacao";
+import {
+    getDocumentGroupItemsService,
+    getDocumentGroupsService,
+} from "@/service/configurador";
 import { criarSessaoSugestaoService } from "@/service/sugestaoTipificacao";
 
 type ModoSugestao = "create" | "enrich";
@@ -37,7 +45,7 @@ const OPCOES: OpcaoModo[] = [
         valor: "create",
         titulo: "Criar nova tipificação",
         descricao:
-            "Gera uma tipificação nova, com taxonomias e ramos, a partir do documento.",
+            "Gera uma tipificação nova, com taxonomias e ramos, a partir do documento. Informe o grupo e o tipo do documento.",
         icone: Layers3,
     },
     {
@@ -62,9 +70,46 @@ export default function EnviarDocumentoSugestao({
 }: EnviarDocumentoSugestaoProps) {
     const [modo, setModo] = useState<ModoSugestao>("create");
     const [tipificacaoAlvo, setTipificacaoAlvo] = useState("");
+    const [grupoSelecionado, setGrupoSelecionado] = useState("");
+    const [tipoSelecionado, setTipoSelecionado] = useState("");
+    const [grupos, setGrupos] = useState<DocumentGroup[]>([]);
+    const [tipos, setTipos] = useState<DocumentGroupItem[]>([]);
+    const [carregandoTipos, setCarregandoTipos] = useState(false);
     const [arquivo, setArquivo] = useState<File | null>(null);
     const [enviando, setEnviando] = useState(false);
     const [erro, setErro] = useState("");
+
+    useEffect(() => {
+        async function carregarGrupos() {
+            const dados = await getDocumentGroupsService();
+            setGrupos(dados ?? []);
+        }
+
+        void carregarGrupos();
+    }, []);
+
+    useEffect(() => {
+        if (!grupoSelecionado) {
+            setTipos([]);
+            return;
+        }
+
+        let cancelado = false;
+
+        async function carregarTipos() {
+            setCarregandoTipos(true);
+            const dados = await getDocumentGroupItemsService(grupoSelecionado);
+            if (cancelado) return;
+            setTipos(dados ?? []);
+            setCarregandoTipos(false);
+        }
+
+        void carregarTipos();
+
+        return () => {
+            cancelado = true;
+        };
+    }, [grupoSelecionado]);
 
     async function enviar() {
         if (enviando) return;
@@ -88,6 +133,18 @@ export default function EnviarDocumentoSugestao({
             return;
         }
 
+        if (modo === "create") {
+            if (!grupoSelecionado) {
+                setErro("Selecione o grupo do documento.");
+                return;
+            }
+
+            if (!tipoSelecionado) {
+                setErro("Selecione o tipo do documento.");
+                return;
+            }
+        }
+
         setEnviando(true);
         setErro("");
 
@@ -95,6 +152,12 @@ export default function EnviarDocumentoSugestao({
             const sessao = await criarSessaoSugestaoService(
                 arquivo,
                 modo === "enrich" ? tipificacaoAlvo : undefined,
+                modo === "create"
+                    ? {
+                          groupId: grupoSelecionado,
+                          groupItemId: tipoSelecionado,
+                      }
+                    : undefined,
             );
 
             toast.success("Documento enviado!", {
@@ -153,6 +216,72 @@ export default function EnviarDocumentoSugestao({
                     })}
                 </div>
             </div>
+
+            {modo === "create" && (
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                        <Label className="text-lg">Grupo do documento</Label>
+
+                        <Select
+                            value={grupoSelecionado}
+                            onValueChange={(valor) => {
+                                setGrupoSelecionado(valor);
+                                setTipoSelecionado("");
+                            }}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Selecione o grupo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {grupos.map((grupo) => (
+                                    <SelectItem key={grupo.id} value={grupo.id}>
+                                        {grupo.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {grupos.length === 0 && (
+                            <span className="text-sm text-gray-500 italic">
+                                Nenhum grupo de documento cadastrado.
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Label className="text-lg">Tipo do documento</Label>
+
+                        <Select
+                            value={tipoSelecionado}
+                            onValueChange={setTipoSelecionado}
+                            disabled={!grupoSelecionado || carregandoTipos}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue
+                                    placeholder={
+                                        !grupoSelecionado
+                                            ? "Selecione o grupo antes"
+                                            : "Selecione o tipo"
+                                    }
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {tipos.map((tipo) => (
+                                    <SelectItem key={tipo.id} value={tipo.id}>
+                                        {tipo.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {grupoSelecionado && tipos.length === 0 && (
+                            <span className="text-sm text-gray-500 italic">
+                                O grupo selecionado não possui tipos cadastrados.
+                            </span>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {modo === "enrich" && (
                 <div className="flex flex-col gap-2">

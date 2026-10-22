@@ -50,6 +50,10 @@ export interface SessaoSugestao {
   status: StatusSessaoSugestao;
   target_typification_id?: string | null;
   target_typification_name?: string | null;
+  document_group_id?: string | null;
+  document_group_name?: string | null;
+  document_group_item_id?: string | null;
+  document_group_item_name?: string | null;
   original_filename: string;
   file_path: string;
   page_count?: number | null;

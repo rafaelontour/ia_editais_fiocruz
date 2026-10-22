@@ -544,6 +544,13 @@ export default function AprovarSugestoes({
                                 : `Tipificação: ${detalhe.target_typification_name ?? "—"}`}
                             {detalhe.page_count ? ` • ${detalhe.page_count} páginas` : ""}
                         </span>
+
+                        {detalhe.document_group_name && (
+                            <span className="text-sm text-gray-500">
+                                Grupo: {detalhe.document_group_name} • Tipo:{" "}
+                                {detalhe.document_group_item_name ?? "—"}
+                            </span>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">
