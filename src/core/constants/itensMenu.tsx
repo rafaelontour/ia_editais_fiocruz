@@ -45,11 +45,6 @@ const itemsAdm = [
     icon: Type,
   },
   {
-    title: "Sugestões",
-    url: "/adm/tipificacoes/sugestoes",
-    icon: ClipboardCheck,
-  },
-  {
     title: "Configurador",
     url: "/adm/configurador",
     icon: Settings,
@@ -101,11 +96,6 @@ const itemsAuditorAnalista = [
     title: "Tipificações",
     url: "/adm/tipificacoes",
     icon: Type,
-  },
-  {
-    title: "Sugestões",
-    url: "/adm/tipificacoes/sugestoes",
-    icon: ClipboardCheck,
   },
   {
     title: "Docs. Arquivados",
