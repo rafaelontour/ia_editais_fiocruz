@@ -451,7 +451,7 @@ export default function Editais() {
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Projeto:</label>
+                  <label className="text-sm font-medium">Processo:</label>
           <select
             className="border rounded-md px-2 py-1 text-sm"
             value={selectedProjectFilter}

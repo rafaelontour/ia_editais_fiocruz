@@ -273,7 +273,7 @@ export default function ProjetoInternoPage() {
     <div className="flex flex-col gap-5">
       {carregando ? (
         <div className="flex justify-center items-center gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <p className="animate-pulse">Carregando projeto...</p>
+            <p className="animate-pulse">Carregando processo...</p>
           <Loader2 className="animate-spin" />
         </div>
       ) : (
